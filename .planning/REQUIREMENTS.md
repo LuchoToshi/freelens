@@ -9,7 +9,7 @@
 
 - [ ] **CALC-01**: User can enter current balance as a currency amount
 - [ ] **CALC-02**: User can set estimated tax rate via slider (range: 15–50%)
-- [ ] **CALC-03**: User can set desired runway in months
+- [ ] **CALC-03**: User can set desired runway in months and enter monthly expenses (both inputs required for runway buffer calculation)
 - [ ] **CALC-04**: Calculator updates output reactively on every input change (no submit button)
 - [ ] **CALC-05**: Calculator outputs a single "safe to spend" number as the primary result
 - [ ] **CALC-06**: Calculator displays full math breakdown: Balance → Tax Reserve → Runway Buffer → Safe to Spend
