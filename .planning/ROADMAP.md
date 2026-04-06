@@ -12,7 +12,7 @@ Three phases to ship a trustworthy calculator. First, get the math right — bui
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Calculation Engine** - Pure function + reactive inputs + single output on screen
+- [x] **Phase 1: Calculation Engine** - Pure function + reactive inputs + single output on screen
 - [ ] **Phase 2: Trust Layer** - Guidance copy, breakdown labels, and honest limits callout
 - [ ] **Phase 3: Production Polish** - Input validation, mobile responsiveness, formatting, instant load
 
@@ -26,7 +26,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. User can type a balance, adjust a tax rate slider, and set runway months — and see "safe to spend" update on every keystroke without hitting submit
   2. The full math breakdown is visible: Balance, Tax Reserve, Runway Buffer, Safe to Spend — in that order
   3. When tax reserve plus runway buffer exceeds the balance, safe to spend shows $0 with a message explaining why — not a negative number
-**Plans**: TBD
+**Plans**: 3 plans
+  - [x] 01-01-PLAN.md — Scaffold Vite + React + TS + Tailwind v4
+  - [x] 01-02-PLAN.md — calculate() + Calculator component (CALC-01..07)
+  - [x] 01-03-PLAN.md — Human verify in browser
 **UI hint**: yes
 
 ### Phase 2: Trust Layer
@@ -59,6 +62,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Calculation Engine | 0/? | Not started | - |
+| 1. Calculation Engine | 3/3 | ✓ Complete | 2026-04-06 |
 | 2. Trust Layer | 0/? | Not started | - |
 | 3. Production Polish | 0/? | Not started | - |
