@@ -136,14 +136,21 @@ function BreakdownRow({
   label,
   value,
   computed,
+  sublabel,
 }: {
   label: string;
   value: string;
   computed: boolean;
+  sublabel?: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between">
-      <span className="text-[14px] leading-[1.5] text-[#3F3F46]">{label}</span>
+    <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-1">
+        <span className="text-[14px] leading-[1.5] text-[#3F3F46]">{label}</span>
+        {sublabel && (
+          <span className="text-[13px] leading-[1.4] text-[#A1A1AA]">{sublabel}</span>
+        )}
+      </div>
       <span
         className={`text-[14px] leading-[1.5] ${computed ? 'text-[#3F3F46]' : 'text-[#A1A1AA]'}`}
       >
