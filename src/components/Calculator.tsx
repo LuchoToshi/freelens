@@ -139,6 +139,9 @@ export default function Calculator() {
               Your tax reserve and runway buffer use up your full balance. Nothing left to spend freely.
             </p>
           )}
+          <p className="mt-4 text-[16px] leading-[1.5] text-[#3F3F46]">
+            This doesn't account for upcoming large expenses or invoices not yet in your balance.
+          </p>
         </div>
       </div>
     </div>
