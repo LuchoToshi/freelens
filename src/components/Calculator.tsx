@@ -4,12 +4,12 @@ import { formatCurrency } from '../lib/format';
 
 export default function Calculator() {
   const [balanceStr, setBalanceStr] = useState('');
-  const [taxRatePercent, setTaxRatePercent] = useState(30);
+  const [taxRatePercent, setTaxRatePercent] = useState(37);
   const [monthlyExpensesStr, setMonthlyExpensesStr] = useState('');
   const [runwayMonths, setRunwayMonths] = useState(3);
 
-  const balance = parseFloat(balanceStr) || 0;
-  const monthlyExpenses = parseFloat(monthlyExpensesStr) || 0;
+  const balance = parseFloat(balanceStr.replace(',', '.')) || 0;
+  const monthlyExpenses = parseFloat(monthlyExpensesStr.replace(',', '.')) || 0;
 
   const result = calculate({ balance, taxRatePercent, monthlyExpenses, runwayMonths });
 
@@ -28,31 +28,34 @@ export default function Calculator() {
     <div className="mx-auto max-w-[480px] px-8 pt-16 pb-12">
       <div className="bg-[#F4F4F5] rounded-lg p-6">
         <h1 className="text-[20px] font-semibold leading-[1.2] text-[#18181B]">
-          What's safe to spend?
+          Wat kan ik veilig uitgeven?
         </h1>
 
         <div className="mt-6 flex flex-col gap-4">
           {/* Balance */}
           <div className="flex flex-col gap-2">
             <label htmlFor="balance" className="text-[14px] leading-[1.5] text-[#3F3F46]">
-              Current balance
+              Huidig saldo
             </label>
-            <input
-              id="balance"
-              type="text"
-              inputMode="decimal"
-              placeholder="0"
-              value={balanceStr}
-              onChange={(e) => setBalanceStr(e.target.value)}
-              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[16px] text-[#A1A1AA] select-none">€</span>
+              <input
+                id="balance"
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                value={balanceStr}
+                onChange={(e) => setBalanceStr(e.target.value)}
+                className="bg-white border border-[#E4E4E7] rounded-md pl-8 pr-4 py-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
+              />
+            </div>
           </div>
 
           {/* Tax rate slider */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <label htmlFor="taxRate" className="text-[14px] leading-[1.5] text-[#3F3F46]">
-                Tax rate
+                Belastingtarief (IB)
               </label>
               <span className="text-[14px] leading-[1.5] text-[#18181B] font-medium">
                 {taxRatePercent}%
@@ -69,30 +72,33 @@ export default function Calculator() {
               style={{ ['--range-progress' as string]: `${sliderProgress}%` }}
             />
             <p className="mt-1 text-[16px] leading-[1.5] text-[#3F3F46]">
-              Typical Dutch ZZP'ers: 25–35% after deductions
+              Typisch voor ZZP'ers: 25–45% na aftrekposten (MKB-winstvrijstelling, zelfstandigenaftrek)
             </p>
           </div>
 
           {/* Monthly expenses */}
           <div className="flex flex-col gap-2">
             <label htmlFor="monthlyExpenses" className="text-[14px] leading-[1.5] text-[#3F3F46]">
-              Monthly expenses
+              Maandelijkse vaste lasten
             </label>
-            <input
-              id="monthlyExpenses"
-              type="text"
-              inputMode="decimal"
-              placeholder="0"
-              value={monthlyExpensesStr}
-              onChange={(e) => setMonthlyExpensesStr(e.target.value)}
-              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[16px] text-[#A1A1AA] select-none">€</span>
+              <input
+                id="monthlyExpenses"
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                value={monthlyExpensesStr}
+                onChange={(e) => setMonthlyExpensesStr(e.target.value)}
+                className="bg-white border border-[#E4E4E7] rounded-md pl-8 pr-4 py-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
+              />
+            </div>
           </div>
 
           {/* Runway months */}
           <div className="flex flex-col gap-2">
             <label htmlFor="runwayMonths" className="text-[14px] leading-[1.5] text-[#3F3F46]">
-              Runway (months)
+              Buffer (maanden)
             </label>
             <input
               id="runwayMonths"
@@ -109,22 +115,22 @@ export default function Calculator() {
 
         {/* Breakdown */}
         <div className="mt-6 flex flex-col gap-2">
-          <BreakdownRow label="Balance" value={displayBalance} computed={hasBalance} />
+          <BreakdownRow label="Saldo" value={displayBalance} computed={hasBalance} />
           <BreakdownRow
-            label="Tax reserve"
+            label="Belastingreserve"
             value={displayTaxReserve}
             computed={hasBalance}
-            sublabel="Set aside in case your tax bill hits"
+            sublabel="Opzij voor de inkomstenbelasting"
           />
           <BreakdownRow
-            label="Runway buffer"
+            label="Maandenbuffer"
             value={displayRunwayBuffer}
             computed={hasExpenses}
-            sublabel={`Covers ${runwayMonths} months if work goes quiet`}
+            sublabel={`Dekt ${runwayMonths} maanden als opdrachten uitblijven`}
           />
 
           <div className="mt-2 flex items-baseline justify-between">
-            <span className="text-[14px] leading-[1.5] text-[#3F3F46]">Safe to spend</span>
+            <span className="text-[14px] leading-[1.5] text-[#3F3F46]">Veilig te besteden</span>
             <span
               className={`text-[36px] font-semibold leading-[1.1] ${
                 allInputsValid ? 'text-[#18181B]' : 'text-[#A1A1AA]'
@@ -136,11 +142,11 @@ export default function Calculator() {
 
           {allInputsValid && result.isOverReserved && (
             <p className="mt-2 text-[14px] leading-[1.5] text-[#3F3F46]">
-              Your tax reserve and runway buffer use up your full balance. Nothing left to spend freely.
+              Je belastingreserve en maandenbuffer verbruiken je volledige saldo. Niets over om vrij uit te geven.
             </p>
           )}
           <p className="mt-4 text-[16px] leading-[1.5] text-[#3F3F46]">
-            This doesn't account for upcoming large expenses or invoices not yet in your balance.
+            Dit houdt geen rekening met grote aankomende uitgaven of facturen die nog niet op je rekening staan.
           </p>
         </div>
       </div>

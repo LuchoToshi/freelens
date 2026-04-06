@@ -1,9 +1,9 @@
-const usd = new Intl.NumberFormat('en-US', {
+const eur = new Intl.NumberFormat('nl-NL', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'EUR',
   maximumFractionDigits: 0,
 });
 
 export function formatCurrency(value: number): string {
-  return usd.format(value);
+  return eur.format(value);
 }
