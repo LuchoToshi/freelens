@@ -13,7 +13,7 @@ Three phases to ship a trustworthy calculator. First, get the math right — bui
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Calculation Engine** - Pure function + reactive inputs + single output on screen
-- [ ] **Phase 2: Trust Layer** - Guidance copy, breakdown labels, and honest limits callout
+- [x] **Phase 2: Trust Layer** - Guidance copy, breakdown labels, and honest limits callout (completed 2026-04-06)
 - [ ] **Phase 3: Production Polish** - Input validation, mobile responsiveness, formatting, instant load
 
 ## Phase Details
@@ -40,7 +40,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. The tax rate slider shows inline guidance ("Most US freelancers: 30–40% total") so users know what rate to enter
   2. Every breakdown line has a plain-English label explaining what it is and what it protects against — no financial jargon
   3. A visible callout tells the user what the calculator does not account for (large upcoming expenses, uninvoiced income)
-**Plans**: TBD
+**Plans**: 1 plan
+  - [x] 02-01-PLAN.md — Trust Layer copy: tax guidance, breakdown sublabels, limits callout (TRUST-01..03)
 **UI hint**: yes
 
 ### Phase 3: Production Polish
@@ -63,5 +64,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Calculation Engine | 3/3 | ✓ Complete | 2026-04-06 |
-| 2. Trust Layer | 0/? | Not started | - |
+| 2. Trust Layer | 1/1 | Complete   | 2026-04-06 |
 | 3. Production Polish | 0/? | Not started | - |

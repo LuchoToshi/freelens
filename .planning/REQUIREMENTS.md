@@ -17,9 +17,9 @@
 
 ### Trust Layer
 
-- [ ] **TRUST-01**: Tax rate slider includes inline guidance: "Most US freelancers: 30–40% total (income tax + 15.3% self-employment tax)"
-- [ ] **TRUST-02**: Each breakdown line has a plain-English label explaining what it represents and what it protects against
-- [ ] **TRUST-03**: Calculator displays an honest limits callout: "This doesn't account for upcoming large expenses or invoices not yet in your balance"
+- [x] **TRUST-01**: Tax rate slider includes inline guidance: "Most US freelancers: 30–40% total (income tax + 15.3% self-employment tax)"
+- [x] **TRUST-02**: Each breakdown line has a plain-English label explaining what it represents and what it protects against
+- [x] **TRUST-03**: Calculator displays an honest limits callout: "This doesn't account for upcoming large expenses or invoices not yet in your balance"
 
 ### UX
 
@@ -69,9 +69,9 @@
 | CALC-05 | Phase 1 | Pending |
 | CALC-06 | Phase 1 | Pending |
 | CALC-07 | Phase 1 | Pending |
-| TRUST-01 | Phase 2 | Pending |
-| TRUST-02 | Phase 2 | Pending |
-| TRUST-03 | Phase 2 | Pending |
+| TRUST-01 | Phase 2 | Complete |
+| TRUST-02 | Phase 2 | Complete |
+| TRUST-03 | Phase 2 | Complete |
 | UX-01 | Phase 3 | Pending |
 | UX-02 | Phase 3 | Pending |
 | UX-03 | Phase 3 | Pending |
