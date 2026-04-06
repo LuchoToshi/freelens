@@ -68,6 +68,9 @@ export default function Calculator() {
               onChange={(e) => setTaxRatePercent(Number(e.target.value))}
               style={{ ['--range-progress' as string]: `${sliderProgress}%` }}
             />
+            <p className="mt-1 text-[16px] leading-[1.5] text-[#3F3F46]">
+              Typical Dutch ZZP'ers: 25–35% after deductions
+            </p>
           </div>
 
           {/* Monthly expenses */}
@@ -107,8 +110,18 @@ export default function Calculator() {
         {/* Breakdown */}
         <div className="mt-6 flex flex-col gap-2">
           <BreakdownRow label="Balance" value={displayBalance} computed={hasBalance} />
-          <BreakdownRow label="Tax reserve" value={displayTaxReserve} computed={hasBalance} />
-          <BreakdownRow label="Runway buffer" value={displayRunwayBuffer} computed={hasExpenses} />
+          <BreakdownRow
+            label="Tax reserve"
+            value={displayTaxReserve}
+            computed={hasBalance}
+            sublabel="Set aside in case your tax bill hits"
+          />
+          <BreakdownRow
+            label="Runway buffer"
+            value={displayRunwayBuffer}
+            computed={hasExpenses}
+            sublabel={`Covers ${runwayMonths} months if work goes quiet`}
+          />
 
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-[14px] leading-[1.5] text-[#3F3F46]">Safe to spend</span>
