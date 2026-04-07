@@ -326,12 +326,13 @@ Step 2.6: SKIPPED — no external dependencies. All changes are pure TypeScript/
 | A1 | `text-red-500` is available in Tailwind v4 default palette | Common Pitfalls, Code Examples | Error text color won't apply — fallback to `style={{ color: '#EF4444' }}` |
 | A2 | Blur-triggered validation pattern with `touched` flags is the standard React approach | Architecture Patterns | Negligible — this is the established React controlled-input pattern |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Soft warning color for 0% tax**
    - What we know: CONTEXT.md says "calm, factual, no alarm" consistent with D-08
    - What's unclear: Should the soft warning use zinc-400 (same as muted sublabels) or amber for visual distinction from normal sublabels?
    - Recommendation: Use zinc-400 (`#A1A1AA`) — matches existing palette, stays calm. If the planner wants visual distinction, amber-600 is a reasonable alternative.
+   - **RESOLVED:** Use zinc-400 (`#A1A1AA`) per Plan 03-01 Task 2 — matches existing palette, stays calm, consistent with D-08 tone.
 
 ## Sources
 
