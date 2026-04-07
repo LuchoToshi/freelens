@@ -6,7 +6,7 @@ export default function Calculator() {
   const [balanceStr, setBalanceStr] = useState('');
   const [taxRatePercent, setTaxRatePercent] = useState(37);
   const [monthlyExpensesStr, setMonthlyExpensesStr] = useState('');
-  const [runwayMonths, setRunwayMonths] = useState(3);
+  const [runwayStr, setRunwayStr] = useState('3');
 
   const [touched, setTouched] = useState({
     balance: false,
@@ -15,6 +15,7 @@ export default function Calculator() {
 
   const balance = parseFloat(balanceStr.replace(',', '.')) || 0;
   const monthlyExpenses = parseFloat(monthlyExpensesStr.replace(',', '.')) || 0;
+  const runwayMonths = parseInt(runwayStr, 10) || 0;
 
   const errors = {
     balance: touched.balance && balance < 0 ? 'Vul een positief saldo in' : null,
@@ -124,15 +125,13 @@ export default function Calculator() {
             </label>
             <input
               id="runwayMonths"
-              type="number"
-              min={1}
-              max={24}
-              step={1}
-              value={runwayMonths}
-              onChange={(e) => setRunwayMonths(Number(e.target.value) || 0)}
-              onFocus={(e) => e.target.select()}
+              type="text"
+              inputMode="numeric"
+              placeholder="3"
+              value={runwayStr}
+              onChange={(e) => setRunwayStr(e.target.value.replace(/[^0-9]/g, ''))}
               onBlur={() => setTouched((prev) => ({ ...prev, runway: true }))}
-              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0"
+              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
             />
             {errors.runway && (
               <p className="text-[13px] leading-[1.4] text-red-500">{errors.runway}</p>
