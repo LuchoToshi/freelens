@@ -75,7 +75,7 @@ export default function Calculator() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <label htmlFor="taxRate" className="text-[14px] leading-[1.5] text-[#3F3F46]">
-                Belastingtarief (IB)
+                Belastingreserve (schatting)
               </label>
               <span className="text-[14px] leading-[1.5] text-[#18181B] font-medium">
                 {taxRatePercent}%
@@ -92,7 +92,7 @@ export default function Calculator() {
               style={{ ['--range-progress' as string]: `${sliderProgress}%` }}
             />
             <p className="mt-1 text-[16px] leading-[1.5] text-[#3F3F46]">
-              Typisch voor ZZP'ers: 25–45% na aftrekposten (MKB-winstvrijstelling, zelfstandigenaftrek)
+              Vuistregel: 25–45% van je winst. Geen vast tarief — afhankelijk van aftrekposten en je situatie.
             </p>
             {taxWarning && (
               <p className="text-[13px] leading-[1.4] text-[#A1A1AA]">{taxWarning}</p>
