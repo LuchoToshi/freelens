@@ -130,6 +130,7 @@ export default function Calculator() {
               step={1}
               value={runwayMonths}
               onChange={(e) => setRunwayMonths(Number(e.target.value) || 0)}
+              onFocus={(e) => e.target.select()}
               onBlur={() => setTouched((prev) => ({ ...prev, runway: true }))}
               className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0"
             />
