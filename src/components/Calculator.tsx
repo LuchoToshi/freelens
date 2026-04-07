@@ -8,8 +8,23 @@ export default function Calculator() {
   const [monthlyExpensesStr, setMonthlyExpensesStr] = useState('');
   const [runwayMonths, setRunwayMonths] = useState(3);
 
+  const [touched, setTouched] = useState({
+    balance: false,
+    runway: false,
+  });
+
   const balance = parseFloat(balanceStr.replace(',', '.')) || 0;
   const monthlyExpenses = parseFloat(monthlyExpensesStr.replace(',', '.')) || 0;
+
+  const errors = {
+    balance: touched.balance && balance < 0 ? 'Vul een positief saldo in' : null,
+    runway: touched.runway && runwayMonths < 1 ? 'Voer minimaal 1 maand buffer in' : null,
+  };
+
+  const taxWarning =
+    taxRatePercent === 0
+      ? "Controleer je belastingtarief — 0% is ongebruikelijk voor ZZP'ers."
+      : null;
 
   const result = calculate({ balance, taxRatePercent, monthlyExpenses, runwayMonths });
 
@@ -46,9 +61,13 @@ export default function Calculator() {
                 placeholder="0"
                 value={balanceStr}
                 onChange={(e) => setBalanceStr(e.target.value)}
+                onBlur={() => setTouched((prev) => ({ ...prev, balance: true }))}
                 className="bg-white border border-[#E4E4E7] rounded-md pl-8 pr-4 py-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
               />
             </div>
+            {errors.balance && (
+              <p className="text-[13px] leading-[1.4] text-red-500">{errors.balance}</p>
+            )}
           </div>
 
           {/* Tax rate slider */}
@@ -74,6 +93,9 @@ export default function Calculator() {
             <p className="mt-1 text-[16px] leading-[1.5] text-[#3F3F46]">
               Typisch voor ZZP'ers: 25–45% na aftrekposten (MKB-winstvrijstelling, zelfstandigenaftrek)
             </p>
+            {taxWarning && (
+              <p className="text-[13px] leading-[1.4] text-[#A1A1AA]">{taxWarning}</p>
+            )}
           </div>
 
           {/* Monthly expenses */}
@@ -108,8 +130,12 @@ export default function Calculator() {
               step={1}
               value={runwayMonths}
               onChange={(e) => setRunwayMonths(Number(e.target.value) || 0)}
-              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] w-24 focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2"
+              onBlur={() => setTouched((prev) => ({ ...prev, runway: true }))}
+              className="bg-white border border-[#E4E4E7] rounded-md p-4 text-[16px] text-[#3F3F46] w-full focus:outline-2 focus:outline-[#18181B] focus:outline-offset-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0"
             />
+            {errors.runway && (
+              <p className="text-[13px] leading-[1.4] text-red-500">{errors.runway}</p>
+            )}
           </div>
         </div>
 
