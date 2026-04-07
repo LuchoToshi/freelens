@@ -53,7 +53,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All inputs are tappable and usable on a real phone — not just on desktop
   3. The page loads with no login screen, no spinner, and no network request — inputs are immediately available
   4. Numbers display with locale-appropriate formatting ($3,200 not 3200)
-**Plans**: TBD
+**Plans**: 2 plans
+  - [ ] 03-01-PLAN.md — Validation state, blur handlers, inline errors, runway width fix (UX-01, UX-02, UX-04)
+  - [ ] 03-02-PLAN.md — Human verify Production Polish in browser + mobile (UX-01..04)
 **UI hint**: yes
 
 ## Progress
