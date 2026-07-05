@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Freelens — Veilig te besteden",
-  description: "Zie in één oogopslag wat je deze maand veilig kunt uitgeven.",
+  title: "Freelens — Safe-to-spend for ZZP'ers",
+  description:
+    "A Y2K-inspired cash clarity tool for Dutch freelancers and ZZP'ers.",
 };
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="nl"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
