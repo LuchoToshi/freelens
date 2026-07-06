@@ -12,22 +12,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  calculateInvoiceSplit,
   calculateSafeToSpend,
   formatBufferNote,
   formatEuro,
   getMonthStatus,
+  getStatusReason,
+  roundToNearest,
   type MonthStatus,
 } from "@/lib/calc";
 
 const STORAGE_KEY = "freelens.safe-to-spend.v1";
 const DESKTOP_QUERY = "(min-width: 1024px)";
 const NUMBER_PATTERN = /^-?\d+([.,]\d+)?$/;
+const BELASTINGDIENST_MKB_URL =
+  "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/inkomstenbelasting_voor_ondernemers/mkb_winstvrijstelling";
 
 interface StoredInputs {
   balance: string;
   monthlyEssentialCosts: string;
   taxReservePercent: string;
   bufferMonths: string;
+  incomeThisYear: string;
+  invoiceAmount: string;
 }
 
 const DEFAULT_INPUTS: StoredInputs = {
@@ -35,6 +42,8 @@ const DEFAULT_INPUTS: StoredInputs = {
   monthlyEssentialCosts: "",
   taxReservePercent: "30",
   bufferMonths: "2",
+  incomeThisYear: "",
+  invoiceAmount: "",
 };
 
 function toNumber(value: string): number {
@@ -56,15 +65,36 @@ const inputClass =
   "rounded-none border-2 border-black bg-[#fbf8eb] font-mono focus-visible:ring-[#0057ff]";
 
 const STATUS_COPY: Record<MonthStatus, { label: string; cardBg: string }> = {
-  good: { label: "Good", cardBg: "bg-[#e3f7d4]" },
-  tight: { label: "Tight", cardBg: "bg-[#f2dc78]" },
-  short: { label: "Short", cardBg: "bg-[#f7d9d9]" },
+  good: { label: "Healthy", cardBg: "bg-[#e3f7d4]" },
+  tight: { label: "Borderline", cardBg: "bg-[#f2dc78]" },
+  short: { label: "Tight", cardBg: "bg-[#f7d9d9]" },
 };
+
+function FormulaTerm({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-base font-black">{value}</span>
+      <span className="font-semibold uppercase text-[#4a4334]">{label}</span>
+    </div>
+  );
+}
+
+function FormulaOperator({ symbol }: { symbol: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-base font-black">{symbol}</span>
+      <span aria-hidden="true" className="invisible text-xs font-semibold">
+        .
+      </span>
+    </div>
+  );
+}
 
 export function SafeToSpend() {
   const [inputs, setInputs] = useState<StoredInputs>(DEFAULT_INPUTS);
   const [hydrated, setHydrated] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [mode, setMode] = useState<"monthly" | "invoice">("monthly");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -91,11 +121,17 @@ export function SafeToSpend() {
   const taxReservePercent = toNumber(inputs.taxReservePercent);
   const bufferMonths = toNumber(inputs.bufferMonths);
 
+  const hasValidIncome =
+    inputs.incomeThisYear.trim() !== "" && fieldError(inputs.incomeThisYear) === null;
+  const incomeThisYear = toNumber(inputs.incomeThisYear);
+  const taxBase = hasValidIncome ? incomeThisYear : balance;
+
   const { taxReserve, buffer, safeToSpend } = calculateSafeToSpend({
     balance,
     monthlyEssentialCosts,
     taxReservePercent,
     bufferMonths,
+    taxBase,
   });
 
   const hasCoreInputs =
@@ -105,7 +141,14 @@ export function SafeToSpend() {
     fieldError(inputs.monthlyEssentialCosts) === null;
 
   const monthStatus = getMonthStatus(safeToSpend, monthlyEssentialCosts);
+  const statusReason = getStatusReason(monthStatus, safeToSpend, monthlyEssentialCosts);
   const bufferNote = formatBufferNote(buffer, bufferMonths);
+  const roundedSafeToSpend = roundToNearest(safeToSpend);
+
+  const hasValidInvoice =
+    inputs.invoiceAmount.trim() !== "" && fieldError(inputs.invoiceAmount) === null;
+  const invoiceAmount = toNumber(inputs.invoiceAmount);
+  const invoiceSplit = calculateInvoiceSplit(invoiceAmount, taxReservePercent);
 
   function updateField(field: keyof StoredInputs) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,9 +270,48 @@ export function SafeToSpend() {
                   <p className={hintClass}>
                     Percentage of profit you set aside for tax.
                   </p>
+                  <p className={hintClass}>
+                    Many ZZP&apos;ers reserve 25–40% of profit for income tax
+                    and Zvw combined; 30% is a common, cautious default for
+                    2026 rates.{" "}
+                    <a
+                      href={BELASTINGDIENST_MKB_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      Source: Belastingdienst
+                    </a>
+                    .
+                  </p>
                   {fieldError(inputs.taxReservePercent) && (
                     <p className={errorClass}>
                       {fieldError(inputs.taxReservePercent)}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <Label className={labelClass} htmlFor="income-this-year">
+                    Estimated taxable income this year (optional)
+                  </Label>
+                  <Input
+                    id="income-this-year"
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="e.g. 40000"
+                    value={inputs.incomeThisYear}
+                    onChange={updateField("incomeThisYear")}
+                    className={inputClass}
+                  />
+                  <p className={hintClass}>
+                    Used as the base for your tax reserve instead of your
+                    balance. Leave blank and we&apos;ll estimate from your
+                    balance.
+                  </p>
+                  {fieldError(inputs.incomeThisYear) && (
+                    <p className={errorClass}>
+                      {fieldError(inputs.incomeThisYear)}
                     </p>
                   )}
                 </div>
@@ -260,72 +342,199 @@ export function SafeToSpend() {
           </CardContent>
         </Card>
 
-        <p className={hintClass}>
-          Example: balance 4,000; fixed costs 2,200; tax reserve 30%; buffer 2
-          months.
-        </p>
+        <div className="flex w-fit gap-1 border-2 border-black bg-white p-1 font-mono text-xs font-black uppercase shadow-[3px_3px_0_#101010]">
+          <button
+            type="button"
+            onClick={() => setMode("monthly")}
+            aria-pressed={mode === "monthly"}
+            className={`px-3 py-1.5 transition ${
+              mode === "monthly" ? "bg-[#0057ff] text-white" : ""
+            }`}
+          >
+            This month
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("invoice")}
+            aria-pressed={mode === "invoice"}
+            className={`px-3 py-1.5 transition ${
+              mode === "invoice" ? "bg-[#0057ff] text-white" : ""
+            }`}
+          >
+            Per invoice
+          </button>
+        </div>
 
-        <Card
-          className={`rounded-none border-4 border-black shadow-[8px_8px_0_#101010] ${
-            hasCoreInputs ? STATUS_COPY[monthStatus].cardBg : "bg-white"
-          }`}
-        >
-          <CardContent className="flex flex-col gap-4 p-6 text-center">
-            {hasCoreInputs ? (
-              <>
-                <div className="flex flex-col gap-1">
+        {mode === "monthly" && (
+          <p className={hintClass}>
+            Example: balance 4,000; fixed costs 2,200; tax reserve 30%; buffer
+            2 months.
+          </p>
+        )}
+
+        {mode === "monthly" ? (
+          <Card
+            className={`rounded-none border-4 border-black shadow-[8px_8px_0_#101010] ${
+              hasCoreInputs ? STATUS_COPY[monthStatus].cardBg : "bg-white"
+            }`}
+          >
+            <CardContent className="flex flex-col gap-4 p-6 text-center">
+              {hasCoreInputs ? (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-mono text-xs font-black uppercase">
+                      This month looks
+                    </span>
+                    <span className="font-mono text-2xl font-black uppercase">
+                      {STATUS_COPY[monthStatus].label}
+                    </span>
+                    <p className="text-sm font-semibold text-[#4a4334]">
+                      {STATUS_COPY[monthStatus].label} because {statusReason}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="font-mono text-xs font-black uppercase">
+                      You can safely pay yourself up to
+                    </span>
+                    <span
+                      className={`font-mono text-5xl font-black tracking-normal sm:text-6xl ${
+                        safeToSpend < 0 ? "text-destructive" : "text-foreground"
+                      }`}
+                    >
+                      {formatEuro(roundedSafeToSpend)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 border-t-2 border-black pt-4 text-left sm:grid-cols-2">
+                    <div>
+                      <p className="font-mono text-xs font-black uppercase">
+                        Tax reserve set aside
+                      </p>
+                      <p className="text-sm font-semibold text-[#4a4334]">
+                        {formatEuro(taxReserve)}
+                      </p>
+                      {!hasValidIncome && (
+                        <p className="text-sm font-semibold text-[#4a4334]">
+                          Estimated from your balance — add your income above
+                          for a more accurate reserve.
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs font-black uppercase">
+                        Buffer impact
+                      </p>
+                      <p className="text-sm font-semibold text-[#4a4334]">
+                        {bufferNote}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-3 border-t-2 border-black pt-4 text-center font-mono text-xs">
+                    <FormulaTerm value={formatEuro(balance)} label="balance" />
+                    <FormulaOperator symbol="-" />
+                    <FormulaTerm
+                      value={`(${formatEuro(monthlyEssentialCosts)} × ${bufferMonths})`}
+                      label="costs × buffer"
+                    />
+                    <FormulaOperator symbol="-" />
+                    <FormulaTerm
+                      value={formatEuro(taxReserve)}
+                      label="tax reserve"
+                    />
+                    <FormulaOperator symbol="≈" />
+                    <FormulaTerm
+                      value={formatEuro(roundedSafeToSpend)}
+                      label="safe-to-spend"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
                   <span className="font-mono text-xs font-black uppercase">
                     This month looks
                   </span>
-                  <span className="font-mono text-2xl font-black uppercase">
-                    {STATUS_COPY[monthStatus].label}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <span className="font-mono text-xs font-black uppercase">
-                    You can safely pay yourself up to
-                  </span>
-                  <span
-                    className={`font-mono text-5xl font-black tracking-normal sm:text-6xl ${
-                      safeToSpend < 0 ? "text-destructive" : "text-foreground"
-                    }`}
-                  >
-                    {formatEuro(safeToSpend)}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 border-t-2 border-black pt-4 text-left sm:grid-cols-2">
-                  <div>
-                    <p className="font-mono text-xs font-black uppercase">
-                      Tax reserve set aside
-                    </p>
-                    <p className="text-sm font-semibold text-[#4a4334]">
-                      {formatEuro(taxReserve)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs font-black uppercase">
-                      Buffer impact
-                    </p>
-                    <p className="text-sm font-semibold text-[#4a4334]">
-                      {bufferNote}
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <span className="font-mono text-xs font-black uppercase">
-                  This month looks
-                </span>
-                <p className="text-base font-semibold text-[#4a4334]">
-                  Enter your numbers above to see your safe-to-spend amount.
+                  <p className="text-base font-semibold text-[#4a4334]">
+                    Enter your numbers above to see your safe-to-spend amount.
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="rounded-none border-4 border-black bg-white shadow-[8px_8px_0_#101010]">
+            <CardContent className="flex flex-col gap-4 p-6 text-center">
+              <div className="flex flex-col gap-1.5 text-left">
+                <Label className={labelClass} htmlFor="invoice-amount">
+                  Invoice amount
+                </Label>
+                <Input
+                  id="invoice-amount"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="e.g. 1500"
+                  value={inputs.invoiceAmount}
+                  onChange={updateField("invoiceAmount")}
+                  className={inputClass}
+                />
+                <p className={hintClass}>
+                  Uses your tax reserve percentage from above (
+                  {taxReservePercent}%).
                 </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                {fieldError(inputs.invoiceAmount) && (
+                  <p className={errorClass}>
+                    {fieldError(inputs.invoiceAmount)}
+                  </p>
+                )}
+              </div>
+
+              {hasValidInvoice ? (
+                <>
+                  <div className="grid grid-cols-1 gap-3 border-t-2 border-black pt-4 text-left sm:grid-cols-2">
+                    <div>
+                      <p className="font-mono text-xs font-black uppercase">
+                        Set aside for tax
+                      </p>
+                      <p className="text-2xl font-black">
+                        {formatEuro(invoiceSplit.setAsideForTax)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-xs font-black uppercase">
+                        Keep as safe-to-spend
+                      </p>
+                      <p className="text-2xl font-black">
+                        {formatEuro(invoiceSplit.keepAsSafeToSpend)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-3 border-t-2 border-black pt-4 text-center font-mono text-xs">
+                    <FormulaTerm
+                      value={formatEuro(invoiceAmount)}
+                      label="invoice"
+                    />
+                    <FormulaOperator symbol="-" />
+                    <FormulaTerm
+                      value={formatEuro(invoiceSplit.setAsideForTax)}
+                      label="tax reserve"
+                    />
+                    <FormulaOperator symbol="=" />
+                    <FormulaTerm
+                      value={formatEuro(invoiceSplit.keepAsSafeToSpend)}
+                      label="keep"
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="text-base font-semibold text-[#4a4334]">
+                  Enter an invoice amount to see the split.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex flex-col gap-1 border-2 border-dashed border-black bg-white px-4 py-3 font-mono text-xs font-bold text-[#4a4334]">
           <p>
