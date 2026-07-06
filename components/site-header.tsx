@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export function SiteHeader() {
   return (
-    <header className="border-b-4 border-black bg-white">
-      <div className="mx-auto flex max-w-7xl items-center px-5 py-3 sm:px-8">
+    <header className="border-b border-[#e3e1da] bg-[#faf9f6]">
+      <div className="mx-auto flex max-w-5xl items-center px-5 py-4 sm:px-8">
         <Link
           href="/"
-          className="font-mono text-lg font-black uppercase tracking-normal hover:underline"
+          className="text-lg font-semibold tracking-tight text-[#122540] hover:opacity-80"
         >
           Freelens
         </Link>

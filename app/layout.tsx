@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Freelens — Safe-to-spend for ZZP'ers",
   description:
-    "A Y2K-inspired cash clarity tool for Dutch freelancers and ZZP'ers.",
+    "Calm, honest cash clarity for Dutch freelancers and ZZP'ers.",
 };
 
 export default function RootLayout({

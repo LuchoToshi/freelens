@@ -75,6 +75,18 @@ export function formatBufferNote(buffer: number, bufferMonths: number): string {
   return `${formatEuro(buffer)} kept aside for your ${monthLabel} buffer`;
 }
 
+export interface CheckIn {
+  date: string;
+  safeToSpend: number;
+  status: MonthStatus;
+}
+
+export function formatCheckInDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
+    new Date(iso)
+  );
+}
+
 export interface InvoiceSplit {
   setAsideForTax: number;
   keepAsSafeToSpend: number;
