@@ -11,7 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { calculateSafeToSpend, formatEuro } from "@/lib/calc";
+import {
+  calculateSafeToSpend,
+  formatBufferNote,
+  formatEuro,
+  getMonthStatus,
+  type MonthStatus,
+} from "@/lib/calc";
 
 const STORAGE_KEY = "freelens.safe-to-spend.v1";
 const DESKTOP_QUERY = "(min-width: 1024px)";
@@ -48,6 +54,12 @@ const hintClass = "text-xs font-semibold text-[#4a4334]";
 const errorClass = "font-mono text-xs font-bold text-red-600";
 const inputClass =
   "rounded-none border-2 border-black bg-[#fbf8eb] font-mono focus-visible:ring-[#0057ff]";
+
+const STATUS_COPY: Record<MonthStatus, { label: string; cardBg: string }> = {
+  good: { label: "Good", cardBg: "bg-[#e3f7d4]" },
+  tight: { label: "Tight", cardBg: "bg-[#f2dc78]" },
+  short: { label: "Short", cardBg: "bg-[#f7d9d9]" },
+};
 
 export function SafeToSpend() {
   const [inputs, setInputs] = useState<StoredInputs>(DEFAULT_INPUTS);
@@ -92,6 +104,9 @@ export function SafeToSpend() {
     fieldError(inputs.balance) === null &&
     fieldError(inputs.monthlyEssentialCosts) === null;
 
+  const monthStatus = getMonthStatus(safeToSpend, monthlyEssentialCosts);
+  const bufferNote = formatBufferNote(buffer, bufferMonths);
+
   function updateField(field: keyof StoredInputs) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       setInputs((prev) => ({ ...prev, [field]: event.target.value }));
@@ -123,6 +138,10 @@ export function SafeToSpend() {
             <CardDescription className="text-[#4a4334]">
               Everything stays on your own device.
             </CardDescription>
+            <p className={hintClass}>
+              If you&apos;re unsure about exact balances, use reasonable
+              estimates. You can update anytime.
+            </p>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 pt-6">
             <div className="flex flex-col gap-1.5">
@@ -246,30 +265,64 @@ export function SafeToSpend() {
           months.
         </p>
 
-        <Card className="rounded-none border-4 border-black bg-[#e3f7d4] shadow-[8px_8px_0_#101010]">
-          <CardContent className="flex flex-col gap-3 p-6 text-center">
-            <span className="font-mono text-xs font-black uppercase">
-              Safe to spend this month
-            </span>
+        <Card
+          className={`rounded-none border-4 border-black shadow-[8px_8px_0_#101010] ${
+            hasCoreInputs ? STATUS_COPY[monthStatus].cardBg : "bg-white"
+          }`}
+        >
+          <CardContent className="flex flex-col gap-4 p-6 text-center">
             {hasCoreInputs ? (
               <>
-                <span
-                  className={`font-mono text-5xl font-black tracking-normal sm:text-6xl ${
-                    safeToSpend < 0 ? "text-destructive" : "text-foreground"
-                  }`}
-                >
-                  {formatEuro(safeToSpend)}
-                </span>
-                <p className="text-sm font-semibold text-[#4a4334]">
-                  {formatEuro(taxReserve)} is already set aside for tax,{" "}
-                  {formatEuro(buffer)} is your buffer. The rest is your usable
-                  cash.
-                </p>
+                <div className="flex flex-col gap-1">
+                  <span className="font-mono text-xs font-black uppercase">
+                    This month looks
+                  </span>
+                  <span className="font-mono text-2xl font-black uppercase">
+                    {STATUS_COPY[monthStatus].label}
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="font-mono text-xs font-black uppercase">
+                    You can safely pay yourself up to
+                  </span>
+                  <span
+                    className={`font-mono text-5xl font-black tracking-normal sm:text-6xl ${
+                      safeToSpend < 0 ? "text-destructive" : "text-foreground"
+                    }`}
+                  >
+                    {formatEuro(safeToSpend)}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 border-t-2 border-black pt-4 text-left sm:grid-cols-2">
+                  <div>
+                    <p className="font-mono text-xs font-black uppercase">
+                      Tax reserve set aside
+                    </p>
+                    <p className="text-sm font-semibold text-[#4a4334]">
+                      {formatEuro(taxReserve)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-mono text-xs font-black uppercase">
+                      Buffer impact
+                    </p>
+                    <p className="text-sm font-semibold text-[#4a4334]">
+                      {bufferNote}
+                    </p>
+                  </div>
+                </div>
               </>
             ) : (
-              <p className="text-base font-semibold text-[#4a4334]">
-                Enter your numbers above to see your safe-to-spend amount.
-              </p>
+              <>
+                <span className="font-mono text-xs font-black uppercase">
+                  This month looks
+                </span>
+                <p className="text-base font-semibold text-[#4a4334]">
+                  Enter your numbers above to see your safe-to-spend amount.
+                </p>
+              </>
             )}
           </CardContent>
         </Card>

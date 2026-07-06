@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, Check, RadioTower, ShieldCheck, Sparkles } from "lucide-react";
 
-const FEATURES = [
-  "Safe-to-spend number in one glance",
-  "Tax reserve and buffer shown separately",
-  "Local-first: your figures stay in this browser",
+const RECURRING_QUESTIONS = [
+  "Is this month actually good?",
+  "How much should I reserve for BTW and income tax for this invoice?",
+  "What can I safely pay myself?",
+  "Can I take time off?",
+  "Am I ready for the VAT payment?",
+  "Can I stop worrying?",
 ];
 
 const TRUST_ITEMS = [
@@ -30,13 +33,12 @@ export default function Home() {
                 Freelens
               </h1>
               <p className="max-w-2xl text-balance text-2xl font-black leading-tight sm:text-4xl">
-                Know what you can spend before the tax bill calls.
+                Make freelance money decisions with confidence.
               </p>
               <p className="max-w-xl text-base font-semibold leading-7 sm:text-lg">
-                A tiny finance lens for Dutch freelancers and ZZP&apos;ers:
-                enter your balance, fixed monthly costs, tax reserve, and
-                buffer. Freelens gives you one calm number: safe to spend in
-                the Dutch tax context.
+                Freelens gives you a clear safe-to-spend number, with tax
+                reserve built in, so you can decide what to pay yourself and
+                when to pause, without spreadsheets or guesswork.
               </p>
             </div>
 
@@ -45,7 +47,7 @@ export default function Home() {
                 href="/tool"
                 className="inline-flex min-h-14 items-center justify-center gap-2 border-4 border-black bg-[#0057ff] px-6 text-base font-black uppercase text-white shadow-[6px_6px_0_#101010] transition hover:-translate-y-0.5 hover:shadow-[8px_8px_0_#101010] focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-black"
               >
-                Try the app
+                Check your safe-to-spend
                 <ArrowRight className="size-5" aria-hidden="true" />
               </Link>
               <a
@@ -78,7 +80,7 @@ export default function Home() {
                   </div>
                   <div className="border-4 border-black bg-[#f2dc78] p-4 text-center">
                     <p className="font-mono text-xs font-black uppercase">
-                      Safe to spend
+                      Pay yourself up to
                     </p>
                     <p className="mt-1 font-mono text-5xl font-black tracking-normal sm:text-6xl">
                       EUR 860
@@ -95,18 +97,23 @@ export default function Home() {
       </section>
 
       <section id="features" className="border-b-4 border-black bg-white">
-        <div className="mx-auto grid max-w-7xl gap-6 px-5 py-12 sm:px-8 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature}
-              className="border-4 border-black bg-[#f6f1df] p-5 shadow-[6px_6px_0_#101010]"
-            >
-              <Sparkles className="mb-5 size-8 text-[#0057ff]" aria-hidden="true" />
-              <h2 className="font-mono text-xl font-black uppercase leading-tight">
-                {feature}
-              </h2>
-            </div>
-          ))}
+        <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
+          <p className="mb-8 font-mono text-sm font-black uppercase text-[#0057ff]">
+            Recurring questions we help answer
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {RECURRING_QUESTIONS.map((question) => (
+              <div
+                key={question}
+                className="border-4 border-black bg-[#f6f1df] p-5 shadow-[6px_6px_0_#101010]"
+              >
+                <Sparkles className="mb-5 size-8 text-[#0057ff]" aria-hidden="true" />
+                <h2 className="font-mono text-xl font-black uppercase leading-tight">
+                  {question}
+                </h2>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
