@@ -28,6 +28,7 @@ const STORAGE_KEY = "freelens.safe-to-spend.v1";
 const CHECKIN_STORAGE_KEY = "freelens.checkin.v1";
 const DESKTOP_QUERY = "(min-width: 1024px)";
 const NUMBER_PATTERN = /^-?\d+([.,]\d+)?$/;
+const BUFFER_OPTIONS = [1, 2, 3, 6] as const;
 const BELASTINGDIENST_MKB_URL =
   "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/inkomstenbelasting_voor_ondernemers/mkb_winstvrijstelling";
 
@@ -389,25 +390,33 @@ export function SafeToSpend() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <Label className={labelClass} htmlFor="buffer-months">
-                    Buffer (months)
-                  </Label>
-                  <Input
-                    id="buffer-months"
-                    type="text"
-                    inputMode="decimal"
-                    value={inputs.bufferMonths}
-                    onChange={updateField("bufferMonths")}
-                    className={inputClass}
-                  />
+                  <Label className={labelClass}>Buffer (months)</Label>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label="Buffer months">
+                    {BUFFER_OPTIONS.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() =>
+                          setInputs((prev) => ({
+                            ...prev,
+                            bufferMonths: String(option),
+                          }))
+                        }
+                        aria-pressed={bufferMonths === option}
+                        className={`min-w-14 rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                          bufferMonths === option
+                            ? "border-[#122540] bg-[#122540] text-white"
+                            : "border-[#d8d5cd] bg-white text-[#122540] hover:border-[#122540]"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                   <p className={hintClass}>
-                    Extra runway you want to keep before spending.
+                    Extra runway you want to keep before spending. Most
+                    freelancers keep 2–3 months.
                   </p>
-                  {fieldError(inputs.bufferMonths) && (
-                    <p className={errorClass}>
-                      {fieldError(inputs.bufferMonths)}
-                    </p>
-                  )}
                 </div>
               </div>
             )}
@@ -423,6 +432,10 @@ export function SafeToSpend() {
               <span className="text-3xl font-semibold text-[#122540]">
                 {formatEuro(vatCollected)}
               </span>
+              <p className="text-sm text-[#5b6472]">
+                This is the BTW you charge on top of invoices (usually 21%)
+                — set it aside for your VAT return.
+              </p>
               <p className="text-sm text-[#5b6472]">
                 Not part of your safe-to-spend number — this was never your
                 money.
@@ -477,13 +490,6 @@ export function SafeToSpend() {
           </div>
         </div>
 
-        {mode === "monthly" && (
-          <p className={hintClass}>
-            Example: balance 4,000; fixed costs 2,200; tax reserve 30%; buffer
-            2 months.
-          </p>
-        )}
-
         {mode === "monthly" ? (
           <Card
             className={`rounded-2xl border shadow-sm ${
@@ -505,6 +511,18 @@ export function SafeToSpend() {
                     <p className="text-sm text-[#5b6472]">
                       {STATUS_COPY[monthStatus].label} because {statusReason}
                     </p>
+                    {monthStatus === "short" && checkIn && (
+                      <p className="text-sm text-[#5b6472]">
+                        Since your last check-in (
+                        {formatCheckInDate(checkIn.date)}), this is{" "}
+                        {trendDiff === 0
+                          ? "no change"
+                          : `${trendDiff > 0 ? "+" : "-"}${formatEuro(
+                              Math.abs(trendDiff)
+                            )}`}
+                        .
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-1">
