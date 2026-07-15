@@ -1,63 +1,14 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  CloudRain,
-  FileCheck,
-  Landmark,
-  ShieldCheck,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { InteractiveHero } from "@/components/design-a/interactive-hero";
+import { HeroCopy } from "@/components/design-a/hero-copy";
+import { MomentCards } from "@/components/design-a/moment-cards";
 
 const TRUST_ITEMS = [
   "Your numbers never leave your browser.",
   "Built for Dutch freelancers and ZZP'ers.",
   "Plain-language output you can double-check.",
 ];
-
-const MOMENTS = [
-  {
-    icon: FileCheck,
-    title: "Invoice paid — what can I actually keep?",
-  },
-  {
-    icon: TrendingUp,
-    title: "Big client just signed — should I upgrade my setup?",
-  },
-  {
-    icon: CloudRain,
-    title: "Slow month again — am I actually in trouble?",
-  },
-  {
-    icon: Landmark,
-    title: "Tax bill's coming — did I save enough?",
-  },
-];
-
-function CtaButtons() {
-  return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Link
-          href="/tool"
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#122540] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[#0d1b30] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#122540]"
-        >
-          Get my number
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </Link>
-        <a
-          href="#live-demo"
-          className="inline-flex min-h-12 items-center justify-center px-2 text-sm font-medium text-[#122540] underline underline-offset-4 sm:min-h-0"
-        >
-          See how it works ↓
-        </a>
-      </div>
-      <span className="text-xs text-[#5b6472]">
-        Free, no signup, nothing stored.
-      </span>
-    </div>
-  );
-}
 
 export default function DesignA() {
   return (
@@ -69,22 +20,7 @@ export default function DesignA() {
       </div>
 
       <section className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-14 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_1fr] lg:gap-16">
-        <div className="flex flex-col gap-6">
-          <span className="inline-flex w-fit items-center rounded-full border border-[#e3e1da] bg-white px-3 py-1 text-xs font-medium text-[#5b6472]">
-            For Dutch freelancers and ZZP&apos;ers
-          </span>
-          <div className="flex flex-col gap-4">
-            <h1 className="max-w-xl text-balance text-4xl font-semibold leading-tight tracking-tight text-[#122540] sm:text-5xl">
-              Stop guessing what the Belastingdienst will take.
-            </h1>
-            <p className="max-w-lg text-lg leading-relaxed text-[#5b6472]">
-              Drag your income and watch your real safe-to-spend number
-              appear.
-            </p>
-          </div>
-          <CtaButtons />
-        </div>
-
+        <HeroCopy />
         <InteractiveHero />
       </section>
 
@@ -93,22 +29,7 @@ export default function DesignA() {
           <h2 className="max-w-md text-2xl font-semibold leading-tight text-[#122540] sm:text-3xl">
             Moments this is built for
           </h2>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {MOMENTS.map(({ icon: Icon, title }) => (
-              <div
-                key={title}
-                className="flex items-start gap-3 rounded-xl border border-[#e3e1da] bg-white p-4"
-              >
-                <Icon
-                  className="mt-0.5 size-5 shrink-0 text-[#122540]"
-                  aria-hidden="true"
-                />
-                <span className="text-sm font-medium leading-relaxed text-[#1c1e21]">
-                  {title}
-                </span>
-              </div>
-            ))}
-          </div>
+          <MomentCards />
         </div>
       </section>
 

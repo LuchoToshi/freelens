@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   calculateSafeToSpend,
   formatEuro,
@@ -9,6 +10,7 @@ import {
   roundToNearest,
   type MonthStatus,
 } from "@/lib/calc";
+import { useCountUp } from "@/components/design-a/use-count-up";
 
 const FIXED_COSTS = 1200;
 const FIXED_BUFFER_MONTHS = 2;
@@ -28,8 +30,14 @@ const STATUS_COPY: Record<
   short: { label: "Tight", tint: "#fbeaea", text: "#b8362b" },
 };
 
+const rowVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function InteractiveHero() {
   const [income, setIncome] = useState(DEFAULT_INCOME);
+  const prefersReducedMotion = useReducedMotion();
 
   const { taxReserve, buffer, safeToSpend } = calculateSafeToSpend({
     balance: income,
@@ -44,6 +52,10 @@ export function InteractiveHero() {
   const statusCopy = STATUS_COPY[status];
   const statusReason = getStatusReason(status, safeToSpend, FIXED_COSTS);
 
+  const animatedResult = useCountUp(rounded);
+  const animatedBuffer = useCountUp(buffer);
+  const animatedTaxReserve = useCountUp(taxReserve);
+
   return (
     <div
       id="live-demo"
@@ -54,12 +66,19 @@ export function InteractiveHero() {
         <label htmlFor="income-slider" className="text-sm font-medium text-[#5b6472]">
           Drag your monthly income
         </label>
-        <span
-          className="text-sm font-semibold transition-colors duration-300"
-          style={{ color: statusCopy.text }}
-        >
-          {statusCopy.label}
-        </span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={status}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: -4, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, y: 4, scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            className="text-sm font-semibold"
+            style={{ color: statusCopy.text }}
+          >
+            {statusCopy.label}
+          </motion.span>
+        </AnimatePresence>
       </div>
 
       <input
@@ -90,8 +109,9 @@ export function InteractiveHero() {
             <span className="text-sm font-medium text-[#5b6472]">
               Right now
             </span>
-            <p className="mt-1 text-3xl font-semibold tracking-tight text-[#122540] transition-all duration-300 sm:text-4xl">
-              You&apos;re {formatEuro(Math.abs(rounded))} short of covered.
+            <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-[#122540] sm:text-4xl">
+              You&apos;re {formatEuro(Math.abs(animatedResult))} short of
+              covered.
             </p>
             <p className="mt-2 text-sm text-[#5b6472]">
               That&apos;s because {statusReason}
@@ -102,8 +122,8 @@ export function InteractiveHero() {
             <span className="text-sm font-medium text-[#5b6472]">
               Safe to spend
             </span>
-            <p className="mt-1 text-5xl font-semibold tracking-tight text-[#122540] transition-all duration-300 sm:text-6xl">
-              {formatEuro(rounded)}
+            <p className="mt-1 text-5xl font-semibold tracking-tight tabular-nums text-[#122540] sm:text-6xl">
+              {formatEuro(animatedResult)}
             </p>
           </>
         )}
@@ -114,40 +134,62 @@ export function InteractiveHero() {
         </p>
       </div>
 
-      <div className="mt-6 flex flex-col gap-4 border-t border-black/10 pt-5 text-sm">
-        <div className="flex items-center justify-between">
+      <motion.div
+        className="mt-6 flex flex-col gap-4 border-t border-black/10 pt-5 text-sm"
+        initial={prefersReducedMotion ? false : "hidden"}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ staggerChildren: prefersReducedMotion ? 0 : 0.15 }}
+      >
+        <motion.div
+          className="flex items-center justify-between"
+          variants={rowVariants}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
+        >
           <span className="text-[#5b6472]">Your money</span>
-          <span className="font-semibold text-[#122540]">
+          <span className="font-semibold tabular-nums text-[#122540]">
             {formatEuro(income)}
           </span>
-        </div>
-        <div className="flex flex-col gap-1">
+        </motion.div>
+        <motion.div
+          className="flex flex-col gap-1"
+          variants={rowVariants}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
+        >
           <div className="flex items-center justify-between">
             <span className="text-[#5b6472]">Minus your cushion</span>
-            <span className="font-semibold text-[#122540]">
-              −{formatEuro(buffer)}
+            <span className="font-semibold tabular-nums text-[#122540]">
+              −{formatEuro(animatedBuffer)}
             </span>
           </div>
           <p className="text-xs text-[#5b6472]">
             Lower your buffer to 1 month and free up{" "}
             {formatEuro(LOWER_BUFFER_SAVINGS)}.
           </p>
-        </div>
-        <div className="flex items-center justify-between">
+        </motion.div>
+        <motion.div
+          className="flex items-center justify-between"
+          variants={rowVariants}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
+        >
           <span className="text-[#5b6472]">Minus taxes</span>
-          <span className="font-semibold text-[#122540]">
-            −{formatEuro(taxReserve)}
+          <span className="font-semibold tabular-nums text-[#122540]">
+            −{formatEuro(animatedTaxReserve)}
           </span>
-        </div>
-        <div className="flex items-center justify-between border-t border-black/10 pt-3">
+        </motion.div>
+        <motion.div
+          className="flex items-center justify-between border-t border-black/10 pt-3"
+          variants={rowVariants}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
+        >
           <span className="font-medium text-[#122540]">Safe to spend</span>
-          <span className="font-semibold text-[#122540]">
+          <span className="font-semibold tabular-nums text-[#122540]">
             {isShort
-              ? `${formatEuro(Math.abs(rounded))} short`
-              : formatEuro(rounded)}
+              ? `${formatEuro(Math.abs(animatedResult))} short`
+              : formatEuro(animatedResult)}
           </span>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <p className="mt-4 text-xs text-[#5b6472]">
         Not tax advice — a clear estimate to work from. Your numbers never
