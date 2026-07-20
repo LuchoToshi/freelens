@@ -10,7 +10,7 @@ import {
   roundToNearest,
   type MonthStatus,
 } from "@/lib/calc";
-import { useCountUp } from "@/components/design-a/use-count-up";
+import { useCountUp } from "@/components/use-count-up";
 
 const FIXED_COSTS = 1200;
 const FIXED_BUFFER_MONTHS = 2;
@@ -25,9 +25,9 @@ const STATUS_COPY: Record<
   MonthStatus,
   { label: string; tint: string; text: string }
 > = {
-  good: { label: "Healthy", tint: "#eaf4ee", text: "#1f7a4d" },
-  tight: { label: "Borderline", tint: "#fbf1de", text: "#a8721c" },
-  short: { label: "Tight", tint: "#fbeaea", text: "#b8362b" },
+  good: { label: "Healthy", tint: "var(--fl-good-tint)", text: "var(--fl-good-text)" },
+  tight: { label: "Borderline", tint: "var(--fl-tight-tint)", text: "var(--fl-tight-text)" },
+  short: { label: "Tight", tint: "var(--fl-short-tint)", text: "var(--fl-short-text)" },
 };
 
 const rowVariants = {
@@ -35,7 +35,7 @@ const rowVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export function InteractiveHero() {
+export function LiveCalculator() {
   const [income, setIncome] = useState(DEFAULT_INCOME);
   const prefersReducedMotion = useReducedMotion();
 
@@ -59,11 +59,14 @@ export function InteractiveHero() {
   return (
     <div
       id="live-demo"
-      className="rounded-2xl border border-[#e3e1da] p-6 shadow-sm transition-colors duration-300 sm:p-8"
+      className="rounded-2xl border border-[var(--fl-line)] p-6 shadow-sm transition-colors duration-300 sm:p-8"
       style={{ backgroundColor: statusCopy.tint }}
     >
       <div className="flex items-center justify-between">
-        <label htmlFor="income-slider" className="text-sm font-medium text-[#5b6472]">
+        <label
+          htmlFor="income-slider"
+          className="text-sm font-medium text-[var(--fl-slate)]"
+        >
           Drag your monthly income
         </label>
         <AnimatePresence mode="wait" initial={false}>
@@ -89,45 +92,45 @@ export function InteractiveHero() {
         step={STEP}
         value={income}
         onChange={(event) => setIncome(Number(event.target.value))}
-        className="mt-4 w-full accent-[#122540]"
+        className="mt-4 w-full accent-[var(--fl-ink)]"
       />
-      <div className="mt-1 flex justify-between text-xs text-[#5b6472]">
+      <div className="mt-1 flex justify-between text-xs text-[var(--fl-slate)]">
         <span>{formatEuro(MIN_INCOME)}</span>
-        <span className="font-semibold text-[#122540]">
+        <span className="font-semibold text-[var(--fl-ink)]">
           {formatEuro(income)}
         </span>
         <span>{formatEuro(MAX_INCOME)}</span>
       </div>
-      <p className="mt-2 text-xs text-[#5b6472]">
-        Based on example costs and a cautious buffer — /tool uses your real
-        numbers.
+      <p className="mt-2 text-xs text-[var(--fl-slate)]">
+        Based on example costs and a cautious buffer. The real calculator uses
+        your own numbers.
       </p>
 
       <div className="mt-6 border-t border-black/10 pt-6">
         {isShort ? (
           <>
-            <span className="text-sm font-medium text-[#5b6472]">
+            <span className="text-sm font-medium text-[var(--fl-slate)]">
               Right now
             </span>
-            <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-[#122540] sm:text-4xl">
+            <p className="mt-1 font-serif text-3xl font-medium tracking-tight tabular-nums text-[var(--fl-ink)] sm:text-4xl">
               You&apos;re {formatEuro(Math.abs(animatedResult))} short of
               covered.
             </p>
-            <p className="mt-2 text-sm text-[#5b6472]">
+            <p className="mt-2 text-sm text-[var(--fl-slate)]">
               That&apos;s because {statusReason}
             </p>
           </>
         ) : (
           <>
-            <span className="text-sm font-medium text-[#5b6472]">
+            <span className="text-sm font-medium text-[var(--fl-slate)]">
               Safe to spend
             </span>
-            <p className="mt-1 text-5xl font-semibold tracking-tight tabular-nums text-[#122540] sm:text-6xl">
+            <p className="mt-1 font-serif text-5xl font-medium tracking-tight tabular-nums text-[var(--fl-ink)] sm:text-6xl">
               {formatEuro(animatedResult)}
             </p>
           </>
         )}
-        <p className="mt-3 text-sm font-medium text-[#122540]">
+        <p className="mt-3 text-sm font-medium text-[var(--fl-ink)]">
           {isShort
             ? "A few tweaks below could close that gap."
             : "That's yours to spend guilt-free this month."}
@@ -146,8 +149,8 @@ export function InteractiveHero() {
           variants={rowVariants}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
         >
-          <span className="text-[#5b6472]">Your money</span>
-          <span className="font-semibold tabular-nums text-[#122540]">
+          <span className="text-[var(--fl-slate)]">Your money</span>
+          <span className="font-semibold tabular-nums text-[var(--fl-ink)]">
             {formatEuro(income)}
           </span>
         </motion.div>
@@ -157,12 +160,12 @@ export function InteractiveHero() {
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[#5b6472]">Minus your cushion</span>
-            <span className="font-semibold tabular-nums text-[#122540]">
+            <span className="text-[var(--fl-slate)]">Minus your cushion</span>
+            <span className="font-semibold tabular-nums text-[var(--fl-ink)]">
               −{formatEuro(animatedBuffer)}
             </span>
           </div>
-          <p className="text-xs text-[#5b6472]">
+          <p className="text-xs text-[var(--fl-slate)]">
             Lower your buffer to 1 month and free up{" "}
             {formatEuro(LOWER_BUFFER_SAVINGS)}.
           </p>
@@ -172,8 +175,8 @@ export function InteractiveHero() {
           variants={rowVariants}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
         >
-          <span className="text-[#5b6472]">Minus taxes</span>
-          <span className="font-semibold tabular-nums text-[#122540]">
+          <span className="text-[var(--fl-slate)]">Minus taxes</span>
+          <span className="font-semibold tabular-nums text-[var(--fl-ink)]">
             −{formatEuro(animatedTaxReserve)}
           </span>
         </motion.div>
@@ -182,8 +185,8 @@ export function InteractiveHero() {
           variants={rowVariants}
           transition={{ duration: prefersReducedMotion ? 0 : 0.5, ease: "easeOut" }}
         >
-          <span className="font-medium text-[#122540]">Safe to spend</span>
-          <span className="font-semibold tabular-nums text-[#122540]">
+          <span className="font-medium text-[var(--fl-ink)]">Safe to spend</span>
+          <span className="font-semibold tabular-nums text-[var(--fl-ink)]">
             {isShort
               ? `${formatEuro(Math.abs(animatedResult))} short`
               : formatEuro(animatedResult)}
@@ -191,8 +194,8 @@ export function InteractiveHero() {
         </motion.div>
       </motion.div>
 
-      <p className="mt-4 text-xs text-[#5b6472]">
-        Not tax advice — a clear estimate to work from. Your numbers never
+      <p className="mt-4 text-xs text-[var(--fl-slate)]">
+        Not tax advice. A clear estimate to work from. Your numbers never
         leave your browser.
       </p>
     </div>

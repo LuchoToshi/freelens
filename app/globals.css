@@ -9,7 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-serif: var(--font-fraunces);
+  --font-heading: var(--font-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -81,6 +82,20 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Freelens brand tokens */
+  --fl-canvas: #faf9f6;
+  --fl-ink: #122540;
+  --fl-ink-hover: #0d1b30;
+  --fl-slate: #5b6472;
+  --fl-line: #e3e1da;
+  --fl-text: #1c1e21;
+  --fl-good-tint: #eaf4ee;
+  --fl-good-text: #1f7a4d;
+  --fl-tight-tint: #fbf1de;
+  --fl-tight-text: #8a5c14;
+  --fl-short-tint: #fbeaea;
+  --fl-short-text: #b8362b;
 }
 
 .dark {
