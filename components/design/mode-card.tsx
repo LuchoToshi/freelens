@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentType, SVGProps } from "react";
+import type { ComponentType, Ref, SVGProps } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 /**
@@ -29,6 +29,7 @@ export function ModeCard({
   id,
   controls,
   onSelect,
+  ref,
 }: {
   index: number;
   title: string;
@@ -39,12 +40,14 @@ export function ModeCard({
   id: string;
   controls: string;
   onSelect: () => void;
+  ref?: Ref<HTMLButtonElement>;
 }) {
   const reduce = useReducedMotion();
   const number = String(index).padStart(2, "0");
 
   return (
     <button
+      ref={ref}
       type="button"
       role="tab"
       id={id}

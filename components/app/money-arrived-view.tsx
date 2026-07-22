@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CurrencyField, PercentField } from "@/components/app/fields";
@@ -9,6 +10,7 @@ import { AllocationBar } from "@/components/app/allocation-bar";
 import { WhyThisNumber } from "@/components/app/why-this-number";
 import { DisclaimerNote } from "@/components/disclaimer-note";
 import { ExampleBadge } from "@/components/example-badge";
+import { AnimatedAmount } from "@/components/design/animated-amount";
 import {
   cardClass,
   hintClass,
@@ -42,6 +44,18 @@ const TREATMENT_LABELS: Record<VatTreatment, string> = {
   "mixed-unsure": "Mixed / unsure",
 };
 
+// The non-numeric ("other") VAT treatments, revealed behind progressive
+// disclosure so the common 21% / 9% path stays calm (audit M3).
+const OTHER_TREATMENTS: VatTreatment[] = [
+  "0",
+  "exempt",
+  "reverse-charged",
+  "kor",
+  "mixed-unsure",
+];
+
+type VatMode = "21" | "9" | "other";
+
 // Ephemeral example shown before the user enters a real amount.
 const SAMPLE = buildSample();
 
@@ -59,6 +73,61 @@ function buildSample() {
   });
 }
 
+/** A sliding segmented pill toggle (audit M3). */
+function Segmented<T extends string>({
+  name,
+  ariaLabel,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  ariaLabel: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (next: T) => void;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className="inline-flex w-fit rounded-xl border border-[var(--fl-line)] bg-white p-1"
+    >
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(opt.value)}
+            className="relative min-h-11 rounded-lg px-4 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            {active && (
+              <motion.span
+                layoutId={`seg-${name}`}
+                aria-hidden="true"
+                className="absolute inset-0 rounded-lg bg-[var(--fl-ink)]"
+                transition={
+                  reduce
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 320, damping: 30 }
+                }
+              />
+            )}
+            <span
+              className={`relative z-10 ${active ? "text-white" : "text-[var(--fl-ink)]"}`}
+            >
+              {opt.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function MoneyArrivedView({
   setup,
   onHandled,
@@ -67,6 +136,12 @@ export function MoneyArrivedView({
   onHandled: (allocation: StoredAllocation) => void;
 }) {
   const defaultTreatment: VatTreatment = setup?.commonVatTreatments?.[0] ?? "21";
+  const defaultMode: VatMode =
+    defaultTreatment === "21" || defaultTreatment === "9"
+      ? defaultTreatment
+      : "other";
+  const defaultOther: VatTreatment =
+    defaultMode === "other" ? defaultTreatment : "reverse-charged";
   const defaultPct =
     setup?.reserveMethod.mode === "own-rule"
       ? String(setup.reserveMethod.percentage)
@@ -76,12 +151,17 @@ export function MoneyArrivedView({
   const [includesVat, setIncludesVat] = useState(
     setup?.amountsDefaultInclusive ?? true
   );
-  const [treatment, setTreatment] = useState<VatTreatment>(defaultTreatment);
+  const [vatMode, setVatMode] = useState<VatMode>(defaultMode);
+  const [otherTreatment, setOtherTreatment] =
+    useState<VatTreatment>(defaultOther);
   const [reservePct, setReservePct] = useState(defaultPct);
   const [businessReserve, setBusinessReserve] = useState("");
   const [deductibleCosts, setDeductibleCosts] = useState("");
   const [label, setLabel] = useState("");
   const [handled, setHandled] = useState(false);
+
+  const treatment: VatTreatment = vatMode === "other" ? otherTreatment : vatMode;
+  const numeric = vatMode !== "other";
 
   const amountCents = parseAmountInput(amount).cents;
   const hasAmount = amountCents !== null && amountCents > 0;
@@ -89,7 +169,7 @@ export function MoneyArrivedView({
   const result: PaymentAllocationResult | null = hasAmount
     ? buildResult({
         amountCents,
-        includesVat,
+        includesVat: numeric ? includesVat : true,
         treatment,
         reservePct,
         businessReserve,
@@ -117,114 +197,132 @@ export function MoneyArrivedView({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-serif text-2xl font-medium text-[var(--fl-ink)] sm:text-3xl">
-          Money arrived
-        </h2>
-        <p className={hintClass}>Give every euro a job before it feels available.</p>
-      </div>
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        {/* Inputs — "what I tell Freelens". */}
+        <Card className={cardClass}>
+          <CardContent className="flex flex-col gap-5 p-6">
+            <CurrencyField
+              id="payment-amount"
+              label="How much did you receive?"
+              placeholder="1500"
+              leadingSymbol="€"
+              size="lg"
+              value={amount}
+              onChange={(v) => {
+                setAmount(v);
+                setHandled(false);
+              }}
+            />
 
-      <Card className={cardClass}>
-        <CardContent className="flex flex-col gap-5 p-6">
-          <CurrencyField
-            id="payment-amount"
-            label="How much did you receive?"
-            placeholder="e.g. 1500"
-            value={amount}
-            onChange={(v) => {
-              setAmount(v);
-              setHandled(false);
-            }}
-          />
+            {numeric && (
+              <div className="flex flex-col gap-1.5">
+                <Label className={labelClass}>Does this amount include VAT?</Label>
+                <Segmented
+                  name="vat-inclusion"
+                  ariaLabel="VAT inclusion"
+                  value={includesVat ? "incl" : "excl"}
+                  onChange={(v) => setIncludesVat(v === "incl")}
+                  options={[
+                    { value: "incl", label: "Includes VAT" },
+                    { value: "excl", label: "Excludes VAT" },
+                  ]}
+                />
+              </div>
+            )}
 
-          <div className="flex flex-col gap-1.5">
-            <Label className={labelClass}>Does this amount include VAT?</Label>
-            <div className="flex gap-2" role="group" aria-label="VAT inclusion">
-              {[
-                { v: true, l: "Includes VAT" },
-                { v: false, l: "Excludes VAT" },
-              ].map((opt) => (
-                <button
-                  key={String(opt.v)}
-                  type="button"
-                  aria-pressed={includesVat === opt.v}
-                  onClick={() => setIncludesVat(opt.v)}
-                  className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
-                    includesVat === opt.v
-                      ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                      : "border-[var(--fl-line)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
-                  }`}
-                >
-                  {opt.l}
-                </button>
-              ))}
+            <div className="flex flex-col gap-1.5">
+              <Label className={labelClass}>VAT treatment</Label>
+              <Segmented
+                name="vat-mode"
+                ariaLabel="VAT treatment"
+                value={vatMode}
+                onChange={setVatMode}
+                options={[
+                  { value: "21", label: "21%" },
+                  { value: "9", label: "9%" },
+                  { value: "other", label: "Other" },
+                ]}
+              />
+              {vatMode === "other" && (
+                <div className="mt-1.5 flex flex-col gap-1.5">
+                  <Label className={labelClass} htmlFor="vat-other">
+                    Which treatment?
+                  </Label>
+                  <select
+                    id="vat-other"
+                    value={otherTreatment}
+                    onChange={(e) =>
+                      setOtherTreatment(e.target.value as VatTreatment)
+                    }
+                    className="h-11 rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+                  >
+                    {OTHER_TREATMENTS.map((t) => (
+                      <option key={t} value={t}>
+                        {TREATMENT_LABELS[t]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1.5">
-            <Label className={labelClass} htmlFor="vat-treatment">
-              VAT treatment
-            </Label>
-            <select
-              id="vat-treatment"
-              value={treatment}
-              onChange={(e) => setTreatment(e.target.value as VatTreatment)}
-              className="h-9 rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-ink)]"
-            >
-              {(Object.keys(TREATMENT_LABELS) as VatTreatment[]).map((t) => (
-                <option key={t} value={t}>
-                  {TREATMENT_LABELS[t]}
-                </option>
-              ))}
-            </select>
-          </div>
+            <PercentField
+              id="reserve-pct"
+              label="Income tax and Zvw reserve (%)"
+              hint="A cautious percentage of this payment to set aside. A planning rule, not your final assessment."
+              value={reservePct}
+              onChange={setReservePct}
+              compact
+            />
 
-          <PercentField
-            id="reserve-pct"
-            label="Income tax and Zvw reserve (%)"
-            hint="A cautious percentage of this payment to set aside. A planning rule, not your final assessment."
-            value={reservePct}
-            onChange={setReservePct}
-            compact
-          />
+            <details className="rounded-lg border border-[var(--fl-line)] p-3">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm font-medium text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
+                Add costs and a label (optional)
+              </summary>
+              <div className="mt-4 flex flex-col gap-5">
+                <CurrencyField
+                  id="business-reserve"
+                  label="Set aside for business costs"
+                  placeholder="e.g. 500"
+                  leadingSymbol="€"
+                  value={businessReserve}
+                  onChange={setBusinessReserve}
+                />
+                <CurrencyField
+                  id="deductible-costs"
+                  label="Deductible costs linked to this payment"
+                  hint="Lowers the amount your reserve percentage applies to. This does not change VAT — your VAT return may differ after input VAT."
+                  placeholder="e.g. 200"
+                  leadingSymbol="€"
+                  value={deductibleCosts}
+                  onChange={setDeductibleCosts}
+                />
+                <CurrencyField
+                  id="payment-label"
+                  label="Label"
+                  placeholder="e.g. Editorial shoot, Friday DJ set"
+                  value={label}
+                  onChange={setLabel}
+                />
+              </div>
+            </details>
+          </CardContent>
+        </Card>
 
-          <CurrencyField
-            id="business-reserve"
-            label="Set aside for business costs (optional)"
-            placeholder="e.g. 500"
-            value={businessReserve}
-            onChange={setBusinessReserve}
-          />
-
-          <CurrencyField
-            id="deductible-costs"
-            label="Deductible costs linked to this payment (optional)"
-            hint="Lowers the amount your reserve percentage applies to. This does not change VAT — your VAT return may differ after input VAT."
-            placeholder="e.g. 200"
-            value={deductibleCosts}
-            onChange={setDeductibleCosts}
-          />
-
-          <CurrencyField
-            id="payment-label"
-            label="Label (optional)"
-            placeholder="e.g. Client X invoice"
-            value={label}
-            onChange={setLabel}
-          />
-        </CardContent>
-      </Card>
-
-      {result ? (
-        <ResultCard
-          result={result}
-          treatment={treatment}
-          handled={handled}
-          onMarkHandled={handleMarkHandled}
-        />
-      ) : (
-        <SampleCard />
-      )}
+        {/* Result — "what Freelens gives me". Sticky, distinct surface. */}
+        <div className="lg:sticky lg:top-24">
+          {result ? (
+            <ResultCard
+              result={result}
+              treatment={treatment}
+              handled={handled}
+              onMarkHandled={handleMarkHandled}
+            />
+          ) : (
+            <SampleCard />
+          )}
+        </div>
+      </div>
 
       <DisclaimerNote />
     </div>
@@ -281,6 +379,9 @@ function buildResult(args: {
   });
 }
 
+const stageCardClass =
+  "rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm";
+
 function ResultCard({
   result,
   treatment,
@@ -317,7 +418,7 @@ function ResultCard({
   ].filter((s): s is NonNullable<typeof s> => s !== null);
 
   return (
-    <Card className={cardClass}>
+    <Card className={stageCardClass}>
       <CardContent className="flex flex-col gap-5 p-6">
         <dl className="flex flex-col gap-2">
           <Row label="Payment received" value={formatEuro(result.grossPaymentCents)} />
@@ -348,15 +449,16 @@ function ResultCard({
 
         <div className="flex flex-col gap-1 border-t border-[var(--fl-line)] pt-4">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            {isShort ? "This payment doesn't cover your set-asides" : "Available for personal payout"}
+            {isShort
+              ? "This payment doesn't cover your set-asides"
+              : "Available for personal payout"}
           </span>
-          <span
-            className={`font-serif text-4xl font-medium tracking-tight tabular-nums sm:text-5xl ${
+          <AnimatedAmount
+            cents={result.availableForPersonalPayoutCents}
+            className={`font-serif text-4xl font-medium tracking-tight sm:text-5xl ${
               isShort ? "text-[var(--fl-short-text)]" : "text-[var(--fl-ink)]"
             }`}
-          >
-            {formatEuro(result.availableForPersonalPayoutCents)}
-          </span>
+          />
         </div>
 
         <AllocationBar segments={segments} />
@@ -374,7 +476,7 @@ function ResultCard({
 
         <div className="flex flex-col gap-2 border-t border-[var(--fl-line)] pt-4">
           {handled ? (
-            <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-good-text)]">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-payout-text)]">
               <Check className="size-4" aria-hidden="true" />
               Saved on this device.
             </p>
@@ -398,7 +500,7 @@ function SampleCard() {
     {
       label: "VAT",
       cents: SAMPLE.vatComponentCents ?? asCentsUnsafe(0),
-      color: "var(--fl-tight-text)",
+      color: "var(--fl-vat-fill)",
     },
     { label: "Reserve", cents: SAMPLE.reserveCents, color: "var(--fl-reserve-fill)" },
     {
@@ -408,7 +510,7 @@ function SampleCard() {
     },
   ];
   return (
-    <Card className={cardClass}>
+    <Card className={stageCardClass}>
       <CardContent className="flex flex-col gap-4 p-6">
         <div className="flex items-center gap-2">
           <ExampleBadge />
@@ -433,7 +535,7 @@ function SampleCard() {
           <span className="text-sm font-medium text-[var(--fl-slate)]">
             Available for personal payout
           </span>
-          <span className="font-serif text-3xl font-medium tracking-tight tabular-nums text-[var(--fl-ink)] sm:text-4xl">
+          <span className="fl-tnum font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
             {formatEuro(SAMPLE.availableForPersonalPayoutCents)}
           </span>
         </div>
@@ -457,7 +559,7 @@ function Row({
       <dt className={muted ? "text-sm text-[var(--fl-slate)]" : "text-sm font-medium text-[var(--fl-ink)]"}>
         {label}
       </dt>
-      <dd className="font-mono text-sm tabular-nums text-[var(--fl-ink)]">
+      <dd className="fl-tnum font-mono text-sm text-[var(--fl-ink)]">
         {value}
       </dd>
     </div>
