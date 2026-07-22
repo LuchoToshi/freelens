@@ -1,0 +1,144 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
+import { getActiveTaxYearConfig, isVerifiedTaxYearConfig } from "@/lib/domain/taxYearConfig";
+
+export const metadata: Metadata = {
+  title: "Accuracy and sources — Freelens",
+  description:
+    "What Freelens does and does not calculate, the reserve rules it applies, and the official Dutch sources behind them.",
+};
+
+const CATEGORIES = ["VAT", "Income tax & Zvw", "Deductions", "Invoicing"] as const;
+
+export default function AccuracyPage() {
+  const config = getActiveTaxYearConfig(2026);
+  const taxYear = config.taxYear;
+
+  return (
+    <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-12 sm:px-6">
+        <Link
+          href="/"
+          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] hover:underline"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
+          Back
+        </Link>
+
+        <div className="flex flex-col gap-3">
+          <h1 className="font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+            Accuracy and sources
+          </h1>
+          <p className="text-base leading-relaxed text-[var(--fl-slate)]">
+            Freelens provides planning estimates based on the information and
+            reserve rules you enter. It does not calculate your final tax
+            assessment and is not tax advice.
+          </p>
+        </div>
+
+        <section className="flex flex-col gap-3">
+          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            What Freelens is
+          </h2>
+          <ul className="flex flex-col gap-2 text-sm leading-relaxed text-[var(--fl-slate)]">
+            <li>It applies your chosen reserve rules consistently.</li>
+            <li>It separates VAT and makes your reserves visible.</li>
+            <li>It turns a payment into a clear allocation plan.</li>
+            <li>It keeps a local record of your position, on your device only.</li>
+          </ul>
+          <h2 className="mt-4 font-serif text-xl font-medium text-[var(--fl-ink)]">
+            What Freelens is not
+          </h2>
+          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+            Freelens does not replace the Belastingdienst, an accountant,
+            bookkeeping software, a tax return, or a provisional assessment. A
+            percentage applied to a payment is a reserve rule, not a calculation
+            of your income tax. Your final income tax depends on annual taxable
+            profit, deductions, credits, other income, and personal
+            circumstances that Freelens does not model.
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            Reference values for {taxYear}
+          </h2>
+          {isVerifiedTaxYearConfig(config) ? (
+            <ul className="flex flex-col gap-2 text-sm text-[var(--fl-slate)]">
+              <li>
+                General VAT rate {config.vat.standardRatePercentage.value}%,
+                reduced rate {config.vat.reducedRatePercentage.value}%.
+              </li>
+              <li>
+                Zvw contribution {config.zvw.ratePercentage.value}% up to the
+                maximum contribution income.
+              </li>
+              <li>
+                Guided-estimate reserve: a flat{" "}
+                {config.guidedEstimateFlatReservePercentage.value}% of profit for
+                income tax (a cautious planning heuristic, not a bracket
+                calculation), with Zvw shown separately.
+              </li>
+              <li>
+                Shown for context only, not used in any calculation:
+                zelfstandigenaftrek and the {config.mkbWinstvrijstellingPercentage.value}%
+                SME profit exemption.
+              </li>
+            </ul>
+          ) : (
+            <p className="text-sm text-[var(--fl-slate)]">
+              Tax references for {taxYear} have not yet been verified. You can
+              still use your own reserve amount or a provisional assessment.
+            </p>
+          )}
+          <p className="text-xs text-[var(--fl-slate)]">
+            These figures require review before they support another tax year.
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            Official sources
+          </h2>
+          {CATEGORIES.map((category) => {
+            const entries = SOURCE_REGISTRY.filter((s) => s.category === category);
+            if (entries.length === 0) return null;
+            return (
+              <div key={category} className="flex flex-col gap-2">
+                <h3 className="text-sm font-semibold text-[var(--fl-ink)]">
+                  {category}
+                </h3>
+                <ul className="flex flex-col gap-3">
+                  {entries.map((entry) => (
+                    <li key={entry.id} className="flex flex-col gap-0.5">
+                      <a
+                        href={entry.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+                      >
+                        {entry.title}
+                      </a>
+                      <span className="text-xs leading-relaxed text-[var(--fl-slate)]">
+                        {entry.notes}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </section>
+
+        <Link
+          href="/tool"
+          className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)]"
+        >
+          Open Freelens
+        </Link>
+      </div>
+    </main>
+  );
+}

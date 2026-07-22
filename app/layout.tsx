@@ -21,9 +21,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Freelens: Always know what you can safely spend",
+  title: "Freelens: Money arrived. Know what happens next.",
   description:
-    "A calm, honest read on what's actually yours to spend, after tax. Built for Dutch freelancers and ZZP'ers. Your numbers never leave your browser.",
+    "Freelens helps Dutch freelancers and ZZP'ers separate VAT, protect a tax reserve, cover business costs, and see what may be available to pay themselves. Planning estimates, not tax advice. Your numbers stay on this device.",
 };
 
 export default function RootLayout({

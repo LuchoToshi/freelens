@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { LiveCalculator } from "@/components/home/live-calculator";
+import { InteractivePaymentExample } from "@/components/home/interactive-payment-example";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -24,9 +24,8 @@ export function HeroSection() {
 
   return (
     <section className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-12 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1fr_1fr] lg:gap-16">
-      {/* Mobile: calculator first, above the fold */}
       <div className="order-1 lg:order-2">
-        <LiveCalculator />
+        <InteractivePaymentExample />
       </div>
 
       <motion.div
@@ -48,15 +47,15 @@ export function HeroSection() {
             transition={itemTransition}
             className="max-w-xl text-balance font-serif text-4xl font-medium leading-[1.1] tracking-tight text-[var(--fl-ink)] sm:text-5xl"
           >
-            Always know what you can safely spend.
+            Money arrived. Know what happens next.
           </motion.h1>
           <motion.p
             variants={itemVariants}
             transition={itemTransition}
             className="max-w-lg text-lg leading-relaxed text-[var(--fl-slate)]"
           >
-            Drag your income and watch your real number appear. That&apos;s
-            it. No accounts, no spreadsheets.
+            Freelens helps you separate VAT, protect a tax reserve, cover
+            business costs, and see what may be available to pay yourself.
           </motion.p>
         </div>
         <motion.div
@@ -69,12 +68,18 @@ export function HeroSection() {
               href="/tool"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-ink)]"
             >
-              Get my number
+              Process a payment
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
+            <a
+              href="#how-it-works"
+              className="inline-flex min-h-12 items-center justify-center px-2 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] sm:min-h-0"
+            >
+              See how it works
+            </a>
           </div>
           <span className="text-xs text-[var(--fl-slate)]">
-            Free, no signup, nothing stored.
+            Free to try. No account. Your numbers stay on this device.
           </span>
         </motion.div>
       </motion.div>

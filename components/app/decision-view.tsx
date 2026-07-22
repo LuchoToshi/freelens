@@ -70,7 +70,7 @@ export function DecisionView({
           Check a decision
         </h2>
         <p className={hintClass}>
-          See how a planned purchase fits against what&apos;s safely yours.
+          See how a planned purchase fits against your optional spending room.
         </p>
       </div>
 
@@ -154,7 +154,7 @@ export function DecisionView({
               <button type="button" onClick={onGoToCheckin} className="font-medium text-[var(--fl-ink)] underline">
                 Do a weekly check-in
               </button>{" "}
-              to check against your real numbers.
+              to check against your own numbers.
             </p>
           )}
         </>
