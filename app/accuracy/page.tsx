@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink, ShieldCheck, CircleAlert, CircleHelp } from "lucide-react";
 import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
 import { getActiveTaxYearConfig, isVerifiedTaxYearConfig } from "@/lib/domain/taxYearConfig";
 
@@ -12,25 +12,55 @@ export const metadata: Metadata = {
 
 const CATEGORIES = ["VAT", "Income tax & Zvw", "Deductions", "Invoicing"] as const;
 
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+function reviewedLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "recently";
+  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(d);
+}
+
 export default function AccuracyPage() {
   const config = getActiveTaxYearConfig(2026);
   const taxYear = config.taxYear;
+  const reviewed = isVerifiedTaxYearConfig(config)
+    ? reviewedLabel(config.vat.standardRatePercentage.dateLastVerified)
+    : null;
 
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-12 sm:px-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 sm:px-6">
         <Link
           href="/"
-          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] hover:underline"
+          className="inline-flex min-h-11 w-fit items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
           <ArrowLeft className="size-3.5" aria-hidden="true" />
           Back
         </Link>
 
-        <div className="flex flex-col gap-3">
-          <h1 className="font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+        <div className="flex flex-col gap-4">
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
             Accuracy and sources
+          </span>
+          <h1 className="font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+            What Freelens is honest about.
           </h1>
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center rounded-full bg-[var(--fl-reserve-tint)] px-3 py-1 text-xs font-semibold text-[var(--fl-reserve-text)]">
+              Tax year {taxYear}
+            </span>
+            {reviewed && (
+              <span className="inline-flex items-center rounded-full bg-[var(--fl-payout-tint)] px-3 py-1 text-xs font-semibold text-[var(--fl-payout-text)]">
+                Last reviewed {reviewed}
+              </span>
+            )}
+          </div>
           <p className="text-base leading-relaxed text-[var(--fl-slate)]">
             Freelens provides planning estimates based on the information and
             reserve rules you enter. It does not calculate your final tax
@@ -38,31 +68,44 @@ export default function AccuracyPage() {
           </p>
         </div>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
-            What Freelens is
-          </h2>
-          <ul className="flex flex-col gap-2 text-sm leading-relaxed text-[var(--fl-slate)]">
-            <li>It applies your chosen reserve rules consistently.</li>
-            <li>It separates VAT and makes your reserves visible.</li>
-            <li>It turns a payment into a clear allocation plan.</li>
-            <li>It keeps a local record of your position, on your device only.</li>
-          </ul>
-          <h2 className="mt-4 font-serif text-xl font-medium text-[var(--fl-ink)]">
-            What Freelens is not
-          </h2>
-          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-            Freelens does not replace the Belastingdienst, an accountant,
-            bookkeeping software, a tax return, or a provisional assessment. A
-            percentage applied to a payment is a reserve rule, not a calculation
-            of your income tax. Your final income tax depends on annual taxable
-            profit, deductions, credits, other income, and personal
-            circumstances that Freelens does not model.
-          </p>
-        </section>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* What it is. */}
+          <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-6">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="size-5 text-[var(--fl-payout-text)]" aria-hidden="true" />
+              <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
+                What Freelens is
+              </h2>
+            </div>
+            <ul className="flex flex-col gap-2 text-sm leading-relaxed text-[var(--fl-slate)]">
+              <li>It applies your chosen reserve rules consistently.</li>
+              <li>It separates VAT and makes your reserves visible.</li>
+              <li>It turns a payment into a clear allocation plan.</li>
+              <li>It keeps a local record of your position, on your device only.</li>
+            </ul>
+          </section>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+          {/* What it is not — designed caution. */}
+          <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-short-text)]/30 bg-[var(--fl-short-tint)] p-6">
+            <div className="flex items-center gap-2">
+              <CircleAlert className="size-5 text-[var(--fl-short-text)]" aria-hidden="true" />
+              <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
+                What Freelens is not
+              </h2>
+            </div>
+            <p className="text-sm leading-relaxed text-[var(--fl-ink)]">
+              Not the Belastingdienst, an accountant, bookkeeping software, a tax
+              return, or a provisional assessment. A percentage applied to a
+              payment is a reserve rule, not a calculation of your income tax.
+              Your final income tax depends on annual taxable profit, deductions,
+              credits, other income, and personal circumstances Freelens does not
+              model.
+            </p>
+          </section>
+        </div>
+
+        <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-6">
+          <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
             Reference values for {taxYear}
           </h2>
           {isVerifiedTaxYearConfig(config) ? (
@@ -107,23 +150,45 @@ export default function AccuracyPage() {
             if (entries.length === 0) return null;
             return (
               <div key={category} className="flex flex-col gap-2">
-                <h3 className="text-sm font-semibold text-[var(--fl-ink)]">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
                   {category}
                 </h3>
                 <ul className="flex flex-col gap-3">
                   {entries.map((entry) => (
-                    <li key={entry.id} className="flex flex-col gap-0.5">
-                      <a
-                        href={entry.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
-                      >
-                        {entry.title}
-                      </a>
-                      <span className="text-xs leading-relaxed text-[var(--fl-slate)]">
+                    <li
+                      key={entry.id}
+                      className="flex flex-col gap-2 rounded-xl border border-[var(--fl-line)] bg-white p-4"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <a
+                          href={entry.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+                        >
+                          {entry.title}
+                          <ExternalLink className="size-3.5" aria-hidden="true" />
+                        </a>
+                        {entry.verified ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--fl-payout-tint)] px-2 py-0.5 text-[11px] font-semibold text-[var(--fl-payout-text)]">
+                            <ShieldCheck className="size-3" aria-hidden="true" />
+                            Verified link
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--fl-vat-tint)] px-2 py-0.5 text-[11px] font-semibold text-[var(--fl-vat-text)]">
+                            <CircleHelp className="size-3" aria-hidden="true" />
+                            Needs review
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
                         {entry.notes}
-                      </span>
+                      </p>
+                      {hostOf(entry.url) && (
+                        <span className="text-[11px] uppercase tracking-wide text-[var(--fl-slate)]">
+                          {hostOf(entry.url)}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -134,7 +199,7 @@ export default function AccuracyPage() {
 
         <Link
           href="/tool"
-          className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)]"
+          className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
           Open Freelens
         </Link>
