@@ -1,0 +1,56 @@
+https://freelens-mvp.vercel.app
+
+DESIGN DIRECTION (Freelens landing, hero section):
+Go bold on the left side. Let the whole left column carry a full-bleed image or moving visual of a real creative at work (a dancer, a hairdresser, a photographer), shot editorial style. Keep the calculator card on a clean surface floating over it so the numbers stay legible and trustworthy. Add motion on scroll, like the image subtly shifting or the planned 3D element, so it feels alive without touching the math. Test at 375px mobile so the background doesn't turn into noise.
+
+CURRENT PAGE COPY:
+For Dutch freelancers and ZZP'ers
+Money arrived. Know what happens next.
+Freelens helps you separate VAT, protect a tax reserve, cover business costs, and see what may be available to pay yourself.
+Process a payment | See how it works
+Free to try. No account. Your numbers stay on this device.
+
+Calculator card:
+EXAMPLE — Example uses 21% VAT and a 30% reserve.
+How much did you receive? 2500
+Includes VAT | Excludes VAT
+Payment received € 2.500
+VAT included in this payment € 434
+Income tax and Zvw reserve € 620
+May be available to pay yourself € 1.446
+VAT: € 434 | Tax reserve: € 620 | Personal payout: € 1.446
+A planning estimate, not a tax assessment. The real tool uses your own VAT treatment and reserve rules. Your numbers stay on your device.
+
+—
+
+Freelens design ideas for creative freelancers (site + calculator):
+
+1. Headline personality: oversized serif with an animated reveal. Swap words dynamically, "Money arrived, from a shoot / from a gig / from a client", so each creative (photographer, dancer, hairdresser) sees themselves in the copy.
+
+2. Make the calculator the delight: numbers count up with a spring animation, the allocation bar animates as segments slide into place, satisfying micro-interactions when toggling Includes/Excludes VAT.
+
+3. Signature element: turn the allocation bar into a bold, color-coded visual language repeated across the whole site, almost like a brand mark.
+
+—
+
+Freelens calculator screen — design elevation for creative freelancers:
+
+1. Tabs as bold color-coded cards: turn the four tabs into cards, each with its own accent color and a tiny animated icon, like chapters in a portfolio.
+
+2. Give the form rhythm: it reads like a bank form now. Use oversized serif labels (Fraunces), generous spacing, and inputs that glow softly with the accent color on focus.
+
+3. Satisfying toggles: make the "Includes VAT / Excludes VAT" toggle a pill switch with a spring animation. Small micro-interactions are what design lovers notice.
+
+4. Hero moment — the example breakdown: turn it into a living, color-coded allocation bar that animates as the euros split (VAT, reserve, personal payout sliding into place), so the math itself becomes beautiful.
+
+—
+
+Freelens design notes — payout section, disclaimers, and footer:
+
+1. Payout number as emotional payoff: make "Available for personal payout" huge in the serif (Fraunces) and let the euro amount count up with a spring animation whenever inputs change.
+
+2. Allocation bar as hero: the current bar is too thin. Make it tall and tactile, with segments sliding in with color, and hover states that reveal each euro amount (VAT, reserve, personal payout).
+
+3. Disclaimers as a confidence block: the "not tax advice" and "saved only on this device" lines read like fine print. Restyle them as a calm confidence block: a small icon plus one warm sentence, framing privacy as a design feature, not legal noise.
+
+4. Footer as a closing moment: the footer is dead space right now. Give it a bold full-width color band in the Freelens palette with the wordmark oversized, like the last page of a portfolio.

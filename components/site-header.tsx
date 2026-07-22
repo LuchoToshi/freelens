@@ -6,13 +6,13 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
         <Link
           href="/"
-          className="font-serif text-xl font-medium tracking-tight text-[var(--fl-ink)] hover:opacity-80"
+          className="inline-flex min-h-11 items-center font-serif text-xl font-medium tracking-tight text-[var(--fl-ink)] hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
           Freelens
         </Link>
         <Link
           href="/tool"
-          className="text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
           Get my number
         </Link>

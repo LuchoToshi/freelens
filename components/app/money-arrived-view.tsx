@@ -298,21 +298,21 @@ function ResultCard({
       ? {
           label: "VAT",
           cents: result.vatComponentCents,
-          color: "var(--fl-tight-text)",
+          color: "var(--fl-vat-fill)",
         }
       : null,
-    { label: "Reserve", cents: result.reserveCents, color: "var(--fl-ink)" },
+    { label: "Reserve", cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
     result.obligationsCents > 0
       ? {
           label: "Business",
           cents: result.obligationsCents,
-          color: "var(--fl-slate)",
+          color: "var(--fl-costs-fill)",
         }
       : null,
     {
       label: "Personal payout",
       cents: result.availableForPersonalPayoutCents,
-      color: "var(--fl-good-text)",
+      color: "var(--fl-payout-fill)",
     },
   ].filter((s): s is NonNullable<typeof s> => s !== null);
 
@@ -400,11 +400,11 @@ function SampleCard() {
       cents: SAMPLE.vatComponentCents ?? asCentsUnsafe(0),
       color: "var(--fl-tight-text)",
     },
-    { label: "Reserve", cents: SAMPLE.reserveCents, color: "var(--fl-ink)" },
+    { label: "Reserve", cents: SAMPLE.reserveCents, color: "var(--fl-reserve-fill)" },
     {
       label: "Personal payout",
       cents: SAMPLE.availableForPersonalPayoutCents,
-      color: "var(--fl-good-text)",
+      color: "var(--fl-payout-fill)",
     },
   ];
   return (
