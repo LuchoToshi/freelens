@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { allocate } from "@/components/design/motion";
 import { formatEuro, type Cents } from "@/lib/domain/money";
 
 export interface AllocationSegment {
@@ -10,30 +12,79 @@ export interface AllocationSegment {
 }
 
 /**
- * A proportional, animated multi-segment bar (VAT / reserve / costs / buffer /
- * payout). Only positive segments are drawn; a negative payout is reported
- * separately by the caller. Respects prefers-reduced-motion.
+ * The Freelens signature (audit Q2 / Signature A): a tall, tactile, proportional
+ * allocation bar. Segments slide into place, reveal their share on hover / focus
+ * / tap, and are keyboard-focusable. Meaning is never carried by color alone —
+ * every segment has a text label in the always-visible legend and a full
+ * `aria-label`. Respects `prefers-reduced-motion`.
+ *
+ * The `segments` API is unchanged from the previous thin bar; `height` and
+ * `interactive` are optional additions with backward-compatible defaults.
  */
-export function AllocationBar({ segments }: { segments: AllocationSegment[] }) {
+export function AllocationBar({
+  segments,
+  height = 32,
+  interactive = true,
+}: {
+  segments: AllocationSegment[];
+  height?: number;
+  interactive?: boolean;
+}) {
   const reduce = useReducedMotion();
+  const [active, setActive] = useState<number | null>(null);
   const positive = segments.filter((s) => s.cents > 0);
   const total = positive.reduce((sum, s) => sum + s.cents, 0);
   if (total <= 0) return null;
 
+  const pct = (cents: Cents) => Math.round((cents / total) * 100);
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-[var(--fl-line)]">
-        {positive.map((s, i) => (
-          <motion.div
-            key={`${s.label}-${i}`}
-            className="h-full"
-            style={{ backgroundColor: s.color }}
-            initial={reduce ? false : { width: 0 }}
-            animate={{ width: `${(s.cents / total) * 100}%` }}
-            transition={{ duration: reduce ? 0 : 0.6, ease: "easeOut" }}
-          />
-        ))}
+    <div className="flex flex-col gap-2.5">
+      {/* Reserved caption row so the reveal never shifts layout on hover/focus. */}
+      <div
+        className="min-h-4 text-xs font-medium text-[var(--fl-ink)]"
+        aria-hidden="true"
+      >
+        {active !== null && positive[active] ? (
+          <span>
+            {positive[active].label} — {pct(positive[active].cents)}% ·{" "}
+            <span className="fl-tnum">{formatEuro(positive[active].cents)}</span>
+          </span>
+        ) : (
+          <span className="text-[var(--fl-slate)]">
+            Every euro, given a job
+          </span>
+        )}
       </div>
+
+      <div
+        className="flex w-full gap-px overflow-hidden rounded-full bg-[var(--fl-line)]"
+        style={{ height }}
+      >
+        {positive.map((s, i) => {
+          const isActive = active === i;
+          return (
+            <motion.div
+              key={`${s.label}-${i}`}
+              className="relative h-full first:rounded-l-full last:rounded-r-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+              style={{ backgroundColor: s.color }}
+              initial={reduce ? false : { width: 0 }}
+              animate={{
+                width: `${(s.cents / total) * 100}%`,
+                filter: isActive ? "brightness(1.06)" : "brightness(1)",
+              }}
+              transition={allocate(reduce)}
+              tabIndex={interactive ? 0 : -1}
+              aria-label={`${s.label}: ${pct(s.cents)} percent, ${formatEuro(s.cents)}`}
+              onMouseEnter={interactive ? () => setActive(i) : undefined}
+              onMouseLeave={interactive ? () => setActive(null) : undefined}
+              onFocus={interactive ? () => setActive(i) : undefined}
+              onBlur={interactive ? () => setActive(null) : undefined}
+            />
+          );
+        })}
+      </div>
+
       <ul className="flex flex-wrap gap-x-4 gap-y-1">
         {positive.map((s, i) => (
           <li
@@ -45,7 +96,7 @@ export function AllocationBar({ segments }: { segments: AllocationSegment[] }) {
               style={{ backgroundColor: s.color }}
               aria-hidden="true"
             />
-            {s.label}: {formatEuro(s.cents)}
+            {s.label}: <span className="fl-tnum">{formatEuro(s.cents)}</span>
           </li>
         ))}
       </ul>

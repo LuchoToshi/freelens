@@ -45,13 +45,13 @@ export function InteractivePaymentExample() {
 
   const segments = [
     result.vatComponentCents
-      ? { label: "VAT", cents: result.vatComponentCents, color: "var(--fl-tight-text)" }
+      ? { label: "VAT", cents: result.vatComponentCents, color: "var(--fl-vat-fill)" }
       : null,
-    { label: "Tax reserve", cents: result.reserveCents, color: "var(--fl-ink)" },
+    { label: "Tax reserve", cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
     {
       label: "Personal payout",
       cents: result.availableForPersonalPayoutCents,
-      color: "var(--fl-good-text)",
+      color: "var(--fl-payout-fill)",
     },
   ].filter((s): s is NonNullable<typeof s> => s !== null);
 

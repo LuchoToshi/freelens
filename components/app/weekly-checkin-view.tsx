@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CurrencyField } from "@/components/app/fields";
 import { StatusBanner } from "@/components/app/status-banner";
 import { WhyThisNumber } from "@/components/app/why-this-number";
 import { DisclaimerNote } from "@/components/disclaimer-note";
+import { AnimatedAmount } from "@/components/design/animated-amount";
 import {
   cardClass,
   hintClass,
@@ -26,6 +28,7 @@ import {
   evaluateWeeklyPosition,
   type CompletenessLevel,
   type WeeklyPositionInput,
+  type WeeklyPositionResult,
 } from "@/lib/domain/allocation";
 import type { ReserveSource } from "@/lib/domain/reserves";
 import type { StoredWeeklyPosition, UserSetup } from "@/lib/domain/persistence";
@@ -36,6 +39,12 @@ const COMPLETENESS_COPY: Record<CompletenessLevel, string> = {
   "quick-estimate": "Based on limited information and your chosen reserve rules.",
   "improved-estimate": "Includes actual reserve balances and upcoming obligations.",
   "bookkeeping-based": "Uses amounts entered from your bookkeeping.",
+};
+
+const STATUS_COLOR: Record<WeeklyPositionResult["status"], string> = {
+  "reserves-covered": "var(--fl-payout-fill)",
+  "limited-room": "var(--fl-vat-fill)",
+  "reserve-gap": "var(--fl-short-text)",
 };
 
 function centsToInput(cents: Cents | undefined): string {
@@ -121,6 +130,14 @@ export function WeeklyCheckinView({
 
   const result = input ? evaluateWeeklyPosition(input) : null;
 
+  // Progress rhythm: Balance -> Protected -> Costs -> Buffer.
+  const steps = [
+    { label: "Balance", done: hasBalance },
+    { label: "Protected", done: reserve.trim() !== "" || actualVat.trim() !== "" },
+    { label: "Costs", done: monthlyCosts.trim() !== "" },
+    { label: "Buffer", done: true },
+  ];
+
   function handleSave() {
     if (!input) return;
     onSave(input);
@@ -129,22 +146,15 @@ export function WeeklyCheckinView({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-serif text-2xl font-medium text-[var(--fl-ink)] sm:text-3xl">
-          Weekly check-in
-        </h2>
-        <p className={hintClass}>
-          A calm read on your position. Takes about a minute. Your numbers never
-          leave your browser.
-        </p>
-      </div>
+      <ProgressRhythm steps={steps} />
 
       <Card className={cardClass}>
         <CardContent className="flex flex-col gap-5 p-6">
           <CurrencyField
             id="balance"
             label="How much is in your business account?"
-            placeholder="e.g. 7000"
+            placeholder="7000"
+            leadingSymbol="€"
             value={balance}
             onChange={(v) => {
               setBalance(v);
@@ -156,7 +166,8 @@ export function WeeklyCheckinView({
           <CurrencyField
             id="reserve-amount"
             label="How much have you reserved for income tax and Zvw?"
-            placeholder="e.g. 1500"
+            placeholder="1500"
+            leadingSymbol="€"
             value={reserve}
             onChange={setReserve}
             hint="The amount you're keeping aside for tax. A planning figure, not a final assessment."
@@ -164,14 +175,16 @@ export function WeeklyCheckinView({
           <CurrencyField
             id="monthly-costs"
             label="Essential monthly business costs"
-            placeholder="e.g. 1200"
+            placeholder="1200"
+            leadingSymbol="€"
             value={monthlyCosts}
             onChange={setMonthlyCosts}
           />
           <CurrencyField
             id="obligations"
             label="Known upcoming obligations (optional)"
-            placeholder="e.g. 500"
+            placeholder="500"
+            leadingSymbol="€"
             value={obligations}
             onChange={setObligations}
           />
@@ -184,7 +197,7 @@ export function WeeklyCheckinView({
                   type="button"
                   aria-pressed={bufferMonths === m}
                   onClick={() => setBufferMonths(m)}
-                  className={`min-w-14 rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
+                  className={`inline-flex min-h-11 min-w-14 items-center justify-center rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
                     bufferMonths === m
                       ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
                       : "border-[var(--fl-line)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
@@ -218,7 +231,8 @@ export function WeeklyCheckinView({
               <CurrencyField
                 id="actual-vat"
                 label="Actual VAT currently reserved (optional)"
-                placeholder="e.g. 600"
+                placeholder="600"
+                leadingSymbol="€"
                 value={actualVat}
                 onChange={setActualVat}
                 hint="From your bookkeeping or latest VAT overview. Often more accurate than one payment."
@@ -226,7 +240,8 @@ export function WeeklyCheckinView({
               <CurrencyField
                 id="recommended-payout"
                 label="Personal payout you plan to take (optional)"
-                placeholder="e.g. 2000"
+                placeholder="2000"
+                leadingSymbol="€"
                 value={recommendedPayout}
                 onChange={setRecommendedPayout}
                 hint="Set this to see how much room remains beyond your planned salary."
@@ -246,7 +261,7 @@ export function WeeklyCheckinView({
                 : undefined
             }
           />
-          <Card className={cardClass}>
+          <Card className="rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm">
             <CardContent className="flex flex-col gap-5 p-6">
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-[var(--fl-slate)]">
@@ -254,26 +269,26 @@ export function WeeklyCheckinView({
                     ? "Short of your selected reserves by"
                     : "May be available for personal payout"}
                 </span>
-                <span
-                  className={`font-serif text-4xl font-medium tracking-tight tabular-nums sm:text-5xl ${
+                <AnimatedAmount
+                  cents={
+                    (result.availableForPersonalPayoutCents < 0
+                      ? Math.abs(result.availableForPersonalPayoutCents)
+                      : result.availableForPersonalPayoutCents) as Cents
+                  }
+                  className={`font-serif text-4xl font-medium tracking-tight sm:text-5xl ${
                     result.availableForPersonalPayoutCents < 0
                       ? "text-[var(--fl-short-text)]"
                       : "text-[var(--fl-ink)]"
                   }`}
-                >
-                  {formatEuro(
-                    result.availableForPersonalPayoutCents < 0
-                      ? (Math.abs(
-                          result.availableForPersonalPayoutCents
-                        ) as Cents)
-                      : result.availableForPersonalPayoutCents
-                  )}
-                </span>
-                <p className={hintClass}>
-                  Based on the information entered, your selected reserves and
-                  business buffer remain protected.
-                </p>
+                />
+                <p className={hintClass}>{interpret(result)}</p>
               </div>
+
+              <RunwayMeter
+                runwayMonths={result.runwayMonths}
+                bufferMonths={bufferMonths}
+                color={STATUS_COLOR[result.status]}
+              />
 
               <dl className="flex flex-col gap-2 border-t border-[var(--fl-line)] pt-4">
                 <Row label="VAT protected" value={formatEuro(result.vatProtectedCents)} />
@@ -289,14 +304,6 @@ export function WeeklyCheckinView({
                   label="Optional spending room"
                   value={formatEuro(result.optionalSpendingRoomCents)}
                 />
-                <Row
-                  label="Business runway"
-                  value={
-                    result.runwayMonths === null
-                      ? "Add monthly costs to estimate"
-                      : `${result.runwayMonths.toFixed(1)} months`
-                  }
-                />
               </dl>
 
               <WhyThisNumber
@@ -310,7 +317,7 @@ export function WeeklyCheckinView({
 
               <div className="flex flex-col gap-2 border-t border-[var(--fl-line)] pt-4">
                 {saveState ? (
-                  <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-good-text)]">
+                  <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-payout-text)]">
                     <Check className="size-4" aria-hidden="true" />
                     Saved on this device.
                   </p>
@@ -338,6 +345,90 @@ export function WeeklyCheckinView({
   );
 }
 
+/** One plain-language read of the result, only from figures we actually have. */
+function interpret(result: WeeklyPositionResult): string {
+  const runway =
+    result.runwayMonths === null
+      ? "Add monthly costs to estimate your runway."
+      : `You have ${result.runwayMonths.toFixed(1)} months of runway.`;
+  const tail =
+    result.status === "reserves-covered"
+      ? " Your selected reserves and buffer are covered."
+      : result.status === "limited-room"
+        ? " Reserves are covered, but spending room is tight."
+        : " Your balance doesn't yet cover all selected reserves.";
+  return runway + tail;
+}
+
+/** A calm horizon meter: runway months against the buffer-target marker. */
+function RunwayMeter({
+  runwayMonths,
+  bufferMonths,
+  color,
+}: {
+  runwayMonths: number | null;
+  bufferMonths: number;
+  color: string;
+}) {
+  const reduce = useReducedMotion();
+  if (runwayMonths === null) return null;
+  const scale = Math.max(6, bufferMonths, Math.ceil(runwayMonths));
+  const fillPct = Math.min(100, Math.max(0, (runwayMonths / scale) * 100));
+  const bufferPct = Math.min(100, (bufferMonths / scale) * 100);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="relative h-6 w-full overflow-hidden rounded-full bg-[var(--fl-line)]">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ backgroundColor: color }}
+          initial={reduce ? false : { width: 0 }}
+          animate={{ width: `${fillPct}%` }}
+          transition={{ duration: reduce ? 0 : 0.6, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <span
+          className="absolute top-0 h-full w-0.5 bg-[var(--fl-ink)]"
+          style={{ left: `${bufferPct}%` }}
+          aria-hidden="true"
+        />
+      </div>
+      <p className={hintClass}>
+        {runwayMonths.toFixed(1)} months of runway · buffer target {bufferMonths}{" "}
+        months.
+      </p>
+    </div>
+  );
+}
+
+function ProgressRhythm({
+  steps,
+}: {
+  steps: { label: string; done: boolean }[];
+}) {
+  return (
+    <ol className="flex items-center gap-2" aria-label="Check-in progress">
+      {steps.map((s, i) => (
+        <li key={s.label} className="flex items-center gap-2">
+          <span
+            className={`flex size-6 items-center justify-center rounded-full text-xs font-semibold ${
+              s.done
+                ? "bg-[var(--fl-payout-fill)] text-white"
+                : "border border-[var(--fl-line)] text-[var(--fl-slate)]"
+            }`}
+          >
+            {s.done ? <Check className="size-3.5" aria-hidden="true" /> : i + 1}
+          </span>
+          <span className="text-xs font-medium text-[var(--fl-slate)]">
+            {s.label}
+          </span>
+          {i < steps.length - 1 && (
+            <span className="h-px w-4 bg-[var(--fl-line)]" aria-hidden="true" />
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function reserveSourceNote(source: ReserveSource | "not-tracked"): string {
   switch (source) {
     case "own-rule":
@@ -357,7 +448,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className="text-sm text-[var(--fl-slate)]">{label}</dt>
-      <dd className="font-mono text-sm tabular-nums text-[var(--fl-ink)]">
+      <dd className="fl-tnum font-mono text-sm text-[var(--fl-ink)]">
         {value}
       </dd>
     </div>

@@ -3,17 +3,29 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBanner } from "@/components/app/status-banner";
 import { DisclaimerNote } from "@/components/disclaimer-note";
+import { ExampleBadge } from "@/components/example-badge";
+import { AnimatedAmount } from "@/components/design/animated-amount";
 import {
   cardClass,
   hintClass,
   linkButtonClass,
   primaryButtonClass,
 } from "@/components/app/styles";
-import { formatEuro } from "@/lib/domain/money";
+import { formatEuro, toCents } from "@/lib/domain/money";
 import { evaluateWeeklyPosition } from "@/lib/domain/allocation";
+import type { WeeklyPositionResult } from "@/lib/domain/allocation";
 import { isStale, type AppState } from "@/lib/domain/persistence";
 import { formatCheckInDate } from "@/lib/format-date";
 import type { AppView } from "@/components/app/nav-tabs";
+
+const RUNWAY_DIRECTION: Record<
+  WeeklyPositionResult["status"],
+  { label: string; color: string }
+> = {
+  "reserves-covered": { label: "On track", color: "var(--fl-payout-text)" },
+  "limited-room": { label: "Getting tight", color: "var(--fl-vat-text)" },
+  "reserve-gap": { label: "Below target", color: "var(--fl-short-text)" },
+};
 
 export function OverviewView({
   state,
@@ -35,15 +47,10 @@ export function OverviewView({
   if (!state.setup && !weekly && !state.lastAllocation) {
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <h2 className="font-serif text-2xl font-medium text-[var(--fl-ink)] sm:text-3xl">
-            Welcome to Freelens
-          </h2>
-          <p className="text-base leading-relaxed text-[var(--fl-slate)]">
-            Freelens helps you separate VAT, protect a tax reserve, cover
-            business costs, and see what may be available to pay yourself.
-          </p>
-        </div>
+        <p className="text-base leading-relaxed text-[var(--fl-slate)]">
+          Freelens helps you separate VAT, protect a tax reserve, cover business
+          costs, and see what may be available to pay yourself.
+        </p>
         <Card className={cardClass}>
           <CardContent className="flex flex-col items-start gap-3 p-6">
             <p className="text-base text-[var(--fl-ink)]">
@@ -59,6 +66,7 @@ export function OverviewView({
             </div>
           </CardContent>
         </Card>
+        <ExampleOverview />
         <DisclaimerNote />
       </div>
     );
@@ -66,18 +74,72 @@ export function OverviewView({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="font-serif text-2xl font-medium text-[var(--fl-ink)] sm:text-3xl">
-          Overview
-        </h2>
-      </div>
-
       {weekly && <StatusBanner status={weekly.result.status} />}
 
+      {/* 1. The permission moment — the hero number. */}
+      {weekly && (
+        <Card className="rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm">
+          <CardContent className="flex flex-col gap-1 p-6">
+            <span className="text-sm font-medium text-[var(--fl-slate)]">
+              May be available to pay yourself
+            </span>
+            <AnimatedAmount
+              cents={weekly.result.availableForPersonalPayoutCents}
+              className="font-serif text-4xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-5xl"
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 2. Protected. */}
+      {weekly && (
+        <Card className={cardClass}>
+          <CardContent className="flex flex-col gap-2 p-6">
+            <span className="text-sm font-medium text-[var(--fl-slate)]">
+              Protected
+            </span>
+            <Figure label="VAT" value={formatEuro(weekly.result.vatProtectedCents)} />
+            <Figure
+              label="Income tax and Zvw reserve"
+              value={formatEuro(weekly.result.reserveProtectedCents)}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 3. Runway — months and direction. */}
+      {weekly && (
+        <Card className={cardClass}>
+          <CardContent className="flex flex-col gap-2 p-6">
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="text-sm font-medium text-[var(--fl-slate)]">
+                Business runway
+              </span>
+              <span
+                className="text-xs font-semibold uppercase tracking-wide"
+                style={{ color: RUNWAY_DIRECTION[weekly.result.status].color }}
+              >
+                {RUNWAY_DIRECTION[weekly.result.status].label}
+              </span>
+            </div>
+            <span className="fl-tnum font-serif text-2xl font-medium text-[var(--fl-ink)]">
+              {weekly.result.runwayMonths === null
+                ? "Add monthly costs to estimate"
+                : `${weekly.result.runwayMonths.toFixed(1)} months`}
+            </span>
+            <p className={`${hintClass} pt-1`}>
+              Last updated {formatCheckInDate(weekly.timestampIso)}
+              {stale ? " — worth refreshing." : "."}
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 4. Next best action. */}
       <Card className={cardClass}>
         <CardContent className="flex flex-col gap-3 p-6">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            Suggested next step
+            Next best action
           </span>
           <p className="font-serif text-lg font-medium text-[var(--fl-ink)]">
             {nextAction.title}
@@ -91,35 +153,6 @@ export function OverviewView({
           </button>
         </CardContent>
       </Card>
-
-      {weekly && (
-        <Card className={cardClass}>
-          <CardContent className="flex flex-col gap-2 p-6">
-            <Figure
-              label="May be available for personal payout"
-              value={formatEuro(weekly.result.availableForPersonalPayoutCents)}
-              emphasis
-            />
-            <Figure label="Protected VAT" value={formatEuro(weekly.result.vatProtectedCents)} />
-            <Figure
-              label="Protected income tax and Zvw reserve"
-              value={formatEuro(weekly.result.reserveProtectedCents)}
-            />
-            <Figure
-              label="Business runway"
-              value={
-                weekly.result.runwayMonths === null
-                  ? "Add monthly costs to estimate"
-                  : `${weekly.result.runwayMonths.toFixed(1)} months`
-              }
-            />
-            <p className={`${hintClass} pt-1`}>
-              Last updated {formatCheckInDate(weekly.timestampIso)}
-              {stale ? " — worth refreshing." : "."}
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {state.lastAllocation && (
         <Card className={cardClass}>
@@ -146,6 +179,31 @@ export function OverviewView({
 
       <DisclaimerNote />
     </div>
+  );
+}
+
+/** A calm, clearly-labelled sample of the populated overview (audit). */
+function ExampleOverview() {
+  return (
+    <Card className="rounded-2xl border border-dashed border-[var(--fl-line)] bg-[var(--fl-surface-stage)]">
+      <CardContent className="flex flex-col gap-3 p-6">
+        <div className="flex items-center gap-2">
+          <ExampleBadge />
+          <p className={hintClass}>A filled-in week looks like this.</p>
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-medium text-[var(--fl-slate)]">
+            May be available to pay yourself
+          </span>
+          <span className="fl-tnum font-serif text-3xl font-medium text-[var(--fl-ink)]">
+            {formatEuro(toCents(2400))}
+          </span>
+        </div>
+        <Figure label="Protected VAT" value={formatEuro(toCents(700))} />
+        <Figure label="Protected reserve" value={formatEuro(toCents(1100))} />
+        <Figure label="Business runway" value="2.4 months" />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -202,7 +260,7 @@ function Figure({
     <div className="flex items-baseline justify-between gap-4">
       <span className="text-sm text-[var(--fl-slate)]">{label}</span>
       <span
-        className={`tabular-nums text-[var(--fl-ink)] ${
+        className={`fl-tnum text-[var(--fl-ink)] ${
           emphasis ? "font-serif text-xl font-medium" : "font-mono text-sm"
         }`}
       >

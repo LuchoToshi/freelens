@@ -96,6 +96,46 @@
   --fl-tight-text: #8a5c14;
   --fl-short-tint: #fbeaea;
   --fl-short-text: #b8362b;
+
+  /* Functional allocation palette — one semantic meaning everywhere.
+     Saturated *-fill for bars/active states; *-tint for surfaces;
+     *-text for AA-legible labels (all pairs >=4.5:1 on canvas/white/tint). */
+  --fl-vat-fill: #c07f16;
+  --fl-vat-tint: #f7ecd3;
+  --fl-vat-text: #7a5210;
+  --fl-reserve-fill: #3a52a3;
+  --fl-reserve-tint: #e6e9f5;
+  --fl-reserve-text: #2c3f80;
+  --fl-costs-fill: #b1543a;
+  --fl-costs-tint: #f6e3dd;
+  --fl-costs-text: #8f3f29;
+  --fl-payout-fill: #1f7a4d;
+  --fl-payout-tint: #e4f2ea;
+  --fl-payout-text: #196b42;
+  --fl-decision-fill: #6a4bb0;
+  --fl-decision-tint: #ece6f6;
+  --fl-decision-text: #543a91;
+
+  /* Three surface levels: page canvas, working card, highlighted result stage. */
+  --fl-surface-canvas: #faf9f6;
+  --fl-surface-card: #ffffff;
+  --fl-surface-stage: #f4f2ec;
+
+  /* Focus ring — visible, not color-alone, >=3:1 against adjacent surfaces. */
+  --fl-focus-ring: #122540;
+
+  /* Motion grammar (L3). Reduced-motion is handled in JS via useReducedMotion. */
+  --fl-motion-arrive: 420ms;
+  --fl-motion-allocate: 600ms;
+  --fl-motion-protect: 220ms;
+  --fl-motion-navigate: 320ms;
+  --fl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Money and any changing figure: tabular numerals so digits never reflow. */
+.fl-tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 .dark {
