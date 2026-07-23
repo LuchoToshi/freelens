@@ -29,6 +29,21 @@ export function SiteFooter() {
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6">
+          {[
+            { href: "/about", label: "About" },
+            { href: "/accuracy", label: "Accuracy & sources" },
+            { href: "/tool", label: "Open Freelens" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex min-h-9 items-center text-sm font-medium text-white/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );
