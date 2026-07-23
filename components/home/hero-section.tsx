@@ -56,8 +56,8 @@ export function HeroSection() {
           transition={itemTransition}
           className="max-w-lg text-lg leading-relaxed text-[var(--fl-slate)]"
         >
-          Freelens helps you separate VAT, protect a tax reserve, cover business
-          costs, and see what may be available to pay yourself.
+          A client paid you. See what&apos;s VAT, what to reserve for tax, what
+          stays in the business, and what you can pay yourself.
         </motion.p>
         <motion.div
           variants={itemVariants}
@@ -68,7 +68,7 @@ export function HeroSection() {
             href="/tool"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-7 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
           >
-            Process a payment
+            See what I can pay myself
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
           <a
@@ -93,6 +93,13 @@ export function HeroSection() {
             </li>
           ))}
         </motion.ul>
+        <motion.p
+          variants={itemVariants}
+          transition={itemTransition}
+          className="text-xs text-[var(--fl-slate)]"
+        >
+          Built on 2026 Dutch tax reference values. Updated July 2026.
+        </motion.p>
       </motion.div>
 
       {/* Product result floating on a clean surface over the creative crop.

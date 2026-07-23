@@ -25,7 +25,7 @@ export function SiteFooter() {
             href="/tool"
             className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
           >
-            Process a payment
+            See what I can pay myself
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>

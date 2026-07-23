@@ -12,7 +12,7 @@ export function FinalCtaSection() {
           href="/tool"
           className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-ink)]"
         >
-          Process a payment
+          See what I can pay myself
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </div>

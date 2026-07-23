@@ -11,6 +11,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
       <HeroSection />
+      <PositioningStrip />
       <ProblemSection />
       <HowItWorksSection />
       <PrivacySection />
@@ -18,6 +19,28 @@ export default function Home() {
       <FaqSection />
       <FinalCtaSection />
     </main>
+  );
+}
+
+function PositioningStrip() {
+  return (
+    <section
+      aria-label="What Freelens is"
+      className="border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
+    >
+      <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-12">
+        <p className="text-lg leading-relaxed text-[var(--fl-ink)] sm:text-xl">
+          <span className="font-medium">
+            The decision layer between your bank account and your bookkeeping.
+          </span>{" "}
+          <span className="text-[var(--fl-slate)]">
+            Your banking and bookkeeping already show what exists and what
+            happened. Freelens turns that into what you can safely do next. It
+            complements your tools, it doesn&apos;t replace them.
+          </span>
+        </p>
+      </div>
+    </section>
   );
 }
 

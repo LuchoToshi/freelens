@@ -14,7 +14,7 @@ export function SiteHeader() {
           href="/tool"
           className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
-          Get my number
+          See my payout
         </Link>
       </div>
     </header>
