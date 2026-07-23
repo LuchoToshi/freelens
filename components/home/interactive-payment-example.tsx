@@ -15,7 +15,7 @@ import {
 import { resolvePaymentVat } from "@/lib/domain/vat";
 import { allocatePayment } from "@/lib/domain/allocation";
 
-// Example assumptions, shown explicitly. This demo is ephemeral — it never
+// Example assumptions, shown explicitly. This demo is ephemeral, it never
 // reads or writes the visitor's saved data.
 const EXAMPLE_VAT_RATE = "21";
 const EXAMPLE_RESERVE_PCT = 30;

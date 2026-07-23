@@ -14,7 +14,7 @@ export interface AllocationSegment {
 /**
  * The Freelens signature (audit Q2 / Signature A): a tall, tactile, proportional
  * allocation bar. Segments slide into place, reveal their share on hover / focus
- * / tap, and are keyboard-focusable. Meaning is never carried by color alone —
+ * / tap, and are keyboard-focusable. Meaning is never carried by color alone-
  * every segment has a text label in the always-visible legend and a full
  * `aria-label`. Respects `prefers-reduced-motion`.
  *
@@ -47,7 +47,7 @@ export function AllocationBar({
       >
         {active !== null && positive[active] ? (
           <span>
-            {positive[active].label} — {pct(positive[active].cents)}% ·{" "}
+            {positive[active].label}: {pct(positive[active].cents)}% ·{" "}
             <span className="fl-tnum">{formatEuro(positive[active].cents)}</span>
           </span>
         ) : (

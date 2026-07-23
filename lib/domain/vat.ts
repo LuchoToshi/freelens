@@ -1,7 +1,7 @@
 /**
  * VAT handling. Numeric rates (21%, 9%) split a payment into VAT + net.
  * Non-numeric treatments (0%, exempt, reverse-charged, KOR, mixed/unsure)
- * never produce a "VAT to remit" figure — they return a structured
+ * never produce a "VAT to remit" figure, they return a structured
  * explanation, because a single payment cannot determine a VAT-return position.
  */
 import { asCentsUnsafe, subtractCents, type Cents } from "@/lib/domain/money";
@@ -64,10 +64,10 @@ export const VAT_EXPLANATIONS: Record<VatNonNumericTreatment, string> = {
   kor: "No VAT is added under the selected KOR treatment. Input VAT is generally not deductible while participating.",
   exempt:
     "No VAT is charged under the selected exempt treatment. The consequences for input VAT can vary.",
-  // Authored in-tone (not given verbatim in the brief) — review before ship.
+  // Authored in-tone (not given verbatim in the brief), review before ship.
   "0": "This treatment applies a 0% VAT rate, for example exports or intra-EU supplies. No VAT is added and no VAT reserve is needed for this amount, but confirm the transaction qualifies in your bookkeeping.",
   "mixed-unsure":
-    "This payment may mix VAT treatments, or the treatment isn't clear yet. No VAT amount is calculated automatically — check the invoice and your bookkeeping before deciding how much to set aside.",
+    "This payment may mix VAT treatments, or the treatment isn't clear yet. No VAT amount is calculated automatically, check the invoice and your bookkeeping before deciding how much to set aside.",
 };
 
 export interface NonNumericVatResult {

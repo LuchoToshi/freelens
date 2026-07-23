@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 /**
  * Reusable mode card (audit M1 / Signature D). Turns a calculator mode into a
  * bold, color-coded, numbered workspace card with its own accent, icon, and a
- * distinct active state — while preserving correct `role="tab"` semantics for
+ * distinct active state, while preserving correct `role="tab"` semantics for
  * use inside a tablist. Active state uses two cues (accent fill bar + tinted
  * surface + bolder text), never color alone.
  */
@@ -62,7 +62,7 @@ export function ModeCard({
       }`}
       style={active ? { backgroundColor: accent.tint } : undefined}
     >
-      {/* Accent bar — the second (non-color-alone) active cue. */}
+      {/* Accent bar, the second (non-color-alone) active cue. */}
       <motion.span
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-1 origin-left"

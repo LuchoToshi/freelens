@@ -200,7 +200,7 @@ export function MoneyArrivedView({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
-        {/* Inputs — "what I tell Freelens". */}
+        {/* Inputs, "what I tell Freelens". */}
         <Card className={cardClass}>
           <CardContent className="flex flex-col gap-5 p-6">
             <CurrencyField
@@ -274,7 +274,7 @@ export function MoneyArrivedView({
                   Most Dutch services use <strong>21%</strong>; some (like certain
                   food, culture, or press work) use <strong>9%</strong>. Pick{" "}
                   <strong>Other</strong> if you use the KOR, invoice reverse-charged
-                  or exempt work, or genuinely aren&apos;t sure — Freelens will then
+                  or exempt work, or genuinely aren&apos;t sure. Freelens will then
                   set no VAT aside and explain why. You can change this anytime.
                 </p>
               </details>
@@ -305,7 +305,7 @@ export function MoneyArrivedView({
                 <CurrencyField
                   id="deductible-costs"
                   label="Deductible costs linked to this payment"
-                  hint="Lowers the amount your reserve percentage applies to. This does not change VAT — your VAT return may differ after input VAT."
+                  hint="Lowers the amount your reserve percentage applies to. This does not change VAT, so your VAT return may differ after input VAT."
                   placeholder="e.g. 200"
                   leadingSymbol="€"
                   value={deductibleCosts}
@@ -323,7 +323,7 @@ export function MoneyArrivedView({
           </CardContent>
         </Card>
 
-        {/* Result — "what Freelens gives me". Sticky, distinct surface. */}
+        {/* Result, "what Freelens gives me". Sticky, distinct surface. */}
         <div className="lg:sticky lg:top-24">
           {result ? (
             <ResultCard

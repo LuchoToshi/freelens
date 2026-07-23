@@ -7,7 +7,7 @@ import { Accordion } from "@base-ui/react/accordion";
  * Confidence block (audit Q3 / Signature C). Replaces repeated fine-print
  * disclaimers with one calm, designed trust module: a shield mark, one warm
  * sentence, and an expandable "How this estimate works" detail. Frames privacy
- * and caution as product features, not legal noise — without dropping any
+ * and caution as product features, not legal noise, without dropping any
  * necessary caveat.
  */
 export function ConfidenceBlock({

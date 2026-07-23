@@ -4,7 +4,7 @@
  *
  * Every helper takes `reduce` (from `useReducedMotion()`) and collapses to an
  * instant/opacity-only change when the user prefers reduced motion. Financial
- * values must always be correct immediately — animation only affects presentation.
+ * values must always be correct immediately, animation only affects presentation.
  */
 import type { Transition, Variants } from "framer-motion";
 
@@ -30,21 +30,21 @@ export function arriveGroup(reduce: boolean | null, stagger = 0.08): Variants {
   };
 }
 
-/** Money dividing into segments — the allocation bar's spring. */
+/** Money dividing into segments, the allocation bar's spring. */
 export function allocate(reduce: boolean | null): Transition {
   return reduce
     ? { duration: 0 }
     : { type: "spring", stiffness: 120, damping: 20, mass: 0.6 };
 }
 
-/** A protected amount locking into place — a short snap. */
+/** A protected amount locking into place, a short snap. */
 export function protect(reduce: boolean | null): Transition {
   return reduce
     ? { duration: 0 }
     : { type: "spring", stiffness: 320, damping: 24 };
 }
 
-/** The permission moment — the payout settles last, with the strongest emphasis. */
+/** The permission moment, the payout settles last, with the strongest emphasis. */
 export function permission(reduce: boolean | null): Transition {
   return reduce
     ? { duration: 0 }

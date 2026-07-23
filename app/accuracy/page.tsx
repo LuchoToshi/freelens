@@ -5,7 +5,7 @@ import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
 import { getActiveTaxYearConfig, isVerifiedTaxYearConfig } from "@/lib/domain/taxYearConfig";
 
 export const metadata: Metadata = {
-  title: "Accuracy and sources — Freelens",
+  title: "Accuracy and sources · Freelens",
   description:
     "What Freelens does and does not calculate, the reserve rules it applies, and the official Dutch sources behind them.",
 };
@@ -27,7 +27,7 @@ const EDGE_CASES: { title: string; body: string }[] = [
   },
   {
     title: "Income outside freelancing",
-    body: "Employment, benefits, or a partner's income change your real tax rate. A flat reserve percentage can't see them — revisit your percentage if you have significant other income.",
+    body: "Employment, benefits, or a partner's income change your real tax rate. A flat reserve percentage can't see them, so revisit your percentage if you have significant other income.",
   },
   {
     title: "Major deductions",
@@ -108,7 +108,7 @@ export default function AccuracyPage() {
             </ul>
           </section>
 
-          {/* What it is not — designed caution. */}
+          {/* What it is not, designed caution. */}
           <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-short-text)]/30 bg-[var(--fl-short-tint)] p-6">
             <div className="flex items-center gap-2">
               <CircleAlert className="size-5 text-[var(--fl-short-text)]" aria-hidden="true" />

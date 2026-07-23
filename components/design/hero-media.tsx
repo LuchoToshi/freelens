@@ -5,11 +5,11 @@ import { useReducedMotion } from "framer-motion";
 /**
  * Hero media slot (audit L1). Structurally complete so a real editorial
  * photograph or muted loop of a working creative can be dropped in later without
- * a redesign — see docs/design-audit/ASSET-BRIEF.md.
+ * a redesign, see docs/design-audit/ASSET-BRIEF.md.
  *
  * Until a licensed asset exists, it renders a *designed* placeholder built from
  * the Freelens allocation palette and the "every euro has a job" label motif
- * (audit L4) — never generic stock. When `poster`/`src` are provided it renders
+ * (audit L4), never generic stock. When `poster`/`src` are provided it renders
  * responsive media instead; a muted loop falls back to its poster under
  * `prefers-reduced-motion`.
  */

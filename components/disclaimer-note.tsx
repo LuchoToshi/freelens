@@ -1,7 +1,7 @@
 import { ConfidenceBlock } from "@/components/design/confidence-block";
 
 /**
- * The calm accuracy disclaimer shown near every result — not hidden in the
+ * The calm accuracy disclaimer shown near every result, not hidden in the
  * footer. Now rendered through the shared {@link ConfidenceBlock}: one warm
  * sentence up front, with the full planning-estimate caveat preserved verbatim
  * behind "How this estimate works". `className` only adjusts spacing/placement.

@@ -55,7 +55,7 @@ const FAQS: { group: Group; question: string; answer: string }[] = [
     group: "VAT and reserve",
     question: "How does VAT work in Freelens?",
     answer:
-      "For a 21% or 9% payment, Freelens separates the VAT from the amount so you don't treat it as income. It labels it as VAT to keep aside — your actual VAT return may be lower or higher after deductible input VAT and other transactions.",
+      "For a 21% or 9% payment, Freelens separates the VAT from the amount so you don't treat it as income. It labels it as VAT to keep aside. Your actual VAT return may be lower or higher after deductible input VAT and other transactions.",
   },
   {
     group: "VAT and reserve",
@@ -67,7 +67,7 @@ const FAQS: { group: Group; question: string; answer: string }[] = [
     group: "VAT and reserve",
     question: "What if VAT is reverse-charged?",
     answer:
-      "Pick the reverse-charged treatment and Freelens won't treat any VAT as collected. Confirm the transaction in your bookkeeping — reverse-charged VAT isn't ordinary output VAT.",
+      "Pick the reverse-charged treatment and Freelens won't treat any VAT as collected. Confirm the transaction in your bookkeeping. Reverse-charged VAT isn't ordinary output VAT.",
   },
   {
     group: "VAT and reserve",

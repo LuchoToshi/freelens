@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 /**
  * A real closing moment (audit Q6): a full-width color band with an oversized
- * wordmark, one concise trust line, and a single primary action — the last page
+ * wordmark, one concise trust line, and a single primary action, the last page
  * of a portfolio, not dead space.
  */
 export function SiteFooter() {

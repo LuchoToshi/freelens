@@ -3,9 +3,9 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Why Freelens exists — the decision layer for freelancers",
+  title: "Why Freelens exists: the decision layer for freelancers",
   description:
-    "Freelens is the decision layer between your bank account and your bookkeeping. It complements your tools and turns one incoming payment into a simple, trustworthy plan — so paying yourself feels safe, not stressful.",
+    "Freelens is the decision layer between your bank account and your bookkeeping. It complements your tools and turns one incoming payment into a simple, trustworthy plan, so paying yourself feels safe, not stressful.",
 };
 
 export default function AboutPage() {
@@ -47,7 +47,7 @@ export default function AboutPage() {
           </p>
           <p className="text-lg leading-relaxed text-[var(--fl-slate)]">
             Creative freelancers are rarely held back by their craft. They&apos;re
-            held back by uncertainty around money — not because they&apos;re
+            held back by uncertainty around money, not because they&apos;re
             irresponsible, but because the tools built for them answer a different
             question.
           </p>
@@ -86,7 +86,7 @@ export default function AboutPage() {
             complexity.
           </p>
           <p className="text-lg leading-relaxed text-[var(--fl-slate)]">
-            It complements the rest of your stack — banking apps, accounting
+            It complements the rest of your stack: banking apps, accounting
             software, invoicing tools, spreadsheets all keep their place. Freelens
             doesn&apos;t replace them; it helps you decide when to pay yourself, how
             much to set aside, and how to stay ahead of obligations without
@@ -119,7 +119,7 @@ export default function AboutPage() {
           </h2>
           <p className="text-base leading-relaxed text-[#9db4d1]">
             No account. No bank connection. No cloud required. Your figures are
-            saved locally in your browser and never uploaded to Freelens — and you
+            saved locally in your browser and never uploaded to Freelens, and you
             can clear them at any time.
           </p>
         </section>
@@ -131,12 +131,12 @@ export default function AboutPage() {
           </h2>
           <p className="text-lg leading-relaxed text-[var(--fl-slate)]">
             Freelens wants to become the trusted financial decision layer for
-            independent creatives — not replacing accountants or bookkeeping, but
+            independent creatives, not replacing accountants or bookkeeping, but
             making everyday money decisions feel calm instead of stressful.
           </p>
           <p className="text-lg leading-relaxed text-[var(--fl-slate)]">
             Today everything is entered manually. Over time, optional conveniences
-            like CSV import and read-only imports may follow — always optional,
+            like CSV import and read-only imports may follow, always optional,
             never required, and never a bank login. As Freelens expands, new
             country-specific logic is added carefully, with local verification and
             visible proof where it matters. The core promise stays the same: help

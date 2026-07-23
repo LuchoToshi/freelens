@@ -170,7 +170,7 @@ export function SetupFlow({
                   scheme. If you joined it, you generally don&apos;t charge VAT or
                   file ordinary VAT returns. If you&apos;re registered for VAT and
                   send invoices with 21% or 9% on them, you&apos;re almost
-                  certainly not on the KOR. When unsure, answer No — you can change
+                  certainly not on the KOR. When unsure, answer No. You can change
                   it later.
                 </p>
               </details>
@@ -185,7 +185,7 @@ export function SetupFlow({
                 </div>
                 {treatments.includes("mixed-unsure") && (
                   <p className={hintClass}>
-                    No problem — you can pick the correct treatment for each
+                    No problem. You can pick the correct treatment for each
                     payment when it arrives.
                   </p>
                 )}

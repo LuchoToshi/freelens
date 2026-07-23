@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-// Behaviour-framed outcomes (what Freelens changes) — the product's promise,
+// Behaviour-framed outcomes (what Freelens changes), the product's promise,
 // deliberately NOT presented as quotes from invented people. Real freelancer
 // stories replace these once we have them.
 const OUTCOMES = [

@@ -14,7 +14,7 @@ const DEMO = [
 const STEPS = [
   {
     step: "Money arrives",
-    body: "Enter a payment. Freelens separates the VAT, sets aside an income tax and Zvw reserve, and protects your business costs — so what's left is genuinely available to pay yourself.",
+    body: "Enter a payment. Freelens separates the VAT, sets aside an income tax and Zvw reserve, and protects your business costs, so what's left is genuinely available to pay yourself.",
     accent: "var(--fl-vat-fill)",
     tint: "var(--fl-vat-tint)",
     visual: "allocate",
@@ -28,7 +28,7 @@ const STEPS = [
   },
   {
     step: "Check a decision",
-    body: "Thinking about a purchase or a payout? See whether it fits within your optional spending room, and what it does to your runway — before you spend, not after.",
+    body: "Thinking about a purchase or a payout? See whether it fits within your optional spending room, and what it does to your runway, before you spend, not after.",
     accent: "var(--fl-decision-fill)",
     tint: "var(--fl-decision-tint)",
     visual: "decision",

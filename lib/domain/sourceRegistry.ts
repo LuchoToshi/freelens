@@ -1,7 +1,7 @@
 /**
  * Registry of official Dutch government / Belastingdienst references behind the
  * tax and VAT concepts Freelens uses. Shown on /accuracy so users can check the
- * source. Only official government sources — never blogs.
+ * source. Only official government sources, never blogs.
  *
  * URL verification status is recorded in `verified`: true means the exact URL was
  * confirmed reachable on the official domain during implementation. All entries
@@ -78,7 +78,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/private-business-ownership-allowance/",
     category: "Deductions",
     notes:
-      "€1,200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational in Freelens — not used in any calculation.",
+      "€1,200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational in Freelens, not used in any calculation.",
     verified: true,
   },
   {
@@ -87,7 +87,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/sme-profit-exemption/",
     category: "Deductions",
     notes:
-      "12.70% of profit after entrepreneur deductions for 2026. Informational in Freelens — not used in any calculation.",
+      "12.70% of profit after entrepreneur deductions for 2026. Informational in Freelens, not used in any calculation.",
     verified: true,
   },
   {
