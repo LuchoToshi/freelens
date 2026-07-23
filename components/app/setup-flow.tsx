@@ -161,6 +161,19 @@ export function SetupFlow({
               <YesNo label="Are you an entrepreneur or freelancer in the Netherlands?" value={isEntrepreneurNL} onChange={setIsEntrepreneurNL} />
               <YesNo label="Are you registered for VAT?" value={vatRegistered} onChange={setVatRegistered} />
               <YesNo label="Do you take part in the KOR (Small Businesses Scheme)?" value={participatesKOR} onChange={setParticipatesKOR} />
+              <details className="-mt-2">
+                <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-xs font-medium text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
+                  What is the KOR? I&apos;m not sure
+                </summary>
+                <p className="mt-1.5 text-xs leading-relaxed text-[var(--fl-slate)]">
+                  The KOR (Kleineondernemersregeling) is a Dutch small-business
+                  scheme. If you joined it, you generally don&apos;t charge VAT or
+                  file ordinary VAT returns. If you&apos;re registered for VAT and
+                  send invoices with 21% or 9% on them, you&apos;re almost
+                  certainly not on the KOR. When unsure, answer No — you can change
+                  it later.
+                </p>
+              </details>
               <div className="flex flex-col gap-1.5">
                 <Label className={labelClass}>Which VAT treatments do you commonly use?</Label>
                 <div className="flex flex-wrap gap-2" role="group" aria-label="Common VAT treatments">

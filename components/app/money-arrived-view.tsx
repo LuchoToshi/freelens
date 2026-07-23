@@ -131,9 +131,11 @@ function Segmented<T extends string>({
 export function MoneyArrivedView({
   setup,
   onHandled,
+  onPersonalize,
 }: {
   setup: UserSetup | null;
   onHandled: (allocation: StoredAllocation) => void;
+  onPersonalize?: () => void;
 }) {
   const defaultTreatment: VatTreatment = setup?.commonVatTreatments?.[0] ?? "21";
   const defaultMode: VatMode =
@@ -264,12 +266,24 @@ export function MoneyArrivedView({
                   </select>
                 </div>
               )}
+              <details className="mt-0.5">
+                <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-xs font-medium text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
+                  I&apos;m not sure which VAT applies
+                </summary>
+                <p className="mt-1.5 text-xs leading-relaxed text-[var(--fl-slate)]">
+                  Most Dutch services use <strong>21%</strong>; some (like certain
+                  food, culture, or press work) use <strong>9%</strong>. Pick{" "}
+                  <strong>Other</strong> if you use the KOR, invoice reverse-charged
+                  or exempt work, or genuinely aren&apos;t sure — Freelens will then
+                  set no VAT aside and explain why. You can change this anytime.
+                </p>
+              </details>
             </div>
 
             <PercentField
               id="reserve-pct"
               label="Income tax and Zvw reserve (%)"
-              hint="A cautious percentage of this payment to set aside. A planning rule, not your final assessment."
+              hint="Not sure? 30% is a cautious default you can adjust anytime. A planning rule, not your final assessment."
               value={reservePct}
               onChange={setReservePct}
               compact
@@ -323,6 +337,19 @@ export function MoneyArrivedView({
           )}
         </div>
       </div>
+
+      {!setup && onPersonalize && (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-4 py-3 text-sm text-[var(--fl-slate)]">
+          <span>This uses sensible defaults (21% VAT, 30% reserve).</span>
+          <button
+            type="button"
+            onClick={onPersonalize}
+            className="min-h-9 font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            Personalize this estimate
+          </button>
+        </div>
+      )}
 
       <DisclaimerNote />
     </div>
@@ -451,7 +478,7 @@ function ResultCard({
           <span className="text-sm font-medium text-[var(--fl-slate)]">
             {isShort
               ? "This payment doesn't cover your set-asides"
-              : "Available for personal payout"}
+              : "Estimated amount available to pay yourself"}
           </span>
           <AnimatedAmount
             cents={result.availableForPersonalPayoutCents}
@@ -465,7 +492,7 @@ function ResultCard({
 
         <WhyThisNumber
           steps={result.breakdown}
-          resultLabel="Available for personal payout"
+          resultLabel="Estimated amount available to pay yourself"
           resultCents={result.availableForPersonalPayoutCents}
           reserveSourceNote="Reserve based on the percentage you set (a planning rule, not a tax assessment)."
         />
@@ -533,7 +560,7 @@ function SampleCard() {
         </dl>
         <div className="flex flex-col gap-1 border-t border-[var(--fl-line)] pt-4">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            Available for personal payout
+            Estimated amount available to pay yourself
           </span>
           <span className="fl-tnum font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
             {formatEuro(SAMPLE.availableForPersonalPayoutCents)}

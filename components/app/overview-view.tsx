@@ -54,14 +54,15 @@ export function OverviewView({
         <Card className={cardClass}>
           <CardContent className="flex flex-col items-start gap-3 p-6">
             <p className="text-base text-[var(--fl-ink)]">
-              Start with a quick setup, or process a payment right away.
+              See what one payment splits into. It takes about 30 seconds, and
+              needs no setup.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => onNavigate("setup")} className={primaryButtonClass}>
-                Set up Freelens
+              <button type="button" onClick={() => onNavigate("money-arrived")} className={primaryButtonClass}>
+                Try one payment (30 seconds)
               </button>
-              <button type="button" onClick={() => onNavigate("money-arrived")} className={linkButtonClass}>
-                Process a payment
+              <button type="button" onClick={() => onNavigate("setup")} className={linkButtonClass}>
+                Personalize my estimate (3 minutes)
               </button>
             </div>
           </CardContent>

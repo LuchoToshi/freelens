@@ -117,6 +117,7 @@ export function FreelensApp() {
             <MoneyArrivedView
               setup={app.state.setup}
               onHandled={app.recordAllocation}
+              onPersonalize={() => setView("setup")}
             />
           )}
           {view === "weekly-checkin" && (
