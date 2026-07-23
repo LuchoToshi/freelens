@@ -5,6 +5,7 @@ import { HowItWorksSection } from "@/components/home/how-it-works-section";
 import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
 import { FinalCtaSection } from "@/components/home/final-cta-section";
+import { SocialProofSection } from "@/components/home/social-proof-section";
 import { ConfidenceBlock } from "@/components/design/confidence-block";
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
       <PositioningStrip />
       <ProblemSection />
       <HowItWorksSection />
+      <SocialProofSection />
       <PrivacySection />
       <AccuracySection />
       <FaqSection />

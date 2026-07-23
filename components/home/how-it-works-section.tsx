@@ -21,7 +21,7 @@ const STEPS = [
   },
   {
     step: "A calm weekly check-in",
-    body: "Once a week, a quick read on your position: what's protected, what may be available, and how many months of runway you have. Saved on your device so it remembers, and you don't have to.",
+    body: "A five-minute weekly habit that prevents tax-time surprises: what's protected, what may be available, and how many months of runway you have. Saved on your device, so it remembers and you don't have to.",
     accent: "var(--fl-payout-fill)",
     tint: "var(--fl-payout-tint)",
     visual: "runway",
@@ -58,6 +58,12 @@ export function HowItWorksSection() {
         <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
           Every payment, given a job.
         </h2>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
+          Overview, Money arrived, Weekly check-in, and Check a decision aren&apos;t
+          four separate tools. They&apos;re one loop: a payment lands and you give
+          it a job, you glance at your position each week, and you test any big
+          spend against it. Every new payment is a new decision.
+        </p>
         <div className="mt-14 flex flex-col gap-16 sm:gap-20">
           {STEPS.map((s, i) => (
             <motion.div
