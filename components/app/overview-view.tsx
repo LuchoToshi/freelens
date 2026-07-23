@@ -243,7 +243,7 @@ function pickNextAction(
   }
   return {
     title: "A payment came in? Give it a job.",
-    cta: "Process a payment",
+    cta: "See what I can pay myself",
     view: "money-arrived",
   };
 }
