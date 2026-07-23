@@ -123,7 +123,7 @@ export function DecisionView({
             </CardContent>
           </Card>
 
-          {/* Inline mini example — no action needed to understand the feature. */}
+          {/* Inline mini example, no action needed to understand the feature. */}
           <Card className="rounded-2xl border border-dashed border-[var(--fl-line)] bg-[var(--fl-surface-stage)]">
             <CardContent className="flex flex-col gap-3 p-6">
               <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ function RunwayCompare({
   before: number | null;
   after: number | null;
 }) {
-  const fmt = (n: number | null) => (n === null ? "—" : `${n.toFixed(1)} mo`);
+  const fmt = (n: number | null) => (n === null ? "n/a" : `${n.toFixed(1)} mo`);
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3">

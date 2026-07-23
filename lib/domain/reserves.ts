@@ -4,7 +4,7 @@
  * A reserve is ALWAYS a planning figure, never a tax assessment. Every result
  * carries a `source` the UI must display, so a number is never shown without
  * saying where it came from. The guided estimate is a flat, cautious percentage
- * of (revenue − costs) — deliberately NOT a bracket calculation — with Zvw shown
+ * of (revenue − costs), deliberately NOT a bracket calculation, with Zvw shown
  * as its own line and a ± range to signal that it's an estimate.
  */
 import {
@@ -267,7 +267,7 @@ export function validateReservePercentage(percentage: number): PercentageValidat
   if (percentage > 100) {
     return {
       valid: true,
-      error: "That's above 100% — the reserve would exceed the amount itself.",
+      error: "That's above 100%, the reserve would exceed the amount itself.",
     };
   }
   return { valid: true, error: null };

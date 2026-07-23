@@ -6,7 +6,7 @@
  *   what's left for a personal payout.
  *
  * `allocatePayment` allocates a single incoming payment. `evaluateWeeklyPosition`
- * evaluates an ongoing balance. Neither clamps negative results — a shortfall
+ * evaluates an ongoing balance. Neither clamps negative results, a shortfall
  * must stay visible, never be silently floored to zero.
  */
 import {
@@ -61,7 +61,7 @@ export interface PaymentAllocationResult {
   obligationsCents: Cents;
   obligations: Obligation[];
   bufferCents: Cents;
-  /** Residual — may be negative. Never clamped. */
+  /** Residual, may be negative. Never clamped. */
   availableForPersonalPayoutCents: Cents;
   assumptions: string[];
   breakdown: BreakdownStep[];
@@ -172,10 +172,10 @@ export interface WeeklyPositionResult {
   bufferTargetCents: Cents;
   /** Non-earmarked business cash (≥0), feeds runway. */
   operatingReserveCents: Cents;
-  /** After the buffer is protected — may be negative. Never clamped. */
+  /** After the buffer is protected, may be negative. Never clamped. */
   availableForPersonalPayoutCents: Cents;
   recommendedPersonalPayoutCents: Cents;
-  /** Discretionary room a decision is checked against — may be negative. */
+  /** Discretionary room a decision is checked against, may be negative. */
   optionalSpendingRoomCents: Cents;
   essentialMonthlyCostsCents: Cents | null;
   runwayMonths: number | null;

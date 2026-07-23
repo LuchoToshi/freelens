@@ -10,12 +10,20 @@ export function SiteHeader() {
         >
           Freelens
         </Link>
-        <Link
-          href="/tool"
-          className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
-        >
-          Get my number
-        </Link>
+        <nav className="flex items-center gap-5">
+          <Link
+            href="/about"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            About
+          </Link>
+          <Link
+            href="/tool"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            See my payout
+          </Link>
+        </nav>
       </div>
     </header>
   );

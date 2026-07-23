@@ -1,7 +1,7 @@
 /**
  * Local persistence. This is the ONLY domain module that touches storage.
  *
- * All financial data stays on the device — nothing is ever sent anywhere. The
+ * All financial data stays on the device, nothing is ever sent anywhere. The
  * storage backend is injectable so it can be unit-tested without a DOM and so
  * "localStorage unavailable" (private browsing, disabled storage) degrades to
  * an in-memory session instead of throwing.
@@ -154,7 +154,7 @@ export function loadAppState(
     }
   }
 
-  // No v2 state yet — attempt a one-time migration from v1.
+  // No v2 state yet, attempt a one-time migration from v1.
   const migrated = migrateFromV1(storage);
   if (migrated) {
     return { state: migrated, recovered: false, migrated: true, storageAvailable: true };
@@ -201,7 +201,7 @@ interface LegacyInputs {
 /**
  * Migrate legacy v1 localStorage into a v2 AppState. The old flat tax
  * percentage becomes a "Legacy user selected reserve" (own-rule, source
- * "manual") — NEVER reinterpreted as a final tax liability. Setup is left null
+ * "manual"), NEVER reinterpreted as a final tax liability. Setup is left null
  * so the user confirms their VAT/reserve details; the legacy percentage is kept
  * so the setup flow can pre-fill it and the notice can name it.
  */

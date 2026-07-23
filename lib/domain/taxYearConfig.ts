@@ -46,7 +46,7 @@ export interface TaxYearConfig {
       status: "active" | "informational";
     }>;
   };
-  /** Informational only — displayed on /accuracy, not used in any calculation. */
+  /** Informational only, displayed on /accuracy, not used in any calculation. */
   zelfstandigenaftrek: ReferenceValue<Cents>;
   mkbWinstvrijstellingPercentage: ReferenceValue<number>;
 }
@@ -59,7 +59,7 @@ export interface UnverifiedTaxYearConfig {
 export type TaxYearConfigResult = TaxYearConfig | UnverifiedTaxYearConfig;
 
 /*
- * ADD_A_TAX_YEAR_CHECKLIST — before adding an entry for a new year:
+ * ADD_A_TAX_YEAR_CHECKLIST, before adding an entry for a new year:
  * 1. Verify each figure against the official Belastingdienst.nl publication for
  *    that year: guided-estimate reserve heuristic (re-justify, don't copy),
  *    Zvw rate + max bijdrage-inkomen, VAT rates, zelfstandigenaftrek, MKB %.
@@ -67,7 +67,7 @@ export type TaxYearConfigResult = TaxYearConfig | UnverifiedTaxYearConfig;
  *    Set dateLastVerified to the date YOU checked it, not the publication date.
  * 3. Re-derive guidedEstimateFlatReservePercentage independently and justify it.
  * 4. Add the new entry to TAX_YEAR_CONFIGS keyed by year. NEVER delete or
- *    overwrite a prior year — past allocations may recalc against their year.
+ *    overwrite a prior year, past allocations may recalc against their year.
  * 5. Pre-publication estimates: status "informational" + say so in notes; do
  *    not mark "active" until confirmed.
  * 6. Extend taxYearConfig.test.ts fixtures to cover the new year.
@@ -87,7 +87,7 @@ const CONFIG_2026: TaxYearConfig = {
     // Zvw is NEVER folded into this number.
     value: 30,
     sourceTitle:
-      "Belastingdienst — Reserve money to pay your taxes (general guidance)",
+      "Belastingdienst, Reserve money to pay your taxes (general guidance)",
     dateLastVerified: "2026-07-22",
     notes:
       "Placeholder cautious heuristic for MVP planning guidance only. Requires review by a Dutch tax professional before relying on it. Not derived from a bracket calculation.",
@@ -98,7 +98,7 @@ const CONFIG_2026: TaxYearConfig = {
       taxYear: 2026,
       value: 4.85,
       sourceTitle:
-        "Belastingdienst — Income-dependent contribution Health Care Insurance Act (Zvw) 2026",
+        "Belastingdienst, Income-dependent contribution Health Care Insurance Act (Zvw) 2026",
       dateLastVerified: "2026-07-22",
       notes:
         "Assessment-based Zvw contribution rate. Applies to the contribution base up to the maximum below.",
@@ -108,7 +108,7 @@ const CONFIG_2026: TaxYearConfig = {
       taxYear: 2026,
       value: toCents(79409),
       sourceTitle:
-        "Belastingdienst — Maximum contribution income Zvw 2026 (€79,409)",
+        "Belastingdienst, Maximum contribution income Zvw 2026 (€79,409)",
       dateLastVerified: "2026-07-22",
       notes: "Zvw is only levied on the contribution base up to this ceiling.",
       status: "active",
@@ -118,7 +118,7 @@ const CONFIG_2026: TaxYearConfig = {
     standardRatePercentage: {
       taxYear: 2026,
       value: 21,
-      sourceTitle: "Belastingdienst — VAT rates and exemptions (standard 21%)",
+      sourceTitle: "Belastingdienst, VAT rates and exemptions (standard 21%)",
       dateLastVerified: "2026-07-22",
       notes: "General Dutch VAT rate.",
       status: "active",
@@ -126,7 +126,7 @@ const CONFIG_2026: TaxYearConfig = {
     reducedRatePercentage: {
       taxYear: 2026,
       value: 9,
-      sourceTitle: "Belastingdienst — VAT rates and exemptions (reduced 9%)",
+      sourceTitle: "Belastingdienst, VAT rates and exemptions (reduced 9%)",
       dateLastVerified: "2026-07-22",
       notes: "Reduced Dutch VAT rate for qualifying goods and services.",
       status: "active",
@@ -142,19 +142,19 @@ const CONFIG_2026: TaxYearConfig = {
   zelfstandigenaftrek: {
     taxYear: 2026,
     value: toCents(1200),
-    sourceTitle: "Belastingdienst — Zelfstandigenaftrek 2026 (€1,200)",
+    sourceTitle: "Belastingdienst, Zelfstandigenaftrek 2026 (€1,200)",
     dateLastVerified: "2026-07-22",
     notes:
-      "For qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational only in Freelens — not used in any calculation.",
+      "For qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational only in Freelens, not used in any calculation.",
     status: "informational",
   },
   mkbWinstvrijstellingPercentage: {
     taxYear: 2026,
     value: 12.7,
-    sourceTitle: "Belastingdienst — MKB profit exemption 2026 (12.7%)",
+    sourceTitle: "Belastingdienst, MKB profit exemption 2026 (12.7%)",
     dateLastVerified: "2026-07-22",
     notes:
-      "12.7% of profit after entrepreneur deductions. Informational only in Freelens — not used in any calculation.",
+      "12.7% of profit after entrepreneur deductions. Informational only in Freelens, not used in any calculation.",
     status: "informational",
   },
 };

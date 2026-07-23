@@ -2,7 +2,7 @@
  * "Check a decision": does a planned purchase fit within the discretionary
  * spending room from a weekly position, and what does it do to runway?
  *
- * A null position means no personal financial state has been saved yet — the
+ * A null position means no personal financial state has been saved yet, the
  * caller should offer an example/demo instead of computing against zeroed data.
  */
 import { subtractCents, type Cents } from "@/lib/domain/money";

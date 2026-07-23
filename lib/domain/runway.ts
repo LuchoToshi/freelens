@@ -1,6 +1,6 @@
 /**
  * Business runway: how many months the operating reserve covers essential
- * monthly business costs. Never returns Infinity — a missing or zero cost base
+ * monthly business costs. Never returns Infinity, a missing or zero cost base
  * is `null` ("can't estimate"), which is a different thing from "infinite".
  */
 import { type Cents } from "@/lib/domain/money";

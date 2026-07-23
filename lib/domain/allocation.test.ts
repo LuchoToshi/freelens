@@ -26,7 +26,7 @@ function conserves(result: {
   return parts === result.grossPaymentCents;
 }
 
-describe("allocatePayment — conservation of money", () => {
+describe("allocatePayment, conservation of money", () => {
   const fixtures: PaymentAllocationInput[] = [
     {
       grossPaymentCents: toCents(4000),
@@ -76,7 +76,7 @@ describe("allocatePayment — conservation of money", () => {
   });
 });
 
-describe("evaluateWeeklyPosition — status + shortfall", () => {
+describe("evaluateWeeklyPosition, status + shortfall", () => {
   const base: WeeklyPositionInput = {
     currentBalanceCents: toCents(7000),
     vatProtectedCents: toCents(600),
@@ -110,7 +110,7 @@ describe("evaluateWeeklyPosition — status + shortfall", () => {
     });
     expect(r.status).toBe("reserve-gap");
     expect(r.shortfallCents).toBe(toCents(2000));
-    // balance 2000 covers VAT 600 + reserve 1500 = 2100? no — cumulative VAT+reserve=2100 > 2000.
+    // balance 2000 covers VAT 600 + reserve 1500 = 2100? no, cumulative VAT+reserve=2100 > 2000.
     expect(r.shortfallPriority).toBe("tax-reserve");
   });
 
@@ -123,7 +123,7 @@ describe("evaluateWeeklyPosition — status + shortfall", () => {
   });
 });
 
-describe("evaluateWeeklyPosition — completeness tiers", () => {
+describe("evaluateWeeklyPosition, completeness tiers", () => {
   it("quick-estimate with minimal data", () => {
     const r = evaluateWeeklyPosition({
       currentBalanceCents: toCents(5000),
@@ -163,7 +163,7 @@ describe("evaluateWeeklyPosition — completeness tiers", () => {
   });
 });
 
-describe("evaluateWeeklyPosition — optional spending room", () => {
+describe("evaluateWeeklyPosition, optional spending room", () => {
   it("reduces optional room by a recommended payout target", () => {
     const r = evaluateWeeklyPosition({
       currentBalanceCents: toCents(5000),

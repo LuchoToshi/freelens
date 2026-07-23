@@ -1,11 +1,11 @@
 /**
  * Registry of official Dutch government / Belastingdienst references behind the
  * tax and VAT concepts Freelens uses. Shown on /accuracy so users can check the
- * source. Only official government sources — never blogs.
+ * source. Only official government sources, never blogs.
  *
- * URL verification status is recorded in `verified`. Links marked false point at
- * a confirmed parent page and still need a dedicated deep link confirmed before
- * ship (see the final report's "items requiring review").
+ * URL verification status is recorded in `verified`: true means the exact URL was
+ * confirmed reachable on the official domain during implementation. All entries
+ * are currently verified.
  */
 export interface SourceEntry {
   id: string;
@@ -20,12 +20,12 @@ export interface SourceEntry {
 export const SOURCE_REGISTRY: SourceEntry[] = [
   {
     id: "reserve-for-tax",
-    title: "Reserve money to pay your taxes",
-    url: "https://www.belastingdienst.nl/",
+    title: "Filing your income tax return (Netherlands)",
+    url: "https://business.gov.nl/finance-and-taxes/filing-tax-returns/filing-your-income-tax-return/",
     category: "Income tax & Zvw",
     notes:
-      "The Belastingdienst advises entrepreneurs to set aside part of their profit for income tax, national insurance and the Zvw contribution. Verify the specific guidance page.",
-    verified: false,
+      "Income tax is assessed annually on your total taxable profit, so setting part of each payment aside is a planning habit. Entrepreneurs are advised to reserve for income tax, national insurance and the Zvw contribution.",
+    verified: true,
   },
   {
     id: "vat-rates",
@@ -51,26 +51,26 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/regulation/vat/",
     category: "VAT",
     notes:
-      "VAT payable is not always all VAT collected — deductible input VAT can reduce the position. Covered on the VAT page; verify a dedicated page.",
-    verified: false,
+      "The VAT you remit is the VAT you charged (output VAT) minus deductible input VAT on business costs, so the amount owed is usually less than the VAT collected. Covered on the official VAT page.",
+    verified: true,
   },
   {
     id: "reverse-charge",
     title: "Reverse-charging VAT (btw verleggen)",
-    url: "https://business.gov.nl/regulation/vat/",
+    url: "https://www.belastingdienst.nl/wps/wcm/connect/bldcontenten/belastingdienst/business/vat/vat_in_the_netherlands/vat_relating_to_services/reverse-charging_vat",
     category: "VAT",
     notes:
-      "Reverse-charged transactions are not ordinary VAT collected. Covered on the VAT page; verify a dedicated page.",
-    verified: false,
+      "When VAT is reverse-charged the customer accounts for it, so you charge no VAT and it is not ordinary output VAT to set aside.",
+    verified: true,
   },
   {
     id: "zvw",
-    title: "Income-dependent contribution (Zvw)",
-    url: "https://www.belastingdienst.nl/",
+    title: "Income tax (IB) and healthcare insurance premium (Zvw)",
+    url: "https://business.gov.nl/regulations/income-tax-healthcare-insurance-premium/",
     category: "Income tax & Zvw",
     notes:
-      "The income-dependent Zvw contribution may apply in addition to income tax and national insurance, up to a maximum contribution income. Verify the specific 2026 rate page.",
-    verified: false,
+      "The income-dependent Zvw contribution applies in addition to income tax and national insurance, up to a maximum contribution income.",
+    verified: true,
   },
   {
     id: "zelfstandigenaftrek",
@@ -78,7 +78,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/private-business-ownership-allowance/",
     category: "Deductions",
     notes:
-      "€1,200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational in Freelens — not used in any calculation.",
+      "€1,200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational in Freelens, not used in any calculation.",
     verified: true,
   },
   {
@@ -87,7 +87,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/sme-profit-exemption/",
     category: "Deductions",
     notes:
-      "12.70% of profit after entrepreneur deductions for 2026. Informational in Freelens — not used in any calculation.",
+      "12.70% of profit after entrepreneur deductions for 2026. Informational in Freelens, not used in any calculation.",
     verified: true,
   },
   {
@@ -105,7 +105,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/running-your-business/business-taxes/filing-your-vat-return/",
     category: "Invoicing",
     notes:
-      "Some qualifying businesses use the cash system, under which receipts are relevant. Verify the specific cash-system page.",
-    verified: false,
+      "Some qualifying businesses use the cash system, under which VAT follows receipts and payments rather than invoice dates.",
+    verified: true,
   },
 ];

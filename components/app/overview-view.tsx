@@ -54,14 +54,15 @@ export function OverviewView({
         <Card className={cardClass}>
           <CardContent className="flex flex-col items-start gap-3 p-6">
             <p className="text-base text-[var(--fl-ink)]">
-              Start with a quick setup, or process a payment right away.
+              See what one payment splits into. It takes about 30 seconds, and
+              needs no setup.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => onNavigate("setup")} className={primaryButtonClass}>
-                Set up Freelens
+              <button type="button" onClick={() => onNavigate("money-arrived")} className={primaryButtonClass}>
+                Try one payment (30 seconds)
               </button>
-              <button type="button" onClick={() => onNavigate("money-arrived")} className={linkButtonClass}>
-                Process a payment
+              <button type="button" onClick={() => onNavigate("setup")} className={linkButtonClass}>
+                Personalize my estimate (3 minutes)
               </button>
             </div>
           </CardContent>
@@ -76,7 +77,7 @@ export function OverviewView({
     <div className="flex flex-col gap-6">
       {weekly && <StatusBanner status={weekly.result.status} />}
 
-      {/* 1. The permission moment — the hero number. */}
+      {/* 1. The permission moment, the hero number. */}
       {weekly && (
         <Card className="rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm">
           <CardContent className="flex flex-col gap-1 p-6">
@@ -107,7 +108,7 @@ export function OverviewView({
         </Card>
       )}
 
-      {/* 3. Runway — months and direction. */}
+      {/* 3. Runway, months and direction. */}
       {weekly && (
         <Card className={cardClass}>
           <CardContent className="flex flex-col gap-2 p-6">
@@ -129,7 +130,7 @@ export function OverviewView({
             </span>
             <p className={`${hintClass} pt-1`}>
               Last updated {formatCheckInDate(weekly.timestampIso)}
-              {stale ? " — worth refreshing." : "."}
+              {stale ? ". Worth refreshing." : "."}
             </p>
           </CardContent>
         </Card>
@@ -159,7 +160,7 @@ export function OverviewView({
           <CardContent className="flex flex-col gap-2 p-6">
             <span className="text-sm font-medium text-[var(--fl-slate)]">
               Latest allocation
-              {state.lastAllocation.label ? ` — ${state.lastAllocation.label}` : ""}
+              {state.lastAllocation.label ? `: ${state.lastAllocation.label}` : ""}
             </span>
             <Figure
               label="Payment"
@@ -235,14 +236,14 @@ function pickNextAction(
   }
   if (stale) {
     return {
-      title: "Your last check-in is a while ago — refresh it.",
+      title: "Your last check-in is a while ago. Refresh it.",
       cta: "Update your check-in",
       view: "weekly-checkin",
     };
   }
   return {
     title: "A payment came in? Give it a job.",
-    cta: "Process a payment",
+    cta: "See what I can pay myself",
     view: "money-arrived",
   };
 }

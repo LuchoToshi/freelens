@@ -1,7 +1,7 @@
 /**
  * Money is stored and computed as integer cents throughout the domain layer.
  * Floating-point euros (the old `lib/calc.ts` approach) are never used for
- * stored or intermediate monetary values — only for display formatting at the
+ * stored or intermediate monetary values, only for display formatting at the
  * very edge, via `formatEuro` / `formatEuroExact`.
  *
  * `Cents` is a branded number so a euros value can never be passed where cents
@@ -52,7 +52,7 @@ const euroExact = new Intl.NumberFormat("nl-NL", {
 /**
  * Display format for headline figures: whole euros, e.g. "€ 1.400". Keeps the
  * product calm rather than accounting-like. Rounds to the nearest euro for
- * display only — the underlying cents are unchanged, and exact reconciliation
+ * display only, the underlying cents are unchanged, and exact reconciliation
  * is shown in "Why this number?" via `formatEuroExact`.
  */
 export function formatEuro(cents: Cents): string {
@@ -104,7 +104,7 @@ export interface ParseAmountResult {
 const AMOUNT_BLANK = "Enter an amount.";
 const AMOUNT_INVALID = "Enter a valid amount, e.g. 1.500 or 1500,50.";
 const AMOUNT_NEGATIVE = "Enter a positive amount.";
-const AMOUNT_TOO_LARGE = "That amount looks too large — check for a typo.";
+const AMOUNT_TOO_LARGE = "That amount looks too large, check for a typo.";
 
 /**
  * Parse free-form currency text into integer cents. Handles Dutch and
@@ -188,7 +188,7 @@ export function parseAmountInput(
 
   const wholeCents = Number(wholePart) * 100;
   // Round using the third fractional digit; extra digits are ignored beyond
-  // their effect on rounding the second digit. Pure integer/string work — no
+  // their effect on rounding the second digit. Pure integer/string work, no
   // float arithmetic on the fraction.
   const centsDigits = (fractionPart + "00").slice(0, 2);
   const thirdDigit = fractionPart.length >= 3 ? Number(fractionPart[2]) : 0;

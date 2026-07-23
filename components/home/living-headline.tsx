@@ -36,7 +36,7 @@ export function LivingHeadline() {
           <span className="block">Money arrived</span>
           {/* The rotating phrase gets its own reserved slot. An invisible sizer
               stacks every phrase in one grid cell, so the slot always occupies
-              the largest phrase's width and wrapped height at any breakpoint —
+              the largest phrase's width and wrapped height at any breakpoint-
               shorter phrases can never change the layout below. */}
           <span className="relative block">
             <span className="grid" aria-hidden="true">

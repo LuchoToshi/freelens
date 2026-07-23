@@ -3,7 +3,7 @@
 import { CheckCircle2, AlertCircle, Info } from "lucide-react";
 import type { WeeklyPositionStatus } from "@/lib/domain/allocation";
 
-// Status is conveyed by icon + text + tint together — never colour alone.
+// Status is conveyed by icon + text + tint together, never colour alone.
 const STATUS_CONFIG: Record<
   WeeklyPositionStatus,
   { icon: typeof CheckCircle2; title: string; tint: string; text: string }

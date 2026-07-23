@@ -97,7 +97,7 @@
   --fl-short-tint: #fbeaea;
   --fl-short-text: #b8362b;
 
-  /* Functional allocation palette — one semantic meaning everywhere.
+  /* Functional allocation palette, one semantic meaning everywhere.
      Saturated *-fill for bars/active states; *-tint for surfaces;
      *-text for AA-legible labels (all pairs >=4.5:1 on canvas/white/tint). */
   --fl-vat-fill: #c07f16;
@@ -121,7 +121,7 @@
   --fl-surface-card: #ffffff;
   --fl-surface-stage: #f4f2ec;
 
-  /* Focus ring — visible, not color-alone, >=3:1 against adjacent surfaces. */
+  /* Focus ring, visible, not color-alone, >=3:1 against adjacent surfaces. */
   --fl-focus-ring: #122540;
 
   /* Motion grammar (L3). Reduced-motion is handled in JS via useReducedMotion. */

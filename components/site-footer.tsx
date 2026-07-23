@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 /**
  * A real closing moment (audit Q6): a full-width color band with an oversized
- * wordmark, one concise trust line, and a single primary action — the last page
+ * wordmark, one concise trust line, and a single primary action, the last page
  * of a portfolio, not dead space.
  */
 export function SiteFooter() {
@@ -25,10 +25,25 @@ export function SiteFooter() {
             href="/tool"
             className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
           >
-            Process a payment
+            See what I can pay myself
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6">
+          {[
+            { href: "/about", label: "About" },
+            { href: "/accuracy", label: "Accuracy & sources" },
+            { href: "/tool", label: "Open Freelens" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex min-h-9 items-center text-sm font-medium text-white/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );

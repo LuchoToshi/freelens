@@ -5,12 +5,35 @@ import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
 import { getActiveTaxYearConfig, isVerifiedTaxYearConfig } from "@/lib/domain/taxYearConfig";
 
 export const metadata: Metadata = {
-  title: "Accuracy and sources — Freelens",
+  title: "Accuracy and sources · Freelens",
   description:
     "What Freelens does and does not calculate, the reserve rules it applies, and the official Dutch sources behind them.",
 };
 
 const CATEGORIES = ["VAT", "Income tax & Zvw", "Deductions", "Invoicing"] as const;
+
+const EDGE_CASES: { title: string; body: string }[] = [
+  {
+    title: "KOR (small businesses scheme)",
+    body: "On the KOR you don't charge VAT. Pick Other → KOR and Freelens sets no VAT aside. It doesn't file VAT returns for you.",
+  },
+  {
+    title: "Reverse-charged VAT",
+    body: "Reverse-charged invoices carry no VAT for you to reserve. Select that treatment so the amount isn't counted as VAT to set aside.",
+  },
+  {
+    title: "Multiple VAT rates on one invoice",
+    body: "Freelens allocates one payment at a time. If an invoice mixes 21% and 9%, enter each part separately, or use Other → Mixed and confirm the split in your bookkeeping.",
+  },
+  {
+    title: "Income outside freelancing",
+    body: "Employment, benefits, or a partner's income change your real tax rate. A flat reserve percentage can't see them, so revisit your percentage if you have significant other income.",
+  },
+  {
+    title: "Major deductions",
+    body: "Large deductible costs and allowances (equipment, zelfstandigenaftrek, the SME profit exemption) lower taxable profit, so your final bill is often lower than a flat reserve suggests. Enter deductible costs per payment to get closer.",
+  },
+];
 
 function hostOf(url: string): string {
   try {
@@ -85,7 +108,7 @@ export default function AccuracyPage() {
             </ul>
           </section>
 
-          {/* What it is not — designed caution. */}
+          {/* What it is not, designed caution. */}
           <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-short-text)]/30 bg-[var(--fl-short-tint)] p-6">
             <div className="flex items-center gap-2">
               <CircleAlert className="size-5 text-[var(--fl-short-text)]" aria-hidden="true" />
@@ -137,8 +160,57 @@ export default function AccuracyPage() {
             </p>
           )}
           <p className="text-xs text-[var(--fl-slate)]">
-            These figures require review before they support another tax year.
+            Reviewed July 2026 for tax year {taxYear}. These figures require review
+            before they support another tax year.
           </p>
+          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+            All calculations are deterministic: the same inputs always produce the
+            same numbers, with no guessing and no hidden model. Every result shows
+            a &ldquo;Why this number?&rdquo; breakdown you can check.
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            Edge cases to know
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {EDGE_CASES.map((e) => (
+              <li
+                key={e.title}
+                className="flex flex-col gap-1 rounded-xl border border-[var(--fl-line)] bg-white p-4"
+              >
+                <span className="text-sm font-semibold text-[var(--fl-ink)]">
+                  {e.title}
+                </span>
+                <span className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                  {e.body}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-6">
+          <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            When to talk to an accountant
+          </h2>
+          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+            Freelens is a planning tool, not a substitute for advice. Check with an
+            accountant or the Belastingdienst when:
+          </p>
+          <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm leading-relaxed text-[var(--fl-slate)]">
+            <li>your income or family situation changed a lot this year;</li>
+            <li>you have substantial income outside freelancing;</li>
+            <li>
+              you&apos;re unsure whether the KOR, reverse charge, or a special
+              scheme applies to you;
+            </li>
+            <li>you&apos;re planning a large purchase or investment;</li>
+            <li>
+              it&apos;s your first year, or you&apos;ve never filed a Dutch return.
+            </li>
+          </ul>
         </section>
 
         <section className="flex flex-col gap-4">
