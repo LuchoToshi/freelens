@@ -33,24 +33,36 @@ export function LivingHeadline() {
         <>Money arrived. Know what happens next.</>
       ) : (
         <>
-          <span>Money arrived </span>
-          <span className="relative inline-flex h-[1.05em] overflow-hidden align-bottom">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={i}
-                initial={{ y: "100%" }}
-                animate={{ y: "0%" }}
-                exit={{ y: "-100%" }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="whitespace-nowrap text-[var(--fl-vat-text)]"
-              >
-                {CONTEXTS[i]}
-              </motion.span>
-            </AnimatePresence>
+          <span className="block">Money arrived</span>
+          {/* The rotating phrase gets its own reserved slot. An invisible sizer
+              stacks every phrase in one grid cell, so the slot always occupies
+              the largest phrase's width and wrapped height at any breakpoint —
+              shorter phrases can never change the layout below. */}
+          <span className="relative block">
+            <span className="grid" aria-hidden="true">
+              {CONTEXTS.map((c) => (
+                <span key={c} className="invisible col-start-1 row-start-1">
+                  {c}.
+                </span>
+              ))}
+            </span>
+            <span className="absolute inset-0 overflow-hidden">
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={i}
+                  initial={{ y: "100%" }}
+                  animate={{ y: "0%" }}
+                  exit={{ y: "-100%" }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="block"
+                >
+                  <span className="text-[var(--fl-vat-text)]">{CONTEXTS[i]}</span>
+                  <span>.</span>
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </span>
-          <span>.</span>
-          <br />
-          <span>Know what happens next.</span>
+          <span className="block">Know what happens next.</span>
         </>
       )}
     </h1>
