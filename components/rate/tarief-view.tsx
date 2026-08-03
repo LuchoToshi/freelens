@@ -24,6 +24,11 @@ import {
   parseAmountInput,
   type Cents,
 } from "@/lib/domain/money";
+import {
+  flatRuleError,
+  HIGH_COST_CASE,
+  HIGH_EARNER_CASE,
+} from "@/lib/tax/flatRuleEvidence";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { quoteForTargetNet } from "@/lib/tax/quote";
 import { rateForTargetAnnualNet } from "@/lib/tax/rate";
@@ -33,6 +38,7 @@ const TAX_YEAR = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
 
 const stageCardClass =
   "rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm";
+
 
 type Mode = "year" | "job";
 
@@ -84,16 +90,21 @@ export function TariefView() {
           What do you need to charge?
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
-          Before the job: what do I need to charge. After the payment: what is
-          actually mine. Same calculation, both directions.
+          This is what you need to charge, not what you can charge. It is your
+          floor: below it the work does not pay for itself once tax and costs
+          are out.
         </p>
         <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
-          This is your floor, not your price. It is the number below which the
-          work does not pay for itself once tax and costs are out. What the
-          market will pay is a different question, and Freelens has no view on
-          it.
+          What the market will pay is a different question. Freelens has no view
+          on it, and will never pretend to.
         </p>
       </header>
+
+      <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">
+        Most rate calculators apply one flat percentage. Freelens runs the real{" "}
+        {TAX_YEAR} brackets, deductions and credits, which is why the answer
+        changes depending on where you already are in your year.
+      </p>
 
       <ModeTabs mode={mode} onChange={setMode} />
 
@@ -108,20 +119,25 @@ export function TariefView() {
           Most rate calculators get this wrong
         </h2>
         <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-          They apply one flat percentage to everything. Dutch income tax is not
-          flat: it runs in brackets, the zelfstandigenaftrek and the
-          MKB-winstvrijstelling come off first, and two tax credits phase out as
-          you earn more. A flat percentage is wrong in both directions at once,
-          and the error grows exactly where the money does.
+          A flat percentage is wrong in both directions at once. On{" "}
+          {formatEuro(HIGH_COST_CASE.revenue)} of revenue with{" "}
+          {formatEuro(HIGH_COST_CASE.costs)} of costs, the 30% rule sets aside{" "}
+          {formatEuro(HIGH_COST_CASE.oldReserve)} against a real bill of{" "}
+          {formatEuroExact(HIGH_COST_CASE.realBill)}. At{" "}
+          {formatEuro(HIGH_EARNER_CASE.profit)} of profit the same rule leaves
+          you {formatEuroExact(flatRuleError(HIGH_EARNER_CASE))} short. Freelens
+          used to apply that rule. Replacing it is the reason this page can
+          exist.
         </p>
         <Link href="/accuracy" className={`${linkButtonClass} w-fit`}>
-          See what the flat rule gets wrong, case by case
+          What Freelens is honest about
         </Link>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-6 py-5">
         <span className="text-sm text-[var(--fl-slate)]">
-          Already been paid? The other half of the same question:
+          Before the job: what do I need to charge. After the payment: what is
+          actually mine. Same calculation, both directions.
         </span>
         <Link
           href="/tool"
@@ -152,6 +168,12 @@ interface Profile {
 const DEFAULT_TARGET_NET = 40_000;
 const DEFAULT_BILLABLE_DAYS = 140;
 
+/**
+ * The hopeful figure freelancers price against: roughly a working year minus
+ * holidays, and nothing else. Used only to show what assuming it costs.
+ */
+const OPTIMISTIC_DAYS = 220;
+
 function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boolean }) {
   const [targetNet, setTargetNet] = useState(DEFAULT_TARGET_NET);
   const [billableDays, setBillableDays] = useState(DEFAULT_BILLABLE_DAYS);
@@ -159,17 +181,29 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 
   const costsCents = parseAmountInput(costs).cents ?? asCentsUnsafe(0);
 
-  const result = rateForTargetAnnualNet({
+  const shared = {
     taxYear: TAX_YEAR,
     country: DEFAULT_COUNTRY,
     targetAnnualNet: targetNet,
-    billableUnitsPerYear: billableDays,
     annualBusinessCosts: fromCents(costsCents),
     meetsHoursCriterion: profile.meetsHoursCriterion,
     isStarter: profile.isStarter,
     otherIncome: profile.otherIncome,
     otherIncomeTaxWithheld: profile.otherIncomeTaxWithheld,
+  };
+
+  const result = rateForTargetAnnualNet({
+    ...shared,
+    billableUnitsPerYear: billableDays,
   });
+
+  // The same year priced for a hopeful number of days, used to show what the
+  // optimism costs. Skipped once the reader is already at or above it, so it
+  // never nags someone who genuinely bills that much.
+  const optimistic =
+    billableDays < OPTIMISTIC_DAYS
+      ? rateForTargetAnnualNet({ ...shared, billableUnitsPerYear: OPTIMISTIC_DAYS })
+      : null;
 
   return (
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
@@ -190,13 +224,19 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
           <RangeField
             id="billable-days"
             label="How many days can you realistically bill?"
-            hint="Not 260. Take out holidays, sick days, admin, chasing work, and the quiet weeks. 140 is a working assumption, not a target."
+            hint="Not 260. Take out holidays, sick days, admin, chasing work and the quiet weeks. Most freelancers bill far fewer days than they plan for, and the rate is what pays for the gap."
             value={billableDays}
             onChange={setBillableDays}
             min={20}
             max={260}
             step={5}
             display={`${billableDays} days`}
+          />
+
+          <OptimismCost
+            honestRevenue={result.requiredGrossRevenue}
+            billableDays={billableDays}
+            optimisticRate={optimistic?.requiredRatePerUnit ?? null}
           />
 
           <CurrencyField
@@ -523,6 +563,41 @@ function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void 
   );
 }
 
+/**
+ * What planning for more days than you bill actually costs, in euros.
+ *
+ * Computed rather than written down. A fixed sentence would be wrong for anyone
+ * who has claimed a deduction or moved either slider, and this is the number
+ * the whole page turns on: underpricing is almost never a maths error, it is an
+ * optimistic day count nobody ever revisits.
+ */
+function OptimismCost({
+  honestRevenue,
+  billableDays,
+  optimisticRate,
+}: {
+  honestRevenue: Cents;
+  billableDays: number;
+  optimisticRate: Cents | null;
+}) {
+  if (optimisticRate === null) return null;
+
+  const earned = asCentsUnsafe(optimisticRate * billableDays);
+  const shortfall = asCentsUnsafe(honestRevenue - earned);
+  if (shortfall <= 0) return null;
+  const share = Math.round((shortfall / honestRevenue) * 100);
+
+  return (
+    <p className="-mt-3 rounded-lg border border-dashed border-[var(--fl-line)] p-3 text-xs leading-relaxed text-[var(--fl-slate)]">
+      If you set your rate for {OPTIMISTIC_DAYS} days and bill {billableDays},
+      you charge {formatEuro(optimisticRate)} a day and end the year on{" "}
+      {formatEuro(earned)} instead of {formatEuro(honestRevenue)}. That is{" "}
+      <strong className="text-[var(--fl-ink)]">{formatEuro(shortfall)}</strong>{" "}
+      short, {share}% of your year.
+    </p>
+  );
+}
+
 function RangeField({
   id,
   label,
@@ -627,8 +702,10 @@ function ProfileNote({ profile, hydrated }: { profile: Profile; hydrated: boolea
   if (!hydrated) return null;
 
   const claimed: string[] = [];
-  if (profile.meetsHoursCriterion) claimed.push("the urencriterium");
-  if (profile.isStarter) claimed.push("startersaftrek");
+  if (profile.meetsHoursCriterion) {
+    claimed.push("the 1.225 hours a year that unlock the zelfstandigenaftrek");
+  }
+  if (profile.isStarter) claimed.push("your first years in business");
   if (profile.otherIncome > 0) claimed.push("a salary alongside this");
 
   return (
@@ -636,7 +713,7 @@ function ProfileNote({ profile, hydrated }: { profile: Profile; hydrated: boolea
       <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
         {claimed.length > 0
           ? `Using what you already told Freelens: ${claimed.join(", ")}.`
-          : "You have not claimed the urencriterium or startersaftrek, so this figure leaves those deductions out. Claiming them lowers what you need to charge."}
+          : "You have not told Freelens whether you qualify for the zelfstandigenaftrek or the extra deduction for your first years in business, so this figure leaves both out. Claiming them lowers what you need to charge."}
       </p>
       <Link href="/tool" className={`${linkButtonClass} w-fit text-xs`}>
         Change your details
