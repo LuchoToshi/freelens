@@ -17,7 +17,7 @@ import type { WeeklyPositionResult } from "@/lib/domain/allocation";
 import { isStale, type AppState } from "@/lib/domain/persistence";
 import { formatCheckInDate } from "@/lib/format-date";
 import type { AppView } from "@/components/app/nav-tabs";
-import { useT } from "@/components/i18n/locale-provider";
+import { useLocale, useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -38,6 +38,7 @@ export function OverviewView({
   onNavigate: (view: AppView) => void;
 }) {
   const t = useT();
+  const { locale } = useLocale();
   const weekly = state.weeklyPosition
     ? {
         result: evaluateWeeklyPosition(state.weeklyPosition.input),
@@ -134,7 +135,7 @@ export function OverviewView({
             </span>
             <p className={`${hintClass} pt-1`}>
               {fill(t.app.overview.lastUpdated, {
-                date: formatCheckInDate(weekly.timestampIso),
+                date: formatCheckInDate(weekly.timestampIso, locale, t.app.overview.recently),
               })}
               {stale ? t.app.overview.worthRefreshing : "."}
             </p>
@@ -178,7 +179,11 @@ export function OverviewView({
             />
             <p className={`${hintClass} pt-1`}>
               {fill(t.app.overview.recordedOn, {
-                date: formatCheckInDate(state.lastAllocation.timestampIso),
+                date: formatCheckInDate(
+                  state.lastAllocation.timestampIso,
+                  locale,
+                  t.app.overview.recently
+                ),
               })}
             </p>
           </CardContent>

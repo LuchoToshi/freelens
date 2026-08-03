@@ -95,6 +95,12 @@ export function FreelensApp() {
           </p>
         )}
 
+        {app.discardedWeeklyPosition && (
+          <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-4 text-sm text-[var(--fl-slate)]">
+            {t.app.shell.discardedCheckin}
+          </p>
+        )}
+
         {!app.storageAvailable && (
           <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-4 text-sm text-[var(--fl-slate)]">
             {t.app.shell.storageUnavailable}

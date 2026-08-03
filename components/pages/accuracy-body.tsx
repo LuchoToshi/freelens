@@ -308,7 +308,12 @@ export function AccuracyPageBody() {
                         )}
                       </div>
                       <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
-                        {entry.notes}
+                        {/* The linked page's own title stays as it is: a Dutch
+                            label on a link that opens an English page would
+                            misdescribe where it goes. Only our note translates. */}
+                        {t.accuracyPage.sourceNotes[
+                          entry.id as keyof typeof t.accuracyPage.sourceNotes
+                        ] ?? entry.notes}
                       </p>
                       {hostOf(entry.url) && (
                         <span className="text-[11px] uppercase tracking-wide text-[var(--fl-slate)]">

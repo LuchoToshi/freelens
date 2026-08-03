@@ -78,7 +78,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/private-business-ownership-allowance/",
     category: "Deductions",
     notes:
-      "€1,200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Informational in Freelens, not used in any calculation.",
+      "€1.200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Applied by the engine when you confirm the hours criterion.",
     verified: true,
   },
   {
@@ -87,7 +87,7 @@ export const SOURCE_REGISTRY: SourceEntry[] = [
     url: "https://business.gov.nl/subsidy/sme-profit-exemption/",
     category: "Deductions",
     notes:
-      "12.70% of profit after entrepreneur deductions for 2026. Informational in Freelens, not used in any calculation.",
+      "12,70% of profit after entrepreneur deductions for 2026. Applied by the engine on every estimate, including in a loss year, where it makes the loss smaller.",
     verified: true,
   },
   {

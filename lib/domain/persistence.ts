@@ -186,6 +186,43 @@ export function isValidAppState(value: unknown): value is AppState {
   return true;
 }
 
+/**
+ * Drops a stored weekly position that cannot be evaluated.
+ *
+ * `evaluateWeeklyPosition` reads `obligations` as an array and several fields
+ * as numbers. A record written by an older build, or truncated mid-write, kills
+ * the whole /tool page with no way back except clearing storage by hand. Saved
+ * payments already get this treatment; the check-in deserves the same.
+ *
+ * Returns null when the record is unusable, which the UI shows as "no check-in
+ * yet" rather than a blank screen.
+ */
+function sanitizeWeeklyPosition(value: unknown): StoredWeeklyPosition | null {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as Record<string, unknown>;
+  if (typeof record.timestampIso !== "string") return null;
+
+  const input = record.input;
+  if (typeof input !== "object" || input === null) return null;
+  const i = input as Record<string, unknown>;
+
+  const isMoney = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+  if (!isMoney(i.currentBalanceCents)) return null;
+  if (!Array.isArray(i.obligations)) return null;
+  if (
+    !i.obligations.every(
+      (o) =>
+        typeof o === "object" &&
+        o !== null &&
+        isMoney((o as Record<string, unknown>).cents)
+    )
+  ) {
+    return null;
+  }
+
+  return record as unknown as StoredWeeklyPosition;
+}
+
 export interface LoadResult {
   state: AppState;
   recovered: boolean; // true when corrupt data was discarded
@@ -196,6 +233,8 @@ export interface LoadResult {
    * must tell the user rather than quietly showing a shorter list.
    */
   discardedPaymentRecords: number;
+  /** True when a stored check-in was unreadable and had to be dropped. */
+  discardedWeeklyPosition: boolean;
 }
 
 export function loadAppState(
@@ -208,6 +247,7 @@ export function loadAppState(
       migrated: false,
       storageAvailable: false,
       discardedPaymentRecords: 0,
+      discardedWeeklyPosition: false,
     };
   }
 
@@ -221,16 +261,22 @@ export function loadAppState(
         const history = sanitizePaymentHistory(
           (parsed as { paymentHistory?: unknown }).paymentHistory
         );
+        const weekly = sanitizeWeeklyPosition(
+          (parsed as { weeklyPosition?: unknown }).weeklyPosition
+        );
         return {
           state: {
             ...parsed,
             setup: normalizeSetup(parsed.setup),
+            weeklyPosition: weekly,
             paymentHistory: history.records,
           },
           recovered: false,
           migrated: false,
           storageAvailable: true,
           discardedPaymentRecords: history.discarded,
+          discardedWeeklyPosition:
+            parsed.weeklyPosition !== null && weekly === null,
         };
       }
       // Present but wrong shape → discard, don't throw.
@@ -240,6 +286,7 @@ export function loadAppState(
         migrated: false,
         storageAvailable: true,
         discardedPaymentRecords: 0,
+        discardedWeeklyPosition: false,
       };
     } catch {
       // Corrupt JSON → recover with a fresh state.
@@ -249,6 +296,7 @@ export function loadAppState(
         migrated: false,
         storageAvailable: true,
         discardedPaymentRecords: 0,
+        discardedWeeklyPosition: false,
       };
     }
   }
@@ -262,6 +310,7 @@ export function loadAppState(
       migrated: true,
       storageAvailable: true,
       discardedPaymentRecords: 0,
+      discardedWeeklyPosition: false,
     };
   }
   return {
@@ -270,6 +319,7 @@ export function loadAppState(
     migrated: false,
     storageAvailable: true,
     discardedPaymentRecords: 0,
+    discardedWeeklyPosition: false,
   };
 }
 

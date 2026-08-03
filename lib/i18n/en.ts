@@ -367,6 +367,26 @@ export const en = {
       "you're planning a large purchase or investment;",
       "it's your first year, or you've never filed a Dutch return.",
     ],
+    sourceNotes: {
+      "reserve-for-tax":
+        "Income tax is assessed annually on your total taxable profit, so setting part of each payment aside is a planning habit. Entrepreneurs are advised to reserve for income tax, national insurance and the Zvw contribution.",
+      "vat-rates":
+        "Covers the 21% and 9% rates, exemptions, and how VAT is calculated and filed.",
+      kor: "KOR participants do not charge VAT, do not file ordinary VAT returns, and cannot deduct input VAT while participating.",
+      "input-vat":
+        "The VAT you remit is the VAT you charged (output VAT) minus deductible input VAT on business costs, so the amount owed is usually less than the VAT collected. Covered on the official VAT page.",
+      "reverse-charge":
+        "When VAT is reverse-charged the customer accounts for it, so you charge no VAT and it is not ordinary output VAT to set aside.",
+      zvw: "The income-dependent Zvw contribution applies in addition to income tax and national insurance, up to a maximum contribution income.",
+      zelfstandigenaftrek:
+        "€1.200 for 2026 for qualifying entrepreneurs meeting the hours criterion who had not reached AOW age at the start of the year. Applied by the engine when you confirm the hours criterion.",
+      "mkb-exemption":
+        "12,70% of profit after entrepreneur deductions for 2026. Applied by the engine on every estimate, including in a loss year, where it makes the loss smaller.",
+      "invoice-system":
+        "Under the invoice system the VAT period is generally set by invoicing rules rather than when the customer pays.",
+      "cash-system":
+        "Some qualifying businesses use the cash system, under which VAT follows receipts and payments rather than invoice dates.",
+    },
     sourcesHeading: "Official sources",
     verifiedLink: "Verified link",
     needsReview: "Needs review",
@@ -549,6 +569,7 @@ export const en = {
       runway: "Business runway",
       runwayUnknown: "Add monthly costs to estimate",
       runwayMonths: "{months} months",
+      recently: "recently",
       lastUpdated: "Last updated {date}",
       worthRefreshing: ". Worth refreshing.",
       direction: {
@@ -682,6 +703,8 @@ export const en = {
         "{count} saved payments could not be read and have been left out.",
       discardedTail:
         "The rest of your history is intact. Your {year} totals below are lower than they should be until you add them again.",
+      discardedCheckin:
+        "Your last weekly check-in could not be read and has been left out. Nothing else was affected. Run a new check-in whenever you like.",
       storageUnavailable:
         "Storage is unavailable in this browser, so your figures won't be saved on this device between visits. Nothing is uploaded either way.",
       privacyToggle: "Privacy and data",

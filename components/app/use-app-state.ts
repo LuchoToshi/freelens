@@ -35,6 +35,8 @@ export interface UseAppState {
   dismissMigrationNotice: () => void;
   /** Non-zero when saved payments were unreadable on load and had to be dropped. */
   discardedPaymentRecords: number;
+  /** True when a stored check-in was unreadable on load and had to be dropped. */
+  discardedWeeklyPosition: boolean;
   /** Persists a deduction answer given from the correction strip. */
   updateProfileFlags: (patch: {
     meetsHoursCriterion?: boolean;
@@ -58,6 +60,7 @@ export function useAppState(): UseAppState {
   const [hydrated, setHydrated] = useState(false);
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [discardedPaymentRecords, setDiscardedPaymentRecords] = useState(0);
+  const [discardedWeeklyPosition, setDiscardedWeeklyPosition] = useState(false);
 
   useEffect(() => {
     // One-time sync from storage post-mount. Rendering neutral defaults first
@@ -68,6 +71,7 @@ export function useAppState(): UseAppState {
     setState(loaded.state);
     setStorageAvailable(loaded.storageAvailable);
     setDiscardedPaymentRecords(loaded.discardedPaymentRecords);
+    setDiscardedWeeklyPosition(loaded.discardedWeeklyPosition);
     setHydrated(true);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
@@ -150,6 +154,7 @@ export function useAppState(): UseAppState {
     clearAppState();
     setState(emptyAppState());
     setDiscardedPaymentRecords(0);
+    setDiscardedWeeklyPosition(false);
   }, []);
 
   return {
@@ -163,6 +168,7 @@ export function useAppState(): UseAppState {
     clearAll,
     dismissMigrationNotice,
     discardedPaymentRecords,
+    discardedWeeklyPosition,
     updateProfileFlags,
     savePayment,
     editPayment,

@@ -292,3 +292,60 @@ describe("isStale", () => {
     expect(isStale("not-a-date")).toBe(false);
   });
 });
+
+describe("a damaged check-in does not take the app down", () => {
+  it("drops a weekly position with no obligations array", () => {
+    // A record written by an older build, or truncated mid-write, used to
+    // crash the whole /tool page inside evaluateWeeklyPosition.
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify({
+        ...emptyAppState(),
+        weeklyPosition: {
+          input: { currentBalanceCents: 700000 },
+          timestampIso: "2026-07-22T10:00:00.000Z",
+        },
+      }),
+    });
+    const loaded = loadAppState(storage);
+    expect(loaded.state.weeklyPosition).toBeNull();
+    expect(loaded.discardedWeeklyPosition).toBe(true);
+    // The rest of the state survives.
+    expect(loaded.recovered).toBe(false);
+  });
+
+  it("drops one with a damaged obligation row", () => {
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify({
+        ...emptyAppState(),
+        weeklyPosition: {
+          input: { currentBalanceCents: 700000, obligations: [{ label: "x" }] },
+          timestampIso: "2026-07-22T10:00:00.000Z",
+        },
+      }),
+    });
+    expect(loadAppState(storage).state.weeklyPosition).toBeNull();
+  });
+
+  it("keeps a valid check-in untouched", () => {
+    const state: AppState = {
+      ...emptyAppState(),
+      weeklyPosition: {
+        input: {
+          currentBalanceCents: toCents(7000),
+          vatProtectedCents: toCents(600),
+          vatProtectedIsActual: false,
+          reserveProtectedCents: toCents(1500),
+          reserveSource: "manual",
+          obligations: [],
+          bufferTargetCents: toCents(2400),
+        },
+        timestampIso: "2026-07-22T10:00:00.000Z",
+      },
+    };
+    const storage = memoryStorage();
+    saveAppState(state, storage);
+    const loaded = loadAppState(storage);
+    expect(loaded.state.weeklyPosition).toEqual(state.weeklyPosition);
+    expect(loaded.discardedWeeklyPosition).toBe(false);
+  });
+});

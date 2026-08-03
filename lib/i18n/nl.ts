@@ -373,6 +373,26 @@ export const nl: DeepPartial<typeof en> = {
       "je een grote aankoop of investering van plan bent;",
       "het je eerste jaar is, of je nog nooit Nederlandse aangifte hebt gedaan.",
     ],
+    sourceNotes: {
+      "reserve-for-tax":
+        "Inkomstenbelasting wordt jaarlijks vastgesteld over je totale belastbare winst, dus per betaling een deel opzij zetten is een planningsgewoonte. Ondernemers wordt aangeraden te reserveren voor inkomstenbelasting, premies volksverzekeringen en de Zvw-bijdrage.",
+      "vat-rates":
+        "Behandelt de tarieven van 21% en 9%, vrijstellingen, en hoe btw wordt berekend en aangegeven.",
+      kor: "Deelnemers aan de KOR brengen geen btw in rekening, doen geen gewone btw-aangifte, en kunnen tijdens deelname geen voorbelasting aftrekken.",
+      "input-vat":
+        "De btw die je afdraagt is de btw die je in rekening bracht, min de aftrekbare voorbelasting op je bedrijfskosten. Het bedrag dat je moet betalen is dus meestal lager dan de geïnde btw. Staat op de officiële btw-pagina.",
+      "reverse-charge":
+        "Bij verlegde btw geeft je klant die aan, dus jij brengt geen btw in rekening en het is geen gewone af te dragen btw om opzij te zetten.",
+      zvw: "De inkomensafhankelijke Zvw-bijdrage komt bovenop de inkomstenbelasting en de premies volksverzekeringen, tot een maximum bijdrage-inkomen.",
+      zelfstandigenaftrek:
+        "€1.200 voor 2026, voor ondernemers die aan het urencriterium voldoen en aan het begin van het jaar de AOW-leeftijd nog niet hadden bereikt. Wordt door de engine toegepast zodra je bevestigt dat je aan het urencriterium voldoet.",
+      "mkb-exemption":
+        "12,70% van de winst na de ondernemersaftrek voor 2026. Wordt bij elke schatting toegepast, ook in een verliesjaar, waar het het verlies kleiner maakt.",
+      "invoice-system":
+        "Bij het factuurstelsel wordt het btw-tijdvak in de regel bepaald door de factuurregels, niet door het moment waarop de klant betaalt.",
+      "cash-system":
+        "Sommige ondernemers gebruiken het kasstelsel, waarbij de btw de ontvangsten en betalingen volgt in plaats van de factuurdata.",
+    },
     sourcesHeading: "Officiële bronnen",
     verifiedLink: "Gecontroleerde link",
     needsReview: "Moet gecontroleerd worden",
@@ -556,6 +576,7 @@ export const nl: DeepPartial<typeof en> = {
       runway: "Hoelang je vooruit kunt",
       runwayUnknown: "Vul je maandlasten in voor een schatting",
       runwayMonths: "{months} maanden",
+      recently: "onlangs",
       lastUpdated: "Laatst bijgewerkt {date}",
       worthRefreshing: ". Tijd om bij te werken.",
       direction: {
@@ -689,6 +710,8 @@ export const nl: DeepPartial<typeof en> = {
         "{count} opgeslagen betalingen konden niet gelezen worden en zijn weggelaten.",
       discardedTail:
         "De rest van je historie is intact. Je totalen voor {year} hieronder zijn lager dan ze horen te zijn totdat je ze opnieuw toevoegt.",
+      discardedCheckin:
+        "Je laatste wekelijkse check-in kon niet gelezen worden en is weggelaten. Verder is er niets aangetast. Doe gerust een nieuwe check-in.",
       storageUnavailable:
         "Opslag is niet beschikbaar in deze browser, dus je cijfers worden tussen bezoeken niet bewaard op dit apparaat. Er wordt hoe dan ook niets geüpload.",
       privacyToggle: "Privacy en gegevens",
