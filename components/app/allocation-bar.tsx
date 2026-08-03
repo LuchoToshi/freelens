@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { allocate } from "@/components/design/motion";
 import { formatEuro, type Cents } from "@/lib/domain/money";
+import { useT } from "@/components/i18n/locale-provider";
 
 export interface AllocationSegment {
   label: string;
@@ -25,7 +26,7 @@ export function AllocationBar({
   segments,
   height = 32,
   interactive = true,
-  caption = "Every euro, given a job",
+  caption,
 }: {
   segments: AllocationSegment[];
   height?: number;
@@ -36,6 +37,7 @@ export function AllocationBar({
    */
   caption?: string;
 }) {
+  const t = useT();
   const reduce = useReducedMotion();
   const [active, setActive] = useState<number | null>(null);
   const positive = segments.filter((s) => s.cents > 0);
@@ -57,7 +59,7 @@ export function AllocationBar({
             <span className="fl-tnum">{formatEuro(positive[active].cents)}</span>
           </span>
         ) : (
-          <span className="text-[var(--fl-slate)]">{caption}</span>
+          <span className="text-[var(--fl-slate)]">{caption ?? t.app.allocation.caption}</span>
         )}
       </div>
 

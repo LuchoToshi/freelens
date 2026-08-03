@@ -3,71 +3,80 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Check, Lock } from "lucide-react";
 import { AllocationBar } from "@/components/app/allocation-bar";
-import { toCents } from "@/lib/domain/money";
-
-const DEMO = [
-  { label: "VAT", cents: toCents(434), color: "var(--fl-vat-fill)" },
-  { label: "Reserve", cents: toCents(620), color: "var(--fl-reserve-fill)" },
-  { label: "Yours", cents: toCents(1446), color: "var(--fl-payout-fill)" },
-];
-
-const STEPS = [
-  {
-    step: "Money arrives",
-    body: "Enter a payment. Freelens separates the VAT, sets aside an income tax and Zvw reserve, and protects your business costs, so what's left is genuinely available to pay yourself.",
-    accent: "var(--fl-vat-fill)",
-    tint: "var(--fl-vat-tint)",
-    visual: "allocate",
-  },
-  {
-    step: "A calm weekly check-in",
-    body: "A five-minute weekly habit that prevents tax-time surprises: what's protected, what may be available, and how many months of runway you have. Saved on your device, so it remembers and you don't have to.",
-    accent: "var(--fl-payout-fill)",
-    tint: "var(--fl-payout-tint)",
-    visual: "runway",
-  },
-  {
-    step: "Check a decision",
-    body: "Thinking about a purchase or a payout? See whether it fits within your optional spending room, and what it does to your runway, before you spend, not after.",
-    accent: "var(--fl-decision-fill)",
-    tint: "var(--fl-decision-tint)",
-    visual: "decision",
-  },
-  {
-    step: "Peace of mind",
-    body: "Every euro has a job. Your reserves stay visible and protected. You know what you can do next.",
-    accent: "var(--fl-reserve-fill)",
-    tint: "var(--fl-reserve-tint)",
-    visual: "locked",
-  },
-] as const;
+import { formatEuro, toCents } from "@/lib/domain/money";
+import { useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
+type VisualKind = "allocate" | "runway" | "decision" | "locked";
+
 export function HowItWorksSection() {
   const reduce = useReducedMotion();
+  const t = useT();
+
+  const demo = [
+    { label: t.app.allocation.vat, cents: toCents(434), color: "var(--fl-vat-fill)" },
+    { label: t.app.allocation.reserve, cents: toCents(620), color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.yours, cents: toCents(1446), color: "var(--fl-payout-fill)" },
+  ];
+
+  const steps: {
+    title: string;
+    body: string;
+    accent: string;
+    tint: string;
+    visual: VisualKind;
+  }[] = [
+    {
+      title: t.home.howItWorks.steps.moneyArrives.title,
+      body: t.home.howItWorks.steps.moneyArrives.body,
+      accent: "var(--fl-vat-fill)",
+      tint: "var(--fl-vat-tint)",
+      visual: "allocate",
+    },
+    {
+      title: t.home.howItWorks.steps.weekly.title,
+      body: t.home.howItWorks.steps.weekly.body,
+      accent: "var(--fl-payout-fill)",
+      tint: "var(--fl-payout-tint)",
+      visual: "runway",
+    },
+    {
+      title: t.home.howItWorks.steps.decision.title,
+      body: t.home.howItWorks.steps.decision.body,
+      accent: "var(--fl-decision-fill)",
+      tint: "var(--fl-decision-tint)",
+      visual: "decision",
+    },
+    {
+      title: t.home.howItWorks.steps.peace.title,
+      body: t.home.howItWorks.steps.peace.body,
+      accent: "var(--fl-reserve-fill)",
+      tint: "var(--fl-reserve-tint)",
+      visual: "locked",
+    },
+  ];
+
   return (
     <section id="how-it-works" className="border-t border-[var(--fl-line)]">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-          How it works
+          {t.home.howItWorks.eyebrow}
         </span>
         <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
-          Every payment, given a job.
+          {t.home.howItWorks.heading}
         </h2>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
-          Overview, Money arrived, Weekly check-in, and Check a decision aren&apos;t
-          four separate tools. They&apos;re one loop: a payment lands and you give
-          it a job, you glance at your position each week, and you test any big
-          spend against it. Every new payment is a new decision.
+          {t.home.howItWorks.body}
         </p>
         <div className="mt-14 flex flex-col gap-16 sm:gap-20">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <motion.div
-              key={s.step}
+              key={s.title}
               initial={reduce ? false : "hidden"}
               whileInView="visible"
               viewport={{ once: true, amount: 0.4 }}
@@ -83,7 +92,7 @@ export function HowItWorksSection() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-serif text-2xl font-medium text-[var(--fl-ink)]">
-                  {s.step}
+                  {s.title}
                 </h3>
                 <p className="mt-3 max-w-md text-base leading-relaxed text-[var(--fl-slate)]">
                   {s.body}
@@ -95,7 +104,7 @@ export function HowItWorksSection() {
                 }`}
                 style={{ backgroundColor: s.tint }}
               >
-                <SceneVisual kind={s.visual} accent={s.accent} />
+                <SceneVisual kind={s.visual} accent={s.accent} demo={demo} />
               </div>
             </motion.div>
           ))}
@@ -105,11 +114,21 @@ export function HowItWorksSection() {
   );
 }
 
-function SceneVisual({ kind, accent }: { kind: string; accent: string }) {
+function SceneVisual({
+  kind,
+  accent,
+  demo,
+}: {
+  kind: VisualKind;
+  accent: string;
+  demo: { label: string; cents: ReturnType<typeof toCents>; color: string }[];
+}) {
+  const t = useT();
+
   if (kind === "allocate") {
     return (
       <div className="w-full max-w-sm">
-        <AllocationBar segments={DEMO} interactive={false} />
+        <AllocationBar segments={demo} interactive={false} caption={t.app.allocation.caption} />
       </div>
     );
   }
@@ -121,7 +140,7 @@ function SceneVisual({ kind, accent }: { kind: string; accent: string }) {
           <span className="absolute top-0 h-full w-0.5 bg-[var(--fl-ink)]" style={{ left: "33%" }} aria-hidden="true" />
         </div>
         <span className="fl-tnum text-sm font-medium text-[var(--fl-ink)]">
-          4.6 months of runway
+          {fill(t.home.howItWorks.visuals.runway, { months: "4,6" })}
         </span>
       </div>
     );
@@ -134,24 +153,26 @@ function SceneVisual({ kind, accent }: { kind: string; accent: string }) {
           style={{ color: accent }}
         >
           <Check className="size-4" aria-hidden="true" />
-          Fits
+          {t.home.howItWorks.visuals.fits}
         </span>
         <span className="fl-tnum text-sm text-[var(--fl-ink)]">
-          €3.000 → €2.700 room
+          {fill(t.home.howItWorks.visuals.decisionRoom, {
+            spend: formatEuro(toCents(3000)),
+            room: formatEuro(toCents(2700)),
+          })}
         </span>
       </div>
     );
   }
-  // locked
   return (
     <div className="flex w-full max-w-sm flex-col gap-3">
-      <AllocationBar segments={DEMO} interactive={false} />
+      <AllocationBar segments={demo} interactive={false} caption={t.app.allocation.caption} />
       <span
         className="inline-flex items-center gap-1.5 text-sm font-medium"
         style={{ color: accent }}
       >
         <Lock className="size-4" aria-hidden="true" />
-        Every euro has a job
+        {t.home.howItWorks.visuals.everyEuro}
       </span>
     </div>
   );

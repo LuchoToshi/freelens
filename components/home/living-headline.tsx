@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-
-const CONTEXTS = [
-  "from a shoot",
-  "from a gig",
-  "from a client",
-  "from a campaign",
-  "from a production day",
-];
+import { useT } from "@/components/i18n/locale-provider";
 
 /**
  * The living hero headline (audit L2): "Money arrived" stays stable while the
@@ -19,28 +12,33 @@ const CONTEXTS = [
  */
 export function LivingHeadline() {
   const reduce = useReducedMotion();
+  const t = useT();
   const [i, setI] = useState(0);
+  const contexts = t.home.hero.contexts;
 
   useEffect(() => {
     if (reduce) return;
-    const id = setInterval(() => setI((n) => (n + 1) % CONTEXTS.length), 2600);
+    const id = setInterval(() => setI((n) => (n + 1) % contexts.length), 2600);
     return () => clearInterval(id);
-  }, [reduce]);
+  }, [reduce, contexts.length]);
+
+  // A shorter translated list must never leave the index out of range.
+  const index = i % contexts.length;
 
   return (
     <h1 className="font-serif text-5xl font-medium leading-[1.05] tracking-tight text-balance text-[var(--fl-ink)] sm:text-6xl lg:text-7xl">
       {reduce ? (
-        <>Money arrived. Know what happens next.</>
+        <>{t.home.hero.headlineStatic}</>
       ) : (
         <>
-          <span className="block">Money arrived</span>
+          <span className="block">{t.home.hero.headlineLine1}</span>
           {/* The rotating phrase gets its own reserved slot. An invisible sizer
               stacks every phrase in one grid cell, so the slot always occupies
               the largest phrase's width and wrapped height at any breakpoint-
               shorter phrases can never change the layout below. */}
           <span className="relative block">
             <span className="grid" aria-hidden="true">
-              {CONTEXTS.map((c) => (
+              {contexts.map((c) => (
                 <span key={c} className="invisible col-start-1 row-start-1">
                   {c}.
                 </span>
@@ -49,20 +47,20 @@ export function LivingHeadline() {
             <span className="absolute inset-0 overflow-hidden">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
-                  key={i}
+                  key={index}
                   initial={{ y: "100%" }}
                   animate={{ y: "0%" }}
                   exit={{ y: "-100%" }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   className="block"
                 >
-                  <span className="text-[var(--fl-vat-text)]">{CONTEXTS[i]}</span>
+                  <span className="text-[var(--fl-vat-text)]">{contexts[index]}</span>
                   <span>.</span>
                 </motion.span>
               </AnimatePresence>
             </span>
           </span>
-          <span className="block">Know what happens next.</span>
+          <span className="block">{t.home.hero.headlineLine3}</span>
         </>
       )}
     </h1>

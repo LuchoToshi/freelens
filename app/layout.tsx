@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { LocaleProvider } from "@/components/i18n/locale-provider";
+import { en } from "@/lib/i18n/en";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,10 +22,11 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
 });
 
+// English, because that is what is prerendered and what crawlers see. The
+// Dutch title is applied on the client once the visitor's choice is known.
 export const metadata: Metadata = {
-  title: "Freelens: Money arrived. Know what happens next.",
-  description:
-    "Freelens helps Dutch freelancers and ZZP'ers separate VAT, protect a tax reserve, cover business costs, and see what may be available to pay themselves. Planning estimates, not tax advice. Your numbers stay on this device.",
+  title: en.meta.home.title,
+  description: en.meta.home.description,
 };
 
 export default function RootLayout({
@@ -37,9 +40,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        {/* `lang` above is the prerendered default. LocaleProvider rewrites it
+            on the client once the visitor's choice is known. */}
+        <LocaleProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </LocaleProvider>
       </body>
     </html>
   );

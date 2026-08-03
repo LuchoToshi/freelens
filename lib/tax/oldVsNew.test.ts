@@ -16,54 +16,11 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { formatEuroExact, toCents, type Cents } from "@/lib/domain/money";
 import { calculateTaxReserve } from "@/lib/tax/engine";
-import { GOLDEN_CASES, inputFor, profitOf, type GoldenCase } from "@/lib/tax/goldenCases";
-
-const OLD_FLAT_RATE = 30;
-/**
- * A realistic loonheffing on €30.000 of salary in 2026. The engine puts the tax
- * on that income on its own at €2.245,88, so €2.250 is the right order.
- */
-const HYBRID_WITHHELD = 2250;
-const ZVW_RATE = 4.85;
-const ZVW_CAP = 79_409;
-
-function oldPerPayment(testCase: GoldenCase): Cents {
-  return toCents((testCase.revenueExVat * OLD_FLAT_RATE) / 100);
-}
-
-function oldGuidedEstimate(testCase: GoldenCase): Cents {
-  const profit = Math.max(0, profitOf(testCase));
-  const incomeTax = (profit * OLD_FLAT_RATE) / 100;
-  const zvw = (Math.min(profit, ZVW_CAP) * ZVW_RATE) / 100;
-  return toCents(incomeTax + zvw);
-}
-
-interface Row {
-  testCase: GoldenCase;
-  profit: number;
-  oldA: Cents;
-  oldB: Cents;
-  actual: Cents;
-  deltaA: number;
-  deltaB: number;
-}
-
-function buildRows(): Row[] {
-  return GOLDEN_CASES.map((testCase) => {
-    const actual = calculateTaxReserve(inputFor(testCase)).totalLiability;
-    const oldA = oldPerPayment(testCase);
-    const oldB = oldGuidedEstimate(testCase);
-    return {
-      testCase,
-      profit: profitOf(testCase),
-      oldA,
-      oldB,
-      actual,
-      deltaA: oldA - actual,
-      deltaB: oldB - actual,
-    };
-  });
-}
+import {
+  buildComparisonRows,
+  HYBRID_WITHHELD,
+  type ComparisonRow,
+} from "@/lib/tax/oldVsNew";
 
 function direction(delta: number): string {
   if (delta === 0) return "exact";
@@ -75,7 +32,7 @@ function euro(cents: Cents | number): string {
   return formatEuroExact(cents as Cents);
 }
 
-function renderMarkdown(rows: Row[]): string {
+function renderMarkdown(rows: ComparisonRow[]): string {
   const lines: string[] = [];
 
   lines.push("# The old 30% model versus the real numbers");
@@ -173,7 +130,7 @@ function renderMarkdown(rows: Row[]): string {
 }
 
 describe("old versus new", () => {
-  const rows = buildRows();
+  const rows = buildComparisonRows();
 
   it("shows the hybrid case both with and without loonheffing", () => {
     const withheld = calculateTaxReserve({

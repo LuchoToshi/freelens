@@ -1,6 +1,7 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
+import { useT } from "@/components/i18n/locale-provider";
 
 /**
  * Hero media slot (audit L1). Structurally complete so a real editorial
@@ -64,11 +65,12 @@ export function HeroMedia({
 
 /** Editorial allocation-motif fallback: stacked color fields + caption labels. */
 function DesignedPlaceholder() {
+  const t = useT();
   const bands = [
-    { label: "VAT", color: "var(--fl-vat-fill)", grow: 21 },
-    { label: "Reserve", color: "var(--fl-reserve-fill)", grow: 30 },
-    { label: "Costs", color: "var(--fl-costs-fill)", grow: 12 },
-    { label: "Yours", color: "var(--fl-payout-fill)", grow: 37 },
+    { label: t.app.allocation.vat, color: "var(--fl-vat-fill)", grow: 21 },
+    { label: t.app.allocation.reserve, color: "var(--fl-reserve-fill)", grow: 30 },
+    { label: t.app.allocation.business, color: "var(--fl-costs-fill)", grow: 12 },
+    { label: t.app.allocation.yours, color: "var(--fl-payout-fill)", grow: 37 },
   ];
   return (
     <div className="absolute inset-0 flex flex-col" aria-hidden="true">

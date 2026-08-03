@@ -45,15 +45,22 @@ import {
   type PaymentRecord,
 } from "@/lib/domain/paymentHistory";
 import type { StoredAllocation, UserSetup } from "@/lib/domain/persistence";
+import { useLocale, useT } from "@/components/i18n/locale-provider";
+import { translateAssumption } from "@/lib/i18n/engineText";
+import { fill } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/types";
 
-const TREATMENT_LABELS: Record<VatTreatment, string> = {
-  "21": "21% VAT",
-  "9": "9% VAT",
-  "0": "0% (export / intra-EU)",
-  exempt: "Exempt",
-  "reverse-charged": "Reverse-charged",
-  kor: "KOR (Small Businesses Scheme)",
-  "mixed-unsure": "Mixed / unsure",
+type TreatmentKey = keyof Dictionary["app"]["moneyArrived"]["treatments"];
+
+const TREATMENT_KEY: Record<VatTreatment, TreatmentKey> = {
+  "21": "21",
+  "9": "9",
+  "0": "0",
+  exempt: "exempt",
+  "reverse-charged": "reverseCharged",
+  kor: "kor",
+  "mixed-unsure": "mixedUnsure",
 };
 
 // The non-numeric ("other") VAT treatments, revealed behind progressive
@@ -193,6 +200,8 @@ export function MoneyArrivedView({
   onUpdateProfile?: (patch: { meetsHoursCriterion?: boolean; isStarter?: boolean }) => void;
   onOpenSettings?: () => void;
 }) {
+  const t = useT();
+  const { locale } = useLocale();
   const defaultTreatment: VatTreatment = setup?.commonVatTreatments?.[0] ?? "21";
   const defaultMode: VatMode =
     defaultTreatment === "21" || defaultTreatment === "9"
@@ -227,6 +236,8 @@ export function MoneyArrivedView({
   // empty history means zero on both, which is the correct
   // first-payment-of-the-year state.
   const totals = yearTotals(paymentHistory, taxYear);
+  // `today` is passed in, so this stays deterministic under test.
+  const isPastJanuary = Number(today.slice(5, 7)) > 1;
   const [paymentDate, setPaymentDate] = useState(today);
   const [paymentNote, setPaymentNote] = useState("");
   const [saved, setSaved] = useState(false);
@@ -252,8 +263,21 @@ export function MoneyArrivedView({
   }).cents;
 
   const hasProfit = annualProfitCents !== null;
+
+  // The projection has fallen behind reality: saved profit has caught up with
+  // it, so the engine has nothing left to spread the remaining bill over and
+  // falls back to the marginal rate. Worth one prompt, not a warning.
+  const showDrift =
+    hasProfit && annualProfitCents > 0 && totals.profitCents >= annualProfitCents;
+
+  // Someone who starts using Freelens in June has months of earnings the
+  // running balance knows nothing about, so it treats every payment as their
+  // first and over-reserves all year. Shown only until they save something.
+  const showMidYear = totals.count === 0 && isPastJanuary;
   const built = hasAmount && hasProfit
     ? buildResult({
+        t,
+        locale,
         amountCents,
         includesVat: numeric ? includesVat : true,
         treatment,
@@ -297,8 +321,8 @@ export function MoneyArrivedView({
           <CardContent className="flex flex-col gap-5 p-6">
             <CurrencyField
               id="payment-amount"
-              label="How much did you receive?"
-              placeholder="1500"
+              label={t.app.moneyArrived.amountLabel}
+              placeholder={t.app.moneyArrived.amountPlaceholder}
               leadingSymbol="€"
               size="lg"
               value={amount}
@@ -311,31 +335,37 @@ export function MoneyArrivedView({
             <details className="-mt-2">
               <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-xs text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
                 <span>
-                  {numeric && includesVat ? "Includes" : numeric ? "Excludes" : "No"}{" "}
-                  {numeric ? `${treatment}% btw` : TREATMENT_LABELS[treatment].toLowerCase()}
+                  {numeric && includesVat
+                    ? t.app.moneyArrived.vatSummary.includes
+                    : numeric
+                      ? t.app.moneyArrived.vatSummary.excludes
+                      : t.app.moneyArrived.vatSummary.none}{" "}
+                  {numeric
+                    ? `${treatment}% btw`
+                    : t.app.moneyArrived.treatments[TREATMENT_KEY[treatment]].toLowerCase()}
                 </span>
                 <span className="ml-1.5 font-medium underline decoration-[var(--fl-line)] underline-offset-2">
-                  change
+                  {t.common.actions.change}
                 </span>
               </summary>
               <div className="mt-3 flex flex-col gap-4 rounded-lg border border-[var(--fl-line)] p-3">
                 <div className="flex flex-col gap-1.5">
-                  <Label className={labelClass}>btw treatment</Label>
+                  <Label className={labelClass}>{t.app.moneyArrived.vatTreatmentLabel}</Label>
                   <Segmented
                     name="vat-mode"
-                    ariaLabel="btw treatment"
+                    ariaLabel={t.app.moneyArrived.vatTreatmentLabel}
                     value={vatMode}
                     onChange={setVatMode}
                     options={[
                       { value: "21", label: "21%" },
                       { value: "9", label: "9%" },
-                      { value: "other", label: "Other" },
+                      { value: "other", label: t.app.moneyArrived.vatOther },
                     ]}
                   />
                   {vatMode === "other" && (
                     <div className="mt-1.5 flex flex-col gap-1.5">
                       <Label className={labelClass} htmlFor="vat-other">
-                        Which treatment?
+                        {t.app.moneyArrived.whichTreatment}
                       </Label>
                       <select
                         id="vat-other"
@@ -345,9 +375,9 @@ export function MoneyArrivedView({
                         }
                         className="h-11 rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
                       >
-                        {OTHER_TREATMENTS.map((t) => (
-                          <option key={t} value={t}>
-                            {TREATMENT_LABELS[t]}
+                        {OTHER_TREATMENTS.map((option) => (
+                          <option key={option} value={option}>
+                            {t.app.moneyArrived.treatments[TREATMENT_KEY[option]]}
                           </option>
                         ))}
                       </select>
@@ -356,34 +386,30 @@ export function MoneyArrivedView({
                 </div>
                 {numeric && (
                   <div className="flex flex-col gap-1.5">
-                    <Label className={labelClass}>Does this amount include btw?</Label>
+                    <Label className={labelClass}>{t.app.moneyArrived.includesQuestion}</Label>
                     <Segmented
                       name="vat-inclusion"
                       ariaLabel="btw inclusion"
                       value={includesVat ? "incl" : "excl"}
                       onChange={(v) => setIncludesVat(v === "incl")}
                       options={[
-                        { value: "incl", label: "Includes btw" },
-                        { value: "excl", label: "Excludes btw" },
+                        { value: "incl", label: t.app.moneyArrived.includesVat },
+                        { value: "excl", label: t.app.moneyArrived.excludesVat },
                       ]}
                     />
                   </div>
                 )}
                 <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
-                  Most Dutch services use <strong>21%</strong>; some (food,
-                  culture, press work) use <strong>9%</strong>. Pick{" "}
-                  <strong>Other</strong> for KOR, reverse-charged or exempt work,
-                  or if you genuinely are not sure. Freelens then sets no btw
-                  aside and explains why.
+                  {t.app.moneyArrived.vatExplainer}
                 </p>
               </div>
             </details>
 
             <CurrencyField
               id="annual-profit"
-              label="Expected profit this year"
-              hint="Revenue excluding VAT, minus your business costs. Income tax is worked out on profit for the whole year, so this is what sets your real rate. A rough figure is fine."
-              placeholder="e.g. 40000"
+              label={t.app.moneyArrived.profitLabel}
+              hint={t.app.moneyArrived.profitHint}
+              placeholder={t.app.moneyArrived.profitPlaceholder}
               leadingSymbol="€"
               value={annualProfit}
               onChange={setAnnualProfit}
@@ -391,30 +417,30 @@ export function MoneyArrivedView({
 
             <details className="rounded-lg border border-[var(--fl-line)] p-3">
               <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm font-medium text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
-                Add costs and a label (optional)
+                {t.app.moneyArrived.extrasToggle}
               </summary>
               <div className="mt-4 flex flex-col gap-5">
                 <CurrencyField
                   id="business-reserve"
-                  label="Set aside for business costs"
-                  placeholder="e.g. 500"
+                  label={t.app.moneyArrived.businessReserveLabel}
+                  placeholder={t.app.moneyArrived.businessReservePlaceholder}
                   leadingSymbol="€"
                   value={businessReserve}
                   onChange={setBusinessReserve}
                 />
                 <CurrencyField
                   id="deductible-costs"
-                  label="Deductible costs linked to this payment"
-                  hint="Lowers the amount this payment is taxed on. It does not change VAT, so your VAT return may differ after input VAT."
-                  placeholder="e.g. 200"
+                  label={t.app.moneyArrived.deductibleLabel}
+                  hint={t.app.moneyArrived.deductibleHint}
+                  placeholder={t.app.moneyArrived.deductiblePlaceholder}
                   leadingSymbol="€"
                   value={deductibleCosts}
                   onChange={setDeductibleCosts}
                 />
                 <CurrencyField
                   id="payment-label"
-                  label="Label"
-                  placeholder="e.g. Editorial shoot, Friday DJ set"
+                  label={t.app.moneyArrived.labelLabel}
+                  placeholder={t.app.moneyArrived.labelPlaceholder}
                   value={label}
                   onChange={setLabel}
                 />
@@ -458,17 +484,16 @@ export function MoneyArrivedView({
         <div className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-line)] bg-white p-6">
           <div className="flex flex-col gap-1">
             <h3 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
-              Save this payment to {taxYear}
+              {fill(t.app.moneyArrived.saveHeading, { year: taxYear })}
             </h3>
             <p className={hintClass}>
-              Nothing is saved unless you choose to. Once it is, Freelens counts
-              it towards the year and takes less from your later payments.
+              {t.app.moneyArrived.saveBody}
             </p>
           </div>
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex flex-col gap-1.5">
               <Label className={labelClass} htmlFor="payment-date">
-                Date
+                {t.app.moneyArrived.dateLabel}
               </Label>
               <input
                 id="payment-date"
@@ -483,7 +508,7 @@ export function MoneyArrivedView({
             </div>
             <div className="flex min-w-48 flex-1 flex-col gap-1.5">
               <Label className={labelClass} htmlFor="payment-note">
-                Note (optional)
+                {t.app.moneyArrived.noteLabel}
               </Label>
               <input
                 id="payment-note"
@@ -494,7 +519,7 @@ export function MoneyArrivedView({
                   setPaymentNote(e.target.value);
                   setSaved(false);
                 }}
-                placeholder="e.g. Editorial shoot"
+                placeholder={t.app.moneyArrived.notePlaceholder}
                 className="h-11 rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
               />
             </div>
@@ -520,16 +545,52 @@ export function MoneyArrivedView({
               }}
               className={`${primaryButtonClass} disabled:cursor-not-allowed disabled:opacity-50`}
             >
-              {saved ? "Saved" : `Save to ${taxYear}`}
+              {saved
+                ? t.common.actions.saved
+                : fill(t.app.moneyArrived.saveButton, { year: taxYear })}
             </button>
           </div>
           {saved && (
             <p className="text-sm text-[var(--fl-slate)]">
-              Saved on this device. Your {taxYear} totals below have gone up, and
-              your next payment will ask for less.
+              {fill(t.app.moneyArrived.savedConfirm, { year: taxYear })}
             </p>
           )}
         </div>
+      )}
+
+      {showDrift && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-[var(--fl-vat-fill)]/40 bg-[var(--fl-vat-tint)] px-6 py-5">
+          <span className="text-sm text-[var(--fl-ink)]">
+            {fill(t.app.moneyArrived.driftPrompt, {
+              earned: formatEuro(totals.profitCents),
+              projected: formatEuro(annualProfitCents ?? asCentsUnsafe(0)),
+            })}
+          </span>
+          <button
+            type="button"
+            // Focus the field rather than filling it in. Setting the
+            // projection to exactly what has been earned leaves the engine on
+            // the same marginal fallback and the prompt still showing, so the
+            // button would look broken. Only the user knows their real figure.
+            onClick={() => {
+              const field = document.getElementById("annual-profit");
+              if (field instanceof HTMLInputElement) {
+                field.focus();
+                field.select();
+                field.scrollIntoView({ block: "center", behavior: "smooth" });
+              }
+            }}
+            className="min-h-9 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            {t.app.moneyArrived.driftCta}
+          </button>
+        </div>
+      )}
+
+      {showMidYear && (
+        <p className="rounded-2xl border border-dashed border-[var(--fl-line)] bg-white px-6 py-5 text-sm leading-relaxed text-[var(--fl-slate)]">
+          {fill(t.app.moneyArrived.midYearPrompt, { year: taxYear })}
+        </p>
       )}
 
       <PaymentHistory
@@ -542,28 +603,27 @@ export function MoneyArrivedView({
       {!setup && onPersonalize && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-4 py-3 text-sm text-[var(--fl-slate)]">
           <span>
-            Freelens is remembering nothing yet. Your answers above apply to this
-            payment only.
+            {t.app.moneyArrived.rememberNothing}
           </span>
           <button
             type="button"
             onClick={onPersonalize}
             className="min-h-9 font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
           >
-            Save my details
+            {t.app.moneyArrived.saveMyDetails}
           </button>
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-6 py-5">
         <span className="text-sm text-[var(--fl-slate)]">
-          Pricing the next one? Same calculation, run backwards:
+          {t.app.moneyArrived.crossLink}
         </span>
         <Link
           href="/tarief"
           className="inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
-          Work out what to charge
+          {t.app.moneyArrived.crossLinkCta}
           <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
@@ -596,23 +656,24 @@ function CorrectionStrip({
   onToggleStarter: (next: boolean) => void;
   onOpenSettings?: () => void;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-[var(--fl-line)] bg-white p-4">
       <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
-        Make this more accurate
+        {t.app.moneyArrived.strip.heading}
       </span>
       <div className="flex flex-col gap-2">
         <StripToggle
           active={meetsHours}
           onClick={() => onToggleHours(!meetsHours)}
-          label="I work 1.225 hours or more a year on this"
-          effect="lowers it"
+          label={t.app.moneyArrived.strip.hours}
+          effect={t.app.moneyArrived.strip.lowers}
         />
         <StripToggle
           active={isStarter}
           onClick={() => onToggleStarter(!isStarter)}
-          label="I'm in my first five years in business"
-          effect="lowers it"
+          label={t.app.moneyArrived.strip.starter}
+          effect={t.app.moneyArrived.strip.lowers}
         />
         {onOpenSettings && (
           <button
@@ -622,17 +683,19 @@ function CorrectionStrip({
           >
             <span>
               {hasOtherIncome
-                ? "I have a salary alongside this"
-                : "I also have a salary"}
+                ? t.app.moneyArrived.strip.salaryHas
+                : t.app.moneyArrived.strip.salaryNew}
             </span>
             <span className="shrink-0 text-xs text-[var(--fl-slate)]">
-              {hasOtherIncome ? "counted" : "raises it"}
+              {hasOtherIncome
+                ? t.app.moneyArrived.strip.counted
+                : t.app.moneyArrived.strip.raises}
             </span>
           </button>
         )}
       </div>
       <p className={hintClass}>
-        Each answer is remembered, so you are only asked once.
+        {t.app.moneyArrived.strip.askedOnce}
       </p>
     </div>
   );
@@ -649,6 +712,7 @@ function StripToggle({
   label: string;
   effect: string;
 }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -664,13 +728,15 @@ function StripToggle({
       <span
         className={`shrink-0 text-xs ${active ? "text-white/70" : "text-[var(--fl-slate)]"}`}
       >
-        {active ? "applied" : effect}
+        {active ? t.app.moneyArrived.strip.applied : effect}
       </span>
     </button>
   );
 }
 
 function buildResult(args: {
+  t: Dictionary;
+  locale: Locale;
   amountCents: Cents;
   includesVat: boolean;
   treatment: VatTreatment;
@@ -709,7 +775,10 @@ function buildResult(args: {
   const assumptions: string[] = [];
   if (deductible > 0) {
     assumptions.push(
-      `Reserve applied to ${formatEuro(reserveBase)} after ${formatEuro(deductible)} deductible costs.`
+      fill(args.t.app.moneyArrived.assumptions.deductible, {
+        base: formatEuro(reserveBase),
+        costs: formatEuro(deductible),
+      })
     );
   }
 
@@ -743,9 +812,16 @@ function buildResult(args: {
     : null;
   if (engineReserve) {
     assumptions.push(
-      `This payment's share of the ${formatEuro(engineReserve.annualLiabilityCents)} you are on track to owe for the year, which works out at ${ratePercent}% of this payment.`
+      fill(args.t.app.moneyArrived.assumptions.share, {
+        annual: formatEuro(engineReserve.annualLiabilityCents),
+        pct: ratePercent ?? 0,
+      })
     );
-    assumptions.push(...engineReserve.assumptions.slice(1));
+    assumptions.push(
+      ...engineReserve.assumptions
+        .slice(1)
+        .map((line) => translateAssumption(args.locale, line))
+    );
   }
 
   const businessReserveCents =
@@ -784,25 +860,26 @@ function ResultCard({
   handled: boolean;
   onMarkHandled: () => void;
 }) {
+  const t = useT();
   const isShort = result.availableForPersonalPayoutCents < 0;
   const segments = [
     result.vatComponentCents
       ? {
-          label: "VAT",
+          label: t.app.allocation.vat,
           cents: result.vatComponentCents,
           color: "var(--fl-vat-fill)",
         }
       : null,
-    { label: "Reserve", cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.reserve, cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
     result.obligationsCents > 0
       ? {
-          label: "Business",
+          label: t.app.allocation.business,
           cents: result.obligationsCents,
           color: "var(--fl-costs-fill)",
         }
       : null,
     {
-      label: "Personal payout",
+      label: t.app.allocation.personalPayout,
       cents: result.availableForPersonalPayoutCents,
       color: "var(--fl-payout-fill)",
     },
@@ -812,10 +889,10 @@ function ResultCard({
     <Card className={stageCardClass}>
       <CardContent className="flex flex-col gap-5 p-6">
         <dl className="flex flex-col gap-2">
-          <Row label="Payment received" value={formatEuro(result.grossPaymentCents)} />
+          <Row label={t.app.moneyArrived.result.received} value={formatEuro(result.grossPaymentCents)} />
           {result.vatComponentCents !== null ? (
             <Row
-              label="VAT included in this payment"
+              label={t.app.moneyArrived.result.vatIncluded}
               value={formatEuro(result.vatComponentCents)}
               muted
             />
@@ -825,13 +902,13 @@ function ResultCard({
             </p>
           )}
           <Row
-            label="Income tax and Zvw reserve"
+            label={t.app.moneyArrived.result.reserve}
             value={formatEuro(result.reserveCents)}
             muted
           />
           {result.obligationsCents > 0 && (
             <Row
-              label="Set aside for business costs"
+              label={t.app.moneyArrived.result.businessSetAside}
               value={formatEuro(result.obligationsCents)}
               muted
             />
@@ -841,8 +918,8 @@ function ResultCard({
         <div className="flex flex-col gap-1 border-t border-[var(--fl-line)] pt-4">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
             {isShort
-              ? "This payment doesn't cover your set-asides"
-              : "Estimated amount available to pay yourself"}
+              ? t.app.moneyArrived.result.short
+              : t.app.moneyArrived.result.available}
           </span>
           <AnimatedAmount
             cents={result.availableForPersonalPayoutCents}
@@ -856,9 +933,9 @@ function ResultCard({
 
         <WhyThisNumber
           steps={result.breakdown}
-          resultLabel="Estimated amount available to pay yourself"
+          resultLabel={t.app.moneyArrived.result.available}
           resultCents={result.availableForPersonalPayoutCents}
-          reserveSourceNote="Reserve based on the percentage you set (a planning rule, not a tax assessment)."
+          reserveSourceNote={t.app.moneyArrived.result.reserveSourceNote}
         />
 
         {treatment !== "21" && treatment !== "9" && (
@@ -869,16 +946,15 @@ function ResultCard({
           {handled ? (
             <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-payout-text)]">
               <Check className="size-4" aria-hidden="true" />
-              Saved on this device.
+              {t.app.moneyArrived.result.savedOnDevice}
             </p>
           ) : (
             <button type="button" onClick={onMarkHandled} className={primaryButtonClass}>
-              Mark allocation as handled
+              {t.app.moneyArrived.result.markHandled}
             </button>
           )}
           <p className={hintClass}>
-            Freelens records the plan on this device. You still need to move the
-            money in your bank.
+            {t.app.moneyArrived.result.movesMoneyNote}
           </p>
         </div>
       </CardContent>
@@ -887,15 +963,16 @@ function ResultCard({
 }
 
 function SampleCard() {
+  const t = useT();
   const segments = [
     {
-      label: "VAT",
+      label: t.app.allocation.vat,
       cents: SAMPLE.allocation.vatComponentCents ?? asCentsUnsafe(0),
       color: "var(--fl-vat-fill)",
     },
-    { label: "Reserve", cents: SAMPLE.allocation.reserveCents, color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.reserve, cents: SAMPLE.allocation.reserveCents, color: "var(--fl-reserve-fill)" },
     {
-      label: "Personal payout",
+      label: t.app.allocation.personalPayout,
       cents: SAMPLE.allocation.availableForPersonalPayoutCents,
       color: "var(--fl-payout-fill)",
     },
@@ -906,30 +983,34 @@ function SampleCard() {
         <div className="flex items-center gap-2">
           <ExampleBadge />
           <p className={hintClass}>
-            Here&apos;s how a €1.500 payment at 21% VAT splits, for someone
-            expecting €40.000 profit this year
-            {SAMPLE.ratePercent !== null
-              ? ` (reserved at ${SAMPLE.ratePercent}%, the rate on their next euro)`
-              : ""}
-            .
+            {fill(t.app.moneyArrived.sample.intro, {
+              amount: formatEuro(toCents(1500)),
+              profit: formatEuro(toCents(SAMPLE_ANNUAL_PROFIT)),
+              rate:
+                SAMPLE.ratePercent !== null
+                  ? fill(t.app.moneyArrived.sample.rateNote, {
+                      pct: SAMPLE.ratePercent,
+                    })
+                  : "",
+            })}
           </p>
         </div>
         <dl className="flex flex-col gap-2">
-          <Row label="Payment received" value={formatEuro(SAMPLE.allocation.grossPaymentCents)} />
+          <Row label={t.app.moneyArrived.result.received} value={formatEuro(SAMPLE.allocation.grossPaymentCents)} />
           <Row
-            label="VAT included in this payment"
+            label={t.app.moneyArrived.result.vatIncluded}
             value={formatEuro(SAMPLE.allocation.vatComponentCents ?? asCentsUnsafe(0))}
             muted
           />
           <Row
-            label="Income tax and Zvw reserve"
+            label={t.app.moneyArrived.result.reserve}
             value={formatEuro(SAMPLE.allocation.reserveCents)}
             muted
           />
         </dl>
         <div className="flex flex-col gap-1 border-t border-[var(--fl-line)] pt-4">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            Estimated amount available to pay yourself
+            {t.app.moneyArrived.result.available}
           </span>
           <span className="fl-tnum font-serif text-3xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-4xl">
             {formatEuro(SAMPLE.allocation.availableForPersonalPayoutCents)}

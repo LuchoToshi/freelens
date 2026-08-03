@@ -2,6 +2,7 @@
 
 import { ShieldCheck, ChevronDown } from "lucide-react";
 import { Accordion } from "@base-ui/react/accordion";
+import { useT } from "@/components/i18n/locale-provider";
 
 /**
  * Confidence block (audit Q3 / Signature C). Replaces repeated fine-print
@@ -11,14 +12,15 @@ import { Accordion } from "@base-ui/react/accordion";
  * necessary caveat.
  */
 export function ConfidenceBlock({
-  sentence = "A planning estimate, never a hidden promise. Your numbers stay on this device.",
+  sentence,
   detail,
   className = "",
 }: {
-  sentence?: string;
+  sentence?: React.ReactNode;
   detail?: React.ReactNode;
   className?: string;
 }) {
+  const t = useT();
   return (
     <div
       className={`rounded-xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-4 ${className}`}
@@ -30,14 +32,14 @@ export function ConfidenceBlock({
         />
         <div className="flex flex-col gap-1">
           <p className="text-sm leading-relaxed text-[var(--fl-ink)]">
-            {sentence}
+            {sentence ?? t.common.confidence.sentence}
           </p>
           {detail ? (
             <Accordion.Root className="mt-1">
               <Accordion.Item>
                 <Accordion.Header>
                   <Accordion.Trigger className="group flex min-h-11 items-center gap-1.5 bg-transparent py-1 text-sm font-medium text-[var(--fl-slate)] select-none hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
-                    How this estimate works
+                    {t.common.confidence.toggle}
                     <ChevronDown
                       className="size-4 transition-transform duration-200 group-data-panel-open:rotate-180"
                       aria-hidden="true"

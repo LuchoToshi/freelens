@@ -16,6 +16,8 @@ import { resolvePaymentVat } from "@/lib/domain/vat";
 import { allocatePayment } from "@/lib/domain/allocation";
 import { calculatePerPaymentReserve } from "@/lib/domain/reserves";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
+import { useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
 
 // Example assumptions, shown explicitly. This demo is ephemeral, it never
 // reads or writes the visitor's saved data. The reserve is the real engine, not
@@ -58,6 +60,7 @@ function allocate(grossCents: Cents, includesVat: boolean) {
 }
 
 export function InteractivePaymentExample() {
+  const t = useT();
   const [amount, setAmount] = useState("2500");
   const [includesVat, setIncludesVat] = useState(true);
 
@@ -67,11 +70,11 @@ export function InteractivePaymentExample() {
 
   const segments = [
     result.vatComponentCents
-      ? { label: "VAT", cents: result.vatComponentCents, color: "var(--fl-vat-fill)" }
+      ? { label: t.app.allocation.vat, cents: result.vatComponentCents, color: "var(--fl-vat-fill)" }
       : null,
-    { label: "Tax reserve", cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.reserve, cents: result.reserveCents, color: "var(--fl-reserve-fill)" },
     {
-      label: "Personal payout",
+      label: t.app.allocation.personalPayout,
       cents: result.availableForPersonalPayoutCents,
       color: "var(--fl-payout-fill)",
     },
@@ -82,16 +85,21 @@ export function InteractivePaymentExample() {
       <div className="mb-4 flex items-center gap-2">
         <ExampleBadge />
         <span className="text-xs text-[var(--fl-slate)]">
-          Example uses {EXAMPLE_VAT_RATE}% VAT and the {EXAMPLE_TAX_YEAR} Dutch tax
-          rules, for someone expecting {formatEuro(toCents(EXAMPLE_ANNUAL_PROFIT))}{" "}
-          profit this year
-          {ratePercent !== null ? `, so ${ratePercent}% of this payment` : ""}.
+          {fill(t.home.heroExample.note, {
+            rate: EXAMPLE_VAT_RATE,
+            year: EXAMPLE_TAX_YEAR,
+            profit: formatEuro(toCents(EXAMPLE_ANNUAL_PROFIT)),
+            rateNote:
+              ratePercent !== null
+                ? fill(t.home.heroExample.rateNote, { pct: ratePercent })
+                : "",
+          })}
         </span>
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label className="text-sm font-medium text-[var(--fl-ink)]" htmlFor="hero-amount">
-          How much did you receive?
+          {t.home.heroExample.amountLabel}
         </Label>
         <Input
           id="hero-amount"
@@ -103,10 +111,10 @@ export function InteractivePaymentExample() {
         />
       </div>
 
-      <div className="mt-3 flex gap-2" role="group" aria-label="VAT inclusion">
+      <div className="mt-3 flex gap-2" role="group" aria-label={t.home.heroExample.vatGroupLabel}>
         {[
-          { v: true, l: "Includes VAT" },
-          { v: false, l: "Excludes VAT" },
+          { v: true, l: t.home.heroExample.includesVat },
+          { v: false, l: t.home.heroExample.excludesVat },
         ].map((opt) => (
           <button
             key={String(opt.v)}
@@ -125,20 +133,20 @@ export function InteractivePaymentExample() {
       </div>
 
       <dl className="mt-6 flex flex-col gap-2 border-t border-[var(--fl-line)] pt-5">
-        <Line label="Payment received" value={formatEuro(result.grossPaymentCents)} strong />
+        <Line label={t.home.heroExample.received} value={formatEuro(result.grossPaymentCents)} strong />
         <Line
-          label="VAT included in this payment"
+          label={t.home.heroExample.vatIncluded}
           value={formatEuro(result.vatComponentCents ?? asCentsUnsafe(0))}
         />
         <Line
-          label="Income tax and Zvw reserve"
+          label={t.home.heroExample.reserve}
           value={formatEuro(result.reserveCents)}
         />
       </dl>
 
       <div className="mt-5 flex flex-col gap-1 border-t border-[var(--fl-line)] pt-5">
         <span className="text-sm font-medium text-[var(--fl-slate)]">
-          May be available to pay yourself
+          {t.home.heroExample.available}
         </span>
         <span className="font-serif text-4xl font-medium tracking-tight tabular-nums text-[var(--fl-ink)] sm:text-5xl">
           {formatEuro(result.availableForPersonalPayoutCents)}
@@ -146,12 +154,11 @@ export function InteractivePaymentExample() {
       </div>
 
       <div className="mt-5">
-        <AllocationBar segments={segments} />
+        <AllocationBar segments={segments} caption={t.app.allocation.caption} />
       </div>
 
       <p className="mt-4 text-xs leading-relaxed text-[var(--fl-slate)]">
-        A planning estimate, not a tax assessment. The real tool uses your own
-        VAT treatment and reserve rules. Your numbers stay on your device.
+        {t.home.heroExample.footnote}
       </p>
     </div>
   );

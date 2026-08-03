@@ -16,15 +16,19 @@ import type { ReserveMethod } from "@/lib/domain/reserves";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import type { VatTreatment } from "@/lib/domain/vat";
 import type { UserSetup } from "@/lib/domain/persistence";
+import { useT } from "@/components/i18n/locale-provider";
+import type { Dictionary } from "@/lib/i18n";
 
-const TREATMENT_CHOICES: { v: VatTreatment; l: string }[] = [
-  { v: "21", l: "21%" },
-  { v: "9", l: "9%" },
-  { v: "0", l: "0%" },
-  { v: "exempt", l: "Exempt" },
-  { v: "reverse-charged", l: "Reverse-charged" },
-  { v: "kor", l: "KOR" },
-  { v: "mixed-unsure", l: "Mixed / unsure" },
+type TreatmentKey = keyof Dictionary["app"]["settings"]["treatments"];
+
+const TREATMENT_CHOICES: { v: VatTreatment; k: TreatmentKey }[] = [
+  { v: "21", k: "21" },
+  { v: "9", k: "9" },
+  { v: "0", k: "0" },
+  { v: "exempt", k: "exempt" },
+  { v: "reverse-charged", k: "reverseCharged" },
+  { v: "kor", k: "kor" },
+  { v: "mixed-unsure", k: "mixedUnsure" },
 ];
 
 function centsToInput(cents: number): string {
@@ -48,6 +52,7 @@ export function SettingsView({
   onSave: (setup: UserSetup) => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   const guided =
     initial?.reserveMethod.mode === "guided-estimate" ? initial.reserveMethod : null;
 
@@ -136,26 +141,24 @@ export function SettingsView({
   return (
     <div className="flex flex-col gap-6">
       <p className="max-w-xl text-sm leading-relaxed text-[var(--fl-slate)]">
-        None of this is required. The calculator works without it, and says on
-        every result which defaults it used. Filling this in makes the number
-        yours instead of typical.
+        {t.app.settings.intro}
       </p>
 
-      <Section title="Your year">
+      <Section title={t.app.settings.sections.year}>
         {splitCosts ? (
           <>
             <CurrencyField
               id="set-revenue"
-              label="Expected revenue this year (excl. btw)"
-              placeholder="e.g. 55000"
+              label={t.app.settings.revenueLabel}
+              placeholder={t.app.settings.revenuePlaceholder}
               leadingSymbol="€"
               value={revenue}
               onChange={setRevenue}
             />
             <CurrencyField
               id="set-costs"
-              label="Expected business costs this year (excl. btw)"
-              placeholder="e.g. 15000"
+              label={t.app.settings.costsLabel}
+              placeholder={t.app.settings.costsPlaceholder}
               leadingSymbol="€"
               value={costs}
               onChange={setCosts}
@@ -164,9 +167,9 @@ export function SettingsView({
         ) : (
           <CurrencyField
             id="set-profit"
-            label="Expected profit this year"
-            hint="Revenue excluding btw, minus your business costs. A rough figure is fine; you can change it whenever the year changes."
-            placeholder="e.g. 40000"
+            label={t.app.settings.profitLabel}
+            hint={t.app.settings.profitHint}
+            placeholder={t.app.settings.profitPlaceholder}
             leadingSymbol="€"
             value={profit}
             onChange={setProfit}
@@ -177,33 +180,31 @@ export function SettingsView({
           onClick={() => setSplitCosts((v) => !v)}
           className={`${linkButtonClass} w-fit`}
         >
-          {splitCosts
-            ? "Enter one profit figure instead"
-            : "Enter revenue and costs separately"}
+          {splitCosts ? t.app.settings.splitOn : t.app.settings.splitOff}
         </button>
       </Section>
 
-      <Section title="Deductions you qualify for">
+      <Section title={t.app.settings.sections.deductions}>
         <YesNo
-          label="Do you spend at least 1.225 hours a year on your business?"
-          hint="The urencriterium. Meeting it unlocks the zelfstandigenaftrek, which lowers what you owe. Roughly 24 hours a week across a full year."
+          label={t.app.settings.hoursLabel}
+          hint={t.app.settings.hoursHint}
           value={meetsHours}
           onChange={setMeetsHours}
         />
         <YesNo
-          label="Were you not an entrepreneur in one or more of the last five years?"
-          hint="If so you may qualify for the startersaftrek, an extra deduction for up to three of your first five years."
+          label={t.app.settings.starterLabel}
+          hint={t.app.settings.starterHint}
           value={isStarter}
           onChange={setIsStarter}
         />
       </Section>
 
-      <Section title="Other income">
+      <Section title={t.app.settings.sections.otherIncome}>
         <CurrencyField
           id="set-other-income"
-          label="Salary or benefits this year, before tax"
-          hint="Leave blank if the business is your only income. Other income raises the bracket your freelance profit lands in."
-          placeholder="e.g. 30000"
+          label={t.app.settings.otherIncomeLabel}
+          hint={t.app.settings.otherIncomeHint}
+          placeholder={t.app.settings.otherIncomePlaceholder}
           leadingSymbol="€"
           value={otherIncome}
           onChange={setOtherIncome}
@@ -211,9 +212,9 @@ export function SettingsView({
         {hasOtherIncome && (
           <CurrencyField
             id="set-withheld"
-            label="Tax your employer already withheld this year"
-            hint="The loonheffing on your payslip or jaaropgaaf. You have already paid this, so Freelens will not ask you to set it aside again. Leave blank if you are not sure and the estimate stays on the cautious side."
-            placeholder="e.g. 2250"
+            label={t.app.settings.withheldLabel}
+            hint={t.app.settings.withheldHint}
+            placeholder={t.app.settings.withheldPlaceholder}
             leadingSymbol="€"
             value={withheld}
             onChange={setWithheld}
@@ -221,46 +222,45 @@ export function SettingsView({
         )}
       </Section>
 
-      <Section title="Defaults for new payments">
+      <Section title={t.app.settings.sections.paymentDefaults}>
         <div className="flex flex-col gap-1.5">
-          <Label className={labelClass}>btw you usually charge</Label>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Usual VAT treatments">
-            {TREATMENT_CHOICES.map((t) => (
+          <Label className={labelClass}>{t.app.settings.vatLabel}</Label>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t.app.settings.vatGroupLabel}>
+            {TREATMENT_CHOICES.map((choice) => (
               <Chip
-                key={t.v}
-                active={treatments.includes(t.v)}
-                onClick={() => toggleTreatment(t.v)}
+                key={choice.v}
+                active={treatments.includes(choice.v)}
+                onClick={() => toggleTreatment(choice.v)}
               >
-                {t.l}
+                {t.app.settings.treatments[choice.k]}
               </Chip>
             ))}
           </div>
           <p className={hintClass}>
-            The first one you pick prefills the calculator. You can change it on
-            any individual payment.
+            {t.app.settings.vatHint}
           </p>
         </div>
         <YesNo
-          label="Are the amounts you type usually inclusive of btw?"
-          hint="Money landing in your bank account normally includes btw, so this is usually yes."
+          label={t.app.settings.inclusiveLabel}
+          hint={t.app.settings.inclusiveHint}
           value={amountsInclusive}
           onChange={setAmountsInclusive}
         />
       </Section>
 
-      <Section title="For the weekly check-in">
+      <Section title={t.app.settings.sections.weekly}>
         <CurrencyField
           id="set-monthly-costs"
-          label="Essential monthly business costs"
-          hint="Rent, insurance, utilities, core subscriptions."
-          placeholder="e.g. 1200"
+          label={t.app.settings.monthlyCostsLabel}
+          hint={t.app.settings.monthlyCostsHint}
+          placeholder={t.app.settings.monthlyCostsPlaceholder}
           leadingSymbol="€"
           value={monthlyCosts}
           onChange={setMonthlyCosts}
         />
         <div className="flex flex-col gap-1.5">
-          <Label className={labelClass}>Business buffer, in months</Label>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Buffer months">
+          <Label className={labelClass}>{t.app.settings.bufferLabel}</Label>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t.app.settings.bufferGroupLabel}>
             {[1, 2, 3, 6].map((m) => (
               <Chip key={m} active={bufferMonths === m} onClick={() => setBufferMonths(m)}>
                 {m}
@@ -272,10 +272,10 @@ export function SettingsView({
 
       <div className="flex items-center justify-between gap-3">
         <button type="button" onClick={onCancel} className={linkButtonClass}>
-          Back without saving
+          {t.app.settings.backWithoutSaving}
         </button>
         <button type="button" onClick={save} className={primaryButtonClass}>
-          Save settings
+          {t.app.settings.saveSettings}
         </button>
       </div>
     </div>
@@ -304,15 +304,16 @@ function YesNo({
   value: boolean;
   onChange: (v: boolean) => void;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-1.5">
       <Label className={labelClass}>{label}</Label>
       <div className="flex gap-2" role="group" aria-label={label}>
         <Chip active={value} onClick={() => onChange(true)}>
-          Yes
+          {t.app.settings.yes}
         </Chip>
         <Chip active={!value} onClick={() => onChange(false)}>
-          No
+          {t.app.settings.no}
         </Chip>
       </div>
       {hint && <p className={hintClass}>{hint}</p>}

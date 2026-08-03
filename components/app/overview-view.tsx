@@ -17,14 +17,17 @@ import type { WeeklyPositionResult } from "@/lib/domain/allocation";
 import { isStale, type AppState } from "@/lib/domain/persistence";
 import { formatCheckInDate } from "@/lib/format-date";
 import type { AppView } from "@/components/app/nav-tabs";
+import { useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n";
 
 const RUNWAY_DIRECTION: Record<
   WeeklyPositionResult["status"],
-  { label: string; color: string }
+  { key: "onTrack" | "gettingTight" | "belowTarget"; color: string }
 > = {
-  "reserves-covered": { label: "On track", color: "var(--fl-payout-text)" },
-  "limited-room": { label: "Getting tight", color: "var(--fl-vat-text)" },
-  "reserve-gap": { label: "Below target", color: "var(--fl-short-text)" },
+  "reserves-covered": { key: "onTrack", color: "var(--fl-payout-text)" },
+  "limited-room": { key: "gettingTight", color: "var(--fl-vat-text)" },
+  "reserve-gap": { key: "belowTarget", color: "var(--fl-short-text)" },
 };
 
 export function OverviewView({
@@ -34,6 +37,7 @@ export function OverviewView({
   state: AppState;
   onNavigate: (view: AppView) => void;
 }) {
+  const t = useT();
   const weekly = state.weeklyPosition
     ? {
         result: evaluateWeeklyPosition(state.weeklyPosition.input),
@@ -42,27 +46,25 @@ export function OverviewView({
     : null;
   const stale = weekly ? isStale(weekly.timestampIso) : false;
 
-  const nextAction = pickNextAction(state, weekly?.result.status, stale);
+  const nextAction = pickNextAction(t, state, weekly?.result.status, stale);
 
   if (!state.setup && !weekly && !state.lastAllocation) {
     return (
       <div className="flex flex-col gap-6">
         <p className="text-base leading-relaxed text-[var(--fl-slate)]">
-          Freelens helps you separate VAT, protect a tax reserve, cover business
-          costs, and see what may be available to pay yourself.
+          {t.app.overview.emptyIntro}
         </p>
         <Card className={cardClass}>
           <CardContent className="flex flex-col items-start gap-3 p-6">
             <p className="text-base text-[var(--fl-ink)]">
-              See what one payment splits into. It takes about 30 seconds, and
-              needs no setup.
+              {t.app.overview.emptyPrompt}
             </p>
             <div className="flex flex-wrap gap-3">
               <button type="button" onClick={() => onNavigate("money-arrived")} className={primaryButtonClass}>
-                Try one payment (30 seconds)
+                {t.app.overview.tryPayment}
               </button>
               <button type="button" onClick={() => onNavigate("setup")} className={linkButtonClass}>
-                Set up my details (1 minute)
+                {t.app.overview.setUpDetails}
               </button>
             </div>
           </CardContent>
@@ -82,7 +84,7 @@ export function OverviewView({
         <Card className="rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] shadow-sm">
           <CardContent className="flex flex-col gap-1 p-6">
             <span className="text-sm font-medium text-[var(--fl-slate)]">
-              May be available to pay yourself
+              {t.app.overview.available}
             </span>
             <AnimatedAmount
               cents={weekly.result.availableForPersonalPayoutCents}
@@ -97,11 +99,11 @@ export function OverviewView({
         <Card className={cardClass}>
           <CardContent className="flex flex-col gap-2 p-6">
             <span className="text-sm font-medium text-[var(--fl-slate)]">
-              Protected
+              {t.app.overview.protected}
             </span>
-            <Figure label="VAT" value={formatEuro(weekly.result.vatProtectedCents)} />
+            <Figure label={t.app.overview.vat} value={formatEuro(weekly.result.vatProtectedCents)} />
             <Figure
-              label="Income tax and Zvw reserve"
+              label={t.app.overview.reserve}
               value={formatEuro(weekly.result.reserveProtectedCents)}
             />
           </CardContent>
@@ -114,23 +116,27 @@ export function OverviewView({
           <CardContent className="flex flex-col gap-2 p-6">
             <div className="flex items-baseline justify-between gap-4">
               <span className="text-sm font-medium text-[var(--fl-slate)]">
-                Business runway
+                {t.app.overview.runway}
               </span>
               <span
                 className="text-xs font-semibold uppercase tracking-wide"
                 style={{ color: RUNWAY_DIRECTION[weekly.result.status].color }}
               >
-                {RUNWAY_DIRECTION[weekly.result.status].label}
+                {t.app.overview.direction[RUNWAY_DIRECTION[weekly.result.status].key]}
               </span>
             </div>
             <span className="fl-tnum font-serif text-2xl font-medium text-[var(--fl-ink)]">
               {weekly.result.runwayMonths === null
-                ? "Add monthly costs to estimate"
-                : `${weekly.result.runwayMonths.toFixed(1)} months`}
+                ? t.app.overview.runwayUnknown
+                : fill(t.app.overview.runwayMonths, {
+                    months: weekly.result.runwayMonths.toFixed(1),
+                  })}
             </span>
             <p className={`${hintClass} pt-1`}>
-              Last updated {formatCheckInDate(weekly.timestampIso)}
-              {stale ? ". Worth refreshing." : "."}
+              {fill(t.app.overview.lastUpdated, {
+                date: formatCheckInDate(weekly.timestampIso),
+              })}
+              {stale ? t.app.overview.worthRefreshing : "."}
             </p>
           </CardContent>
         </Card>
@@ -140,7 +146,7 @@ export function OverviewView({
       <Card className={cardClass}>
         <CardContent className="flex flex-col gap-3 p-6">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            Next best action
+            {t.app.overview.nextAction}
           </span>
           <p className="font-serif text-lg font-medium text-[var(--fl-ink)]">
             {nextAction.title}
@@ -159,20 +165,21 @@ export function OverviewView({
         <Card className={cardClass}>
           <CardContent className="flex flex-col gap-2 p-6">
             <span className="text-sm font-medium text-[var(--fl-slate)]">
-              Latest allocation
+              {t.app.overview.latestAllocation}
               {state.lastAllocation.label ? `: ${state.lastAllocation.label}` : ""}
             </span>
             <Figure
-              label="Payment"
+              label={t.app.overview.payment}
               value={formatEuro(state.lastAllocation.grossPaymentCents)}
             />
             <Figure
-              label="Available for personal payout"
+              label={t.app.overview.availableForPayout}
               value={formatEuro(state.lastAllocation.availableForPersonalPayoutCents)}
             />
             <p className={`${hintClass} pt-1`}>
-              {formatCheckInDate(state.lastAllocation.timestampIso)} · recorded on
-              this device.
+              {fill(t.app.overview.recordedOn, {
+                date: formatCheckInDate(state.lastAllocation.timestampIso),
+              })}
             </p>
           </CardContent>
         </Card>
@@ -185,67 +192,45 @@ export function OverviewView({
 
 /** A calm, clearly-labelled sample of the populated overview (audit). */
 function ExampleOverview() {
+  const t = useT();
   return (
     <Card className="rounded-2xl border border-dashed border-[var(--fl-line)] bg-[var(--fl-surface-stage)]">
       <CardContent className="flex flex-col gap-3 p-6">
         <div className="flex items-center gap-2">
           <ExampleBadge />
-          <p className={hintClass}>A filled-in week looks like this.</p>
+          <p className={hintClass}>{t.app.overview.exampleIntro}</p>
         </div>
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium text-[var(--fl-slate)]">
-            May be available to pay yourself
+            {t.app.overview.available}
           </span>
           <span className="fl-tnum font-serif text-3xl font-medium text-[var(--fl-ink)]">
             {formatEuro(toCents(2400))}
           </span>
         </div>
-        <Figure label="Protected VAT" value={formatEuro(toCents(700))} />
-        <Figure label="Protected reserve" value={formatEuro(toCents(1100))} />
-        <Figure label="Business runway" value="2.4 months" />
+        <Figure label={t.app.overview.exampleVat} value={formatEuro(toCents(700))} />
+        <Figure label={t.app.overview.exampleReserve} value={formatEuro(toCents(1100))} />
+        <Figure
+          label={t.app.overview.runway}
+          value={fill(t.app.overview.exampleRunway, { months: "2,4" })}
+        />
       </CardContent>
     </Card>
   );
 }
 
 function pickNextAction(
+  t: Dictionary,
   state: AppState,
   status: string | undefined,
   stale: boolean
 ): { title: string; cta: string; view: AppView } {
-  if (!state.setup) {
-    return {
-      title: "Finish setting up so your numbers inherit sensible defaults.",
-      cta: "Set up Freelens",
-      view: "setup",
-    };
-  }
-  if (status === "reserve-gap") {
-    return {
-      title: "Your balance doesn't yet cover all selected reserves.",
-      cta: "Review your check-in",
-      view: "weekly-checkin",
-    };
-  }
-  if (!state.weeklyPosition) {
-    return {
-      title: "Do this week's check-in to see where you stand.",
-      cta: "Weekly check-in",
-      view: "weekly-checkin",
-    };
-  }
-  if (stale) {
-    return {
-      title: "Your last check-in is a while ago. Refresh it.",
-      cta: "Update your check-in",
-      view: "weekly-checkin",
-    };
-  }
-  return {
-    title: "A payment came in? Give it a job.",
-    cta: "See what I can pay myself",
-    view: "money-arrived",
-  };
+  const a = t.app.overview.actions;
+  if (!state.setup) return { ...a.finishSetup, view: "setup" };
+  if (status === "reserve-gap") return { ...a.reserveGap, view: "weekly-checkin" };
+  if (!state.weeklyPosition) return { ...a.firstCheckin, view: "weekly-checkin" };
+  if (stale) return { ...a.stale, view: "weekly-checkin" };
+  return { ...a.payment, view: "money-arrived" };
 }
 
 function Figure({

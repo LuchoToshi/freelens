@@ -33,6 +33,13 @@ import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { quoteForTargetNet } from "@/lib/tax/quote";
 import { rateForTargetAnnualNet } from "@/lib/tax/rate";
 import type { BreakdownLine } from "@/lib/tax/types";
+import { useDocumentTitle, useLocale, useT } from "@/components/i18n/locale-provider";
+import {
+  translateAssumption,
+  translateBreakdownExplanation,
+  translateBreakdownLabel,
+} from "@/lib/i18n/engineText";
+import { fill } from "@/lib/i18n";
 
 const TAX_YEAR = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
 
@@ -55,6 +62,8 @@ type Mode = "year" | "job";
  * their tax settings.
  */
 export function TariefView() {
+  const t = useT();
+  useDocumentTitle(t.meta.tarief.title, t.meta.tarief.description);
   const [mode, setMode] = useState<Mode>("year");
   const { state, hydrated } = useAppState();
 
@@ -84,26 +93,21 @@ export function TariefView() {
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-4">
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-          Before the job
+          {t.rate.eyebrow}
         </span>
         <h1 className="font-serif text-4xl font-medium leading-[1.1] tracking-tight text-[var(--fl-ink)] sm:text-5xl">
-          What do you need to charge?
+          {t.rate.heading}
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
-          This is what you need to charge, not what you can charge. It is your
-          floor: below it the work does not pay for itself once tax and costs
-          are out.
+          {t.rate.floor}
         </p>
         <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
-          What the market will pay is a different question. Freelens has no view
-          on it, and will never pretend to.
+          {t.rate.marketNote}
         </p>
       </header>
 
       <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">
-        Most rate calculators apply one flat percentage. Freelens runs the real{" "}
-        {TAX_YEAR} brackets, deductions and credits, which is why the answer
-        changes depending on where you already are in your year.
+        {fill(t.rate.framing, { year: TAX_YEAR })}
       </p>
 
       <ModeTabs mode={mode} onChange={setMode} />
@@ -116,34 +120,32 @@ export function TariefView() {
 
       <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-6">
         <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
-          Most rate calculators get this wrong
+          {t.rate.flatRuleHeading}
         </h2>
         <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-          A flat percentage is wrong in both directions at once. On{" "}
-          {formatEuro(HIGH_COST_CASE.revenue)} of revenue with{" "}
-          {formatEuro(HIGH_COST_CASE.costs)} of costs, the 30% rule sets aside{" "}
-          {formatEuro(HIGH_COST_CASE.oldReserve)} against a real bill of{" "}
-          {formatEuroExact(HIGH_COST_CASE.realBill)}. At{" "}
-          {formatEuro(HIGH_EARNER_CASE.profit)} of profit the same rule leaves
-          you {formatEuroExact(flatRuleError(HIGH_EARNER_CASE))} short. Freelens
-          used to apply that rule. Replacing it is the reason this page can
-          exist.
+          {fill(t.rate.flatRuleBody, {
+            revenue: formatEuro(HIGH_COST_CASE.revenue),
+            costs: formatEuro(HIGH_COST_CASE.costs),
+            oldReserve: formatEuro(HIGH_COST_CASE.oldReserve),
+            realBill: formatEuroExact(HIGH_COST_CASE.realBill),
+            profit: formatEuro(HIGH_EARNER_CASE.profit),
+            shortfall: formatEuroExact(flatRuleError(HIGH_EARNER_CASE)),
+          })}
         </p>
-        <Link href="/accuracy" className={`${linkButtonClass} w-fit`}>
-          What Freelens is honest about
+        <Link href="/accuracy#flat-rule" className={`${linkButtonClass} w-fit`}>
+          {t.rate.flatRuleLink}
         </Link>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-6 py-5">
         <span className="text-sm text-[var(--fl-slate)]">
-          Before the job: what do I need to charge. After the payment: what is
-          actually mine. Same calculation, both directions.
+          {t.rate.bothDirections}
         </span>
         <Link
           href="/tool"
           className="inline-flex min-h-9 items-center gap-1.5 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         >
-          See what is actually yours
+          {t.rate.toToolCta}
           <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
@@ -175,6 +177,7 @@ const DEFAULT_BILLABLE_DAYS = 140;
 const OPTIMISTIC_DAYS = 220;
 
 function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boolean }) {
+  const t = useT();
   const [targetNet, setTargetNet] = useState(DEFAULT_TARGET_NET);
   const [billableDays, setBillableDays] = useState(DEFAULT_BILLABLE_DAYS);
   const [costs, setCosts] = useState("");
@@ -211,8 +214,8 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
         <CardContent className="flex flex-col gap-7 p-6">
           <RangeField
             id="target-net"
-            label="What do you want to earn, after tax?"
-            hint="Your take-home for the year, once income tax and Zvw are paid. Not your revenue."
+            label={t.rate.targetLabel}
+            hint={t.rate.targetHint}
             value={targetNet}
             onChange={setTargetNet}
             min={10_000}
@@ -223,14 +226,14 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 
           <RangeField
             id="billable-days"
-            label="How many days can you realistically bill?"
-            hint="Not 260. Take out holidays, sick days, admin, chasing work and the quiet weeks. Most freelancers bill far fewer days than they plan for, and the rate is what pays for the gap."
+            label={t.rate.daysLabel}
+            hint={t.rate.daysHint}
             value={billableDays}
             onChange={setBillableDays}
             min={20}
             max={260}
             step={5}
-            display={`${billableDays} days`}
+            display={fill(t.rate.daysValue, { days: billableDays })}
           />
 
           <OptimismCost
@@ -241,9 +244,9 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 
           <CurrencyField
             id="annual-costs"
-            label="Your yearly business costs"
-            hint="Software, insurance, gear, workspace, your accountant, professional memberships. Leave blank if you genuinely have none."
-            placeholder="e.g. 6000"
+            label={t.rate.costsLabel}
+            hint={t.rate.costsHint}
+            placeholder={t.rate.costsPlaceholder}
             leadingSymbol="€"
             value={costs}
             onChange={setCosts}
@@ -258,21 +261,22 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
           <CardContent className="flex flex-col gap-5 p-6">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium text-[var(--fl-slate)]">
-                Your day rate, excluding btw
+                {t.rate.dayRate}
               </span>
               <AnimatedAmount
                 cents={result.requiredRatePerUnit}
                 className="font-serif text-4xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-5xl"
               />
               <span className={hintClass}>
-                {billableDays} billable days at this rate is{" "}
-                {formatEuro(result.requiredGrossRevenue)} of revenue for the
-                year.
+                {fill(t.rate.dayRateNote, {
+                  days: billableDays,
+                  revenue: formatEuro(result.requiredGrossRevenue),
+                })}
               </span>
             </div>
 
             <AllocationBar
-              caption="Where every euro of your rate goes"
+              caption={t.rate.rateCaption}
               segments={[
                 result.annualBusinessCosts > 0
                   ? {
@@ -297,10 +301,9 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
             <BreakdownList lines={result.breakdown} highlightId="rate-take-home" />
 
             <p className={hintClass}>
-              Across the whole year that works out at{" "}
-              <strong>{(result.effectiveRate * 100).toFixed(1)}%</strong> in
-              income tax and Zvw. Not a flat rate: it is what the real brackets,
-              deductions and credits add up to at this profit.
+              {fill(t.rate.effectiveRate, {
+                pct: (result.effectiveRate * 100).toFixed(1),
+              })}
             </p>
 
             <Assumptions lines={result.assumptions} />
@@ -318,6 +321,7 @@ function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 const VAT_CHOICES = [21, 9, 0];
 
 function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boolean }) {
+  const t = useT();
   const [keep, setKeep] = useState("2000");
   const [jobCosts, setJobCosts] = useState("");
   const [projectedProfit, setProjectedProfit] = useState(
@@ -358,8 +362,8 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
         <CardContent className="flex flex-col gap-5 p-6">
           <CurrencyField
             id="job-keep"
-            label="What do you want to keep from this job?"
-            placeholder="2000"
+            label={t.rate.keepLabel}
+            placeholder={t.rate.keepPlaceholder}
             leadingSymbol="€"
             size="lg"
             value={keep}
@@ -368,9 +372,9 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 
           <CurrencyField
             id="job-costs"
-            label="Costs just for this job (optional)"
-            hint="Travel, an assistant, equipment rental, licensing. Money that goes straight back out. It is added to the quote in full, because it is deductible."
-            placeholder="e.g. 500"
+            label={t.rate.jobCostsLabel}
+            hint={t.rate.jobCostsHint}
+            placeholder={t.rate.jobCostsPlaceholder}
             leadingSymbol="€"
             value={jobCosts}
             onChange={setJobCosts}
@@ -378,17 +382,17 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
 
           <CurrencyField
             id="job-projected-profit"
-            label="Profit you already expect this year"
-            hint="Everything except this job. It decides which bracket this job lands in, which is why the same job is worth different amounts in January and November."
-            placeholder="e.g. 40000"
+            label={t.rate.projectedLabel}
+            hint={t.rate.projectedHint}
+            placeholder={t.rate.projectedPlaceholder}
             leadingSymbol="€"
             value={effectiveProfit}
             onChange={setProjectedProfit}
           />
 
           <div className="flex flex-col gap-1.5">
-            <Label className={labelClass}>btw you charge on this</Label>
-            <div className="flex gap-2" role="group" aria-label="btw rate">
+            <Label className={labelClass}>{t.rate.vatLabel}</Label>
+            <div className="flex gap-2" role="group" aria-label={t.rate.vatGroupLabel}>
               {VAT_CHOICES.map((rate) => (
                 <button
                   key={rate}
@@ -406,8 +410,7 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
               ))}
             </div>
             <p className={hintClass}>
-              btw is charged on top and passed straight on. It never changes what
-              you keep.
+              {t.rate.vatNote}
             </p>
           </div>
 
@@ -421,7 +424,7 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
             <CardContent className="flex flex-col gap-5 p-6">
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-[var(--fl-slate)]">
-                  Quote this, excluding btw
+                  {t.rate.quote}
                 </span>
                 <AnimatedAmount
                   cents={quote.quoteExVat}
@@ -429,14 +432,16 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
                 />
                 {vatRate > 0 && (
                   <span className={hintClass}>
-                    {formatEuro(quote.quoteInclVat)} on the invoice, including{" "}
-                    {formatEuro(quote.vat)} btw.
+                    {fill(t.rate.quoteInvoice, {
+                      gross: formatEuro(quote.quoteInclVat),
+                      vat: formatEuro(quote.vat),
+                    })}
                   </span>
                 )}
               </div>
 
               <AllocationBar
-                caption="Where every euro of this quote goes"
+                caption={t.rate.quoteCaption}
                 segments={[
                   quote.jobCosts > 0
                     ? {
@@ -475,13 +480,10 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
           <Card className={stageCardClass}>
             <CardContent className="flex flex-col gap-2 p-6">
               <p className="text-sm text-[var(--fl-slate)]">
-                Fill in what you want to keep and the profit you already expect
-                this year.
+                {t.rate.emptyTitle}
               </p>
               <p className={hintClass}>
-                Both are needed. Without the profit figure there is no way to
-                know which bracket this job lands in, and a number produced
-                without it would be a guess wearing a decimal point.
+                {t.rate.emptyBody}
               </p>
             </CardContent>
           </Card>
@@ -508,20 +510,21 @@ function BracketCrossingNote({
   amountAbove: Cents;
   jobRate: number;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-1.5 rounded-xl border border-[var(--fl-line)] bg-white p-4">
       <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
-        This job crosses a bracket
+        {t.rate.crossing.title}
       </span>
       <p className="text-sm leading-relaxed text-[var(--fl-ink)]">
-        It takes you past €{threshold.toLocaleString("nl-NL")} of taxable income,
-        so about <strong>{formatEuro(amountAbove)}</strong> of it is taxed in the
-        higher bracket. Across the whole job that averages{" "}
-        <strong>{(jobRate * 100).toFixed(1)}%</strong>.
+        {fill(t.rate.crossing.body, {
+          threshold: threshold.toLocaleString("nl-NL"),
+          amount: formatEuro(amountAbove),
+          pct: (jobRate * 100).toFixed(1),
+        })}
       </p>
       <p className={hintClass}>
-        A flat percentage cannot see this, which is why it under-quotes exactly
-        the jobs that matter most.
+        {t.rate.crossing.note}
       </p>
     </div>
   );
@@ -532,12 +535,13 @@ function BracketCrossingNote({
 // ---------------------------------------------------------------------------
 
 function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
+  const t = useT();
   const tabs: { id: Mode; label: string; sub: string }[] = [
-    { id: "year", label: "My rate for the year", sub: "Set a day rate" },
-    { id: "job", label: "This one job", sub: "Quote a project" },
+    { id: "year", ...t.rate.tabs.year },
+    { id: "job", ...t.rate.tabs.job },
   ];
   return (
-    <div role="tablist" aria-label="What are you pricing?" className="flex gap-2">
+    <div role="tablist" aria-label={t.rate.tabsLabel} className="flex gap-2">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -580,6 +584,7 @@ function OptimismCost({
   billableDays: number;
   optimisticRate: Cents | null;
 }) {
+  const t = useT();
   if (optimisticRate === null) return null;
 
   const earned = asCentsUnsafe(optimisticRate * billableDays);
@@ -589,11 +594,15 @@ function OptimismCost({
 
   return (
     <p className="-mt-3 rounded-lg border border-dashed border-[var(--fl-line)] p-3 text-xs leading-relaxed text-[var(--fl-slate)]">
-      If you set your rate for {OPTIMISTIC_DAYS} days and bill {billableDays},
-      you charge {formatEuro(optimisticRate)} a day and end the year on{" "}
-      {formatEuro(earned)} instead of {formatEuro(honestRevenue)}. That is{" "}
-      <strong className="text-[var(--fl-ink)]">{formatEuro(shortfall)}</strong>{" "}
-      short, {share}% of your year.
+      {fill(t.rate.optimism, {
+        optimistic: OPTIMISTIC_DAYS,
+        actual: billableDays,
+        rate: formatEuro(optimisticRate),
+        earned: formatEuro(earned),
+        needed: formatEuro(honestRevenue),
+        short: formatEuro(shortfall),
+        pct: share,
+      })}
     </p>
   );
 }
@@ -652,10 +661,12 @@ function BreakdownList({
   lines: BreakdownLine[];
   highlightId: string;
 }) {
+  const t = useT();
+  const { locale } = useLocale();
   return (
     <details className="border-t border-[var(--fl-line)] pt-4">
       <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
-        Why this number?
+        {t.rate.whyThisNumber}
       </summary>
       <dl className="mt-4 flex flex-col gap-3">
         {lines.map((line) => (
@@ -665,13 +676,15 @@ function BreakdownList({
                 line.id === highlightId ? "font-semibold" : ""
               }`}
             >
-              <dt className="text-[var(--fl-ink)]">{line.label}</dt>
+              <dt className="text-[var(--fl-ink)]">
+                {translateBreakdownLabel(locale, line.id, line.label)}
+              </dt>
               <dd className="fl-tnum shrink-0 font-mono tabular-nums text-[var(--fl-ink)]">
                 {formatEuroExact(line.amount)}
               </dd>
             </div>
             <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
-              {line.explanation}
+              {translateBreakdownExplanation(locale, line.id, line.explanation)}
             </p>
           </div>
         ))}
@@ -681,15 +694,17 @@ function BreakdownList({
 }
 
 function Assumptions({ lines }: { lines: string[] }) {
+  const t = useT();
+  const { locale } = useLocale();
   return (
     <details className="border-t border-[var(--fl-line)] pt-4">
       <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
-        What this assumes ({lines.length})
+        {fill(t.rate.assumptionsToggle, { count: lines.length })}
       </summary>
       <ul className="mt-3 flex list-disc flex-col gap-2 pl-5">
         {lines.map((line, i) => (
           <li key={i} className="text-xs leading-relaxed text-[var(--fl-slate)]">
-            {line}
+            {translateAssumption(locale, line)}
           </li>
         ))}
       </ul>
@@ -699,24 +714,23 @@ function Assumptions({ lines }: { lines: string[] }) {
 
 /** What was read from the saved profile, and where to change it. */
 function ProfileNote({ profile, hydrated }: { profile: Profile; hydrated: boolean }) {
+  const t = useT();
   if (!hydrated) return null;
 
   const claimed: string[] = [];
-  if (profile.meetsHoursCriterion) {
-    claimed.push("the 1.225 hours a year that unlock the zelfstandigenaftrek");
-  }
-  if (profile.isStarter) claimed.push("your first years in business");
-  if (profile.otherIncome > 0) claimed.push("a salary alongside this");
+  if (profile.meetsHoursCriterion) claimed.push(t.rate.profileHours);
+  if (profile.isStarter) claimed.push(t.rate.profileStarter);
+  if (profile.otherIncome > 0) claimed.push(t.rate.profileSalary);
 
   return (
     <div className="flex flex-col gap-1.5 rounded-lg border border-dashed border-[var(--fl-line)] p-3">
       <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
         {claimed.length > 0
-          ? `Using what you already told Freelens: ${claimed.join(", ")}.`
-          : "You have not told Freelens whether you qualify for the zelfstandigenaftrek or the extra deduction for your first years in business, so this figure leaves both out. Claiming them lowers what you need to charge."}
+          ? fill(t.rate.profileUsing, { claimed: claimed.join(", ") })
+          : t.rate.profileNone}
       </p>
       <Link href="/tool" className={`${linkButtonClass} w-fit text-xs`}>
-        Change your details
+        {t.rate.changeDetails}
       </Link>
     </div>
   );

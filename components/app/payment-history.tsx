@@ -25,6 +25,8 @@ import {
   type PaymentPatch,
   type PaymentRecord,
 } from "@/lib/domain/paymentHistory";
+import { useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -57,6 +59,7 @@ export function PaymentHistory({
   onDelete: (id: string) => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const t = useT();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const years = taxYearsPresent(records);
@@ -65,32 +68,28 @@ export function PaymentHistory({
   const totals = yearTotals(records, taxYear);
 
   return (
-    <section className="flex flex-col gap-4" aria-label={`Saved payments for ${taxYear}`}>
+    <section className="flex flex-col gap-4" aria-label={fill(t.app.paymentHistory.sectionLabel, { year: taxYear })}>
       <div className="flex flex-col gap-1 rounded-xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-4">
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
-          {taxYear} so far
+          {fill(t.app.paymentHistory.soFar, { year: taxYear })}
         </span>
         <dl className="mt-1 flex flex-wrap gap-x-8 gap-y-2">
-          <Total label="Earned (excl. btw)" value={formatEuro(totals.profitCents)} />
-          <Total label="Set aside for tax" value={formatEuro(totals.reservedCents)} />
-          <Total label="btw collected" value={formatEuro(totals.vatCents)} />
+          <Total label={t.app.paymentHistory.earned} value={formatEuro(totals.profitCents)} />
+          <Total label={t.app.paymentHistory.setAside} value={formatEuro(totals.reservedCents)} />
+          <Total label={t.app.paymentHistory.vatCollected} value={formatEuro(totals.vatCents)} />
           <Total
-            label="Payments"
+            label={t.app.paymentHistory.payments}
             value={String(totals.count)}
           />
         </dl>
         <p className={`${hintClass} mt-2`}>
-          These totals are what Freelens uses to work out your share of the
-          remaining bill. Set aside too much early and later payments ask for
-          less.
+          {t.app.paymentHistory.totalsNote}
         </p>
       </div>
 
       {thisYear.length === 0 ? (
         <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-          No payments saved for {taxYear} yet. Work out a payment above and
-          choose <strong>Save to {taxYear}</strong> to start the running total.
-          Until then Freelens treats every payment as your first of the year.
+          {fill(t.app.paymentHistory.empty, { year: taxYear })}
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
@@ -118,11 +117,11 @@ export function PaymentHistory({
                   {formatEuro(record.amountExVat)}
                 </span>
                 <span className="fl-tnum font-mono text-xs text-[var(--fl-slate)]">
-                  btw {formatEuro(record.vatAmount)}
+                  {t.app.paymentHistory.vatPrefix} {formatEuro(record.vatAmount)}
                   {record.vatRate > 0 ? ` (${record.vatRate}%)` : ""}
                 </span>
                 <span className="fl-tnum font-mono text-xs text-[var(--fl-slate)]">
-                  reserved {formatEuro(record.reserveTaken)}
+                  {t.app.paymentHistory.reservedPrefix} {formatEuro(record.reserveTaken)}
                 </span>
                 {record.note && (
                   <span className="w-full text-xs text-[var(--fl-slate)]">
@@ -136,7 +135,7 @@ export function PaymentHistory({
                       setEditingId(record.id);
                       setConfirmDeleteId(null);
                     }}
-                    aria-label={`Edit payment of ${formatEuro(record.amountExVat)} on ${formatDate(record.date)}`}
+                    aria-label={fill(t.app.paymentHistory.editAria, { amount: formatEuro(record.amountExVat), date: formatDate(record.date) })}
                     className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
                   >
                     <Pencil className="size-4" aria-hidden="true" />
@@ -144,7 +143,7 @@ export function PaymentHistory({
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteId(record.id)}
-                    aria-label={`Delete payment of ${formatEuro(record.amountExVat)} on ${formatDate(record.date)}`}
+                    aria-label={fill(t.app.paymentHistory.deleteAria, { amount: formatEuro(record.amountExVat), date: formatDate(record.date) })}
                     className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[var(--fl-slate)] hover:text-[var(--fl-short-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
@@ -163,14 +162,14 @@ export function PaymentHistory({
                       }}
                       className="min-h-11 text-sm font-medium text-[var(--fl-short-text)] underline"
                     >
-                      Yes, delete
+                      {t.app.paymentHistory.confirmDelete}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmDeleteId(null)}
                       className={linkButtonClass}
                     >
-                      Cancel
+                      {t.common.actions.cancel}
                     </button>
                   </div>
                 )}
@@ -183,16 +182,14 @@ export function PaymentHistory({
       {previousYears.length > 0 && (
         <details className="rounded-xl border border-[var(--fl-line)] p-4">
           <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm font-medium text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
-            Earlier years ({previousYears.join(", ")})
+            {fill(t.app.paymentHistory.earlierYears, { years: previousYears.join(", ") })}
           </summary>
           <p className={`${hintClass} mt-2`}>
-            Kept, but left out of the {taxYear} totals. Income tax is settled one
-            year at a time, so an earlier year cannot change what you owe for
-            this one.
+            {fill(t.app.paymentHistory.earlierYearsNote, { year: taxYear })}
           </p>
           {previousYears.map((year) => {
             const yearRecords = recordsForTaxYear(records, year);
-            const t = yearTotals(records, year);
+            const yearTotal = yearTotals(records, year);
             return (
               <div key={year} className="mt-4 flex flex-col gap-2">
                 <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
@@ -200,13 +197,18 @@ export function PaymentHistory({
                     {year}
                   </span>
                   <span className="fl-tnum font-mono text-xs text-[var(--fl-slate)]">
-                    {formatEuro(t.profitCents)} earned
+                    {formatEuro(yearTotal.profitCents)} {t.app.paymentHistory.earnedSuffix}
                   </span>
                   <span className="fl-tnum font-mono text-xs text-[var(--fl-slate)]">
-                    {formatEuro(t.reservedCents)} set aside
+                    {formatEuro(yearTotal.reservedCents)} {t.app.paymentHistory.setAsideSuffix}
                   </span>
                   <span className="text-xs text-[var(--fl-slate)]">
-                    {t.count} payment{t.count === 1 ? "" : "s"}
+                    {fill(
+                      yearTotal.count === 1
+                        ? t.app.paymentHistory.paymentCountOne
+                        : t.app.paymentHistory.paymentCountMany,
+                      { count: yearTotal.count }
+                    )}
                   </span>
                 </div>
                 <ul className="flex flex-col gap-1">
@@ -220,14 +222,14 @@ export function PaymentHistory({
                         {formatEuro(record.amountExVat)}
                       </span>
                       <span className="fl-tnum font-mono">
-                        reserved {formatEuro(record.reserveTaken)}
+                        {t.app.paymentHistory.reservedPrefix} {formatEuro(record.reserveTaken)}
                       </span>
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteId(record.id)}
                         className="ml-auto min-h-9 underline hover:text-[var(--fl-ink)]"
                       >
-                        Delete
+                        {t.common.actions.delete}
                       </button>
                       {confirmDeleteId === record.id && (
                         <span className="flex w-full items-center gap-3 pt-1">
@@ -239,14 +241,14 @@ export function PaymentHistory({
                             }}
                             className="min-h-9 font-medium text-[var(--fl-short-text)] underline"
                           >
-                            Yes, delete
+                            {t.app.paymentHistory.confirmDelete}
                           </button>
                           <button
                             type="button"
                             onClick={() => setConfirmDeleteId(null)}
                             className="min-h-9 underline"
                           >
-                            Cancel
+                            {t.common.actions.cancel}
                           </button>
                         </span>
                       )}
@@ -282,6 +284,7 @@ function EditRow({
   onSave: (patch: PaymentPatch) => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [date, setDate] = useState(record.date);
   const [amount, setAmount] = useState(String(record.amountExVat / 100));
   const [vat, setVat] = useState(String(record.vatAmount / 100));
@@ -299,7 +302,7 @@ function EditRow({
     <div className="flex flex-col gap-4 rounded-xl border border-[var(--fl-ink)] bg-white p-4">
       <div className="flex flex-col gap-1.5">
         <Label className={labelClass} htmlFor={`date-${record.id}`}>
-          Date
+          {t.app.paymentHistory.dateLabel}
         </Label>
         <input
           id={`date-${record.id}`}
@@ -309,37 +312,36 @@ function EditRow({
           className="h-11 w-fit rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         />
         {!dateValid && (
-          <p className="text-xs text-[var(--fl-short-text)]">Enter a valid date.</p>
+          <p className="text-xs text-[var(--fl-short-text)]">{t.app.paymentHistory.invalidDate}</p>
         )}
         <p className={hintClass}>
-          Moving this to another year takes it out of the current year&apos;s
-          totals. It is kept, not deleted.
+          {t.app.paymentHistory.movingYearNote}
         </p>
       </div>
       <CurrencyField
         id={`amount-${record.id}`}
-        label="Amount excluding btw"
+        label={t.app.paymentHistory.amountLabel}
         leadingSymbol="€"
         value={amount}
         onChange={setAmount}
       />
       <CurrencyField
         id={`vat-${record.id}`}
-        label="btw"
+        label={t.app.paymentHistory.vatLabel}
         leadingSymbol="€"
         value={vat}
         onChange={setVat}
       />
       <CurrencyField
         id={`reserve-${record.id}`}
-        label="Set aside for tax"
+        label={t.app.paymentHistory.reserveLabel}
         leadingSymbol="€"
         value={reserve}
         onChange={setReserve}
       />
       <div className="flex flex-col gap-1.5">
         <Label className={labelClass} htmlFor={`note-${record.id}`}>
-          Note (optional)
+          {t.app.paymentHistory.noteLabel}
         </Label>
         <input
           id={`note-${record.id}`}
@@ -347,7 +349,7 @@ function EditRow({
           maxLength={MAX_NOTE_LENGTH}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="e.g. Editorial shoot"
+          placeholder={t.app.paymentHistory.notePlaceholder}
           className="h-11 rounded-lg border border-[var(--fl-line)] bg-white px-2.5 text-sm text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
         />
       </div>
@@ -366,10 +368,10 @@ function EditRow({
           }
           className={`${primaryButtonClass} disabled:cursor-not-allowed disabled:opacity-50`}
         >
-          Save changes
+          {t.app.paymentHistory.saveChanges}
         </button>
         <button type="button" onClick={onCancel} className={secondaryButtonClass}>
-          Cancel
+          {t.common.actions.cancel}
         </button>
       </div>
     </div>

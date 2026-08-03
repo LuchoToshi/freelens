@@ -6,6 +6,8 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { InteractivePaymentExample } from "@/components/home/interactive-payment-example";
 import { LivingHeadline } from "@/components/home/living-headline";
 import { HeroMedia } from "@/components/design/hero-media";
+import { useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -19,14 +21,14 @@ const itemVariants: Variants = {
   visible: { y: 0 },
 };
 
-const TRUST = [
-  { icon: Sparkles, label: "Free to try" },
-  { icon: UserX, label: "No account" },
-  { icon: ShieldCheck, label: "Numbers stay on this device" },
-];
-
 export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
+  const t = useT();
+  const trust = [
+    { icon: Sparkles, label: t.home.hero.trust.free },
+    { icon: UserX, label: t.home.hero.trust.noAccount },
+    { icon: ShieldCheck, label: t.home.hero.trust.onDevice },
+  ];
   const itemTransition = {
     duration: prefersReducedMotion ? 0 : 0.5,
     ease: "easeOut" as const,
@@ -46,7 +48,7 @@ export function HeroSection() {
           transition={itemTransition}
           className="inline-flex w-fit items-center rounded-full border border-[var(--fl-line)] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--fl-slate)]"
         >
-          For Dutch freelancers and ZZP&apos;ers
+          {t.home.hero.eyebrow}
         </motion.span>
         <motion.div variants={itemVariants} transition={itemTransition}>
           <LivingHeadline />
@@ -56,8 +58,7 @@ export function HeroSection() {
           transition={itemTransition}
           className="max-w-lg text-lg leading-relaxed text-[var(--fl-slate)]"
         >
-          A client paid you. See what&apos;s VAT, what to reserve for tax, what
-          stays in the business, and what you can pay yourself.
+          {t.home.hero.body}
         </motion.p>
         <motion.div
           variants={itemVariants}
@@ -68,14 +69,14 @@ export function HeroSection() {
             href="/tool"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--fl-ink)] px-7 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
           >
-            See what I can pay myself
+            {t.home.hero.primaryCta}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
           <a
             href="#how-it-works"
             className="inline-flex min-h-12 items-center justify-center px-2 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
           >
-            See how it works
+            {t.home.hero.secondaryCta}
           </a>
         </motion.div>
         <motion.ul
@@ -83,7 +84,7 @@ export function HeroSection() {
           transition={itemTransition}
           className="flex flex-wrap gap-x-5 gap-y-2"
         >
-          {TRUST.map(({ icon: Icon, label }) => (
+          {trust.map(({ icon: Icon, label }) => (
             <li
               key={label}
               className="flex items-center gap-1.5 text-xs font-medium text-[var(--fl-slate)]"
@@ -98,7 +99,10 @@ export function HeroSection() {
           transition={itemTransition}
           className="text-xs text-[var(--fl-slate)]"
         >
-          Built on 2026 Dutch tax reference values. Updated July 2026.
+          {fill(t.home.hero.updated, {
+            year: "2026",
+            updated: t.home.hero.updatedDate,
+          })}
         </motion.p>
       </motion.div>
 
@@ -107,7 +111,7 @@ export function HeroSection() {
       <div className="flex flex-col-reverse gap-4 lg:flex-col lg:gap-0">
         <HeroMedia
           className="lg:aspect-[4/3]"
-          alt="A Dutch creative freelancer at work"
+          alt={t.home.hero.mediaAlt}
         />
         <div className="relative z-10 lg:-mt-20 lg:px-6">
           <InteractivePaymentExample />

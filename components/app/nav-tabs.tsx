@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Compass, ArrowDownToLine, CalendarCheck, Scale } from "lucide-react";
 import { ModeCard, type ModeAccent } from "@/components/design/mode-card";
+import { useT } from "@/components/i18n/locale-provider";
 
 export type AppView =
   | "overview"
@@ -36,16 +37,11 @@ const ACCENTS: Record<TabId, ModeAccent> = {
   },
 };
 
-const TABS: {
-  id: TabId;
-  title: string;
-  description: string;
-  icon: typeof Compass;
-}[] = [
-  { id: "overview", title: "Overview", description: "Where you stand and what to do next.", icon: Compass },
-  { id: "money-arrived", title: "Money arrived", description: "Give a payment a job, after VAT.", icon: ArrowDownToLine },
-  { id: "weekly-checkin", title: "Weekly check-in", description: "A calm read on your position.", icon: CalendarCheck },
-  { id: "decision", title: "Check a decision", description: "See if a purchase fits.", icon: Scale },
+const TABS: { id: TabId; key: "overview" | "moneyArrived" | "weeklyCheckin" | "decision"; icon: typeof Compass }[] = [
+  { id: "overview", key: "overview", icon: Compass },
+  { id: "money-arrived", key: "moneyArrived", icon: ArrowDownToLine },
+  { id: "weekly-checkin", key: "weeklyCheckin", icon: CalendarCheck },
+  { id: "decision", key: "decision", icon: Scale },
 ];
 
 /**
@@ -61,6 +57,7 @@ export function NavTabs({
   view: TabId;
   onChange: (next: TabId) => void;
 }) {
+  const t = useT();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const move = (delta: number) => {
@@ -91,7 +88,7 @@ export function NavTabs({
   return (
     <div
       role="tablist"
-      aria-label="Freelens modes"
+      aria-label={t.app.navTabs.ariaLabel}
       onKeyDown={onKeyDown}
       className="grid grid-cols-2 gap-2 sm:grid-cols-4"
     >
@@ -102,8 +99,8 @@ export function NavTabs({
             refs.current[i] = el;
           }}
           index={i + 1}
-          title={tab.title}
-          description={tab.description}
+          title={t.app.navTabs[tab.key].title}
+          description={t.app.navTabs[tab.key].description}
           icon={tab.icon}
           accent={ACCENTS[tab.id]}
           active={view === tab.id}

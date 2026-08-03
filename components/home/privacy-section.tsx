@@ -1,27 +1,35 @@
-import { Monitor, RotateCcw } from "lucide-react";
+"use client";
 
-const PRIVACY_POINTS = ["No accounts.", "No tracking.", "No surprises."];
+import { Monitor, RotateCcw } from "lucide-react";
+import { formatEuro, toCents } from "@/lib/domain/money";
+import { useT } from "@/components/i18n/locale-provider";
 
 export function PrivacySection() {
+  const t = useT();
+  const rows: [string, string][] = [
+    [t.home.privacy.demo.vat, formatEuro(toCents(434))],
+    [t.home.privacy.demo.reserve, formatEuro(toCents(620))],
+    [t.home.privacy.demo.available, formatEuro(toCents(1446))],
+  ];
+
   return (
     <section
-      aria-label="Privacy"
+      aria-label={t.home.privacy.ariaLabel}
       className="border-t border-[var(--fl-line)] bg-[var(--fl-ink)] text-white"
     >
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-16">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9db4d1]">
-            Are my numbers safe?
+            {t.home.privacy.eyebrow}
           </p>
           <h2 className="mt-3 max-w-lg font-serif text-3xl font-medium leading-tight sm:text-4xl">
-            Your financial data never leaves your browser.
+            {t.home.privacy.heading}
           </h2>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-[#9db4d1]">
-            Nothing is uploaded to Freelens. Your saved values remain on this
-            device, and you can clear them at any time.
+            {t.home.privacy.body}
           </p>
           <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3">
-            {PRIVACY_POINTS.map((point) => (
+            {t.home.privacy.points.map((point) => (
               <span key={point} className="text-base font-medium text-[#9db4d1]">
                 {point}
               </span>
@@ -39,15 +47,11 @@ export function PrivacySection() {
               <span className="size-2.5 rounded-full bg-white/25" aria-hidden="true" />
               <span className="ml-2 inline-flex items-center gap-1.5 text-xs text-[#9db4d1]">
                 <Monitor className="size-3.5" aria-hidden="true" />
-                this device
+                {t.home.privacy.thisDevice}
               </span>
             </div>
             <dl className="flex flex-col gap-3 p-6">
-              {[
-                ["VAT reserved", "€ 434"],
-                ["Tax reserve", "€ 620"],
-                ["Available to you", "€ 1.446"],
-              ].map(([k, v]) => (
+              {rows.map(([k, v]) => (
                 <div key={k} className="flex items-baseline justify-between gap-4">
                   <dt className="text-sm text-[#9db4d1]">{k}</dt>
                   <dd className="fl-tnum text-sm font-medium text-white">{v}</dd>
@@ -57,7 +61,7 @@ export function PrivacySection() {
           </div>
           <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white">
             <RotateCcw className="size-3.5" aria-hidden="true" />
-            Stays here. Never uploaded.
+            {t.home.privacy.staysHere}
           </span>
         </div>
       </div>

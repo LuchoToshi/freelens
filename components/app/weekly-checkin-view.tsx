@@ -32,13 +32,18 @@ import {
 } from "@/lib/domain/allocation";
 import type { ReserveSource } from "@/lib/domain/reserves";
 import type { StoredWeeklyPosition, UserSetup } from "@/lib/domain/persistence";
+import { useT } from "@/components/i18n/locale-provider";
 
 const BUFFER_OPTIONS = [1, 2, 3, 6] as const;
 
-const COMPLETENESS_COPY: Record<CompletenessLevel, string> = {
-  "quick-estimate": "Based on limited information and your chosen reserve rules.",
-  "improved-estimate": "Includes actual reserve balances and upcoming obligations.",
-  "bookkeeping-based": "Uses amounts entered from your bookkeeping.",
+/** Which confidence sentence a completeness level maps onto in the dictionary. */
+const COMPLETENESS_KEY: Record<
+  CompletenessLevel,
+  "quick" | "improved" | "bookkeeping"
+> = {
+  "quick-estimate": "quick",
+  "improved-estimate": "improved",
+  "bookkeeping-based": "bookkeeping",
 };
 
 const STATUS_COLOR: Record<WeeklyPositionResult["status"], string> = {
@@ -82,6 +87,7 @@ export function WeeklyCheckinView({
   const [bufferMonths, setBufferMonths] = useState<number>(
     setup?.bufferMonths ?? 2
   );
+  const t = useT();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [recommendedPayout, setRecommendedPayout] = useState(
     centsToInput(prior?.recommendedPersonalPayoutCents)
@@ -116,7 +122,7 @@ export function WeeklyCheckinView({
           (parseAmountInput(obligations).cents ?? 0) > 0
             ? [
                 {
-                  label: "Upcoming obligations",
+                  label: t.app.weekly.obligations,
                   cents: parseAmountInput(obligations).cents as Cents,
                 },
               ]
@@ -132,10 +138,10 @@ export function WeeklyCheckinView({
 
   // Progress rhythm: Balance -> Protected -> Costs -> Buffer.
   const steps = [
-    { label: "Balance", done: hasBalance },
-    { label: "Protected", done: reserve.trim() !== "" || actualVat.trim() !== "" },
-    { label: "Costs", done: monthlyCosts.trim() !== "" },
-    { label: "Buffer", done: true },
+    { label: t.app.weekly.steps.balance, done: hasBalance },
+    { label: t.app.weekly.steps.protected, done: reserve.trim() !== "" || actualVat.trim() !== "" },
+    { label: t.app.weekly.steps.costs, done: monthlyCosts.trim() !== "" },
+    { label: t.app.weekly.steps.buffer, done: true },
   ];
 
   function handleSave() {
@@ -152,8 +158,8 @@ export function WeeklyCheckinView({
         <CardContent className="flex flex-col gap-5 p-6">
           <CurrencyField
             id="balance"
-            label="How much is in your business account?"
-            placeholder="7000"
+            label={t.app.weekly.balanceLabel}
+            placeholder={t.app.weekly.balancePlaceholder}
             leadingSymbol="€"
             value={balance}
             onChange={(v) => {
@@ -161,36 +167,36 @@ export function WeeklyCheckinView({
               setSaveState(false);
             }}
             allowNegative
-            hint="Use the balance from your banking app; a close estimate works."
+            hint={t.app.weekly.balanceHint}
           />
           <CurrencyField
             id="reserve-amount"
-            label="How much have you reserved for income tax and Zvw?"
-            placeholder="1500"
+            label={t.app.weekly.reserveLabel}
+            placeholder={t.app.weekly.reservePlaceholder}
             leadingSymbol="€"
             value={reserve}
             onChange={setReserve}
-            hint="The amount you're keeping aside for tax. A planning figure, not a final assessment."
+            hint={t.app.weekly.reserveHint}
           />
           <CurrencyField
             id="monthly-costs"
-            label="Essential monthly business costs"
-            placeholder="1200"
+            label={t.app.weekly.monthlyCostsLabel}
+            placeholder={t.app.weekly.monthlyCostsPlaceholder}
             leadingSymbol="€"
             value={monthlyCosts}
             onChange={setMonthlyCosts}
           />
           <CurrencyField
             id="obligations"
-            label="Known upcoming obligations (optional)"
-            placeholder="500"
+            label={t.app.weekly.obligationsLabel}
+            placeholder={t.app.weekly.obligationsPlaceholder}
             leadingSymbol="€"
             value={obligations}
             onChange={setObligations}
           />
           <div className="flex flex-col gap-1.5">
-            <Label className={labelClass}>Buffer to keep, in months</Label>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Buffer months">
+            <Label className={labelClass}>{t.app.weekly.bufferLabel}</Label>
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t.app.weekly.bufferGroupLabel}>
               {BUFFER_OPTIONS.map((m) => (
                 <button
                   key={m}
@@ -219,7 +225,7 @@ export function WeeklyCheckinView({
             aria-expanded={advancedOpen}
             className={pillButtonClass}
           >
-            Improve accuracy
+            {t.app.weekly.improveAccuracy}
             {advancedOpen ? (
               <ChevronUp className="size-3.5" aria-hidden="true" />
             ) : (
@@ -230,21 +236,21 @@ export function WeeklyCheckinView({
             <div className="flex flex-col gap-5">
               <CurrencyField
                 id="actual-vat"
-                label="Actual VAT currently reserved (optional)"
-                placeholder="600"
+                label={t.app.weekly.actualVatLabel}
+                placeholder={t.app.weekly.actualVatPlaceholder}
                 leadingSymbol="€"
                 value={actualVat}
                 onChange={setActualVat}
-                hint="From your bookkeeping or latest VAT overview. Often more accurate than one payment."
+                hint={t.app.weekly.actualVatHint}
               />
               <CurrencyField
                 id="recommended-payout"
-                label="Personal payout you plan to take (optional)"
-                placeholder="2000"
+                label={t.app.weekly.plannedPayoutLabel}
+                placeholder={t.app.weekly.plannedPayoutPlaceholder}
                 leadingSymbol="€"
                 value={recommendedPayout}
                 onChange={setRecommendedPayout}
-                hint="Set this to see how much room remains beyond your planned salary."
+                hint={t.app.weekly.plannedPayoutHint}
               />
             </div>
           )}
@@ -266,8 +272,8 @@ export function WeeklyCheckinView({
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-[var(--fl-slate)]">
                   {result.availableForPersonalPayoutCents < 0
-                    ? "Short of your selected reserves by"
-                    : "May be available for personal payout"}
+                    ? t.app.weekly.short
+                    : t.app.weekly.available}
                 </span>
                 <AnimatedAmount
                   cents={
@@ -291,39 +297,39 @@ export function WeeklyCheckinView({
               />
 
               <dl className="flex flex-col gap-2 border-t border-[var(--fl-line)] pt-4">
-                <Row label="VAT protected" value={formatEuro(result.vatProtectedCents)} />
+                <Row label={t.app.weekly.vatProtected} value={formatEuro(result.vatProtectedCents)} />
                 <Row
-                  label="Income tax and Zvw reserve protected"
+                  label={t.app.weekly.reserveProtected}
                   value={formatEuro(result.reserveProtectedCents)}
                 />
                 {result.obligationsCents > 0 && (
-                  <Row label="Upcoming obligations" value={formatEuro(result.obligationsCents)} />
+                  <Row label={t.app.weekly.obligations} value={formatEuro(result.obligationsCents)} />
                 )}
-                <Row label="Business buffer" value={formatEuro(result.bufferTargetCents)} />
+                <Row label={t.app.weekly.buffer} value={formatEuro(result.bufferTargetCents)} />
                 <Row
-                  label="Optional spending room"
+                  label={t.app.weekly.spendingRoom}
                   value={formatEuro(result.optionalSpendingRoomCents)}
                 />
               </dl>
 
               <WhyThisNumber
                 steps={result.breakdown}
-                resultLabel="May be available for personal payout"
+                resultLabel={t.app.weekly.available}
                 resultCents={result.availableForPersonalPayoutCents}
                 reserveSourceNote={reserveSourceNote(result.reserveSource)}
               />
 
-              <p className={hintClass}>{COMPLETENESS_COPY[result.completeness]}</p>
+              <p className={hintClass}>{t.app.weekly.confidence[COMPLETENESS_KEY[result.completeness]]}</p>
 
               <div className="flex flex-col gap-2 border-t border-[var(--fl-line)] pt-4">
                 {saveState ? (
                   <p className="flex items-center gap-1.5 text-sm font-medium text-[var(--fl-payout-text)]">
                     <Check className="size-4" aria-hidden="true" />
-                    Saved on this device.
+                    {t.app.weekly.saved}
                   </p>
                 ) : (
                   <button type="button" onClick={handleSave} className={primaryButtonClass}>
-                    Save this check-in
+                    {t.app.weekly.save}
                   </button>
                 )}
               </div>
@@ -334,7 +340,7 @@ export function WeeklyCheckinView({
         <Card className={cardClass}>
           <CardContent className="p-6">
             <p className="text-sm text-[var(--fl-slate)]">
-              Enter your business balance to see where you stand.
+              {t.app.weekly.emptyPrompt}
             </p>
           </CardContent>
         </Card>
@@ -404,8 +410,9 @@ function ProgressRhythm({
 }: {
   steps: { label: string; done: boolean }[];
 }) {
+  const t = useT();
   return (
-    <ol className="flex items-center gap-2" aria-label="Check-in progress">
+    <ol className="flex items-center gap-2" aria-label={t.app.weekly.progressLabel}>
       {steps.map((s, i) => (
         <li key={s.label} className="flex items-center gap-2">
           <span
