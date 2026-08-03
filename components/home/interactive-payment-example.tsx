@@ -14,25 +14,47 @@ import {
 } from "@/lib/domain/money";
 import { resolvePaymentVat } from "@/lib/domain/vat";
 import { allocatePayment } from "@/lib/domain/allocation";
+import { calculatePerPaymentReserve } from "@/lib/domain/reserves";
+import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 
 // Example assumptions, shown explicitly. This demo is ephemeral, it never
-// reads or writes the visitor's saved data.
+// reads or writes the visitor's saved data. The reserve is the real engine, not
+// a flat percentage, so the landing page cannot promise something the tool does
+// not do.
 const EXAMPLE_VAT_RATE = "21";
-const EXAMPLE_RESERVE_PCT = 30;
+const EXAMPLE_ANNUAL_PROFIT = 40_000;
+const EXAMPLE_TAX_YEAR = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
 
 function allocate(grossCents: Cents, includesVat: boolean) {
   const vat = resolvePaymentVat(grossCents, EXAMPLE_VAT_RATE, includesVat);
   const gross = includesVat ? grossCents : (asCentsUnsafe(grossCents + (vat.vatCents ?? 0)));
-  return allocatePayment({
-    grossPaymentCents: gross,
-    vat,
-    reserve: {
-      cents: asCentsUnsafe((vat.netCents * EXAMPLE_RESERVE_PCT) / 100),
-      source: "own-rule",
-    },
-    obligations: [],
-    bufferCents: asCentsUnsafe(0),
+  const reserve = calculatePerPaymentReserve({
+    paymentNetCents: vat.netCents,
+    taxYear: EXAMPLE_TAX_YEAR,
+    country: DEFAULT_COUNTRY,
+    projectedAnnualProfitCents: toCents(EXAMPLE_ANNUAL_PROFIT),
+    // The example is the first payment of the year: nothing earned or set
+    // aside yet.
+    ytdProfitCents: asCentsUnsafe(0),
+    ytdReservedCents: asCentsUnsafe(0),
+    meetsHoursCriterion: true,
+    isStarter: false,
+    otherIncomeCents: asCentsUnsafe(0),
+    otherIncomeTaxWithheldCents: asCentsUnsafe(0),
   });
+  return {
+    allocation: allocatePayment({
+      grossPaymentCents: gross,
+      vat,
+      reserve: {
+        cents: reserve?.reserveCents ?? asCentsUnsafe(0),
+        source: "guided-estimate",
+      },
+      obligations: [],
+      bufferCents: asCentsUnsafe(0),
+    }),
+    ratePercent: reserve ? Math.round(reserve.marginalRate * 1000) / 10 : null,
+  };
 }
 
 export function InteractivePaymentExample() {
@@ -41,7 +63,7 @@ export function InteractivePaymentExample() {
 
   const parsed = parseAmountInput(amount).cents;
   const grossCents = parsed !== null && parsed > 0 ? parsed : toCents(2500);
-  const result = allocate(grossCents, includesVat);
+  const { allocation: result, ratePercent } = allocate(grossCents, includesVat);
 
   const segments = [
     result.vatComponentCents
@@ -60,7 +82,10 @@ export function InteractivePaymentExample() {
       <div className="mb-4 flex items-center gap-2">
         <ExampleBadge />
         <span className="text-xs text-[var(--fl-slate)]">
-          Example uses {EXAMPLE_VAT_RATE}% VAT and a {EXAMPLE_RESERVE_PCT}% reserve.
+          Example uses {EXAMPLE_VAT_RATE}% VAT and the {EXAMPLE_TAX_YEAR} Dutch tax
+          rules, for someone expecting {formatEuro(toCents(EXAMPLE_ANNUAL_PROFIT))}{" "}
+          profit this year
+          {ratePercent !== null ? `, so ${ratePercent}% of this payment` : ""}.
         </span>
       </div>
 

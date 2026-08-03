@@ -33,6 +33,8 @@ export function SiteFooter() {
           {[
             { href: "/about", label: "About" },
             { href: "/accuracy", label: "Accuracy & sources" },
+            { href: "/methodology", label: "How it's calculated" },
+            { href: "/tarief", label: "What should I charge?" },
             { href: "/tool", label: "Open Freelens" },
           ].map(({ href, label }) => (
             <Link

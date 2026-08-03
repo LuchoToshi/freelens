@@ -3,21 +3,23 @@
  *
  * A reserve is ALWAYS a planning figure, never a tax assessment. Every result
  * carries a `source` the UI must display, so a number is never shown without
- * saying where it came from. The guided estimate is a flat, cautious percentage
- * of (revenue − costs), deliberately NOT a bracket calculation, with Zvw shown
- * as its own line and a ± range to signal that it's an estimate.
+ * saying where it came from.
+ *
+ * The guided estimate runs the real tax engine in `lib/tax`: progressive
+ * brackets, the entrepreneur deductions, the MKB-winstvrijstelling, both
+ * heffingskortingen, and Zvw on its own capped base. It replaced a flat 30%
+ * heuristic that was wrong in both directions, badly. See OLD_VS_NEW.md.
  */
 import {
-  addCents,
   asCentsUnsafe,
+  fromCents,
   maxCents,
+  minCents,
   subtractCents,
   type Cents,
 } from "@/lib/domain/money";
-import {
-  isVerifiedTaxYearConfig,
-  type TaxYearConfigResult,
-} from "@/lib/domain/taxYearConfig";
+import { calculateTaxReserve } from "@/lib/tax/engine";
+import type { TaxResult } from "@/lib/tax/types";
 
 export type ReserveSource =
   | "own-rule"
@@ -35,8 +37,18 @@ export type ReserveMethod =
     }
   | {
       mode: "guided-estimate";
+      /** Explicit, never read from the clock, so a stored estimate stays stable. */
+      taxYear: number;
+      country: string;
       expectedAnnualRevenueExVatCents: Cents;
       expectedDeductibleCostsExVatCents: Cents;
+      /** At least 1.225 hours a year on the business. Unlocks the deductions. */
+      meetsHoursCriterion: boolean;
+      isStarter: boolean;
+      /** Employment income or benefits alongside the business. */
+      otherIncomeCents: Cents;
+      /** Loonheffing the employer already withheld on that income. */
+      otherIncomeTaxWithheldCents: Cents;
       alreadyReservedCents: Cents;
       alreadyPaidCents: Cents;
     };
@@ -44,6 +56,22 @@ export type ReserveMethod =
 export interface ReserveBreakdownStep {
   label: string;
   amountCents: Cents;
+  /** Why this line is here. Written by the engine, shown by the UI verbatim. */
+  explanation?: string;
+}
+
+/** Extra detail only the guided estimate can produce, because only it runs the engine. */
+export interface GuidedEstimateDetail {
+  totalLiabilityCents: Cents;
+  netTaxCents: Cents;
+  zvwCents: Cents;
+  /** Share of total income that goes to tax and contributions. */
+  effectiveRate: number;
+  /** Share of the next euro of profit. This is what a per-payment reserve uses. */
+  marginalRate: number;
+  assumptions: string[];
+  configVersion: string;
+  configRetrievedAt: string;
 }
 
 export type SuggestedReserve =
@@ -59,6 +87,8 @@ export type SuggestedReserve =
       perMonthCents: Cents | null;
       breakdown: ReserveBreakdownStep[];
       warnings: string[];
+      /** Null for every mode except the guided estimate. */
+      estimate: GuidedEstimateDetail | null;
     }
   | {
       status: "unavailable";
@@ -71,11 +101,18 @@ export interface ReserveContext {
   profitBaseCents?: Cents;
 }
 
-const GUIDED_RANGE_BAND = 0.15; // ±15% band communicates "this is an estimate".
+/**
+ * How far the projected profit is swung to produce the low/high band.
+ *
+ * The old ±15% band was arbitrary decoration on a flat percentage. This one
+ * answers a real question: what happens if the year comes in a tenth lighter or
+ * heavier than projected. The engine is run at both ends, so the band picks up
+ * bracket edges and credit phase-outs rather than scaling a single number.
+ */
+const PROFIT_SWING = 0.1;
 
 export function calculateSuggestedReserve(
   method: ReserveMethod,
-  config: TaxYearConfigResult,
   context: ReserveContext = {}
 ): SuggestedReserve {
   switch (method.mode) {
@@ -84,7 +121,7 @@ export function calculateSuggestedReserve(
     case "provisional-assessment":
       return calculateProvisional(method);
     case "guided-estimate":
-      return calculateGuided(method, config);
+      return calculateGuided(method);
   }
 }
 
@@ -134,6 +171,7 @@ function calculateOwnRule(
       { label: `Your reserve rule (${percentage}%)`, amountCents: reserveCents },
     ],
     warnings,
+    estimate: null,
   };
 }
 
@@ -171,84 +209,182 @@ function calculateProvisional(
     perMonthCents,
     breakdown,
     warnings,
+    estimate: null,
   };
 }
 
 function calculateGuided(
-  method: Extract<ReserveMethod, { mode: "guided-estimate" }>,
-  config: TaxYearConfigResult
+  method: Extract<ReserveMethod, { mode: "guided-estimate" }>
 ): SuggestedReserve {
-  if (!isVerifiedTaxYearConfig(config)) {
-    return {
-      status: "unavailable",
-      source: "guided-estimate",
-      reason: `Tax references for ${config.taxYear} have not yet been verified. Use your own reserve percentage or a provisional assessment instead.`,
-    };
-  }
   const {
+    taxYear,
+    country,
     expectedAnnualRevenueExVatCents,
     expectedDeductibleCostsExVatCents,
+    meetsHoursCriterion,
+    isStarter,
+    otherIncomeCents,
+    otherIncomeTaxWithheldCents,
     alreadyReservedCents,
     alreadyPaidCents,
   } = method;
-
-  const flatPct = config.guidedEstimateFlatReservePercentage.value;
-  const zvwRate = config.zvw.ratePercentage.value;
-  const zvwCap = config.zvw.maxContributionIncomeCents.value;
 
   const rawProfit = subtractCents(
     expectedAnnualRevenueExVatCents,
     expectedDeductibleCostsExVatCents
   );
-  const profit = maxCents(rawProfit, asCentsUnsafe(0));
+  const alreadyHandled = asCentsUnsafe(alreadyReservedCents + alreadyPaidCents);
 
-  // Flat income-tax reserve on profit. NOT a bracket calculation.
-  const incomeTaxReserve = asCentsUnsafe((profit * flatPct) / 100);
-  // Zvw on the same profit base, capped at the maximum contribution income.
-  const zvwBase = Math.min(profit, zvwCap);
-  const zvwCents = asCentsUnsafe((zvwBase * zvwRate) / 100);
+  const run = (profitCents: number) =>
+    calculateTaxReserve({
+      taxYear,
+      country,
+      projectedAnnualProfit: fromCents(asCentsUnsafe(profitCents)),
+      ytdReserved: fromCents(alreadyHandled),
+      meetsHoursCriterion,
+      isStarter,
+      otherIncome: fromCents(otherIncomeCents),
+      otherIncomeTaxWithheld: fromCents(otherIncomeTaxWithheldCents),
+    });
 
-  const grossReserve = addCents(incomeTaxReserve, zvwCents);
-  const alreadyHandled = addCents(alreadyReservedCents, alreadyPaidCents);
-  const netReserveRaw = subtractCents(grossReserve, alreadyHandled);
-  const reserveCents = maxCents(netReserveRaw, asCentsUnsafe(0));
+  let result: TaxResult;
+  try {
+    result = run(rawProfit);
+  } catch {
+    // The engine refuses a year it has no verified figures for, rather than
+    // reaching for last year's. The other reserve modes still work.
+    return {
+      status: "unavailable",
+      source: "guided-estimate",
+      reason: `Tax figures for ${taxYear} have not been verified yet. Use your own reserve percentage or a provisional assessment instead.`,
+    };
+  }
 
   const warnings: string[] = [];
   if (rawProfit <= 0) {
     warnings.push(
-      "Your expected costs meet or exceed your expected revenue, so the estimated reserve is €0."
+      "Your expected costs meet or exceed your expected revenue, so there is no income tax or Zvw to set aside for this year."
     );
   }
-  if (netReserveRaw < 0) {
+  if (alreadyHandled > result.totalLiability) {
     warnings.push(
-      "You've already set aside more than this estimate, so nothing more is suggested."
+      "You have already set aside more than this estimate, so nothing more is suggested."
+    );
+  }
+  if (otherIncomeCents > 0 && otherIncomeTaxWithheldCents <= 0) {
+    warnings.push(
+      "You have employment income but have not entered the loonheffing your employer already withheld, so this estimate is higher than what you actually still owe."
     );
   }
 
-  const low = asCentsUnsafe(reserveCents * (1 - GUIDED_RANGE_BAND));
-  const high = asCentsUnsafe(reserveCents * (1 + GUIDED_RANGE_BAND));
+  // Band from a real swing in the projected year, not a decorative percentage.
+  const low = run(rawProfit * (1 - PROFIT_SWING)).reserveGap;
+  const high = run(rawProfit * (1 + PROFIT_SWING)).reserveGap;
 
-  const breakdown: ReserveBreakdownStep[] = [
-    { label: "Expected profit (revenue − costs)", amountCents: profit },
-    {
-      label: `Flat income-tax reserve (${flatPct}%, a planning estimate)`,
-      amountCents: incomeTaxReserve,
-    },
-    { label: `Zvw contribution (${zvwRate}%)`, amountCents: zvwCents },
-    { label: "Already reserved or paid", amountCents: alreadyHandled },
-    { label: "Suggested still to reserve", amountCents: reserveCents },
-  ];
+  const breakdown: ReserveBreakdownStep[] = result.breakdown.map((line) => ({
+    label: line.label,
+    amountCents: line.amount,
+    explanation: line.explanation,
+  }));
 
   return {
     status: "calculated",
     source: "guided-estimate",
-    reserveCents,
-    reserveRangeCents: [low, high],
-    zvwCents,
+    reserveCents: result.reserveGap,
+    reserveRangeCents: [minCents(low, high), maxCents(low, high)],
+    zvwCents: result.zvw,
     perMonthCents: null,
     breakdown,
     warnings,
+    estimate: {
+      totalLiabilityCents: result.totalLiability,
+      netTaxCents: result.netTax,
+      zvwCents: result.zvw,
+      effectiveRate: result.effectiveRate,
+      marginalRate: result.marginalRate,
+      assumptions: result.assumptions,
+      configVersion: result.configVersion,
+      configRetrievedAt: result.configRetrievedAt,
+    },
   };
+}
+
+export interface PerPaymentReserveInput {
+  /** The payment's net amount, excluding VAT and any linked deductible costs. */
+  paymentNetCents: Cents;
+  taxYear: number;
+  country: string;
+  projectedAnnualProfitCents: Cents;
+  /** Profit already earned this year, before this payment. */
+  ytdProfitCents: Cents;
+  /** Already set aside this year, before this payment. */
+  ytdReservedCents: Cents;
+  meetsHoursCriterion: boolean;
+  isStarter: boolean;
+  otherIncomeCents: Cents;
+  otherIncomeTaxWithheldCents: Cents;
+}
+
+export interface PerPaymentReserve {
+  reserveCents: Cents;
+  /** The rate this payment was actually reserved at, as a fraction. */
+  appliedRate: number;
+  /** Tax on the next euro. Correct, but the wrong number to reserve at. */
+  marginalRate: number;
+  /** The whole year's bill, for context. */
+  annualLiabilityCents: Cents;
+  assumptions: string[];
+  configVersion: string;
+  configRetrievedAt: string;
+}
+
+/**
+ * What to hold back from one payment.
+ *
+ * This payment's share of the annual bill that is still outstanding, allocated
+ * across the income still expected this year. It is a running balance, not a
+ * rate, which is what makes it self-correcting: set aside too much early and
+ * later payments take less.
+ *
+ * It is deliberately NOT the marginal rate. The marginal rate is what the next
+ * euro costs, which is far above the average, and charging it on every payment
+ * over-reserves a year several times over. That is the same class of error as
+ * the flat 30% rule this engine replaced.
+ *
+ * Returns null when the year has no verified figures, so the caller can fall
+ * back to the user's own percentage rule rather than showing nothing.
+ */
+export function calculatePerPaymentReserve(
+  input: PerPaymentReserveInput
+): PerPaymentReserve | null {
+  if (input.paymentNetCents <= 0) return null;
+  try {
+    const result = calculateTaxReserve({
+      taxYear: input.taxYear,
+      country: input.country,
+      projectedAnnualProfit: fromCents(input.projectedAnnualProfitCents),
+      ytdReserved: fromCents(input.ytdReservedCents),
+      ytdProfit: fromCents(input.ytdProfitCents),
+      meetsHoursCriterion: input.meetsHoursCriterion,
+      isStarter: input.isStarter,
+      otherIncome: fromCents(input.otherIncomeCents),
+      otherIncomeTaxWithheld: fromCents(input.otherIncomeTaxWithheldCents),
+      paymentReceived: fromCents(input.paymentNetCents),
+    });
+    const reserveCents = result.reserveFromThisPayment ?? asCentsUnsafe(0);
+    return {
+      reserveCents,
+      appliedRate:
+        input.paymentNetCents > 0 ? reserveCents / input.paymentNetCents : 0,
+      marginalRate: result.marginalRate,
+      annualLiabilityCents: result.totalLiability,
+      assumptions: result.assumptions,
+      configVersion: result.configVersion,
+      configRetrievedAt: result.configRetrievedAt,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export interface PercentageValidation {

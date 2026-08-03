@@ -25,10 +25,16 @@ export function AllocationBar({
   segments,
   height = 32,
   interactive = true,
+  caption = "Every euro, given a job",
 }: {
   segments: AllocationSegment[];
   height?: number;
   interactive?: boolean;
+  /**
+   * Resting caption above the bar. Overridable because on the rate page "job"
+   * means a piece of client work, so the default reads as the wrong noun.
+   */
+  caption?: string;
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<number | null>(null);
@@ -51,9 +57,7 @@ export function AllocationBar({
             <span className="fl-tnum">{formatEuro(positive[active].cents)}</span>
           </span>
         ) : (
-          <span className="text-[var(--fl-slate)]">
-            Every euro, given a job
-          </span>
+          <span className="text-[var(--fl-slate)]">{caption}</span>
         )}
       </div>
 

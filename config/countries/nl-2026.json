@@ -1,0 +1,241 @@
+{
+  "country": "NL",
+  "taxYear": 2026,
+  "currency": "EUR",
+  "configVersion": "nl-2026.1",
+  "configRetrievedAt": "2026-08-03",
+  "taxpayerProfile": "under-AOW-age",
+
+  "vatRates": [
+    { "id": "standard", "label": "Standard rate (21%)", "rate": 21 },
+    { "id": "reduced", "label": "Reduced rate (9%)", "rate": 9 },
+    { "id": "zero", "label": "Zero rate (0%)", "rate": 0 }
+  ],
+
+  "brackets": [
+    { "upTo": 38883, "rate": 35.75 },
+    { "upTo": 78426, "rate": 37.56 },
+    { "upTo": null, "rate": 49.5 }
+  ],
+
+  "bracketComposition": [
+    {
+      "upTo": 38883,
+      "incomeTaxRate": 8.1,
+      "socialPremiumRate": 27.65,
+      "combinedRate": 35.75
+    },
+    {
+      "upTo": 78426,
+      "incomeTaxRate": 37.56,
+      "socialPremiumRate": 0,
+      "combinedRate": 37.56
+    },
+    {
+      "upTo": null,
+      "incomeTaxRate": 49.5,
+      "socialPremiumRate": 0,
+      "combinedRate": 49.5
+    }
+  ],
+
+  "deductions": [
+    {
+      "id": "zelfstandigenaftrek",
+      "label": "Zelfstandigenaftrek",
+      "explanation": "A fixed deduction for entrepreneurs who spend at least 1.225 hours a year on the business and had not reached AOW age at the start of the year. It cannot exceed your profit, unless you also qualify for the startersaftrek.",
+      "type": "fixed",
+      "value": 1200,
+      "appliesAfter": [],
+      "cappedAtBase": true,
+      "capWaivedBy": ["startersaftrek"],
+      "conditions": ["meetsHoursCriterion"],
+      "subjectToRateAdjustment": true
+    },
+    {
+      "id": "startersaftrek",
+      "label": "Startersaftrek",
+      "explanation": "An extra deduction on top of the zelfstandigenaftrek, for up to three of your first five years in business. It is not capped at your profit, so in a lean year it can increase a loss you carry forward.",
+      "type": "fixed",
+      "value": 2123,
+      "appliesAfter": ["zelfstandigenaftrek"],
+      "cappedAtBase": false,
+      "capWaivedBy": [],
+      "conditions": ["meetsHoursCriterion", "isStarter"],
+      "subjectToRateAdjustment": true
+    },
+    {
+      "id": "mkb-winstvrijstelling",
+      "label": "MKB-winstvrijstelling",
+      "explanation": "12,7% of what is left after the entrepreneur deductions is exempt from income tax. It applies to a loss too, which makes the loss smaller.",
+      "type": "percentage",
+      "value": 12.7,
+      "appliesAfter": ["zelfstandigenaftrek", "startersaftrek"],
+      "cappedAtBase": false,
+      "capWaivedBy": [],
+      "conditions": [],
+      "subjectToRateAdjustment": true
+    }
+  ],
+
+  "credits": [
+    {
+      "id": "algemene-heffingskorting",
+      "label": "Algemene heffingskorting",
+      "explanation": "A credit subtracted from the tax you owe, not from your income. It is the full amount up to €29.736 and then tapers away, reaching zero at €78.427.",
+      "base": "taxableIncome",
+      "segments": [
+        { "from": 0, "to": 29736, "baseAmount": 3115, "rate": 0 },
+        { "from": 29736, "to": 78426, "baseAmount": 3115, "rate": -6.398 },
+        { "from": 78426, "to": null, "baseAmount": 0, "rate": 0 }
+      ]
+    },
+    {
+      "id": "arbeidskorting",
+      "label": "Arbeidskorting",
+      "explanation": "A credit for people who work, including self-employed people. It is calculated on your arbeidsinkomen, which counts business profit BEFORE the entrepreneur deductions and the MKB-winstvrijstelling.",
+      "base": "labourIncome",
+      "segments": [
+        { "from": 0, "to": 11965, "baseAmount": 0, "rate": 8.324 },
+        { "from": 11965, "to": 25845, "baseAmount": 996, "rate": 31.009 },
+        { "from": 25845, "to": 45592, "baseAmount": 5300, "rate": 1.95 },
+        { "from": 45592, "to": 132920, "baseAmount": 5685, "rate": -6.51 },
+        { "from": 132920, "to": null, "baseAmount": 0, "rate": 0 }
+      ]
+    }
+  ],
+
+  "rateAdjustment": {
+    "id": "tariefsaanpassing-aftrekposten",
+    "label": "Tariefsaanpassing aftrekposten",
+    "explanation": "Above €78.426 your deductions would otherwise save you tax at 49,50%. A correction of 11,94% is added back so the benefit is capped at 37,56%.",
+    "correctionRate": 11.94,
+    "appliesAboveIncome": 78426,
+    "resultingMaxBenefitRate": 37.56
+  },
+
+  "socialContributions": [
+    {
+      "id": "zvw",
+      "label": "Zvw contribution",
+      "explanation": "The income-dependent healthcare contribution. It is a separate bill from income tax, paid through your assessment, and it is owed even in a year where income tax works out at zero.",
+      "rate": 4.85,
+      "base": "profitAfterDeductions",
+      "cap": 79409,
+      "floorAtZero": true,
+      "baseVerified": false
+    }
+  ],
+
+  "assumptions": [
+    "This is a planning estimate, not tax advice and not an assessment. Your actual bill is set by the Belastingdienst on your annual return.",
+    "Figures are for a taxpayer who has not reached AOW age, is taxed as an entrepreneur for income tax (ondernemer voor de inkomstenbelasting), and lives in the Netherlands.",
+    "Income tax is assessed once a year on your total profit. This estimate projects the whole year, so it changes as your projected profit changes.",
+    "The Zvw base is taken as your profit after the entrepreneur deductions and the MKB-winstvrijstelling. Belastingdienst publishes the rate (4,85%) and the maximum contribution base (€79.409) but does not state the base on its public pages, so this is unconfirmed. See NEEDS_VERIFICATION.md.",
+    "The algemene heffingskorting is calculated on your Box 1 income only. Box 2 and Box 3 income are not modelled and would reduce this credit, so anyone with such income will be under-reserved here.",
+    "Employment income is counted so the bracket your freelance profit lands in is right. Tax your employer already withheld is only subtracted if you enter it.",
+    "The Zvw maximum contribution base is applied to business profit alone. With a job alongside the business the maximum is shared across both, so this estimate can overstate Zvw at high combined income.",
+    "Only the zelfstandigenaftrek, the startersaftrek and the MKB-winstvrijstelling are modelled. Investeringsaftrek, meewerkaftrek, stakingsaftrek, fiscale oudedagsreserve and loss carry-forward are not.",
+    "Amounts to set aside are rounded up to the whole euro. Under-reserving produces a surprise bill; over-reserving only costs liquidity, and those two are not equally bad."
+  ],
+
+  "provenance": [
+    {
+      "field": "brackets",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/belastingberekening",
+      "retrievedAt": "2026-08-03",
+      "note": "Box 1 brackets 2026 for people who have not reached AOW age: 35,75% up to €38.883, 37,56% to €78.426, 49,50% above."
+    },
+    {
+      "field": "brackets",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/nl/voorlopige-aanslag/content/voorlopige-aanslag-tarieven-en-heffingskortingen",
+      "retrievedAt": "2026-08-03",
+      "note": "Second, independent confirmation of the same three brackets and thresholds."
+    },
+    {
+      "field": "bracketComposition.socialPremiumRate",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/werk_en_inkomen/sociale_verzekeringen/premies_volks_en_werknemersverzekeringen/volksverzekeringen/hoeveel_moet_u_betalen",
+      "retrievedAt": "2026-08-03",
+      "note": "Premies volksverzekeringen 2026: AOW 17,90% + Anw 0,10% + Wlz 9,65% = 27,65%, levied on income up to €38.883, maximum €10.751."
+    },
+    {
+      "field": "bracketComposition.incomeTaxRate",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/belastingberekening",
+      "retrievedAt": "2026-08-03",
+      "derived": true,
+      "note": "The 8,10% income tax component of bracket 1 is derived as 35,75% - 27,65%. Belastingdienst publishes the combined rate and the premie rate but not this split. Documentation only; no calculation uses it."
+    },
+    {
+      "field": "deductions.zelfstandigenaftrek",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/veranderingen-inkomstenbelasting-2026/ondernemersaftrek-2026/zelfstandigenaftrek-2026",
+      "retrievedAt": "2026-08-03",
+      "note": "€1.200 for 2026. Requires the urencriterium and not having reached AOW age at the start of the year. May not exceed profit before ondernemersaftrek unless startersaftrek applies."
+    },
+    {
+      "field": "deductions.zelfstandigenaftrek.conditions",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/ondernemersaftrek_en_investeringsaftrek",
+      "retrievedAt": "2026-08-03",
+      "note": "Urencriterium is at least 1.225 hours a year. Unused zelfstandigenaftrek carries forward 9 years (not modelled)."
+    },
+    {
+      "field": "deductions.startersaftrek",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/veranderingen-inkomstenbelasting-2026/ondernemersaftrek-2026/zelfstandigenaftrek-2026",
+      "retrievedAt": "2026-08-03",
+      "note": "€2.123 for 2026, if you were not an entrepreneur in one or more of the five preceding calendar years and applied the zelfstandigenaftrek at most twice in that period."
+    },
+    {
+      "field": "deductions.mkb-winstvrijstelling",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/veranderingen-inkomstenbelasting-2026/mkb-winstvrijstelling-2026",
+      "retrievedAt": "2026-08-03",
+      "note": "12,7% of profit after it has been reduced by the ondernemersaftrek. Benefit calculated at a rate of 37,56%."
+    },
+    {
+      "field": "rateAdjustment",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/nl/aftrek-en-kortingen/content/afbouw-tarief-aftrekposten-bij-hoog-inkomen",
+      "retrievedAt": "2026-08-03",
+      "note": "Tariefsaanpassing 11,94% in 2026, applies above €78.426, capping deduction benefit at 37,56%. Belastingdienst names zelfstandigenaftrek and mkb-winstvrijstelling in the covered list."
+    },
+    {
+      "field": "credits.algemene-heffingskorting.segments",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/algemene_heffingskorting/tabel-algemene-heffingskorting-2026",
+      "retrievedAt": "2026-08-03",
+      "note": "Not yet AOW age: €3.115 up to €29.736; then €3.115 - 6,398% x (verzamelinkomen - €29.736); €0 from €78.427."
+    },
+    {
+      "field": "credits.arbeidskorting.segments",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/tabel-arbeidskorting-2026",
+      "retrievedAt": "2026-08-03",
+      "note": "Not yet AOW age: 8,324% to €11.965; €996 + 31,009% to €25.845; €5.300 + 1,950% to €45.592; €5.685 - 6,510% to €132.920; €0 from €132.921."
+    },
+    {
+      "field": "credits.arbeidskorting.base",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/inkomen_uit_werk",
+      "retrievedAt": "2026-08-03",
+      "note": "Arbeidsinkomen counts 'winst uit onderneming vóór ondernemersaftrek en mkb-winstvrijstelling', plus wages and resultaat uit overig werk. A different base from the algemene heffingskorting."
+    },
+    {
+      "field": "socialContributions.zvw.rate",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/inkomensafhankelijke_bijdrage_zorgverzekeringswet",
+      "retrievedAt": "2026-08-03",
+      "note": "Bijdrage Zvw 4,85% for income not subject to employer withholding, including winst uit onderneming. Werkgeversheffing is 6,10% and does not apply here."
+    },
+    {
+      "field": "socialContributions.zvw.cap",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/inkomensafhankelijke_bijdrage_zorgverzekeringswet",
+      "retrievedAt": "2026-08-03",
+      "note": "Maximum bijdrage-inkomen 2026 is €79.409."
+    },
+    {
+      "field": "socialContributions.zvw.base",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/inkomensafhankelijke_bijdrage_zorgverzekeringswet",
+      "retrievedAt": "2026-08-03",
+      "note": "UNCONFIRMED. Belastingdienst states the contribution is paid over 'winst uit onderneming' but does not say on any reachable public page whether that is belastbare winst (after ondernemersaftrek and MKB-winstvrijstelling) or profit before those. Configured as belastbare winst. See NEEDS_VERIFICATION.md item 1."
+    },
+    {
+      "field": "vatRates",
+      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/btw/tarieven_en_vrijstellingen/tarieven_en_vrijstellingen",
+      "retrievedAt": "2026-08-03",
+      "note": "21% standard, 9% reduced, 0% for cross-border supplies. No rate changed for 2026; logies moved from the 9% category to the 21% category on 1 January 2026, which is a classification change."
+    }
+  ]
+}

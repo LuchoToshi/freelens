@@ -62,7 +62,7 @@ export function OverviewView({
                 Try one payment (30 seconds)
               </button>
               <button type="button" onClick={() => onNavigate("setup")} className={linkButtonClass}>
-                Personalize my estimate (3 minutes)
+                Set up my details (1 minute)
               </button>
             </div>
           </CardContent>

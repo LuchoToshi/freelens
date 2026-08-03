@@ -33,16 +33,11 @@ describe("save / load round trip", () => {
     const state: AppState = {
       ...emptyAppState(),
       setup: {
-        isEntrepreneurNL: true,
-        vatRegistered: true,
-        participatesKOR: false,
         commonVatTreatments: ["21"],
-        accountingSystem: "invoice",
         amountsDefaultInclusive: true,
         reserveMethod: { mode: "own-rule", percentage: 30 },
         essentialMonthlyBusinessCostsCents: toCents(1200),
         bufferMonths: 2,
-        recommendPersonalPayout: true,
       },
     };
     saveAppState(state, storage);
@@ -133,6 +128,130 @@ describe("v1 → v2 migration", () => {
 
   it("returns null when there is no legacy data", () => {
     expect(migrateFromV1(memoryStorage())).toBeNull();
+  });
+});
+
+describe("payment history in stored state", () => {
+  it("round-trips saved payments", () => {
+    const storage = memoryStorage();
+    const state: AppState = {
+      ...emptyAppState(),
+      paymentHistory: [
+        {
+          id: "a",
+          date: "2026-03-14",
+          amountExVat: toCents(1000),
+          vatRate: 21,
+          vatAmount: toCents(210),
+          reserveTaken: toCents(134),
+          taxYear: 2026,
+        },
+      ],
+    };
+    saveAppState(state, storage);
+    const loaded = loadAppState(storage);
+    expect(loaded.state.paymentHistory).toHaveLength(1);
+    expect(loaded.discardedPaymentRecords).toBe(0);
+  });
+
+  it("loads a state saved before payment history existed", () => {
+    // An install from before this feature has no paymentHistory key at all.
+    // It must load, not be discarded as the wrong shape.
+    const withoutHistory: Record<string, unknown> = { ...emptyAppState() };
+    delete withoutHistory.paymentHistory;
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify(withoutHistory),
+    });
+    const loaded = loadAppState(storage);
+    expect(loaded.recovered).toBe(false);
+    expect(loaded.state.paymentHistory).toEqual([]);
+    expect(loaded.discardedPaymentRecords).toBe(0);
+  });
+
+  it("drops damaged payments without throwing or losing the rest", () => {
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify({
+        ...emptyAppState(),
+        paymentHistory: [
+          {
+            id: "good",
+            date: "2026-03-14",
+            amountExVat: 100000,
+            vatRate: 21,
+            vatAmount: 21000,
+            reserveTaken: 13400,
+            taxYear: 2026,
+          },
+          { id: "bad", date: "nonsense" },
+          "not even an object",
+        ],
+      }),
+    });
+    let loaded: ReturnType<typeof loadAppState> | null = null;
+    expect(() => {
+      loaded = loadAppState(storage);
+    }).not.toThrow();
+    expect(loaded!.state.paymentHistory).toHaveLength(1);
+    expect(loaded!.discardedPaymentRecords).toBe(2);
+    // The rest of the app state survives a damaged history.
+    expect(loaded!.recovered).toBe(false);
+  });
+
+  it("survives a history that is not an array at all", () => {
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify({
+        ...emptyAppState(),
+        paymentHistory: "wiped by something else",
+      }),
+    });
+    const loaded = loadAppState(storage);
+    expect(loaded.state.paymentHistory).toEqual([]);
+    expect(loaded.discardedPaymentRecords).toBe(1);
+  });
+});
+
+describe("an empty state leaves no trace", () => {
+  it("saving an empty state removes the key rather than writing an empty record", () => {
+    // Clearing sets the state to empty, which immediately triggers the app's
+    // autosave. Without this the key came straight back, and the privacy copy
+    // promises the opposite.
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 2, setup: {} }),
+    });
+    saveAppState(emptyAppState(), storage);
+    expect(storage.dump()).toEqual({});
+  });
+
+  it("still writes as soon as there is anything to keep", () => {
+    const storage = memoryStorage();
+    saveAppState(
+      {
+        ...emptyAppState(),
+        paymentHistory: [
+          {
+            id: "a",
+            date: "2026-03-14",
+            amountExVat: toCents(1000),
+            vatRate: 21,
+            vatAmount: toCents(210),
+            reserveTaken: toCents(134),
+            taxYear: 2026,
+          },
+        ],
+      },
+      storage
+    );
+    expect(storage.getItem(APP_STATE_STORAGE_KEY)).not.toBeNull();
+  });
+
+  it("clear then autosave leaves storage empty", () => {
+    const storage = memoryStorage({
+      [APP_STATE_STORAGE_KEY]: JSON.stringify(emptyAppState()),
+      "freelens.safe-to-spend.v1": "{}",
+    });
+    clearAppState(storage);
+    saveAppState(emptyAppState(), storage);
+    expect(storage.dump()).toEqual({});
   });
 });
 

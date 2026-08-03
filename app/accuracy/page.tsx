@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, ShieldCheck, CircleAlert, CircleHelp } from "lucide-react";
 import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
-import { getActiveTaxYearConfig, isVerifiedTaxYearConfig } from "@/lib/domain/taxYearConfig";
+import { DEFAULT_COUNTRY, latestProfileYear, loadProfile } from "@/lib/tax/loadProfile";
 
 export const metadata: Metadata = {
   title: "Accuracy and sources · Freelens",
@@ -27,11 +27,11 @@ const EDGE_CASES: { title: string; body: string }[] = [
   },
   {
     title: "Income outside freelancing",
-    body: "Employment, benefits, or a partner's income change your real tax rate. A flat reserve percentage can't see them, so revisit your percentage if you have significant other income.",
+    body: "Employment income raises the bracket your freelance profit lands in, and Freelens accounts for that if you enter it. What it does not do is subtract wage tax your employer already withheld, so count that as already set aside. A partner's income is not modelled at all.",
   },
   {
     title: "Major deductions",
-    body: "Large deductible costs and allowances (equipment, zelfstandigenaftrek, the SME profit exemption) lower taxable profit, so your final bill is often lower than a flat reserve suggests. Enter deductible costs per payment to get closer.",
+    body: "The zelfstandigenaftrek, the startersaftrek and the MKB-winstvrijstelling are all applied. Investeringsaftrek, fiscale oudedagsreserve and carrying a loss forward are not, so a year with a big equipment purchase or a loss to carry will come out lower than this estimate.",
   },
 ];
 
@@ -50,11 +50,9 @@ function reviewedLabel(iso: string): string {
 }
 
 export default function AccuracyPage() {
-  const config = getActiveTaxYearConfig(2026);
-  const taxYear = config.taxYear;
-  const reviewed = isVerifiedTaxYearConfig(config)
-    ? reviewedLabel(config.vat.standardRatePercentage.dateLastVerified)
-    : null;
+  const taxYear = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
+  const profile = loadProfile(DEFAULT_COUNTRY, taxYear);
+  const reviewed = reviewedLabel(profile.configRetrievedAt);
 
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
@@ -131,43 +129,42 @@ export default function AccuracyPage() {
           <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
             Reference values for {taxYear}
           </h2>
-          {isVerifiedTaxYearConfig(config) ? (
-            <ul className="flex flex-col gap-2 text-sm text-[var(--fl-slate)]">
-              <li>
-                General VAT rate {config.vat.standardRatePercentage.value}%,
-                reduced rate {config.vat.reducedRatePercentage.value}%.
-              </li>
-              <li>
-                Zvw contribution {config.zvw.ratePercentage.value}% up to the
-                maximum contribution income.
-              </li>
-              <li>
-                Guided-estimate reserve: a flat{" "}
-                {config.guidedEstimateFlatReservePercentage.value}% of profit for
-                income tax (a cautious planning heuristic, not a bracket
-                calculation), with Zvw shown separately.
-              </li>
-              <li>
-                Shown for context only, not used in any calculation:
-                zelfstandigenaftrek and the {config.mkbWinstvrijstellingPercentage.value}%
-                SME profit exemption.
-              </li>
-            </ul>
-          ) : (
-            <p className="text-sm text-[var(--fl-slate)]">
-              Tax references for {taxYear} have not yet been verified. You can
-              still use your own reserve amount or a provisional assessment.
-            </p>
-          )}
+          <ul className="flex flex-col gap-2 text-sm text-[var(--fl-slate)]">
+            <li>
+              VAT: {profile.vatRates.map((r) => `${r.rate}%`).join(", ")}.
+            </li>
+            <li>
+              Income tax:{" "}
+              {profile.brackets.map((b) => `${b.rate}%`).join(" then ")}, applied
+              to your profit for the year after the entrepreneur deductions and
+              the MKB-winstvrijstelling.
+            </li>
+            <li>
+              Tax credits: the algemene heffingskorting and the arbeidskorting,
+              both income-dependent, are subtracted from the tax owed.
+            </li>
+            <li>
+              Zvw: {profile.socialContributions[0]?.rate}%, a separate
+              contribution with its own capped base, never folded into the income
+              tax figure.
+            </li>
+          </ul>
           <p className="text-xs text-[var(--fl-slate)]">
-            Reviewed July 2026 for tax year {taxYear}. These figures require review
-            before they support another tax year.
+            Config {profile.configVersion}. Every figure checked against
+            belastingdienst.nl on {profile.configRetrievedAt}, and it needs
+            rechecking before it supports another tax year.
           </p>
           <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
             All calculations are deterministic: the same inputs always produce the
             same numbers, with no guessing and no hidden model. Every result shows
             a &ldquo;Why this number?&rdquo; breakdown you can check.
           </p>
+          <Link
+            href="/methodology"
+            className="inline-flex min-h-11 w-fit items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          >
+            See every rate, threshold and source
+          </Link>
         </section>
 
         <section className="flex flex-col gap-4">

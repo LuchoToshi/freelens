@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { useAppState } from "@/components/app/use-app-state";
 import { NavTabs, type AppView } from "@/components/app/nav-tabs";
 import { OverviewView } from "@/components/app/overview-view";
-import { SetupFlow } from "@/components/app/setup-flow";
+import { SettingsView } from "@/components/app/settings-view";
 import { MoneyArrivedView } from "@/components/app/money-arrived-view";
 import { WeeklyCheckinView } from "@/components/app/weekly-checkin-view";
 import { DecisionView } from "@/components/app/decision-view";
@@ -18,8 +18,9 @@ const VIEW_HEADER: Record<AppView, { title: string; subtitle: string }> = {
     subtitle: "A calm read on what is protected and what is free.",
   },
   setup: {
-    title: "Set up Freelens",
-    subtitle: "Three quick steps. Skip anything you are unsure about.",
+    title: "Your settings",
+    subtitle:
+      "Everything Freelens remembers about you. All optional, all changeable.",
   },
   "money-arrived": {
     title: "Money arrived",
@@ -39,6 +40,10 @@ export function FreelensApp() {
   const app = useAppState();
   const [view, setView] = useState<AppView>("overview");
   const [confirmClear, setConfirmClear] = useState(false);
+  // Read once per mount and passed down, so no child component reaches for the
+  // clock and the whole tree stays deterministic under test.
+  const [today] = useState(() => new Date().toISOString().slice(0, 10));
+  const currentTaxYear = Number(today.slice(0, 4));
 
   // Render a stable neutral shell until hydration completes to avoid an
   // SSR/client mismatch on this statically-prerendered page.
@@ -90,6 +95,16 @@ export function FreelensApp() {
           </div>
         )}
 
+        {app.discardedPaymentRecords > 0 && (
+          <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-4 text-sm text-[var(--fl-slate)]">
+            {app.discardedPaymentRecords === 1
+              ? "One saved payment could not be read and has been left out."
+              : `${app.discardedPaymentRecords} saved payments could not be read and have been left out.`}{" "}
+            The rest of your history is intact. Your {currentTaxYear} totals
+            below are lower than they should be until you add them again.
+          </p>
+        )}
+
         {!app.storageAvailable && (
           <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-4 text-sm text-[var(--fl-slate)]">
             Storage is unavailable in this browser, so your figures won&apos;t be
@@ -104,11 +119,11 @@ export function FreelensApp() {
             <OverviewView state={app.state} onNavigate={setView} />
           )}
           {view === "setup" && (
-            <SetupFlow
+            <SettingsView
               initial={app.state.setup}
-              onComplete={(setup) => {
+              onSave={(setup) => {
                 app.setSetup(setup);
-                setView("overview");
+                setView("money-arrived");
               }}
               onCancel={() => setView("overview")}
             />
@@ -118,6 +133,14 @@ export function FreelensApp() {
               setup={app.state.setup}
               onHandled={app.recordAllocation}
               onPersonalize={() => setView("setup")}
+              paymentHistory={app.state.paymentHistory}
+              taxYear={currentTaxYear}
+              today={today}
+              onSavePayment={app.savePayment}
+              onEditPayment={app.editPayment}
+              onDeletePayment={app.deletePayment}
+              onUpdateProfile={app.updateProfileFlags}
+              onOpenSettings={() => setView("setup")}
             />
           )}
           {view === "weekly-checkin" && (
@@ -144,17 +167,20 @@ export function FreelensApp() {
               sentence="Saved only on this device. Nothing is uploaded to Freelens."
               detail={
                 <>
-                  Freelens stores your figures in this browser&apos;s local
-                  storage so they are here next time. Clearing them below removes
-                  everything from this device. There is no account and no server
-                  copy.
+                  Freelens stores your figures, including every payment you
+                  save, in this browser&apos;s local storage so they are here
+                  next time. Clearing them below removes all of it from this
+                  device, permanently and immediately. There is no account and
+                  no server copy, so there is nothing else to delete and nothing
+                  to request from us.
                 </>
               }
             />
             {confirmClear ? (
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm text-[var(--fl-ink)]">
-                  Clear all saved data on this device?
+                  Clear your setup, your saved payments and your check-ins from
+                  this device? This cannot be undone.
                 </span>
                 <button
                   type="button"
