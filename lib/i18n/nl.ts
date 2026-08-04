@@ -613,6 +613,22 @@ export const nl: DeepPartial<typeof en> = {
           fromProfile: "Overgenomen uit je opgeslagen gegevens. Je kunt het hier aanpassen, alleen voor deze berekening.",
         },
 
+        year: {
+          count: "Tel dit mee voor dit jaar",
+          countHint: "Telt {amount} op bij je verwachte winst, zodat je volgende offerte in de juiste schijf valt.",
+          counted: "Meegeteld. {total} tot nu toe dit jaar.",
+          alreadyCounted: "Al meegeteld.",
+          undo: "Ongedaan maken",
+          undone: "Er weer afgehaald.",
+          prefilled: "Uit wat je dit jaar hebt meegeteld. Je kunt het hier aanpassen, alleen voor deze berekening.",
+          adjust: "Een ander bedrag gebruiken",
+          reset: "Opnieuw beginnen dit jaar",
+          resetHint: "Wist het lopende totaal op dit apparaat.",
+          rolledOver:
+            "Het is een nieuw belastingjaar, dus je lopende totaal begint weer bij nul. Het bedrag van vorig jaar zou het werk van dit jaar in de verkeerde schijf zetten.",
+          rolledOverDismiss: "Duidelijk",
+        },
+
         result: {
           eyebrow: "Wat jij overhoudt",
           ofFee: "van je prijs van {fee}",

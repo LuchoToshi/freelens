@@ -18,6 +18,7 @@ import {
   type PaymentRecord,
 } from "@/lib/domain/paymentHistory";
 import { sanitizeJobs, type JobRecord } from "@/lib/domain/jobs";
+import { sanitizeYearPosition, type YearPosition } from "@/lib/domain/yearPosition";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import type { WeeklyPositionInput } from "@/lib/domain/allocation";
 import type { VatTreatment } from "@/lib/domain/vat";
@@ -99,6 +100,14 @@ export interface AppState {
    * `paymentHistory` and is unaffected by this field.
    */
   jobs: JobRecord[];
+  /**
+   * Expected profit for the year, accumulated by the user one job at a time.
+   *
+   * Null means never counted, which is different from zero: zero is a claim
+   * that nothing was earned, null is the absence of an answer, and the quote
+   * flow treats them differently.
+   */
+  yearPosition: YearPosition | null;
 }
 
 /**
@@ -137,6 +146,7 @@ export function emptyAppState(): AppState {
     migrationNotice: null,
     paymentHistory: [],
     jobs: [],
+    yearPosition: null,
   };
 }
 
@@ -288,6 +298,9 @@ export function loadAppState(
             weeklyPosition: weekly,
             paymentHistory: history.records,
             jobs: jobs.jobs,
+            yearPosition: sanitizeYearPosition(
+              (parsed as { yearPosition?: unknown }).yearPosition
+            ),
           },
           recovered: false,
           migrated: false,
@@ -354,7 +367,8 @@ function isEmptyAppState(state: AppState): boolean {
     state.weeklyPosition === null &&
     state.migrationNotice === null &&
     state.paymentHistory.length === 0 &&
-    state.jobs.length === 0
+    state.jobs.length === 0 &&
+    state.yearPosition === null
   );
 }
 
@@ -449,6 +463,7 @@ export function migrateFromV1(storage: StorageLike): AppState | null {
     // carry over. The year starts empty, which is the honest state.
     paymentHistory: [],
     jobs: [],
+    yearPosition: null,
     weeklyPosition:
       balance !== null || monthlyCosts !== null
         ? { input: weeklyInput, timestampIso: new Date().toISOString() }

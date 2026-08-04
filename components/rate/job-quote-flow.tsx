@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import { CurrencyField } from "@/components/app/fields";
 import { AllocationBar } from "@/components/app/allocation-bar";
 import { AnimatedAmount } from "@/components/design/animated-amount";
@@ -21,9 +21,13 @@ import {
   formatEuroExact,
   fromCents,
   parseAmountInput,
+  type Cents,
 } from "@/lib/domain/money";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { outcomeForJobFee } from "@/lib/tax/jobOutcome";
+import { useYearPosition } from "@/components/rate/use-year-position";
+import { countKey, jobContribution } from "@/lib/domain/yearPosition";
+import { track } from "@/lib/analytics";
 import type { RateProfile } from "@/components/rate/guided-rate-calculator";
 import { useLocale, useT } from "@/components/i18n/locale-provider";
 import {
@@ -91,14 +95,33 @@ export function JobQuoteFlow({
   const [days, setDays] = useState("");
   const [costs, setCosts] = useState("");
   const [profitEdited, setProfitEdited] = useState<number | null>(null);
+  const year = useYearPosition(TAX_YEAR);
+
+  // What the user has actually counted beats the saved profile, which beats the
+  // default. The whole point of the running total is to replace a guess.
+  const countedProfit = year.position ? fromCents(year.position.profitCents) : 0;
+  const basis: "counted" | "profile" | "default" =
+    countedProfit > 0 ? "counted" : knownProjectedProfit > 0 ? "profile" : "default";
 
   // The saved profile arrives after hydration. Until the user types here, the
   // field shows whatever Freelens already knows, so nobody is asked to
   // re-enter a figure the product has.
   const profitValue =
     profitEdited ??
-    (knownProjectedProfit > 0 ? knownProjectedProfit : DEFAULT_PROJECTED_PROFIT);
-  const usingSavedProfit = profitEdited === null && knownProjectedProfit > 0;
+    (basis === "counted"
+      ? countedProfit
+      : basis === "profile"
+        ? knownProjectedProfit
+        : DEFAULT_PROJECTED_PROFIT);
+  const usingSavedProfit = profitEdited === null && basis === "profile";
+  const usingCountedProfit = profitEdited === null && basis === "counted";
+
+  const prefillReported = useRef(false);
+  useEffect(() => {
+    if (prefillReported.current || !usingCountedProfit) return;
+    prefillReported.current = true;
+    track("year_position_prefilled");
+  }, [usingCountedProfit]);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstPaint = useRef(true);
@@ -141,8 +164,24 @@ export function JobQuoteFlow({
         vatRate={vatRate}
         assumesFirstJob={profitCents === 0}
         onFixFirstJob={() => setStep(2)}
-        onAdjust={() => setStep(0)}
+        onAdjust={() => {
+          // Release the pin so the next run picks up the new running total.
+          setProfitEdited(null);
+          setStep(0);
+        }}
         showTariefLink={showTariefLink}
+        year={year}
+        // Counting must not move the answer on screen. Without this the total
+        // that now includes this job would become the basis for this job's own
+        // calculation, taxing it on top of itself and swinging the headline.
+        onCounted={() => setProfitEdited(profitValue)}
+        contribution={jobContribution(result.feeExVat, result.jobCosts)}
+        countKey={countKey({
+          feeExVatCents: result.feeExVat,
+          jobCostsCents: result.jobCosts,
+          vatRate,
+          taxYear: TAX_YEAR,
+        })}
       />
     );
   }
@@ -227,7 +266,33 @@ export function JobQuoteFlow({
       question: j.profit.question,
       helper: j.profit.helper,
       why: j.profit.why,
-      body: (
+      body: usingCountedProfit ? (
+        // A counted total is known, so it is stated rather than offered on a
+        // slider. A slider would also snap it to the nearest step and show a
+        // thumb that disagrees with the figure beside it.
+        <div className="flex flex-col gap-3">
+          <p className="fl-tnum font-serif text-4xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-5xl">
+            {formatEuro(asCentsUnsafe(Math.round(profitValue * 100)))}
+          </p>
+          <p className={hintClass}>{j.year.prefilled}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <button
+              type="button"
+              onClick={() => setProfitEdited(profitValue)}
+              className={`${linkButtonClass} text-xs`}
+            >
+              {j.year.adjust}
+            </button>
+            <button
+              type="button"
+              onClick={year.reset}
+              className={`${linkButtonClass} text-xs`}
+            >
+              {j.year.reset}
+            </button>
+          </div>
+        </div>
+      ) : (
         <div className="flex flex-col gap-3">
           <Label className="sr-only" htmlFor="job-projected-profit">
             {j.profit.fieldLabel}
@@ -375,6 +440,10 @@ function JobResult({
   onFixFirstJob,
   onAdjust,
   showTariefLink,
+  year,
+  onCounted,
+  contribution,
+  countKey: resultKey,
 }: {
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   result: Outcome;
@@ -383,6 +452,10 @@ function JobResult({
   onFixFirstJob: () => void;
   onAdjust: () => void;
   showTariefLink: boolean;
+  year: ReturnType<typeof useYearPosition>;
+  onCounted: () => void;
+  contribution: Cents;
+  countKey: string;
 }) {
   const t = useT();
   const { locale } = useLocale();
@@ -467,6 +540,13 @@ function JobResult({
         </dl>
       </div>
 
+      <CountTowardYear
+        year={year}
+        onCounted={onCounted}
+        contribution={contribution}
+        resultKey={resultKey}
+      />
+
       {/* Not collapsed. A zero-profit assumption makes this job look better
           than it is, which is the one direction the product must not be quiet
           about. */}
@@ -535,6 +615,107 @@ function JobResult({
           {r.toTarief}
         </Link>
       )}
+    </div>
+  );
+}
+
+/**
+ * "Count this toward my year."
+ *
+ * The one place the running total is built, and deliberately the only new
+ * control in this flow. It is not "save this job": nothing is filed, there is
+ * no list to return to and nothing to keep tidy. The user is adding one number
+ * to one number, which is the most this audience will do.
+ *
+ * Two safeguards, both load-bearing:
+ *
+ *   Undo, offered immediately and in the same place. A mis-tap shifts every
+ *   later reserve up the progressive curve and nothing on screen would say so,
+ *   which makes it the most expensive silent error in the product.
+ *
+ *   One count per result. The same fingerprint cannot be added twice, so an
+ *   impatient double-click is free. Change any input and the fingerprint
+ *   changes, so a genuinely different job counts again.
+ */
+function CountTowardYear({
+  year,
+  onCounted,
+  contribution,
+  resultKey,
+}: {
+  year: ReturnType<typeof useYearPosition>;
+  onCounted: () => void;
+  contribution: Cents;
+  resultKey: string;
+}) {
+  const t = useT();
+  const y = t.rate.job.year;
+  const [countedKey, setCountedKey] = useState<string | null>(null);
+
+  // A result worth nothing is not worth a control.
+  if (contribution <= 0) return null;
+
+  const isCounted = countedKey === resultKey;
+
+  if (year.rolledOver) {
+    return (
+      <div className="flex flex-col items-start gap-2 rounded-2xl border border-[var(--fl-line)] bg-white p-5">
+        <p className="text-sm leading-relaxed text-[var(--fl-ink)]">{y.rolledOver}</p>
+        <button
+          type="button"
+          onClick={year.dismissRollover}
+          className={`${linkButtonClass} w-fit`}
+        >
+          {y.rolledOverDismiss}
+        </button>
+      </div>
+    );
+  }
+
+  if (isCounted) {
+    return (
+      <div
+        className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-5"
+        aria-live="polite"
+      >
+        <p className="text-sm leading-relaxed text-[var(--fl-ink)]">
+          {fill(y.counted, {
+            total: formatEuro(year.position?.profitCents ?? asCentsUnsafe(0)),
+          })}
+        </p>
+        {year.canUndo && (
+          <button
+            type="button"
+            onClick={() => {
+              year.undo();
+              setCountedKey(null);
+            }}
+            className={`${linkButtonClass} shrink-0`}
+          >
+            {y.undo}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-2 rounded-2xl border border-[var(--fl-line)] bg-white p-5">
+      <button
+        type="button"
+        onClick={() => {
+          year.count(contribution);
+          onCounted();
+          setCountedKey(resultKey);
+        }}
+        className={secondaryButtonClass}
+      >
+        <Plus className="size-4" aria-hidden="true" />
+        {y.count}
+      </button>
+      <p className={hintClass}>
+        {fill(y.countHint, { amount: formatEuro(contribution) })}
+      </p>
     </div>
   );
 }

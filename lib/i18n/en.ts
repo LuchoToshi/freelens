@@ -623,6 +623,27 @@ export const en = {
           fromProfile: "Taken from your saved figures. Change it here for this calculation only.",
         },
 
+        /**
+         * Counting toward the year. Not "save this job": nothing is filed,
+         * nothing has to be maintained, and there is no list to come back to.
+         * The user is adding one number to one number.
+         */
+        year: {
+          count: "Count this toward my year",
+          countHint: "Adds {amount} to your expected profit, so your next quote lands in the right bracket.",
+          counted: "Counted. {total} so far this year.",
+          alreadyCounted: "Already counted.",
+          undo: "Undo",
+          undone: "Removed again.",
+          prefilled: "From what you have counted this year. Change it here for this calculation only.",
+          adjust: "Use a different figure",
+          reset: "Start the year again",
+          resetHint: "Clears the running total on this device.",
+          rolledOver:
+            "It is a new tax year, so your running total has started again at zero. Last year's figure would put this year's work in the wrong bracket.",
+          rolledOverDismiss: "Got it",
+        },
+
         result: {
           eyebrow: "What you keep",
           ofFee: "of your {fee} fee",
