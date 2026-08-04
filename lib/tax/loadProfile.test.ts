@@ -25,18 +25,43 @@ describe("loadProfile", () => {
     expect(() => loadProfile("BE", 2026)).toThrow(/No verified tax profile/);
   });
 
+  /**
+   * Two domains, and only two.
+   *
+   * belastingdienst.nl is where the figures come from. wetten.overheid.nl is
+   * the government's legislation database, which the Belastingdienst pages
+   * paraphrase; it is admitted only where a figure is defined in statute and
+   * the Belastingdienst does not restate the definition. That is exactly one
+   * case today: the Zvw contribution base, which their pages leave as the bare
+   * phrase "winst uit onderneming".
+   *
+   * The point of this test is to keep aggregators, accountancy summaries, bank
+   * knowledge bases and blogs out of the provenance. Widening it past these two
+   * defeats the config.
+   */
+  const OFFICIAL_SOURCES = /^https:\/\/(www\.)?(belastingdienst\.nl|wetten\.overheid\.nl)\//;
+
   it("records a source and a retrieval date for every figure", () => {
     expect(base.provenance.length).toBeGreaterThan(0);
     for (const entry of base.provenance) {
-      expect(entry.sourceUrl).toMatch(/^https:\/\/(www\.)?belastingdienst\.nl\//);
+      expect(entry.sourceUrl).toMatch(OFFICIAL_SOURCES);
       expect(entry.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
   });
 
-  it("flags the Zvw base as unverified so the engine says so out loud", () => {
+  it("cites the statute for the Zvw base rather than asserting it", () => {
     const zvw = base.socialContributions.find((c) => c.id === "zvw")!;
-    expect(zvw.baseVerified).toBe(false);
-    expect(base.assumptions.some((a) => a.includes("Zvw base"))).toBe(true);
+    expect(zvw.baseVerified).toBe(true);
+    expect(zvw.base).toBe("profitAfterDeductions");
+
+    // Zvw art. 43(2)(b) points at afdeling 3.2 Wet IB 2001, and art. 3.2 there
+    // defines belastbare winst as profit less the ondernemersaftrek and the
+    // MKB-winstvrijstelling. Both hops have to stay recorded: the first alone
+    // does not tell you what the base is.
+    const note = base.provenance.find((p) => p.field === "socialContributions.zvw.base")!.note!;
+    expect(note).toContain("art. 43");
+    expect(note).toContain("art. 3.2");
+    expect(base.assumptions.some((a) => a.includes("Zorgverzekeringswet"))).toBe(true);
   });
 });
 

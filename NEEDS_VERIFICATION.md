@@ -4,27 +4,34 @@ Every figure in `config/countries/nl-2026.json` was taken from belastingdienst.n
 
 The items below could not be settled from a Belastingdienst page. Each one names the exact figure needed and where I looked. None of them are guesses dressed up as facts: where a value had to be chosen to keep the engine working, the choice is stated and the direction of the error if it is wrong is stated with it.
 
+**Status: 4 open, 3 closed.** Items 1, 6 and 7 are resolved and kept here for the record rather than deleted, so the reasoning stays auditable. Item 1 was closed from the statute after the Belastingdienst pages turned out not to state the definition at all.
+
 ---
 
 ## 1. The Zvw contribution base for a self-employed person
 
-**Confirmed:** rate 4,85%, maximum bijdrage-inkomen €79.409.
+**Resolved 2026-08-04.** The configured base was right. No figure changed.
 
-**Not confirmed:** whether the base is the *belastbare winst uit onderneming* (profit after ondernemersaftrek and MKB-winstvrijstelling) or the profit before those deductions.
+The Belastingdienst never settles this: every one of its pages says only *winst uit onderneming*, which is ambiguous between profit before and after the entrepreneur deductions. The statute settles it in two hops.
 
-**Configured as:** belastbare winst, i.e. after deductions. `socialContributions.zvw.baseVerified` is `false`, and the engine emits an explicit assumption line for it.
+**Zorgverzekeringswet art. 43 lid 2 onder b** — what the contribution is levied on:
 
-**If this is wrong** the engine under-reserves. On a €40.000 profit the difference is about €297 a year.
+> belastbare winst uit onderneming, bepaald volgens de regels van **afdeling 3.2 van de Wet inkomstenbelasting 2001**
 
-**Searched:**
-- `fisin/fisin2026/inkomensafhankelijke_bijdrage_zorgverzekeringswet` — gives the rate and cap, lists the income categories ("winst uit Nederland"), never defines the base.
-- `.../zorgverzekeringswet/bijdrage_zorgverzekeringswet/inkomensafhankelijke_bijdrage_zorgverzekeringswet` — refers on to other pages.
-- `.../werken/niet_in_loondienst_werken/zorgverzekeringswet` — "Over uw resultaat uit overig werk moet u ... een bijdrage Zvw betalen", no definition.
-- `.../ondernemen/onderneming_starten/wat_u_verder_wilt_weten/zorgverzekering/` — "U betaalt de bijdrage over uw winst uit onderneming", ambiguous.
-- `nl/werk-en-inkomen/content/voorlopige-aanslag-zvw` — no calculation detail.
-- `data/online_aangifte/ih2015/.../bijdrage-inkomen.htm` — returns 404.
+**Wet IB 2001 art. 3.2** — what afdeling 3.2 defines that term as:
 
-**What would settle it:** the definition of *bijdrage-inkomen* in the Zorgverzekeringswet as Belastingdienst applies it, or a worked example on an official page showing a business profit and the resulting contribution.
+> Belastbare winst uit onderneming is het gezamenlijke bedrag van de winst die de belastingplichtige als ondernemer geniet uit een of meer ondernemingen **verminderd met de ondernemersaftrek (paragraaf 3.2.4) en de MKB-winstvrijstelling (paragraaf 3.2.5)**.
+
+So the base is profit after the ondernemersaftrek *and* after the MKB-winstvrijstelling, which is what `profitAfterDeductions` computes. `baseVerified` is now `true` and the assumption line cites both articles instead of warning that the base is unknown.
+
+Two side confirmations from the same reading:
+
+- **Art. 43 lid 3** — *"Het bijdrage-inkomen wordt ten minste op nihil gesteld"*, and capped at the ministerially fixed amount. Confirms `floorAtZero` and the €79.409 ceiling.
+- **Wet IB 2001 art. 3.79a** — the MKB-winstvrijstelling is 12,7% of profit *"nadat dit bedrag is verminderd met de ondernemersaftrek"*. Confirms the engine applies the exemption after the deductions, not before.
+
+**Source note.** This came from wetten.overheid.nl, not belastingdienst.nl. That is the government's official legislation database and the primary law the Belastingdienst pages paraphrase, not a third-party summary. `loadProfile.test.ts` admits exactly these two domains and no others.
+
+**Excluded from the base, and not modelled here:** art. 43 lid 2 onder b carves out the oudedagsreserve release amount under the pre-2023 art. 3.70. The FOR is out of scope and closed to new entrants, so nothing turns on it.
 
 ---
 
@@ -84,6 +91,12 @@ What remains unmodelled: over-withholding does not produce a refund in this esti
 
 ## 7. The Zvw maximum applied across two income sources
 
-The €79.409 maximum bijdrage-inkomen is a single ceiling across all of a person's contribution income. The engine applies it to business profit alone, ignoring that employment income also consumes it.
+**No longer an open question. A known, sourced limitation.**
 
-**Direction of the error:** over-states Zvw, and only for someone whose combined income exceeds the ceiling. Surfaced in `assumptions[]`.
+Confirmed 2026-08-04 by **Zorgverzekeringswet art. 43 lid 5**: where the contribution is levied by assessment, the maximum bijdrage-inkomen taken into account is the ceiling *"verminderd met het loon"* already subject to withholding. The ceiling is explicitly shared between a job and a business.
+
+The engine applies the ceiling to business profit alone.
+
+**Direction of the error:** over-states Zvw, and only for someone whose combined income exceeds €79.409. Over-reserving, which is the safe direction. Surfaced in `assumptions[]` with the article cited.
+
+**To close it properly** the engine would need employment income split into Zvw-liable wage and other income, which is a modelling change rather than a missing figure.
