@@ -6,7 +6,7 @@ Two sources, in that order, and nothing else. Belastingdienst for the figures, b
 
 Each item names the exact figure needed and where I looked. None of them are guesses dressed up as facts: where a value had to be chosen to keep the engine working, the choice is stated, and so is the direction of the error if it is wrong.
 
-**Status: 6 closed, 1 permanent scope limit, 1 open defect.**
+**Status: 7 closed, 1 permanent scope limit.**
 
 | # | What | State |
 |---|---|---|
@@ -17,7 +17,7 @@ Each item names the exact figure needed and where I looked. None of them are gue
 | 5 | Verzamelinkomen for the AHK | **Will not close.** Needs Box 2 and Box 3, out of scope. |
 | 6 | Wage tax already withheld | Closed. Now an input. |
 | 7 | Zvw maximum across two sources | Closed as a sourced limitation. |
-| 8 | MKB added back on a negative base | **Open defect**, under-reserving. Fix proposed, not applied. |
+| 8 | MKB added back on a negative base | Closed. Guard applied, three regression tests. |
 
 Resolved items are kept rather than deleted so the reasoning stays auditable. Items 1 to 4 could not be settled from any Belastingdienst page and were closed from the statute instead; every one of them confirmed what was already configured, so no figure moved.
 
@@ -173,4 +173,15 @@ deductions subject to the adjustment   € 1.630,97   (should be € 3.323,00)
 
 **Direction:** understates tax by roughly €200, so the user reserves too little. That is the direction this engine is not allowed to fail in.
 
-**The fix** is a positivity guard on the MKB contribution to `totalSubjectToRateAdjustment` in `lib/tax/deductions.ts`, not on the exemption itself, which still correctly reduces the loss. Deliberately left unapplied pending review, because it changes tax logic.
+**Fixed 2026-08-04.** A positivity guard on the contribution to `totalSubjectToRateAdjustment` in `lib/tax/deductions.ts`. It sits on the adjustment base only, not on the exemption, which still correctly reduces the loss.
+
+Stated generally rather than as an MKB special case: a deduction that did not reduce the base cannot have its benefit clawed back. That is what the statute says for the one deduction where it can happen, and it is the right rule for any future percentage deduction.
+
+Measured, at a €10.000 loss with €100.000 of salary and the starter increase:
+
+| | adjustment | total liability |
+|---|---|---|
+| before | €194,74 | €31.075,55 |
+| after | €396,77 | €31.277,58 |
+
+€202,03 of tax that had not been reserved for. Three regression tests pin it, two at engine level and one at deduction level; all three fail if the guard is removed.

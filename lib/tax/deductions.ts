@@ -102,7 +102,18 @@ export function applyDeductions(
 
     base = asCentsUnsafe(base - amount);
     total += amount;
-    if (deduction.subjectToRateAdjustment) {
+    // Only a deduction that actually reduced the base can have its benefit
+    // clawed back by the rate adjustment. Wet IB 2001 art. 2.10 lid 3 onder b
+    // says this outright for the MKB-winstvrijstelling: it counts as a
+    // grondslagverminderende post only "mits het gezamenlijke bedrag van de met
+    // de ondernemersaftrek verminderde winst [...] positief is".
+    //
+    // Without the guard, a percentage deduction on a loss produces a NEGATIVE
+    // amount that shrinks the total the adjustment is computed on, understating
+    // tax. That only surfaces for a loss-making business alongside enough salary
+    // to clear the threshold, but it under-reserves, and this engine is allowed
+    // to be wrong in the other direction only.
+    if (deduction.subjectToRateAdjustment && amount > 0) {
       totalSubjectToRateAdjustment += amount;
     }
 

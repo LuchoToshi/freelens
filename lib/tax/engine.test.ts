@@ -583,3 +583,36 @@ describe("edge cases", () => {
     expect(() => calculateTaxReserve(nl({ taxYear: 2031, projectedAnnualProfit: 40_000 }))).toThrow();
   });
 });
+
+/**
+ * A loss-making business alongside a salary large enough to clear the
+ * tariefsaanpassing threshold. The only shape where art. 2.10 lid 3 onder b
+ * changes an answer, and the reason the condition is worth implementing.
+ */
+describe("the tariefsaanpassing when the business made a loss", () => {
+  const input = nl({
+    projectedAnnualProfit: -10_000,
+    otherIncome: 100_000,
+    isStarter: true,
+  });
+
+  it("computes the adjustment on the ondernemersaftrek alone", () => {
+    const result = calculateTaxReserve(input);
+    const adjustment = result.breakdown.find((b) => b.id === "rate-adjustment")!;
+
+    // 11,94% of the €3.323 ondernemersaftrek, which is smaller than the
+    // €9.943,03 by which income before deductions clears €78.426, so the
+    // deductions are what binds.
+    expect(adjustment.amount).toBe(toCents(396.77));
+  });
+
+  it("does not let the negative MKB exemption shrink that adjustment", () => {
+    const result = calculateTaxReserve(input);
+
+    // Folding the -€1.692,03 exemption into the adjustment base would give
+    // €194,74 here, and a total liability of €31.075,55. That is €202,03 of
+    // tax the user would not have reserved for.
+    expect(result.totalLiability).toBe(toCents(31_277.58));
+    expect(result.totalLiability).toBeGreaterThan(toCents(31_075.55));
+  });
+});

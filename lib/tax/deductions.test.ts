@@ -77,3 +77,32 @@ describe("applyDeductions", () => {
     expect(result.total).toBe(toCents(1200 + 11_912.6));
   });
 });
+
+/**
+ * Wet IB 2001 art. 2.10 lid 3 onder b admits the MKB-winstvrijstelling as a
+ * grondslagverminderende post only "mits het gezamenlijke bedrag van de met de
+ * ondernemersaftrek verminderde winst [...] positief is".
+ *
+ * On a loss the exemption is a negative amount. Folding that into the total the
+ * tariefsaanpassing is computed on shrinks the total and understates tax, which
+ * is the under-reserving direction. These pin the guard that prevents it.
+ */
+describe("the rate adjustment base on a loss", () => {
+  it("leaves out an exemption that deepened a loss instead of reducing a profit", () => {
+    const result = applyDeductions(toCents(-10_000), profile, starter);
+
+    const mkb = amountOf(result, "mkb-winstvrijstelling").amount;
+    expect(mkb).toBeLessThan(0);
+
+    // The two ondernemersaftrek amounts, and only those.
+    expect(result.totalSubjectToRateAdjustment).toBe(toCents(1200 + 2123));
+    // The negative exemption still reduces the loss itself.
+    expect(result.total).toBeLessThan(result.totalSubjectToRateAdjustment);
+  });
+
+  it("counts the exemption again as soon as profit after ondernemersaftrek is positive", () => {
+    const result = applyDeductions(toCents(5_000), profile, starter);
+    expect(amountOf(result, "mkb-winstvrijstelling").amount).toBeGreaterThan(0);
+    expect(result.totalSubjectToRateAdjustment).toBe(result.total);
+  });
+});
