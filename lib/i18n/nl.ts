@@ -19,11 +19,14 @@ export const nl: DeepPartial<typeof en> = {
   common: {
     brand: "Freelens",
     nav: {
+      ariaLabel: "Hoofdnavigatie",
       about: "Over ons",
+      beforeJob: "Voor de klus",
+      afterPayment: "Na betaling",
       openTool: "Bekijk mijn uitbetaling",
       accuracy: "Nauwkeurigheid & bronnen",
       methodology: "Hoe we rekenen",
-      rate: "Wat moet ik vragen?",
+      rate: "Voor de klus",
       openFreelens: "Freelens openen",
     },
     back: "Terug",
@@ -270,16 +273,31 @@ export const nl: DeepPartial<typeof en> = {
       lead: "De laag tussen je bankrekening en je boekhouding waarin je beslist.",
       body: "Je bank en je boekhouding laten al zien wat er staat en wat er gebeurd is. Freelens vertaalt dat naar wat je nu veilig kunt doen. Het vult je tools aan, het vervangt ze niet.",
     },
-    rateSection: {
-      ariaLabel: "Bereken je dagtarief",
-      eyebrow: "Voor de opdracht",
-      heading: "Kijk wat je overhoudt, voordat je de offerte stuurt.",
-      body: "Je hebt een bedrag in gedachten voor deze klus. Freelens haalt het uit elkaar volgens de echte Nederlandse regels van {year}: wat de klus jou kost, hoeveel belasting eroverheen gaat en wat er echt van jou blijft.",
-      youEnter: "Drie antwoorden, ongeveer een minuut",
-      youGet: "Wat er van je prijs overblijft, geen advies over je prijs",
-      privacy: "Je cijfers blijven op dit apparaat",
-      fullPage: "Liever een dagtarief voor het jaar berekenen",
+    fork: {
+      ariaLabel: "Kies waar je bent",
+      eyebrow: "Twee momenten",
+      heading: "Eén berekening, beide kanten van de klus.",
+
+      before: {
+        eyebrow: "Voor de klus",
+        heading: "Wat houd ik hieraan over?",
+        body: "Vul het bedrag in dat je overweegt. Freelens haalt de kosten van de klus en de belasting eraf, volgens de echte Nederlandse regels van {year}.",
+        fullPage: "Open de volledige calculator",
+      },
+
+      after: {
+        eyebrow: "Na de betaling",
+        heading: "Wat is hier echt van mij?",
+        body: "Er is betaald. Haal de btw eruit, zet je belasting opzij, dek je kosten en zie wat je veilig kunt uitbetalen.",
+        points: [
+          "Elke betaling krijgt een taak",
+          "Wekelijks rustig zicht op je positie",
+          "Toets een uitgave voordat je hem doet",
+        ],
+        cta: "Open de werkruimte",
+      },
     },
+
     accuracy: {
       ariaLabel: "Nauwkeurigheid en beperkingen",
       eyebrow: "Nauwkeurigheid",
@@ -289,10 +307,6 @@ export const nl: DeepPartial<typeof en> = {
       detail:
         "Het geeft schattingen om mee te plannen, op basis van de gegevens en reserveringsregels die je zelf invult. Het berekent niet je definitieve aanslag, is geen belastingadvies, en vervangt niet de Belastingdienst, een boekhouder of je administratie.",
       link: "Lees onze notities over nauwkeurigheid en de officiële bronnen →",
-    },
-    finalCta: {
-      heading: "Geef je volgende betaling een taak.",
-      cta: "Bekijk wat ik mezelf kan uitbetalen",
     },
   },
 

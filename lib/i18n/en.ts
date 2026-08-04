@@ -14,11 +14,14 @@ export const en = {
   common: {
     brand: "Freelens",
     nav: {
+      ariaLabel: "Main navigation",
       about: "About",
+      beforeJob: "Before the job",
+      afterPayment: "After payment",
       openTool: "See my payout",
       accuracy: "Accuracy & sources",
       methodology: "How it's calculated",
-      rate: "What should I charge?",
+      rate: "Before the job",
       openFreelens: "Open Freelens",
     },
     back: "Back",
@@ -269,16 +272,36 @@ export const en = {
      * before the job". Placed where the reader has just understood the loop,
      * because that is the point the next question forms on its own.
      */
-    rateSection: {
-      ariaLabel: "Work out your day rate",
-      eyebrow: "Before the job",
-      heading: "Before you send the quote, see what you'll keep.",
-      body: "You have a number in mind for this job. Freelens takes it apart on the real {year} Dutch rules: what the job costs you, what the tax on it comes to, and what actually stays with you.",
-      youEnter: "Three answers, about a minute",
-      youGet: "What's left of the fee, not what you should charge",
-      privacy: "Your numbers stay on this device",
-      fullPage: "Work out a day rate for the year instead",
+    /**
+     * Both moments, grouped. The hero has already made its promise; this is
+     * the first thing on the page a visitor can act on, and it is a choice
+     * between two questions rather than a question put to them.
+     */
+    fork: {
+      ariaLabel: "Choose where you are",
+      eyebrow: "Two moments",
+      heading: "One engine, both ends of the job.",
+
+      before: {
+        eyebrow: "Before the job",
+        heading: "What will I keep from this job?",
+        body: "Put in the fee you're considering. Freelens takes out the job's costs and the tax it triggers, on the real {year} Dutch rules.",
+        fullPage: "Open the full calculator",
+      },
+
+      after: {
+        eyebrow: "After the payment",
+        heading: "What's actually mine here?",
+        body: "A payment landed. Separate the btw, protect the tax reserve, cover your costs, and see what's safe to pay yourself.",
+        points: [
+          "Every payment gets a job",
+          "A calm weekly read on your position",
+          "Test a spend before you make it",
+        ],
+        cta: "Open the workspace",
+      },
     },
+
     accuracy: {
       ariaLabel: "Accuracy and limitations",
       eyebrow: "Accuracy",
@@ -288,10 +311,6 @@ export const en = {
       detail:
         "It provides planning estimates based on the information and reserve rules you enter. It does not calculate your final tax assessment, is not tax advice, and doesn't replace the Belastingdienst, an accountant, or your bookkeeping.",
       link: "Read our accuracy notes and official sources →",
-    },
-    finalCta: {
-      heading: "Give your next payment a job.",
-      cta: "See what I can pay myself",
     },
   },
 

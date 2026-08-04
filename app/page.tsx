@@ -4,10 +4,9 @@ import Link from "next/link";
 import { HeroSection } from "@/components/home/hero-section";
 import { ProblemSection } from "@/components/home/problem-section";
 import { HowItWorksSection } from "@/components/home/how-it-works-section";
-import { RateSection } from "@/components/home/rate-section";
+import { ForkSection } from "@/components/home/fork-section";
 import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
-import { FinalCtaSection } from "@/components/home/final-cta-section";
 import { SocialProofSection } from "@/components/home/social-proof-section";
 import { ConfidenceBlock } from "@/components/design/confidence-block";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
@@ -19,17 +18,15 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
       <HeroSection />
       <PositioningStrip />
+      {/* The first thing on the page a visitor can act on. Both routes get
+          equal billing here; the hero has already made the one promise. */}
+      <ForkSection />
       <ProblemSection />
       <HowItWorksSection />
-      {/* The hinge: everything above is after the payment, this is before the
-          job. Placed here because the reader has just finished the loop and
-          the next question forms on its own. */}
-      <RateSection />
       <SocialProofSection />
       <PrivacySection />
       <AccuracySection />
       <FaqSection />
-      <FinalCtaSection />
     </main>
   );
 }
