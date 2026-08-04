@@ -160,16 +160,16 @@
     },
     {
       "field": "bracketComposition.incomeTaxRate",
-      "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/fisin/fisin2026/belastingberekening",
-      "retrievedAt": "2026-08-03",
-      "derived": true,
-      "note": "The 8,10% income tax component of bracket 1 is derived as 35,75% - 27,65%. Belastingdienst publishes the combined rate and the premie rate but not this split. Documentation only; no calculation uses it."
+      "sourceUrl": "https://wetten.overheid.nl/BWBR0011353/2026-01-01",
+      "retrievedAt": "2026-08-04",
+      "derived": false,
+      "note": "8,10%, published directly in the Wet IB 2001 art. 2.10 lid 1 tariefstabel, whose columns give 8,10% / 37,56% / 49,50% at the same €38.883 and €78.426 boundaries. Previously derived as 35,75% - 27,65%; the derivation matched the statute exactly. Documentation only; no calculation uses it."
     },
     {
       "field": "deductions.zelfstandigenaftrek",
       "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/veranderingen-inkomstenbelasting-2026/ondernemersaftrek-2026/zelfstandigenaftrek-2026",
       "retrievedAt": "2026-08-03",
-      "note": "€1.200 for 2026. Requires the urencriterium and not having reached AOW age at the start of the year. May not exceed profit before ondernemersaftrek unless startersaftrek applies."
+      "note": "€1.200 for 2026. Requires the urencriterium and not having reached AOW age at the start of the year. May not exceed profit before ondernemersaftrek unless startersaftrek applies. All three confirmed by Wet IB 2001 art. 3.76: lid 1 the urencriterium, lid 2 the €1.200 and the AOW condition, lid 5 the profit cap and its waiver for starters."
     },
     {
       "field": "deductions.zelfstandigenaftrek.conditions",
@@ -181,7 +181,7 @@
       "field": "deductions.startersaftrek",
       "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/zakelijk/winst/inkomstenbelasting/veranderingen-inkomstenbelasting-2026/ondernemersaftrek-2026/zelfstandigenaftrek-2026",
       "retrievedAt": "2026-08-03",
-      "note": "€2.123 for 2026, if you were not an entrepreneur in one or more of the five preceding calendar years and applied the zelfstandigenaftrek at most twice in that period."
+      "note": "€2.123 for 2026, if you were not an entrepreneur in one or more of the five preceding calendar years and applied the zelfstandigenaftrek at most twice in that period. Wet IB 2001 art. 3.76 lid 3 states it as a verhoging OF the zelfstandigenaftrek ('wordt de zelfstandigenaftrek verhoogd met € 2123'), not a deduction in its own right, which is why it inherits that deduction's treatment under the tariefsaanpassing. Art. 3.76 lid 5 waives the profit cap for anyone entitled to this increase, which is what capWaivedBy encodes."
     },
     {
       "field": "deductions.mkb-winstvrijstelling",
@@ -193,19 +193,19 @@
       "field": "rateAdjustment",
       "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/nl/aftrek-en-kortingen/content/afbouw-tarief-aftrekposten-bij-hoog-inkomen",
       "retrievedAt": "2026-08-03",
-      "note": "Tariefsaanpassing 11,94% in 2026, applies above €78.426, capping deduction benefit at 37,56%. Belastingdienst names zelfstandigenaftrek and mkb-winstvrijstelling in the covered list."
+      "note": "Tariefsaanpassing 11,94% in 2026, applies above €78.426, capping deduction benefit at 37,56%. Wet IB 2001 art. 2.10 lid 2 gives the formula this engine implements: 11,94% of the amount by which income plus the deductions exceeds the top bracket boundary, capped at 11,94% of the deductions themselves. Art. 2.10 lid 3 onder a covers 'de ondernemersaftrek, bedoeld in artikel 3.74' as a whole rather than an itemised list, and art. 3.74 onder a puts the zelfstandigenaftrek inside it. Note lid 3 onder b admits the MKB-winstvrijstelling only where profit after the ondernemersaftrek is positive; see NEEDS_VERIFICATION.md item 8."
     },
     {
       "field": "credits.algemene-heffingskorting.segments",
       "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/algemene_heffingskorting/tabel-algemene-heffingskorting-2026",
       "retrievedAt": "2026-08-03",
-      "note": "Not yet AOW age: €3.115 up to €29.736; then €3.115 - 6,398% x (verzamelinkomen - €29.736); €0 from €78.427."
+      "note": "Not yet AOW age: €3.115 up to €29.736; then €3.115 - 6,398% x (verzamelinkomen - €29.736); €0 from €78.427. Wet IB 2001 art. 8.10 lid 2 states exactly this and names verzamelinkomen as the base, which is what NEEDS_VERIFICATION.md item 5 is about: the engine substitutes Box 1 income for it."
     },
     {
       "field": "credits.arbeidskorting.segments",
       "sourceUrl": "https://www.belastingdienst.nl/wps/wcm/connect/bldcontentnl/belastingdienst/prive/inkomstenbelasting/heffingskortingen_boxen_tarieven/heffingskortingen/arbeidskorting/tabel-arbeidskorting-2026",
       "retrievedAt": "2026-08-03",
-      "note": "Not yet AOW age: 8,324% to €11.965; €996 + 31,009% to €25.845; €5.300 + 1,950% to €45.592; €5.685 - 6,510% to €132.920; €0 from €132.921."
+      "note": "Not yet AOW age: 8,324% to €11.965; €996 + 31,009% to €25.845; €5.300 + 1,950% to €45.592; €5.685 - 6,510% to €132.920; €0 from €132.921. Wet IB 2001 art. 8.11 lid 2 onder a-d states the same four rates and the same three thresholds, with the caps at €996, €5.300 and €5.685 and a floor at nil. The €2.840 seen on the Belastingdienst overview page appears nowhere in the Wet IB 2001; art. 8.11's closing sentence is a floor at the payroll-computed credit capped at €5.685, not a ceiling of €2.840. See NEEDS_VERIFICATION.md item 4."
     },
     {
       "field": "credits.arbeidskorting.base",
@@ -236,6 +236,13 @@
       "sourceUrl": "https://wetten.overheid.nl/BWBR0018450/2026-01-01",
       "retrievedAt": "2026-08-04",
       "note": "Zorgverzekeringswet art. 43 lid 3: 'Het bijdrage-inkomen wordt ten minste op nihil gesteld' and is capped at the amount fixed by ministerial regulation. Confirms both the zero floor and the existence of the maximum applied here. Art. 43 lid 5 shares that maximum with wage income, which this engine does not model; see NEEDS_VERIFICATION.md item 7."
+    },
+    {
+      "field": "brackets",
+      "sourceUrl": "https://wetten.overheid.nl/BWBR0011353/2026-01-01",
+      "retrievedAt": "2026-08-04",
+      "note": "Statutory cross-check of the whole Box 1 model against the Wet inkomstenbelasting 2001 as in force on 2026-01-01. Art. 2.10 lid 1 the bracket table and the 8,10% component; art. 2.10 lid 2 and 3 the tariefsaanpassing formula and what it covers; art. 3.2 belastbare winst; art. 3.74 the composition of the ondernemersaftrek; art. 3.76 the zelfstandigenaftrek, the starter increase and the profit cap; art. 3.79a the ordering of the MKB-winstvrijstelling; art. 8.10 and 8.11 the two credits. Every figure already taken from belastingdienst.nl matched. This entry is the single link for all of it, so the notes above can cite articles without repeating the URL.",
+      "derived": false
     },
     {
       "field": "vatRates",
