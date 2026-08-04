@@ -273,12 +273,12 @@ export const nl: DeepPartial<typeof en> = {
     rateSection: {
       ariaLabel: "Bereken je dagtarief",
       eyebrow: "Voor de opdracht",
-      heading: "En wat moet je dan vragen?",
-      body: "Dezelfde berekening, andersom. Zeg wat je wilt overhouden en hoeveel je realistisch kunt factureren, dan rekent Freelens uit welk dagtarief je daarvoor nodig hebt nadat belasting en kosten betaald zijn.",
+      heading: "Kijk wat je overhoudt, voordat je de offerte stuurt.",
+      body: "Je hebt een bedrag in gedachten voor deze klus. Freelens haalt het uit elkaar volgens de echte Nederlandse regels van {year}: wat de klus jou kost, hoeveel belasting eroverheen gaat en wat er echt van jou blijft.",
       youEnter: "Drie antwoorden, ongeveer een minuut",
-      youGet: "Een dagtarief op de echte Nederlandse regels van {year}",
+      youGet: "Wat er van je prijs overblijft, geen advies over je prijs",
       privacy: "Niets wordt opgeslagen, niets verlaat dit apparaat",
-      fullPage: "Open de volledige calculator",
+      fullPage: "Liever een dagtarief voor het jaar berekenen",
     },
     accuracy: {
       ariaLabel: "Nauwkeurigheid en beperkingen",
@@ -572,6 +572,65 @@ export const nl: DeepPartial<typeof en> = {
         jobCosts: "Kosten voor deze opdracht",
         tax: "Inkomstenbelasting en Zvw",
         yours: "Voor jou",
+      },
+
+      job: {
+        progressLabel: "Waar je bent",
+        stepOf: "Stap {n} van {total}",
+        announce: "Stap {n} van {total}. {question}",
+        back: "Terug",
+        next: "Volgende",
+        submit: "Laat zien wat ik overhoud",
+        whyAsk: "Waarom vragen we dit?",
+        optional: "Optioneel",
+
+        fee: {
+          question: "Wat wil je hiervoor vragen?",
+          helper: "Je prijs voor de hele klus, exclusief btw.",
+          fieldLabel: "Jouw prijs",
+          placeholder: "1800",
+          why: "Het bedrag dat je overweegt op de offerte te zetten. Freelens haalt het uit elkaar: wat de klus jou kost, hoeveel belasting erover gaat en wat er echt overblijft. Of het bedrag klopt voor het werk, daar zegt Freelens niets over.",
+          vatLabel: "btw die je erbovenop zet",
+          vatGroupLabel: "btw-tarief",
+          vatNote: "Komt op de factuur en gaat er weer vanaf. Het verandert nooit wat jij overhoudt.",
+          daysLabel: "Aantal werkdagen",
+          daysHelper: "Optioneel. Laat zien wat de klus per dag oplevert.",
+          daysPlaceholder: "2",
+        },
+        costs: {
+          question: "Wat kost deze klus jou?",
+          helper: "Reizen, een assistent, huur, licenties.",
+          fieldLabel: "Kosten voor deze klus",
+          placeholder: "bijv. 200",
+          why: "Geld dat direct weer weggaat aan deze klus. Het verlaagt je belasting, maar het gaat nog steeds van je prijs af voordat er iets van jou is. Leeglaten kan prima: dan dekt je prijs alleen je eigen tijd.",
+        },
+        profit: {
+          question: "Waar sta je dit jaar?",
+          helper: "Winst die je dit jaar al verwacht, zonder deze klus.",
+          fieldLabel: "Winst tot nu toe dit jaar",
+          placeholder: "0",
+          why: "De inkomstenbelasting wordt één keer per jaar berekend over oplopende schijven, dus dezelfde prijs is in januari meer waard dan in november. Dit bepaalt in welke schijf deze klus valt. Kent Freelens je cijfers al, dan staat het hier vast ingevuld.",
+          fromProfile: "Overgenomen uit je opgeslagen gegevens. Je kunt het hier aanpassen, alleen voor deze berekening.",
+        },
+
+        result: {
+          eyebrow: "Wat jij overhoudt",
+          ofFee: "van je prijs van {fee}",
+          summary: "Na {tax} aan inkomstenbelasting en Zvw{costsClause}.",
+          costsClause: " en {costs} aan kosten voor de klus",
+          invoice: "{gross} op de factuur, inclusief {vat} btw.",
+          perDay: "{rate} per dag over {days} dagen.",
+          keptShare: "Je houdt {pct}% over van wat je vraagt.",
+          firstJobWarning:
+            "Dit gaat ervan uit dat dit je eerste werk van het jaar is. Heb je dit jaar al verdiend, dan valt deze klus hoger belast uit en houd je minder over.",
+          fixFirstJob: "Vul in wat ik al verdiend heb",
+          notAdvice:
+            "Wat een prijs jou oplevert, geen oordeel of die prijs klopt. Freelens heeft geen mening over wat jouw markt betaalt.",
+          adjust: "Mijn antwoorden aanpassen",
+          breakdown: "Hoe dit is berekend",
+          toTool: "Kijken wat er echt van jou is",
+          toTarief: "Liever een dagtarief voor het jaar berekenen",
+        },
       },
 
       guided: {

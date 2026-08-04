@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Clock, Lock, Scale } from "lucide-react";
-import { GuidedRateCalculator } from "@/components/rate/guided-rate-calculator";
+import { JobQuoteFlow } from "@/components/rate/job-quote-flow";
 import { useRateProfile } from "@/components/rate/use-rate-profile";
 import { linkButtonClass } from "@/components/app/styles";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
@@ -24,11 +24,11 @@ const TAX_YEAR = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
 export function RateSection() {
   const t = useT();
   const s = t.home.rateSection;
-  const { profile } = useRateProfile();
+  const { profile, projectedProfit } = useRateProfile();
 
   const promises = [
     { icon: Clock, text: s.youEnter },
-    { icon: Scale, text: fill(s.youGet, { year: TAX_YEAR }) },
+    { icon: Scale, text: s.youGet },
     { icon: Lock, text: s.privacy },
   ];
 
@@ -48,7 +48,7 @@ export function RateSection() {
               {s.heading}
             </h2>
             <p className="max-w-xl text-lg leading-relaxed text-[var(--fl-slate)]">
-              {s.body}
+              {fill(s.body, { year: TAX_YEAR })}
             </p>
 
             {/* What they are signing up for, before they start. Icons carry the
@@ -74,7 +74,11 @@ export function RateSection() {
           </div>
 
           <div className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 shadow-sm sm:p-7">
-            <GuidedRateCalculator profile={profile} showTariefLink />
+            <JobQuoteFlow
+              profile={profile}
+              knownProjectedProfit={projectedProfit}
+              showTariefLink
+            />
           </div>
         </div>
       </div>

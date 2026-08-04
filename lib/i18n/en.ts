@@ -272,12 +272,12 @@ export const en = {
     rateSection: {
       ariaLabel: "Work out your day rate",
       eyebrow: "Before the job",
-      heading: "So what should you charge?",
-      body: "Same calculation, run backwards. Tell Freelens what you want to earn and how much you can realistically bill, and it works out the day rate that gets you there once tax and costs are paid.",
+      heading: "Before you send the quote, see what you'll keep.",
+      body: "You have a number in mind for this job. Freelens takes it apart on the real {year} Dutch rules: what the job costs you, what the tax on it comes to, and what actually stays with you.",
       youEnter: "Three answers, about a minute",
-      youGet: "A day rate on the real {year} Dutch rules",
+      youGet: "What's left of the fee, not what you should charge",
       privacy: "Nothing is saved, nothing leaves this device",
-      fullPage: "Open the full calculator",
+      fullPage: "Work out a day rate for the year instead",
     },
     accuracy: {
       ariaLabel: "Accuracy and limitations",
@@ -576,6 +576,71 @@ export const en = {
         jobCosts: "Job costs",
         tax: "Income tax and Zvw",
         yours: "Yours",
+      },
+
+      /**
+       * The per-job flow: I am thinking of quoting X, what is left?
+       *
+       * Named carefully. This does not recommend a price, it shows what a price
+       * you chose leaves you, so nothing here may say "what you should charge".
+       */
+      job: {
+        progressLabel: "Where you are",
+        stepOf: "Step {n} of {total}",
+        announce: "Step {n} of {total}. {question}",
+        back: "Back",
+        next: "Next",
+        submit: "Show what I keep",
+        whyAsk: "Why are we asking?",
+        optional: "Optional",
+
+        fee: {
+          question: "What are you thinking of charging?",
+          helper: "Your fee for the whole job, excluding btw.",
+          fieldLabel: "Your fee",
+          placeholder: "1800",
+          why: "The number you are considering putting on the quote. Freelens takes it apart: what the job costs you, what the tax on it comes to, and what is genuinely left. It has no view on whether the fee is right for the work.",
+          vatLabel: "btw you add on top",
+          vatGroupLabel: "btw rate",
+          vatNote: "Added to the invoice and passed straight on. It never changes what you keep.",
+          daysLabel: "Days of work",
+          daysHelper: "Optional. Gives you what the job pays per day.",
+          daysPlaceholder: "2",
+        },
+        costs: {
+          question: "What will this job cost you?",
+          helper: "Travel, an assistant, rental, licensing.",
+          fieldLabel: "Costs for this job",
+          placeholder: "e.g. 200",
+          why: "Money that goes straight back out on this job. It lowers your tax, but it still comes out of the fee before anything is yours. Leaving it blank is safe: it just means the fee covers nothing but your own time.",
+        },
+        profit: {
+          question: "Where are you in your year?",
+          helper: "Profit you already expect this year, before this job.",
+          fieldLabel: "Profit so far this year",
+          placeholder: "0",
+          why: "Dutch income tax is worked out once a year across rising brackets, so the same fee is worth more in January than in November. This is what decides which bracket this job lands in. If Freelens already knows your figures, it has filled this in.",
+          fromProfile: "Taken from your saved figures. Change it here for this calculation only.",
+        },
+
+        result: {
+          eyebrow: "What you keep",
+          ofFee: "of your {fee} fee",
+          summary: "After {tax} in income tax and Zvw{costsClause}.",
+          costsClause: ", and {costs} of costs for the job",
+          invoice: "{gross} on the invoice, including {vat} btw.",
+          perDay: "{rate} per day across {days} days.",
+          keptShare: "You keep {pct}% of what you charge.",
+          firstJobWarning:
+            "This assumes this is your first work of the year. If you have already earned, this job is taxed higher and you keep less.",
+          fixFirstJob: "Add what I have earned",
+          notAdvice:
+            "What a fee leaves you, not a view on whether the fee is right. Freelens has no opinion on what your market pays.",
+          adjust: "Change my answers",
+          breakdown: "How this was worked out",
+          toTool: "See what's actually mine",
+          toTarief: "Work out a day rate for the year instead",
+        },
       },
 
       guided: {
