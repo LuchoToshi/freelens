@@ -118,8 +118,8 @@ export const en = {
     },
     problem: {
       eyebrow: "The real problem",
-      heading: "Your bank balance is not your salary.",
-      body: "A balance tells you how much money exists. It doesn't tell you what's actually available to pay yourself.",
+      heading: "The number you see is never the number you keep.",
+      body: "A fee on a quote and a balance in your account have the same problem. Both are gross. btw, tax and the cost of doing the work still come out, and neither figure tells you what is actually yours.",
       claims: {
         vat: "What may be needed for VAT",
         tax: "What belongs to the tax authority",
@@ -127,15 +127,19 @@ export const en = {
         buffer: "What should stay as a buffer",
       },
       closing:
-        "Freelens turns an irregular payment into a clear allocation plan, so you know what to do with money the moment it lands.",
+        "Freelens does the same subtraction at both ends: before you name a price, and after the money lands.",
       demoLabel: "A {amount} payment",
       demoYours: "{amount} yours",
     },
     howItWorks: {
       eyebrow: "How it works",
-      heading: "Every payment, given a job.",
-      body: "Overview, Money arrived, Weekly check-in, and Check a decision aren't four separate tools. They're one loop: a payment lands and you give it a job, you glance at your position each week, and you test any big spend against it. Every new payment is a new decision.",
+      heading: "Before you quote, and after you're paid.",
+      body: "One calculation, run in both directions. Before the job it tells you what a fee survives. After the payment it gives every euro a job. And what you counted before decides which bracket the next job lands in, so the two ends are not separate tools.",
       steps: {
+        beforeQuote: {
+          title: "Before you quote",
+          body: "Put in the fee you're considering. Freelens takes out what the job costs you and the tax it triggers, across the real brackets, so you see what survives before you send it.",
+        },
         moneyArrives: {
           title: "Money arrives",
           body: "Enter a payment. Freelens separates the VAT, sets aside an income tax and Zvw reserve, and protects your business costs, so what's left is genuinely available to pay yourself.",

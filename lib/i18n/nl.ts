@@ -124,8 +124,8 @@ export const nl: DeepPartial<typeof en> = {
     },
     problem: {
       eyebrow: "Het echte probleem",
-      heading: "Je banksaldo is niet je salaris.",
-      body: "Een saldo vertelt je hoeveel geld er staat. Het vertelt je niet wat je jezelf daadwerkelijk kunt uitbetalen.",
+      heading: "Het bedrag dat je ziet is nooit het bedrag dat je houdt.",
+      body: "Een bedrag op een offerte en een saldo op je rekening hebben hetzelfde probleem. Allebei bruto. Btw, belasting en de kosten van het werk gaan er nog af, en geen van beide zegt wat er echt van jou is.",
       claims: {
         vat: "Wat je mogelijk nodig hebt voor de btw",
         tax: "Wat van de Belastingdienst is",
@@ -133,15 +133,19 @@ export const nl: DeepPartial<typeof en> = {
         buffer: "Wat als buffer moet blijven staan",
       },
       closing:
-        "Freelens maakt van een onregelmatige betaling een helder verdeelplan, zodat je weet wat je met geld doet op het moment dat het binnenkomt.",
+        "Freelens doet dezelfde aftreksom aan beide kanten: voordat je een prijs noemt, en nadat het geld binnen is.",
       demoLabel: "Een betaling van {amount}",
       demoYours: "{amount} voor jou",
     },
     howItWorks: {
       eyebrow: "Hoe het werkt",
-      heading: "Elke betaling krijgt een taak.",
-      body: "Overzicht, Geld binnen, Wekelijkse check-in en Beslissing checken zijn geen vier losse tools. Het is één cyclus: er komt een betaling binnen en jij geeft die een taak, je kijkt wekelijks even naar je positie, en je toetst elke grote uitgave daaraan. Elke nieuwe betaling is een nieuwe beslissing.",
+      heading: "Voordat je offreert, en nadat je betaald krijgt.",
+      body: "Eén berekening, in twee richtingen. Voor de klus zie je wat er van een bedrag overblijft. Na de betaling krijgt elke euro een taak. En wat je eerder meetelde bepaalt in welke schijf de volgende klus valt, dus het zijn geen twee losse tools.",
       steps: {
+        beforeQuote: {
+          title: "Voordat je offreert",
+          body: "Vul het bedrag in dat je overweegt. Freelens haalt eraf wat de klus jou kost en de belasting die eroverheen gaat, volgens de echte schijven, zodat je ziet wat er overblijft voordat je hem verstuurt.",
+        },
         moneyArrives: {
           title: "Er komt geld binnen",
           body: "Vul een betaling in. Freelens haalt de btw eruit, zet een reservering opzij voor inkomstenbelasting en Zvw, en beschermt je bedrijfskosten, zodat wat overblijft ook echt beschikbaar is om jezelf uit te betalen.",

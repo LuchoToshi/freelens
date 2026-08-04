@@ -4,6 +4,8 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Check, Lock } from "lucide-react";
 import { AllocationBar } from "@/components/app/allocation-bar";
 import { formatEuro, toCents } from "@/lib/domain/money";
+import { outcomeForJobFee } from "@/lib/tax/jobOutcome";
+import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
 
@@ -12,11 +14,44 @@ const variants: Variants = {
   visible: { opacity: 1, y: 0 },
 };
 
-type VisualKind = "allocate" | "runway" | "decision" | "locked";
+type VisualKind = "quote" | "allocate" | "runway" | "decision" | "locked";
+
+/**
+ * The quote illustration, computed rather than written down.
+ *
+ * Same fee and same starting position as the calculator further up the page,
+ * so the two never disagree. A hardcoded pair of figures here would drift the
+ * first time a rate or a deduction changed, and it would drift silently.
+ */
+const QUOTE_DEMO_FEE = 1_800;
+const QUOTE_DEMO_PROFIT = 40_000;
 
 export function HowItWorksSection() {
   const reduce = useReducedMotion();
   const t = useT();
+
+  const quote = outcomeForJobFee({
+    taxYear: latestProfileYear(DEFAULT_COUNTRY) ?? 0,
+    country: DEFAULT_COUNTRY,
+    feeExVat: QUOTE_DEMO_FEE,
+    currentProjectedProfit: QUOTE_DEMO_PROFIT,
+    vatRate: 21,
+    meetsHoursCriterion: false,
+    isStarter: false,
+  });
+
+  const quoteDemo = [
+    {
+      label: t.rate.segments.tax,
+      cents: quote.additionalLiability,
+      color: "var(--fl-reserve-fill)",
+    },
+    {
+      label: t.rate.segments.yours,
+      cents: quote.takeHome,
+      color: "var(--fl-payout-fill)",
+    },
+  ];
 
   const demo = [
     { label: t.app.allocation.vat, cents: toCents(434), color: "var(--fl-vat-fill)" },
@@ -31,6 +66,13 @@ export function HowItWorksSection() {
     tint: string;
     visual: VisualKind;
   }[] = [
+    {
+      title: t.home.howItWorks.steps.beforeQuote.title,
+      body: t.home.howItWorks.steps.beforeQuote.body,
+      accent: "var(--fl-payout-fill)",
+      tint: "var(--fl-payout-tint)",
+      visual: "quote",
+    },
     {
       title: t.home.howItWorks.steps.moneyArrives.title,
       body: t.home.howItWorks.steps.moneyArrives.body,
@@ -104,7 +146,7 @@ export function HowItWorksSection() {
                 }`}
                 style={{ backgroundColor: s.tint }}
               >
-                <SceneVisual kind={s.visual} accent={s.accent} demo={demo} />
+                <SceneVisual kind={s.visual} accent={s.accent} demo={demo} quoteDemo={quoteDemo} />
               </div>
             </motion.div>
           ))}
@@ -118,13 +160,26 @@ function SceneVisual({
   kind,
   accent,
   demo,
+  quoteDemo,
 }: {
   kind: VisualKind;
   accent: string;
   demo: { label: string; cents: ReturnType<typeof toCents>; color: string }[];
+  quoteDemo: { label: string; cents: ReturnType<typeof toCents>; color: string }[];
 }) {
   const t = useT();
 
+  if (kind === "quote") {
+    return (
+      <div className="w-full max-w-sm">
+        <AllocationBar
+          segments={quoteDemo}
+          interactive={false}
+          caption={t.rate.quoteCaption}
+        />
+      </div>
+    );
+  }
   if (kind === "allocate") {
     return (
       <div className="w-full max-w-sm">
