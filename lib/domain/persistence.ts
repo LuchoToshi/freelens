@@ -17,6 +17,7 @@ import {
   sanitizePaymentHistory,
   type PaymentRecord,
 } from "@/lib/domain/paymentHistory";
+import { sanitizeJobs, type JobRecord } from "@/lib/domain/jobs";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import type { WeeklyPositionInput } from "@/lib/domain/allocation";
 import type { VatTreatment } from "@/lib/domain/vat";
@@ -89,6 +90,15 @@ export interface AppState {
    * not by deletion.
    */
   paymentHistory: PaymentRecord[];
+  /**
+   * Quotes and jobs, from the price named to the money received.
+   *
+   * A paid job carries the id of the payment record it produced, so the two are
+   * one chain rather than two lists that happen to agree. Every existing
+   * reserve, year-total and weekly-position calculation still reads
+   * `paymentHistory` and is unaffected by this field.
+   */
+  jobs: JobRecord[];
 }
 
 /**
@@ -126,6 +136,7 @@ export function emptyAppState(): AppState {
     weeklyPosition: null,
     migrationNotice: null,
     paymentHistory: [],
+    jobs: [],
   };
 }
 
@@ -235,6 +246,8 @@ export interface LoadResult {
   discardedPaymentRecords: number;
   /** True when a stored check-in was unreadable and had to be dropped. */
   discardedWeeklyPosition: boolean;
+  /** How many saved jobs were unreadable and dropped. */
+  discardedJobs: number;
 }
 
 export function loadAppState(
@@ -248,6 +261,7 @@ export function loadAppState(
       storageAvailable: false,
       discardedPaymentRecords: 0,
       discardedWeeklyPosition: false,
+      discardedJobs: 0,
     };
   }
 
@@ -264,12 +278,16 @@ export function loadAppState(
         const weekly = sanitizeWeeklyPosition(
           (parsed as { weeklyPosition?: unknown }).weeklyPosition
         );
+        // Absent for anyone who saved state before jobs existed, which is the
+        // common case rather than an error: an empty list is the right answer.
+        const jobs = sanitizeJobs((parsed as { jobs?: unknown }).jobs);
         return {
           state: {
             ...parsed,
             setup: normalizeSetup(parsed.setup),
             weeklyPosition: weekly,
             paymentHistory: history.records,
+            jobs: jobs.jobs,
           },
           recovered: false,
           migrated: false,
@@ -277,6 +295,7 @@ export function loadAppState(
           discardedPaymentRecords: history.discarded,
           discardedWeeklyPosition:
             parsed.weeklyPosition !== null && weekly === null,
+          discardedJobs: jobs.discarded,
         };
       }
       // Present but wrong shape → discard, don't throw.
@@ -287,6 +306,7 @@ export function loadAppState(
         storageAvailable: true,
         discardedPaymentRecords: 0,
         discardedWeeklyPosition: false,
+        discardedJobs: 0,
       };
     } catch {
       // Corrupt JSON → recover with a fresh state.
@@ -297,6 +317,7 @@ export function loadAppState(
         storageAvailable: true,
         discardedPaymentRecords: 0,
         discardedWeeklyPosition: false,
+        discardedJobs: 0,
       };
     }
   }
@@ -311,6 +332,7 @@ export function loadAppState(
       storageAvailable: true,
       discardedPaymentRecords: 0,
       discardedWeeklyPosition: false,
+      discardedJobs: 0,
     };
   }
   return {
@@ -320,6 +342,7 @@ export function loadAppState(
     storageAvailable: true,
     discardedPaymentRecords: 0,
     discardedWeeklyPosition: false,
+    discardedJobs: 0,
   };
 }
 
@@ -330,7 +353,8 @@ function isEmptyAppState(state: AppState): boolean {
     state.lastAllocation === null &&
     state.weeklyPosition === null &&
     state.migrationNotice === null &&
-    state.paymentHistory.length === 0
+    state.paymentHistory.length === 0 &&
+    state.jobs.length === 0
   );
 }
 
@@ -424,6 +448,7 @@ export function migrateFromV1(storage: StorageLike): AppState | null {
     // A v1 install predates payment history entirely, so there is nothing to
     // carry over. The year starts empty, which is the honest state.
     paymentHistory: [],
+    jobs: [],
     weeklyPosition:
       balance !== null || monthlyCosts !== null
         ? { input: weeklyInput, timestampIso: new Date().toISOString() }

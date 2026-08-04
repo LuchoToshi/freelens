@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { createJob } from "@/lib/domain/jobs";
 import { toCents } from "./money";
 import {
   APP_STATE_STORAGE_KEY,
@@ -347,5 +348,78 @@ describe("a damaged check-in does not take the app down", () => {
     const loaded = loadAppState(storage);
     expect(loaded.state.weeklyPosition).toEqual(state.weeklyPosition);
     expect(loaded.discardedWeeklyPosition).toBe(false);
+  });
+});
+
+describe("jobs in stored state", () => {
+  it("gives an empty list to state saved before jobs existed", () => {
+    // The common case, not an error: nobody's saved state has this field yet.
+    const storage = memoryStorage();
+    const legacy = { ...emptyAppState() } as Record<string, unknown>;
+    delete legacy.jobs;
+    storage.setItem(APP_STATE_STORAGE_KEY, JSON.stringify({ ...legacy, setup: null }));
+
+    const loaded = loadAppState(storage);
+    expect(loaded.state.jobs).toEqual([]);
+    expect(loaded.discardedJobs).toBe(0);
+    expect(loaded.recovered).toBe(false);
+  });
+
+  it("round-trips a saved job", () => {
+    const storage = memoryStorage();
+    const job = createJob({
+      client: "Studio Noord",
+      feeExVatCents: toCents(1_800),
+      jobCostsCents: toCents(0),
+      vatRate: 21,
+      quotedTakeHomeCents: toCents(1_100),
+      quotedTaxCents: toCents(700),
+      quotedConfigVersion: "nl-2026.1",
+      createdAt: "2026-03-01",
+    });
+
+    saveAppState({ ...emptyAppState(), jobs: [job] }, storage);
+    expect(loadAppState(storage).state.jobs).toEqual([job]);
+  });
+
+  it("drops one damaged job and reports it, keeping the rest", () => {
+    const storage = memoryStorage();
+    const job = createJob({
+      client: "A",
+      feeExVatCents: toCents(1_000),
+      jobCostsCents: toCents(0),
+      vatRate: 21,
+      quotedTakeHomeCents: toCents(600),
+      quotedTaxCents: toCents(400),
+      quotedConfigVersion: "nl-2026.1",
+      createdAt: "2026-03-01",
+    });
+    storage.setItem(
+      APP_STATE_STORAGE_KEY,
+      JSON.stringify({ ...emptyAppState(), jobs: [job, { id: "broken" }] })
+    );
+
+    const loaded = loadAppState(storage);
+    expect(loaded.state.jobs).toHaveLength(1);
+    expect(loaded.discardedJobs).toBe(1);
+  });
+
+  it("counts a lone job as data worth keeping", () => {
+    // Otherwise saving a first quote and reloading would lose it: saveAppState
+    // deletes the key when it thinks the state is empty.
+    const storage = memoryStorage();
+    const job = createJob({
+      client: "A",
+      feeExVatCents: toCents(1_000),
+      jobCostsCents: toCents(0),
+      vatRate: 21,
+      quotedTakeHomeCents: toCents(600),
+      quotedTaxCents: toCents(400),
+      quotedConfigVersion: "nl-2026.1",
+      createdAt: "2026-03-01",
+    });
+
+    saveAppState({ ...emptyAppState(), jobs: [job] }, storage);
+    expect(storage.getItem(APP_STATE_STORAGE_KEY)).not.toBeNull();
   });
 });
