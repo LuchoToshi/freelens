@@ -277,7 +277,7 @@ export const nl: DeepPartial<typeof en> = {
       body: "Je hebt een bedrag in gedachten voor deze klus. Freelens haalt het uit elkaar volgens de echte Nederlandse regels van {year}: wat de klus jou kost, hoeveel belasting eroverheen gaat en wat er echt van jou blijft.",
       youEnter: "Drie antwoorden, ongeveer een minuut",
       youGet: "Wat er van je prijs overblijft, geen advies over je prijs",
-      privacy: "Niets wordt opgeslagen, niets verlaat dit apparaat",
+      privacy: "Je cijfers blijven op dit apparaat",
       fullPage: "Liever een dagtarief voor het jaar berekenen",
     },
     accuracy: {

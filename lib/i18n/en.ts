@@ -276,7 +276,7 @@ export const en = {
       body: "You have a number in mind for this job. Freelens takes it apart on the real {year} Dutch rules: what the job costs you, what the tax on it comes to, and what actually stays with you.",
       youEnter: "Three answers, about a minute",
       youGet: "What's left of the fee, not what you should charge",
-      privacy: "Nothing is saved, nothing leaves this device",
+      privacy: "Your numbers stay on this device",
       fullPage: "Work out a day rate for the year instead",
     },
     accuracy: {

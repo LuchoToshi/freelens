@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { Analytics } from "@vercel/analytics/next";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { en } from "@/lib/i18n/en";
 import "./globals.css";
@@ -47,6 +48,10 @@ export default function RootLayout({
           {children}
           <SiteFooter />
         </LocaleProvider>
+        {/* Cookieless, and every event this app sends is a bare name: see
+            lib/analytics.ts, where `track` has no second parameter. No figure
+            a user types can reach it. */}
+        <Analytics />
       </body>
     </html>
   );
