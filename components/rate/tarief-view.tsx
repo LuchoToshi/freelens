@@ -9,7 +9,8 @@ import { CurrencyField } from "@/components/app/fields";
 import { AllocationBar } from "@/components/app/allocation-bar";
 import { AnimatedAmount } from "@/components/design/animated-amount";
 import { DisclaimerNote } from "@/components/disclaimer-note";
-import { useAppState } from "@/components/app/use-app-state";
+import { useRateProfile } from "@/components/rate/use-rate-profile";
+import { GuidedRateCalculator } from "@/components/rate/guided-rate-calculator";
 import {
   cardClass,
   hintClass,
@@ -31,7 +32,6 @@ import {
 } from "@/lib/tax/flatRuleEvidence";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { quoteForTargetNet } from "@/lib/tax/quote";
-import { rateForTargetAnnualNet } from "@/lib/tax/rate";
 import type { BreakdownLine } from "@/lib/tax/types";
 import { useDocumentTitle, useLocale, useT } from "@/components/i18n/locale-provider";
 import {
@@ -65,29 +65,9 @@ export function TariefView() {
   const t = useT();
   useDocumentTitle(t.meta.tarief.title, t.meta.tarief.description);
   const [mode, setMode] = useState<Mode>("year");
-  const { state, hydrated } = useAppState();
-
-  const guided =
-    state.setup?.reserveMethod.mode === "guided-estimate"
-      ? state.setup.reserveMethod
-      : null;
-
-  const profile = {
-    meetsHoursCriterion: guided?.meetsHoursCriterion ?? false,
-    isStarter: guided?.isStarter ?? false,
-    otherIncome: fromCents(guided?.otherIncomeCents ?? asCentsUnsafe(0)),
-    otherIncomeTaxWithheld: fromCents(
-      guided?.otherIncomeTaxWithheldCents ?? asCentsUnsafe(0)
-    ),
-    projectedProfit: guided
-      ? fromCents(
-          asCentsUnsafe(
-            guided.expectedAnnualRevenueExVatCents -
-              guided.expectedDeductibleCostsExVatCents
-          )
-        )
-      : 0,
-  };
+  // Read only. This page explores rates; it never edits the saved profile.
+  const { profile: saved, projectedProfit, hydrated } = useRateProfile();
+  const profile = { ...saved, projectedProfit };
 
   return (
     <div className="flex flex-col gap-8">
@@ -101,28 +81,25 @@ export function TariefView() {
         <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
           {t.rate.floor}
         </p>
-        <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
-          {t.rate.marketNote}
-        </p>
       </header>
-
-      <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">
-        {fill(t.rate.framing, { year: TAX_YEAR })}
-      </p>
 
       <ModeTabs mode={mode} onChange={setMode} />
 
       {mode === "year" ? (
-        <YearRateMode profile={profile} hydrated={hydrated} />
+        <div className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-7">
+          <GuidedRateCalculator profile={profile} />
+        </div>
       ) : (
         <JobQuoteMode profile={profile} hydrated={hydrated} />
       )}
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-6">
-        <h2 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
+      {/* Why this calculator can exist at all. Below the tool, not above it:
+          the reader came to price something, not to read an argument. */}
+      <details className="rounded-2xl border border-[var(--fl-line)] bg-white p-6">
+        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center font-serif text-lg font-medium text-[var(--fl-ink)]">
           {t.rate.flatRuleHeading}
-        </h2>
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+        </summary>
+        <p className="mt-3 max-w-prose text-sm leading-relaxed text-[var(--fl-slate)]">
           {fill(t.rate.flatRuleBody, {
             revenue: formatEuro(HIGH_COST_CASE.revenue),
             costs: formatEuro(HIGH_COST_CASE.costs),
@@ -132,10 +109,13 @@ export function TariefView() {
             shortfall: formatEuroExact(flatRuleError(HIGH_EARNER_CASE)),
           })}
         </p>
-        <Link href="/accuracy#flat-rule" className={`${linkButtonClass} w-fit`}>
+        <Link
+          href="/accuracy#flat-rule"
+          className={`${linkButtonClass} mt-3 w-fit`}
+        >
           {t.rate.flatRuleLink}
         </Link>
-      </div>
+      </details>
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] px-6 py-5">
         <span className="text-sm text-[var(--fl-slate)]">
@@ -161,157 +141,6 @@ interface Profile {
   otherIncome: number;
   otherIncomeTaxWithheld: number;
   projectedProfit: number;
-}
-
-// ---------------------------------------------------------------------------
-// Mode 2: what should my rate be
-// ---------------------------------------------------------------------------
-
-const DEFAULT_TARGET_NET = 40_000;
-const DEFAULT_BILLABLE_DAYS = 140;
-
-/**
- * The hopeful figure freelancers price against: roughly a working year minus
- * holidays, and nothing else. Used only to show what assuming it costs.
- */
-const OPTIMISTIC_DAYS = 220;
-
-function YearRateMode({ profile, hydrated }: { profile: Profile; hydrated: boolean }) {
-  const t = useT();
-  const [targetNet, setTargetNet] = useState(DEFAULT_TARGET_NET);
-  const [billableDays, setBillableDays] = useState(DEFAULT_BILLABLE_DAYS);
-  const [costs, setCosts] = useState("");
-
-  const costsCents = parseAmountInput(costs).cents ?? asCentsUnsafe(0);
-
-  const shared = {
-    taxYear: TAX_YEAR,
-    country: DEFAULT_COUNTRY,
-    targetAnnualNet: targetNet,
-    annualBusinessCosts: fromCents(costsCents),
-    meetsHoursCriterion: profile.meetsHoursCriterion,
-    isStarter: profile.isStarter,
-    otherIncome: profile.otherIncome,
-    otherIncomeTaxWithheld: profile.otherIncomeTaxWithheld,
-  };
-
-  const result = rateForTargetAnnualNet({
-    ...shared,
-    billableUnitsPerYear: billableDays,
-  });
-
-  // The same year priced for a hopeful number of days, used to show what the
-  // optimism costs. Skipped once the reader is already at or above it, so it
-  // never nags someone who genuinely bills that much.
-  const optimistic =
-    billableDays < OPTIMISTIC_DAYS
-      ? rateForTargetAnnualNet({ ...shared, billableUnitsPerYear: OPTIMISTIC_DAYS })
-      : null;
-
-  return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
-      <Card className={cardClass}>
-        <CardContent className="flex flex-col gap-7 p-6">
-          <RangeField
-            id="target-net"
-            label={t.rate.targetLabel}
-            hint={t.rate.targetHint}
-            value={targetNet}
-            onChange={setTargetNet}
-            min={10_000}
-            max={150_000}
-            step={1_000}
-            display={formatEuro(asCentsUnsafe(targetNet * 100))}
-          />
-
-          <RangeField
-            id="billable-days"
-            label={t.rate.daysLabel}
-            hint={t.rate.daysHint}
-            value={billableDays}
-            onChange={setBillableDays}
-            min={20}
-            max={260}
-            step={5}
-            display={fill(t.rate.daysValue, { days: billableDays })}
-          />
-
-          <OptimismCost
-            honestRevenue={result.requiredGrossRevenue}
-            billableDays={billableDays}
-            optimisticRate={optimistic?.requiredRatePerUnit ?? null}
-          />
-
-          <CurrencyField
-            id="annual-costs"
-            label={t.rate.costsLabel}
-            hint={t.rate.costsHint}
-            placeholder={t.rate.costsPlaceholder}
-            leadingSymbol="€"
-            value={costs}
-            onChange={setCosts}
-          />
-
-          <ProfileNote profile={profile} hydrated={hydrated} />
-        </CardContent>
-      </Card>
-
-      <div className="lg:sticky lg:top-24">
-        <Card className={stageCardClass}>
-          <CardContent className="flex flex-col gap-5 p-6">
-            <div className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-[var(--fl-slate)]">
-                {t.rate.dayRate}
-              </span>
-              <AnimatedAmount
-                cents={result.requiredRatePerUnit}
-                className="font-serif text-4xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-5xl"
-              />
-              <span className={hintClass}>
-                {fill(t.rate.dayRateNote, {
-                  days: billableDays,
-                  revenue: formatEuro(result.requiredGrossRevenue),
-                })}
-              </span>
-            </div>
-
-            <AllocationBar
-              caption={t.rate.rateCaption}
-              segments={[
-                result.annualBusinessCosts > 0
-                  ? {
-                      label: "Business costs",
-                      cents: result.annualBusinessCosts,
-                      color: "var(--fl-costs-fill)",
-                    }
-                  : null,
-                {
-                  label: "Income tax and Zvw",
-                  cents: result.totalTaxLiability,
-                  color: "var(--fl-reserve-fill)",
-                },
-                {
-                  label: "Yours",
-                  cents: result.takeHome,
-                  color: "var(--fl-payout-fill)",
-                },
-              ].filter((s): s is NonNullable<typeof s> => s !== null)}
-            />
-
-            <BreakdownList lines={result.breakdown} highlightId="rate-take-home" />
-
-            <p className={hintClass}>
-              {fill(t.rate.effectiveRate, {
-                pct: (result.effectiveRate * 100).toFixed(1),
-              })}
-            </p>
-
-            <Assumptions lines={result.assumptions} />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
 }
 
 // ---------------------------------------------------------------------------
@@ -445,18 +274,18 @@ function JobQuoteMode({ profile, hydrated }: { profile: Profile; hydrated: boole
                 segments={[
                   quote.jobCosts > 0
                     ? {
-                        label: "Job costs",
+                        label: t.rate.segments.jobCosts,
                         cents: quote.jobCosts,
                         color: "var(--fl-costs-fill)",
                       }
                     : null,
                   {
-                    label: "Income tax and Zvw",
+                    label: t.rate.segments.tax,
                     cents: quote.additionalLiability,
                     color: "var(--fl-reserve-fill)",
                   },
                   {
-                    label: "Yours",
+                    label: t.rate.segments.yours,
                     cents: quote.takeHome,
                     color: "var(--fl-payout-fill)",
                   },
@@ -563,92 +392,6 @@ function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void 
           </span>
         </button>
       ))}
-    </div>
-  );
-}
-
-/**
- * What planning for more days than you bill actually costs, in euros.
- *
- * Computed rather than written down. A fixed sentence would be wrong for anyone
- * who has claimed a deduction or moved either slider, and this is the number
- * the whole page turns on: underpricing is almost never a maths error, it is an
- * optimistic day count nobody ever revisits.
- */
-function OptimismCost({
-  honestRevenue,
-  billableDays,
-  optimisticRate,
-}: {
-  honestRevenue: Cents;
-  billableDays: number;
-  optimisticRate: Cents | null;
-}) {
-  const t = useT();
-  if (optimisticRate === null) return null;
-
-  const earned = asCentsUnsafe(optimisticRate * billableDays);
-  const shortfall = asCentsUnsafe(honestRevenue - earned);
-  if (shortfall <= 0) return null;
-  const share = Math.round((shortfall / honestRevenue) * 100);
-
-  return (
-    <p className="-mt-3 rounded-lg border border-dashed border-[var(--fl-line)] p-3 text-xs leading-relaxed text-[var(--fl-slate)]">
-      {fill(t.rate.optimism, {
-        optimistic: OPTIMISTIC_DAYS,
-        actual: billableDays,
-        rate: formatEuro(optimisticRate),
-        earned: formatEuro(earned),
-        needed: formatEuro(honestRevenue),
-        short: formatEuro(shortfall),
-        pct: share,
-      })}
-    </p>
-  );
-}
-
-function RangeField({
-  id,
-  label,
-  hint,
-  value,
-  onChange,
-  min,
-  max,
-  step,
-  display,
-}: {
-  id: string;
-  label: string;
-  hint: string;
-  value: number;
-  onChange: (v: number) => void;
-  min: number;
-  max: number;
-  step: number;
-  display: string;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between gap-3">
-        <Label className={labelClass} htmlFor={id}>
-          {label}
-        </Label>
-        <span className="fl-tnum shrink-0 font-serif text-xl font-medium text-[var(--fl-ink)]">
-          {display}
-        </span>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="h-11 w-full accent-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
-      />
-      <p className={hintClass}>{hint}</p>
     </div>
   );
 }

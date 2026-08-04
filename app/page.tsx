@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HeroSection } from "@/components/home/hero-section";
 import { ProblemSection } from "@/components/home/problem-section";
 import { HowItWorksSection } from "@/components/home/how-it-works-section";
+import { RateSection } from "@/components/home/rate-section";
 import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
 import { FinalCtaSection } from "@/components/home/final-cta-section";
@@ -20,6 +21,10 @@ export default function Home() {
       <PositioningStrip />
       <ProblemSection />
       <HowItWorksSection />
+      {/* The hinge: everything above is after the payment, this is before the
+          job. Placed here because the reader has just finished the loop and
+          the next question forms on its own. */}
+      <RateSection />
       <SocialProofSection />
       <PrivacySection />
       <AccuracySection />

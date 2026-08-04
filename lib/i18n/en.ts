@@ -264,6 +264,21 @@ export const en = {
       lead: "The decision layer between your bank account and your bookkeeping.",
       body: "Your banking and bookkeeping already show what exists and what happened. Freelens turns that into what you can safely do next. It complements your tools, it doesn't replace them.",
     },
+    /**
+     * The hinge from "what is mine after the payment" to "what do I charge
+     * before the job". Placed where the reader has just understood the loop,
+     * because that is the point the next question forms on its own.
+     */
+    rateSection: {
+      ariaLabel: "Work out your day rate",
+      eyebrow: "Before the job",
+      heading: "So what should you charge?",
+      body: "Same calculation, run backwards. Tell Freelens what you want to earn and how much you can realistically bill, and it works out the day rate that gets you there once tax and costs are paid.",
+      youEnter: "Three answers, about a minute",
+      youGet: "A day rate on the real {year} Dutch rules",
+      privacy: "Nothing is saved, nothing leaves this device",
+      fullPage: "Open the full calculator",
+    },
     accuracy: {
       ariaLabel: "Accuracy and limitations",
       eyebrow: "Accuracy",
@@ -484,10 +499,6 @@ export const en = {
       heading: "What do you need to charge?",
       floor:
         "This is what you need to charge, not what you can charge. It is your floor: below it the work does not pay for itself once tax and costs are out.",
-      marketNote:
-        "What the market will pay is a different question. Freelens has no view on it, and will never pretend to.",
-      framing:
-        "Most rate calculators apply one flat percentage. Freelens runs the real {year} brackets, deductions and credits, which is why the answer changes depending on where you already are in your year.",
       tabsLabel: "What are you pricing?",
       tabs: {
         year: { label: "My rate for the year", sub: "Set a day rate" },
@@ -553,6 +564,63 @@ export const en = {
       profileStarter: "your first years in business",
       profileSalary: "a salary alongside this",
       changeDetails: "Change your details",
+
+      /**
+       * The guided flow. Deliberately short: every line here is read by someone
+       * who has not decided yet whether this is worth their time. Anything that
+       * explains rather than asks belongs behind `whyAsk`.
+       */
+      /** Allocation-bar labels. Hardcoding these left English on Dutch screens. */
+      segments: {
+        annualCosts: "Business costs",
+        jobCosts: "Job costs",
+        tax: "Income tax and Zvw",
+        yours: "Yours",
+      },
+
+      guided: {
+        progressLabel: "Where you are",
+        stepOf: "Step {n} of {total}",
+        announce: "Step {n} of {total}. {question}",
+        back: "Back",
+        next: "Next",
+        submit: "Show my rate",
+        whyAsk: "Why are we asking?",
+        optional: "Optional",
+
+        target: {
+          question: "What do you want to earn?",
+          helper: "Take-home for the year, after tax.",
+          why: "This is the number you actually live on, not what you invoice. Freelens starts here and works backwards through the real brackets, deductions and credits to find the revenue that leaves you this much.",
+        },
+        days: {
+          question: "How many days will you bill?",
+          helper: "Billable days, not working days.",
+          why: "A year has about 260 working days. Almost nobody bills them. Holidays, sick days, admin, chasing work and quiet weeks all come out first. This is the number most rates get wrong, and it is why the same target income needs a very different day rate.",
+        },
+        costs: {
+          question: "What does the business cost you?",
+          helper: "Software, insurance, gear, workspace, your accountant.",
+          // Not a repeat of the question: the heading asks what, this says per what.
+          fieldLabel: "Per year",
+          placeholder: "e.g. 6000",
+          why: "Costs lower your tax, but you still have to earn them before anything is yours. Leaving this blank is safe: it just means the rate covers nothing but your own time.",
+        },
+
+        result: {
+          eyebrow: "Your floor",
+          perDay: "per day, excluding btw",
+          summary:
+            "{days} billable days at this rate is {revenue} of revenue across the year, of which {take} ends up yours.",
+          notMarket:
+            "This is what the work has to earn to pay for itself. What your market will pay is a separate question, and Freelens has no view on it.",
+          estimate: "A planning estimate from the figures you entered, not a fixed rule.",
+          adjust: "Adjust my answers",
+          breakdown: "How this was worked out",
+          toTool: "See what's actually mine",
+          toTarief: "Price one specific project instead",
+        },
+      },
     },
   app: {
     overview: {

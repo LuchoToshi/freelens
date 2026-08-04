@@ -270,6 +270,16 @@ export const nl: DeepPartial<typeof en> = {
       lead: "De laag tussen je bankrekening en je boekhouding waarin je beslist.",
       body: "Je bank en je boekhouding laten al zien wat er staat en wat er gebeurd is. Freelens vertaalt dat naar wat je nu veilig kunt doen. Het vult je tools aan, het vervangt ze niet.",
     },
+    rateSection: {
+      ariaLabel: "Bereken je dagtarief",
+      eyebrow: "Voor de opdracht",
+      heading: "En wat moet je dan vragen?",
+      body: "Dezelfde berekening, andersom. Zeg wat je wilt overhouden en hoeveel je realistisch kunt factureren, dan rekent Freelens uit welk dagtarief je daarvoor nodig hebt nadat belasting en kosten betaald zijn.",
+      youEnter: "Drie antwoorden, ongeveer een minuut",
+      youGet: "Een dagtarief op de echte Nederlandse regels van {year}",
+      privacy: "Niets wordt opgeslagen, niets verlaat dit apparaat",
+      fullPage: "Open de volledige calculator",
+    },
     accuracy: {
       ariaLabel: "Nauwkeurigheid en beperkingen",
       eyebrow: "Nauwkeurigheid",
@@ -490,10 +500,6 @@ export const nl: DeepPartial<typeof en> = {
       heading: "Wat moet je vragen?",
       floor:
         "Dit is wat je moet vragen, niet wat je kunt vragen. Het is je ondergrens: daaronder verdient het werk zichzelf niet terug zodra belasting en kosten eraf zijn.",
-      marketNote:
-        "Wat de markt betaalt is een andere vraag. Freelens heeft daar geen oordeel over en zal ook nooit doen alsof.",
-      framing:
-        "De meeste tariefcalculators rekenen met één vast percentage. Freelens gebruikt de echte schijven, aftrekposten en heffingskortingen van {year}, en daarom verandert het antwoord afhankelijk van waar je al staat in je jaar.",
       tabsLabel: "Waar bepaal je de prijs van?",
       tabs: {
         year: { label: "Mijn tarief voor het jaar", sub: "Bepaal een dagtarief" },
@@ -560,6 +566,57 @@ export const nl: DeepPartial<typeof en> = {
       profileStarter: "je eerste jaren als ondernemer",
       profileSalary: "loon daarnaast",
       changeDetails: "Je gegevens aanpassen",
+
+      segments: {
+        annualCosts: "Zakelijke kosten",
+        jobCosts: "Kosten voor deze opdracht",
+        tax: "Inkomstenbelasting en Zvw",
+        yours: "Voor jou",
+      },
+
+      guided: {
+        progressLabel: "Waar je bent",
+        stepOf: "Stap {n} van {total}",
+        announce: "Stap {n} van {total}. {question}",
+        back: "Terug",
+        next: "Volgende",
+        submit: "Laat mijn tarief zien",
+        whyAsk: "Waarom vragen we dit?",
+        optional: "Optioneel",
+
+        target: {
+          question: "Wat wil je overhouden?",
+          helper: "Netto voor het hele jaar, na belasting.",
+          why: "Dit is het bedrag waar je echt van leeft, niet wat je factureert. Freelens begint hier en rekent terug via de echte schijven, aftrekposten en heffingskortingen naar de omzet die hier onder de streep overblijft.",
+        },
+        days: {
+          question: "Hoeveel dagen ga je factureren?",
+          helper: "Factureerbare dagen, geen werkdagen.",
+          why: "Een jaar heeft ongeveer 260 werkdagen. Bijna niemand factureert die allemaal. Vakantie, ziekte, administratie, achter opdrachten aan en de stille weken gaan er eerst vanaf. Dit is het getal waar de meeste tarieven op misgaan, en het is de reden dat hetzelfde streefinkomen een heel ander dagtarief nodig heeft.",
+        },
+        costs: {
+          question: "Wat kost je onderneming je?",
+          helper: "Software, verzekeringen, spullen, werkplek, je boekhouder.",
+          fieldLabel: "Per jaar",
+          placeholder: "bijv. 6000",
+          why: "Kosten verlagen je belasting, maar je moet ze nog steeds eerst verdienen voordat er iets van jou is. Leeglaten kan prima: dan dekt het tarief alleen je eigen tijd.",
+        },
+
+        result: {
+          eyebrow: "Je ondergrens",
+          perDay: "per dag, exclusief btw",
+          summary:
+            "{days} factureerbare dagen tegen dit tarief is {revenue} omzet over het jaar, waarvan {take} van jou is.",
+          notMarket:
+            "Dit is wat het werk moet opbrengen om zichzelf te betalen. Wat jouw markt betaalt is een andere vraag, en daar heeft Freelens geen mening over.",
+          estimate:
+            "Een schatting om mee te plannen, op basis van wat je hebt ingevuld. Geen vaste regel.",
+          adjust: "Mijn antwoorden aanpassen",
+          breakdown: "Hoe dit is berekend",
+          toTool: "Kijken wat er echt van jou is",
+          toTarief: "Liever één project doorrekenen",
+        },
+      },
     },
   app: {
     overview: {
