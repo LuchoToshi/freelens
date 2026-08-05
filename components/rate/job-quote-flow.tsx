@@ -63,6 +63,16 @@ export interface JobQuoteFlowProps {
   knownProjectedProfit: number;
   /** Homepage only: the way through to the annual day-rate mode. */
   showTariefLink?: boolean;
+  /**
+   * Open on the answer for the default fee instead of on question one.
+   *
+   * The homepage pairs this flow with a payment calculator that returns a
+   * figure the moment it renders. Opening this one on an empty first step made
+   * the same card behave two different ways depending on the tab, and put three
+   * taps between a visitor and the only thing they came for. Every input is
+   * still one tap away behind "Adjust".
+   */
+  startAtResult?: boolean;
 }
 
 /**
@@ -85,11 +95,12 @@ export function JobQuoteFlow({
   profile,
   knownProjectedProfit,
   showTariefLink = false,
+  startAtResult = false,
 }: JobQuoteFlowProps) {
   const t = useT();
   const j = t.rate.job;
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(startAtResult ? STEP_COUNT : 0);
   const [fee, setFee] = useState(DEFAULT_FEE);
   const [vatRate, setVatRate] = useState(21);
   const [days, setDays] = useState("");

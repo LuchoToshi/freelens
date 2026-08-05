@@ -23,11 +23,8 @@ export const nl: DeepPartial<typeof en> = {
       about: "Over ons",
       beforeJob: "Voor de klus",
       afterPayment: "Na betaling",
-      openTool: "Bekijk mijn uitbetaling",
       accuracy: "Nauwkeurigheid & bronnen",
       methodology: "Hoe we rekenen",
-      rate: "Voor de klus",
-      openFreelens: "Freelens openen",
     },
     back: "Terug",
     languageSwitcher: {
@@ -38,7 +35,7 @@ export const nl: DeepPartial<typeof en> = {
     footer: {
       trustLine:
         "Geen belastingadvies. Een heldere schatting om mee te werken. Je cijfers verlaten je browser nooit.",
-      cta: "Bekijk wat ik mezelf kan uitbetalen",
+      cta: "Open de werkruimte",
     },
     confidence: {
       sentence:
@@ -61,9 +58,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "Freelens: Er is geld binnen. Weet wat er nu gebeurt.",
+      title: "Freelens: wat een klus je echt oplevert, vooraf en achteraf",
       description:
-        "Freelens helpt Nederlandse freelancers en zzp'ers de btw apart te zetten, een belastingreservering te beschermen, bedrijfskosten te dekken en te zien wat er overblijft om zichzelf uit te betalen. Schattingen om mee te plannen, geen belastingadvies. Je cijfers blijven op dit apparaat.",
+        "Voor Nederlandse freelancers en zzp'ers. Vul een tarief in en zie wat de belasting ervan overlaat. Vul een betaling in en zie wat echt van jou is. Met de echte schijven, aftrekposten en heffingskortingen van 2026, geen vast percentage. Schattingen om mee te plannen, geen belastingadvies, en je cijfers blijven op je apparaat.",
     },
     about: {
       title: "Waarom Freelens bestaat: de beslislaag voor freelancers",
@@ -85,18 +82,18 @@ export const nl: DeepPartial<typeof en> = {
   home: {
     hero: {
       eyebrow: "Voor Nederlandse freelancers en zzp'ers",
-      headlineStatic: "Er is geld binnen. Weet wat er nu gebeurt.",
-      headlineLine1: "Er is geld binnen",
-      headlineLine3: "Weet wat er nu gebeurt.",
+      headlineStatic: "Wat je overhoudt aan een klus. Vóór de offerte, na de betaling.",
+      headlineLine1: "Wat je overhoudt aan een",
+      headlineLine3: "Vóór de offerte, na de betaling.",
       contexts: [
-        "van een shoot",
-        "van een klus",
-        "van een klant",
-        "van een campagne",
-        "van een draaidag",
+        "shoot",
+        "klus",
+        "campagne",
+        "opdracht",
+        "draaidag",
       ],
-      body: "Een klant heeft betaald. Zie wat btw is, wat je opzij moet zetten voor de belasting, wat in de zaak blijft en wat je jezelf kunt uitbetalen.",
-      primaryCta: "Bekijk wat ik mezelf kan uitbetalen",
+      body: "Freelens rekent met de echte Nederlandse belastingregels, in twee richtingen. Vul een tarief in en zie wat er overblijft. Vul een betaling in en zie wat echt van jou is.",
+      primaryCta: "Probeer het met je eigen cijfers",
       secondaryCta: "Bekijk hoe het werkt",
       trust: {
         free: "Gratis te proberen",
@@ -109,8 +106,8 @@ export const nl: DeepPartial<typeof en> = {
       mediaAlt: "Een Nederlandse creatieve freelancer aan het werk",
     },
     heroExample: {
-      note: "Voorbeeld met {rate}% btw en de Nederlandse belastingregels van {year}, voor iemand die dit jaar {profit} winst verwacht{rateNote}.",
-      rateNote: ", dus {pct}% van deze betaling",
+      note: "Voorbeeld: {rate}% btw, de Nederlandse regels van {year}, {profit} verwachte winst dit jaar en {costs} zakelijke kosten die deze betaling moet dekken{rateNote}.",
+      rateNote: ", dus {pct}% ervan gaat opzij voor de belasting",
       amountLabel: "Hoeveel heb je ontvangen?",
       vatGroupLabel: "Btw inbegrepen",
       includesVat: "Inclusief btw",
@@ -118,6 +115,7 @@ export const nl: DeepPartial<typeof en> = {
       received: "Ontvangen betaling",
       vatIncluded: "Btw in deze betaling",
       reserve: "Reservering inkomstenbelasting en Zvw",
+      business: "Zakelijke kosten om te dekken",
       available: "Mogelijk beschikbaar om jezelf uit te betalen",
       footnote:
         "Een schatting om mee te plannen, geen aanslag. De echte tool gebruikt jouw eigen btw-behandeling en reserveringsregels. Je cijfers blijven op je apparaat.",
@@ -143,56 +141,33 @@ export const nl: DeepPartial<typeof en> = {
       body: "Eén berekening, in twee richtingen. Voor de klus zie je wat er van een bedrag overblijft. Na de betaling krijgt elke euro een taak. En wat je eerder meetelde bepaalt in welke schijf de volgende klus valt, dus het zijn geen twee losse tools.",
       steps: {
         beforeQuote: {
-          title: "Voordat je offreert",
-          body: "Vul het bedrag in dat je overweegt. Freelens haalt eraf wat de klus jou kost en de belasting die eroverheen gaat, volgens de echte schijven, zodat je ziet wat er overblijft voordat je hem verstuurt.",
+          title: "Voordat je een prijs noemt",
+          body: "Vul het tarief in waar je aan denkt. Freelens haalt eraf wat de klus je kost en welke belasting hij oplevert, over de echte schijven, zodat je ziet wat er overblijft vóór je de offerte stuurt.",
         },
         moneyArrives: {
-          title: "Er komt geld binnen",
-          body: "Vul een betaling in. Freelens haalt de btw eruit, zet een reservering opzij voor inkomstenbelasting en Zvw, en beschermt je bedrijfskosten, zodat wat overblijft ook echt beschikbaar is om jezelf uit te betalen.",
+          title: "Nadat het geld binnen is",
+          body: "Vul de betaling in. Freelens haalt de btw eruit, zet een reservering opzij voor inkomstenbelasting en Zvw, en dekt je zakelijke kosten, zodat wat overblijft echt beschikbaar is om jezelf uit te betalen.",
         },
-        weekly: {
-          title: "Een rustige wekelijkse check-in",
-          body: "Een gewoonte van vijf minuten per week die verrassingen bij de belasting voorkomt: wat beschermd is, wat mogelijk beschikbaar is, en hoeveel maanden je vooruit kunt. Opgeslagen op je apparaat, zodat het onthoudt en jij dat niet hoeft.",
-        },
-        decision: {
-          title: "Beslissing checken",
-          body: "Denk je aan een aankoop of een uitbetaling? Zie of het past binnen je vrije bestedingsruimte, en wat het doet met hoelang je vooruit kunt, vóór je uitgeeft in plaats van erna.",
-        },
-        peace: {
-          title: "Rust in je hoofd",
-          body: "Elke euro heeft een taak. Je reserveringen blijven zichtbaar en beschermd. Je weet wat je hierna kunt doen.",
+        overTime: {
+          title: "Door het jaar heen",
+          body: "De werkruimte houdt je positie bij: wat beschermd is, wat vrij is, en hoeveel maanden je vooruit kunt. Toets een aankoop eraan vóór je hem doet. Opgeslagen op je apparaat, dus hij onthoudt het en jij hoeft dat niet.",
         },
       },
       visuals: {
         runway: "{months} maanden vooruit",
-        fits: "Past",
-        decisionRoom: "{spend} → {room} ruimte",
-        everyEuro: "Elke euro heeft een taak",
       },
-    },
-    socialProof: {
-      ariaLabel: "Van echte freelancers",
-      eyebrow: "Van echte freelancers",
-      heading: "Echte verhalen, binnenkort.",
-      body: "We laten liever echte ervaringen van freelancers zien dan verzonnen quotes, dus die verzamelen we nu. Dit is wat Freelens dag in dag uit wil veranderen.",
-      outcomes: [
-        "Na elke factuur weet je wat je opzij moet zetten.",
-        "Geen verrassingen meer aan het eind van het jaar.",
-        "Een rustige gewoonte van vijf minuten per week.",
-      ],
-      footnotePrefix: "Freelens gebruikt en wil je jouw verhaal hier zien?",
-      footnoteLink: "Lees waarom we het gebouwd hebben",
     },
     privacy: {
       ariaLabel: "Privacy",
       eyebrow: "Zijn mijn cijfers veilig?",
       heading: "Je financiële gegevens verlaten je browser nooit.",
-      body: "Er wordt niets naar Freelens geüpload. Je opgeslagen waarden blijven op dit apparaat en je kunt ze op elk moment wissen.",
-      points: ["Geen accounts.", "Geen tracking.", "Geen verrassingen."],
+      body: "Je bedragen worden nooit geüpload. Ze staan in deze browser en je kunt ze altijd wissen. Freelens telt anonieme paginaweergaven zodat we weten dat de site gebruikt wordt, en dat is alles wat we verzamelen.",
+      points: ["Geen accounts.", "Geen bankkoppeling.", "Geen bedragen geüpload."],
       thisDevice: "dit apparaat",
       demo: {
         vat: "Btw gereserveerd",
         reserve: "Belastingreservering",
+        business: "Zakelijke kosten",
         available: "Beschikbaar voor jou",
       },
       staysHere: "Blijft hier. Nooit geüpload.",
@@ -272,33 +247,25 @@ export const nl: DeepPartial<typeof en> = {
         },
       },
     },
-    positioning: {
-      ariaLabel: "Wat Freelens is",
-      lead: "De laag tussen je bankrekening en je boekhouding waarin je beslist.",
-      body: "Je bank en je boekhouding laten al zien wat er staat en wat er gebeurd is. Freelens vertaalt dat naar wat je nu veilig kunt doen. Het vult je tools aan, het vervangt ze niet.",
-    },
-    fork: {
-      ariaLabel: "Kies waar je bent",
-      eyebrow: "Twee momenten",
-      heading: "Eén berekening, beide kanten van de klus.",
-
+    moments: {
+      ariaLabel: "Probeer Freelens",
+      eyebrow: "Probeer het",
+      heading: "Dezelfde motor, aan beide kanten van de klus.",
+      body: "Kies het moment waar je nu in zit. Allebei rekenen ze met de echte Nederlandse regels van {year}, en niets wat je hier invult wordt opgeslagen of verstuurd.",
+      tablistLabel: "In welk moment zit je?",
       before: {
-        eyebrow: "Voor de klus",
-        heading: "Wat houd ik hieraan over?",
-        body: "Vul het bedrag in dat je overweegt. Freelens haalt de kosten van de klus en de belasting eraf, volgens de echte Nederlandse regels van {year}.",
-        fullPage: "Open de volledige calculator",
+        tab: "Ik moet nog een prijs bepalen",
+        tabSub: "Wat houd ik over aan dit tarief?",
+        deepLink: "Bereken een dagtarief voor het hele jaar",
       },
-
       after: {
-        eyebrow: "Na de betaling",
-        heading: "Wat is hier echt van mij?",
-        body: "Er is betaald. Haal de btw eruit, zet je belasting opzij, dek je kosten en zie wat je veilig kunt uitbetalen.",
-        points: [
-          "Elke betaling krijgt een taak",
-          "Wekelijks rustig zicht op je positie",
-          "Toets een uitgave voordat je hem doet",
-        ],
-        cta: "Open de werkruimte",
+        tab: "Ik ben betaald",
+        tabSub: "Wat is hier echt van mij?",
+        deepLink: "Open de volledige werkruimte",
+      },
+      whyDifferent: {
+        toggle: "Waarom laten de twee tabbladen andere percentages zien?",
+        body: "Omdat ze een andere vraag beantwoorden. Bij offreren gaat het om wat één klus extra bovenop je verwachte jaar oplevert, dus die wordt belast tegen het tarief waar die klus je in duwt. Een betaling die al binnen is hoort bij een jaar waar je al aan vastzit, dus die draagt zijn deel van de hele jaarrekening. Dezelfde motor, dezelfde regels, twee eerlijke antwoorden.",
       },
     },
 

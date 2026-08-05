@@ -1,15 +1,20 @@
 "use client";
 
 import { Monitor, RotateCcw } from "lucide-react";
-import { formatEuro, toCents } from "@/lib/domain/money";
+import { formatEuro } from "@/lib/domain/money";
+import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 
 export function PrivacySection() {
   const t = useT();
+  const split = examplePaymentSplit();
+  // All four buckets, so the panel adds up to the payment. Three lines left a
+  // silent gap where the business costs were.
   const rows: [string, string][] = [
-    [t.home.privacy.demo.vat, formatEuro(toCents(434))],
-    [t.home.privacy.demo.reserve, formatEuro(toCents(620))],
-    [t.home.privacy.demo.available, formatEuro(toCents(1446))],
+    [t.home.privacy.demo.vat, formatEuro(split.vat)],
+    [t.home.privacy.demo.reserve, formatEuro(split.reserve)],
+    [t.home.privacy.demo.business, formatEuro(split.business)],
+    [t.home.privacy.demo.available, formatEuro(split.yours)],
   ];
 
   return (

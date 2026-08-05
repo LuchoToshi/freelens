@@ -1,6 +1,7 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
+import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 
 /**
@@ -63,14 +64,21 @@ export function HeroMedia({
   );
 }
 
-/** Editorial allocation-motif fallback: stacked color fields + caption labels. */
+/**
+ * Editorial allocation-motif fallback: stacked color fields + caption labels.
+ *
+ * The band sizes are the real split, not chosen proportions. They used to be
+ * 21/30/12/37, which was a fifth set of numbers for the same payment and sat
+ * directly above the sections that showed the true one.
+ */
 function DesignedPlaceholder() {
   const t = useT();
+  const split = examplePaymentSplit();
   const bands = [
-    { label: t.app.allocation.vat, color: "var(--fl-vat-fill)", grow: 21 },
-    { label: t.app.allocation.reserve, color: "var(--fl-reserve-fill)", grow: 30 },
-    { label: t.app.allocation.business, color: "var(--fl-costs-fill)", grow: 12 },
-    { label: t.app.allocation.yours, color: "var(--fl-payout-fill)", grow: 37 },
+    { label: t.app.allocation.vat, color: "var(--fl-vat-fill)", grow: split.vat },
+    { label: t.app.allocation.reserve, color: "var(--fl-reserve-fill)", grow: split.reserve },
+    { label: t.app.allocation.business, color: "var(--fl-costs-fill)", grow: split.business },
+    { label: t.app.allocation.yours, color: "var(--fl-payout-fill)", grow: split.yours },
   ];
   return (
     <div className="absolute inset-0 flex flex-col" aria-hidden="true">

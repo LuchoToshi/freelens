@@ -1,7 +1,8 @@
 "use client";
 
 import { AllocationBar } from "@/components/app/allocation-bar";
-import { formatEuro, toCents } from "@/lib/domain/money";
+import { formatEuro } from "@/lib/domain/money";
+import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
 
@@ -15,11 +16,15 @@ export function ProblemSection() {
     { label: t.home.problem.claims.buffer, color: "var(--fl-ink)" },
   ];
 
+  // Same scenario, same engine as the hero and every other illustration. These
+  // used to be four hardcoded figures that disagreed with the engine's reserve
+  // by a factor of two, on the same scroll as the engine's own answer.
+  const split = examplePaymentSplit();
   const segments = [
-    { label: t.app.allocation.vat, cents: toCents(434), color: "var(--fl-vat-fill)" },
-    { label: t.app.allocation.reserve, cents: toCents(620), color: "var(--fl-reserve-fill)" },
-    { label: t.app.allocation.business, cents: toCents(200), color: "var(--fl-costs-fill)" },
-    { label: t.app.allocation.yours, cents: toCents(1246), color: "var(--fl-payout-fill)" },
+    { label: t.app.allocation.vat, cents: split.vat, color: "var(--fl-vat-fill)" },
+    { label: t.app.allocation.reserve, cents: split.reserve, color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.business, cents: split.business, color: "var(--fl-costs-fill)" },
+    { label: t.app.allocation.yours, cents: split.yours, color: "var(--fl-payout-fill)" },
   ];
 
   return (
@@ -59,10 +64,10 @@ export function ProblemSection() {
         <div className="rounded-3xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-6 sm:p-8">
           <div className="flex items-baseline justify-between">
             <span className="text-sm font-medium text-[var(--fl-slate)]">
-              {fill(t.home.problem.demoLabel, { amount: formatEuro(toCents(2500)) })}
+              {fill(t.home.problem.demoLabel, { amount: formatEuro(split.gross) })}
             </span>
             <span className="fl-tnum font-serif text-2xl font-medium text-[var(--fl-payout-text)]">
-              {fill(t.home.problem.demoYours, { amount: formatEuro(toCents(1246)) })}
+              {fill(t.home.problem.demoYours, { amount: formatEuro(split.yours) })}
             </span>
           </div>
           <div className="mt-5">

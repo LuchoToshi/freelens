@@ -18,11 +18,8 @@ export const en = {
       about: "About",
       beforeJob: "Before the job",
       afterPayment: "After payment",
-      openTool: "See my payout",
       accuracy: "Accuracy & sources",
       methodology: "How it's calculated",
-      rate: "Before the job",
-      openFreelens: "Open Freelens",
     },
     back: "Back",
     languageSwitcher: {
@@ -33,7 +30,7 @@ export const en = {
     footer: {
       trustLine:
         "Not tax advice. A clear estimate to work from. Your numbers never leave your browser.",
-      cta: "See what I can pay myself",
+      cta: "Open the workspace",
     },
     confidence: {
       sentence:
@@ -56,9 +53,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "Freelens: Money arrived. Know what happens next.",
+      title: "Freelens: what a job actually leaves you, before and after",
       description:
-        "Freelens helps Dutch freelancers and ZZP'ers separate VAT, protect a tax reserve, cover business costs, and see what may be available to pay themselves. Planning estimates, not tax advice. Your numbers stay on this device.",
+        "For Dutch freelancers and ZZP'ers. Put in a fee and see what survives the tax on it. Put in a payment and see what is genuinely yours. Real 2026 brackets, deductions and credits, not a flat percentage. Planning estimates, not tax advice, and your figures stay on your device.",
     },
     about: {
       title: "Why Freelens exists: the decision layer for freelancers",
@@ -80,18 +77,18 @@ export const en = {
   home: {
     hero: {
       eyebrow: "For Dutch freelancers and ZZP'ers",
-      headlineStatic: "Money arrived. Know what happens next.",
-      headlineLine1: "Money arrived",
-      headlineLine3: "Know what happens next.",
+      headlineStatic: "What you keep from a job. Before the quote, after the payment.",
+      headlineLine1: "What you keep from a",
+      headlineLine3: "Before the quote, after the payment.",
       contexts: [
-        "from a shoot",
-        "from a gig",
-        "from a client",
-        "from a campaign",
-        "from a production day",
+        "shoot",
+        "gig",
+        "campaign",
+        "commission",
+        "production day",
       ],
-      body: "A client paid you. See what's VAT, what to reserve for tax, what stays in the business, and what you can pay yourself.",
-      primaryCta: "See what I can pay myself",
+      body: "Freelens runs the real Dutch tax rules in both directions. Put in a fee and see what survives it. Put in a payment and see what is genuinely yours.",
+      primaryCta: "Try it on your own numbers",
       secondaryCta: "See how it works",
       trust: {
         free: "Free to try",
@@ -103,8 +100,8 @@ export const en = {
       mediaAlt: "A Dutch creative freelancer at work",
     },
     heroExample: {
-      note: "Example uses {rate}% VAT and the {year} Dutch tax rules, for someone expecting {profit} profit this year{rateNote}.",
-      rateNote: ", so {pct}% of this payment",
+      note: "Example: {rate}% btw, the {year} Dutch rules, {profit} of profit expected this year, and {costs} of business costs this payment has to cover{rateNote}.",
+      rateNote: ", so {pct}% of it is held back for tax",
       amountLabel: "How much did you receive?",
       vatGroupLabel: "VAT inclusion",
       includesVat: "Includes VAT",
@@ -112,6 +109,7 @@ export const en = {
       received: "Payment received",
       vatIncluded: "VAT included in this payment",
       reserve: "Income tax and Zvw reserve",
+      business: "Business costs to cover",
       available: "May be available to pay yourself",
       footnote:
         "A planning estimate, not a tax assessment. The real tool uses your own VAT treatment and reserve rules. Your numbers stay on your device.",
@@ -137,56 +135,33 @@ export const en = {
       body: "One calculation, run in both directions. Before the job it tells you what a fee survives. After the payment it gives every euro a job. And what you counted before decides which bracket the next job lands in, so the two ends are not separate tools.",
       steps: {
         beforeQuote: {
-          title: "Before you quote",
-          body: "Put in the fee you're considering. Freelens takes out what the job costs you and the tax it triggers, across the real brackets, so you see what survives before you send it.",
+          title: "Before you name a price",
+          body: "Put in the fee you are considering. Freelens takes out what the job costs you and the tax it triggers across the real brackets, so you see what survives before you send the quote.",
         },
         moneyArrives: {
-          title: "Money arrives",
-          body: "Enter a payment. Freelens separates the VAT, sets aside an income tax and Zvw reserve, and protects your business costs, so what's left is genuinely available to pay yourself.",
+          title: "After the money lands",
+          body: "Enter the payment. Freelens separates the btw, sets aside an income tax and Zvw reserve, and covers your business costs, so what is left is genuinely available to pay yourself.",
         },
-        weekly: {
-          title: "A calm weekly check-in",
-          body: "A five-minute weekly habit that prevents tax-time surprises: what's protected, what may be available, and how many months of runway you have. Saved on your device, so it remembers and you don't have to.",
-        },
-        decision: {
-          title: "Check a decision",
-          body: "Thinking about a purchase or a payout? See whether it fits within your optional spending room, and what it does to your runway, before you spend, not after.",
-        },
-        peace: {
-          title: "Peace of mind",
-          body: "Every euro has a job. Your reserves stay visible and protected. You know what you can do next.",
+        overTime: {
+          title: "Over the year",
+          body: "The workspace keeps your position current: what is protected, what is free, and how many months of runway you have. Test a purchase against it before you make it. Saved on your device, so it remembers and you do not have to.",
         },
       },
       visuals: {
         runway: "{months} months of runway",
-        fits: "Fits",
-        decisionRoom: "{spend} → {room} room",
-        everyEuro: "Every euro has a job",
       },
-    },
-    socialProof: {
-      ariaLabel: "From real freelancers",
-      eyebrow: "From real freelancers",
-      heading: "Real stories, coming soon.",
-      body: "We'd rather show real freelancer experiences than invented quotes, so we're gathering them now. Here's what Freelens is built to change day to day.",
-      outcomes: [
-        "After every invoice, you know what to set aside.",
-        "No more year-end tax surprises.",
-        "A calm five-minute weekly habit.",
-      ],
-      footnotePrefix: "Used Freelens and want your story here?",
-      footnoteLink: "Read why we built it",
     },
     privacy: {
       ariaLabel: "Privacy",
       eyebrow: "Are my numbers safe?",
       heading: "Your financial data never leaves your browser.",
-      body: "Nothing is uploaded to Freelens. Your saved values remain on this device, and you can clear them at any time.",
-      points: ["No accounts.", "No tracking.", "No surprises."],
+      body: "Your figures are never uploaded. They are saved in this browser, and you can clear them at any time. Freelens counts anonymous page views so we know the site is used, and that is the whole of what we collect.",
+      points: ["No accounts.", "No bank connection.", "No figures uploaded."],
       thisDevice: "this device",
       demo: {
         vat: "VAT reserved",
         reserve: "Tax reserve",
+        business: "Business costs",
         available: "Available to you",
       },
       staysHere: "Stays here. Never uploaded.",
@@ -266,11 +241,6 @@ export const en = {
         },
       },
     },
-    positioning: {
-      ariaLabel: "What Freelens is",
-      lead: "The decision layer between your bank account and your bookkeeping.",
-      body: "Your banking and bookkeeping already show what exists and what happened. Freelens turns that into what you can safely do next. It complements your tools, it doesn't replace them.",
-    },
     /**
      * The hinge from "what is mine after the payment" to "what do I charge
      * before the job". Placed where the reader has just understood the loop,
@@ -281,28 +251,25 @@ export const en = {
      * the first thing on the page a visitor can act on, and it is a choice
      * between two questions rather than a question put to them.
      */
-    fork: {
-      ariaLabel: "Choose where you are",
-      eyebrow: "Two moments",
-      heading: "One engine, both ends of the job.",
-
+    moments: {
+      ariaLabel: "Try Freelens",
+      eyebrow: "Try it",
+      heading: "Same engine, both ends of the job.",
+      body: "Pick the moment you are in. Both run on the real {year} Dutch rules, and nothing you type here is saved or sent anywhere.",
+      tablistLabel: "Which moment are you in?",
       before: {
-        eyebrow: "Before the job",
-        heading: "What will I keep from this job?",
-        body: "Put in the fee you're considering. Freelens takes out the job's costs and the tax it triggers, on the real {year} Dutch rules.",
-        fullPage: "Open the full calculator",
+        tab: "I still need to name a price",
+        tabSub: "What is left from this fee?",
+        deepLink: "Work out a day rate for the whole year",
       },
-
       after: {
-        eyebrow: "After the payment",
-        heading: "What's actually mine here?",
-        body: "A payment landed. Separate the btw, protect the tax reserve, cover your costs, and see what's safe to pay yourself.",
-        points: [
-          "Every payment gets a job",
-          "A calm weekly read on your position",
-          "Test a spend before you make it",
-        ],
-        cta: "Open the workspace",
+        tab: "I have been paid",
+        tabSub: "What here is actually mine?",
+        deepLink: "Open the full workspace",
+      },
+      whyDifferent: {
+        toggle: "Why do the two tabs show different percentages?",
+        body: "Because they answer different questions. Quoting asks what one more job adds on top of the year you already expect, so it is taxed at the rate that job pushes you into. A payment that has arrived belongs to a year you are already committed to, so it carries its share of the whole year's bill instead. Same engine, same rules, two honest answers.",
       },
     },
 

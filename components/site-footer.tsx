@@ -15,8 +15,10 @@ export function SiteFooter() {
     { href: "/about", label: t.common.nav.about },
     { href: "/accuracy", label: t.common.nav.accuracy },
     { href: "/methodology", label: t.common.nav.methodology },
-    { href: "/tarief", label: t.common.nav.rate },
-    { href: "/tool", label: t.common.nav.openFreelens },
+    // The same two names the header uses. These used to read "Before the job"
+    // and "Open Freelens", so /tool had four different labels across the site.
+    { href: "/tarief", label: t.common.nav.beforeJob },
+    { href: "/tool", label: t.common.nav.afterPayment },
   ];
 
   return (

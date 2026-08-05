@@ -2,53 +2,44 @@
 
 import Link from "next/link";
 import { HeroSection } from "@/components/home/hero-section";
+import { TwoMoments } from "@/components/home/two-moments";
 import { ProblemSection } from "@/components/home/problem-section";
 import { HowItWorksSection } from "@/components/home/how-it-works-section";
-import { ForkSection } from "@/components/home/fork-section";
 import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
-import { SocialProofSection } from "@/components/home/social-proof-section";
 import { ConfidenceBlock } from "@/components/design/confidence-block";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
+/**
+ * One narrative, in the order a visitor actually needs it.
+ *
+ *   1. Hero          the problem, and what they get instead
+ *   2. Two moments   something to act on, before any further reading
+ *   3. Problem       why the number they just saw is that number
+ *   4. How it works  what the rest of the product does with it
+ *   5. Accuracy      why to believe the number
+ *   6. Privacy       why it is safe to have typed it
+ *   7. FAQ           the objections that are left
+ *
+ * Three sections were removed rather than reordered. A positioning strip that
+ * said "the decision layer between your bank account and your bookkeeping" sat
+ * second, which spent the most valuable slot on the page on an abstraction. A
+ * "Real stories, coming soon" band was an empty state shipped as a section. A
+ * separate final-CTA band duplicated the footer directly above it.
+ */
 export default function Home() {
   const t = useT();
   useDocumentTitle(t.meta.home.title, t.meta.home.description);
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
       <HeroSection />
-      <PositioningStrip />
-      {/* The first thing on the page a visitor can act on. Both routes get
-          equal billing here; the hero has already made the one promise. */}
-      <ForkSection />
+      <TwoMoments />
       <ProblemSection />
       <HowItWorksSection />
-      <SocialProofSection />
-      <PrivacySection />
       <AccuracySection />
+      <PrivacySection />
       <FaqSection />
     </main>
-  );
-}
-
-function PositioningStrip() {
-  const t = useT();
-  return (
-    <section
-      aria-label={t.home.positioning.ariaLabel}
-      className="border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
-    >
-      <div className="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-12">
-        <p className="text-lg leading-relaxed text-[var(--fl-ink)] sm:text-xl">
-          <span className="font-medium">
-            {t.home.positioning.lead}
-          </span>{" "}
-          <span className="text-[var(--fl-slate)]">
-            {t.home.positioning.body}
-          </span>
-        </p>
-      </div>
-    </section>
   );
 }
 

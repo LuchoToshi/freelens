@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { Check, Lock } from "lucide-react";
 import { AllocationBar } from "@/components/app/allocation-bar";
-import { formatEuro, toCents } from "@/lib/domain/money";
-import { outcomeForJobFee } from "@/lib/tax/jobOutcome";
-import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
+import type { Cents } from "@/lib/domain/money";
+import {
+  examplePaymentSplit,
+  exampleQuoteSplit,
+} from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
 
@@ -14,49 +15,41 @@ const variants: Variants = {
   visible: { opacity: 1, y: 0 },
 };
 
-type VisualKind = "quote" | "allocate" | "runway" | "decision" | "locked";
+type VisualKind = "quote" | "allocate" | "runway";
 
 /**
- * The quote illustration, computed rather than written down.
+ * The product as three moments, not five features.
  *
- * Same fee and same starting position as the calculator further up the page,
- * so the two never disagree. A hardcoded pair of figures here would drift the
- * first time a rate or a deduction changed, and it would drift silently.
+ * This was five full-height steps: quote, payment, weekly check-in, check a
+ * decision, and "peace of mind". The last was a feeling rather than a step, and
+ * the two middle ones are both things you do inside the same workspace, so the
+ * section spent roughly two screens describing one route. Folding them into
+ * "over time" leaves three steps that match the three things the product
+ * actually does, and each one now maps to somewhere the visitor can go.
+ *
+ * There is deliberately no step for chasing quotes or invoices. The domain
+ * layer for it exists, but nothing is shipped, so nothing here claims it.
  */
-const QUOTE_DEMO_FEE = 1_800;
-const QUOTE_DEMO_PROFIT = 40_000;
-
 export function HowItWorksSection() {
   const reduce = useReducedMotion();
   const t = useT();
 
-  const quote = outcomeForJobFee({
-    taxYear: latestProfileYear(DEFAULT_COUNTRY) ?? 0,
-    country: DEFAULT_COUNTRY,
-    feeExVat: QUOTE_DEMO_FEE,
-    currentProjectedProfit: QUOTE_DEMO_PROFIT,
-    vatRate: 21,
-    meetsHoursCriterion: false,
-    isStarter: false,
-  });
+  // Both illustrations come from the one scenario the whole site shares, so
+  // the quote step and the payment step describe the same freelancer rather
+  // than two people who happen to use round numbers.
+  const quote = exampleQuoteSplit();
+  const split = examplePaymentSplit();
 
   const quoteDemo = [
-    {
-      label: t.rate.segments.tax,
-      cents: quote.additionalLiability,
-      color: "var(--fl-reserve-fill)",
-    },
-    {
-      label: t.rate.segments.yours,
-      cents: quote.takeHome,
-      color: "var(--fl-payout-fill)",
-    },
+    { label: t.rate.segments.tax, cents: quote.tax, color: "var(--fl-reserve-fill)" },
+    { label: t.rate.segments.yours, cents: quote.yours, color: "var(--fl-payout-fill)" },
   ];
 
-  const demo = [
-    { label: t.app.allocation.vat, cents: toCents(434), color: "var(--fl-vat-fill)" },
-    { label: t.app.allocation.reserve, cents: toCents(620), color: "var(--fl-reserve-fill)" },
-    { label: t.app.allocation.yours, cents: toCents(1446), color: "var(--fl-payout-fill)" },
+  const paymentDemo = [
+    { label: t.app.allocation.vat, cents: split.vat, color: "var(--fl-vat-fill)" },
+    { label: t.app.allocation.reserve, cents: split.reserve, color: "var(--fl-reserve-fill)" },
+    { label: t.app.allocation.business, cents: split.business, color: "var(--fl-costs-fill)" },
+    { label: t.app.allocation.yours, cents: split.yours, color: "var(--fl-payout-fill)" },
   ];
 
   const steps: {
@@ -81,30 +74,19 @@ export function HowItWorksSection() {
       visual: "allocate",
     },
     {
-      title: t.home.howItWorks.steps.weekly.title,
-      body: t.home.howItWorks.steps.weekly.body,
-      accent: "var(--fl-payout-fill)",
-      tint: "var(--fl-payout-tint)",
-      visual: "runway",
-    },
-    {
-      title: t.home.howItWorks.steps.decision.title,
-      body: t.home.howItWorks.steps.decision.body,
-      accent: "var(--fl-decision-fill)",
-      tint: "var(--fl-decision-tint)",
-      visual: "decision",
-    },
-    {
-      title: t.home.howItWorks.steps.peace.title,
-      body: t.home.howItWorks.steps.peace.body,
+      title: t.home.howItWorks.steps.overTime.title,
+      body: t.home.howItWorks.steps.overTime.body,
       accent: "var(--fl-reserve-fill)",
       tint: "var(--fl-reserve-tint)",
-      visual: "locked",
+      visual: "runway",
     },
   ];
 
   return (
-    <section id="how-it-works" className="border-t border-[var(--fl-line)]">
+    <section
+      id="how-it-works"
+      className="scroll-mt-24 border-t border-[var(--fl-line)]"
+    >
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
           {t.home.howItWorks.eyebrow}
@@ -115,20 +97,20 @@ export function HowItWorksSection() {
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
           {t.home.howItWorks.body}
         </p>
-        <div className="mt-14 flex flex-col gap-16 sm:gap-20">
+        <div className="mt-14 flex flex-col gap-14 sm:gap-16">
           {steps.map((s, i) => (
             <motion.div
               key={s.title}
               initial={reduce ? false : "hidden"}
               whileInView="visible"
-              viewport={{ once: true, amount: 0.4 }}
+              viewport={{ once: true, amount: 0.3 }}
               variants={variants}
               transition={{ duration: reduce ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16"
             >
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                 <span
-                  className="fl-tnum font-serif text-6xl font-medium sm:text-7xl"
+                  className="fl-tnum font-serif text-5xl font-medium sm:text-6xl"
                   style={{ color: s.accent }}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -146,7 +128,12 @@ export function HowItWorksSection() {
                 }`}
                 style={{ backgroundColor: s.tint }}
               >
-                <SceneVisual kind={s.visual} accent={s.accent} demo={demo} quoteDemo={quoteDemo} />
+                <SceneVisual
+                  kind={s.visual}
+                  accent={s.accent}
+                  paymentDemo={paymentDemo}
+                  quoteDemo={quoteDemo}
+                />
               </div>
             </motion.div>
           ))}
@@ -156,16 +143,18 @@ export function HowItWorksSection() {
   );
 }
 
+type Segment = { label: string; cents: Cents; color: string };
+
 function SceneVisual({
   kind,
   accent,
-  demo,
+  paymentDemo,
   quoteDemo,
 }: {
   kind: VisualKind;
   accent: string;
-  demo: { label: string; cents: ReturnType<typeof toCents>; color: string }[];
-  quoteDemo: { label: string; cents: ReturnType<typeof toCents>; color: string }[];
+  paymentDemo: Segment[];
+  quoteDemo: Segment[];
 }) {
   const t = useT();
 
@@ -183,51 +172,26 @@ function SceneVisual({
   if (kind === "allocate") {
     return (
       <div className="w-full max-w-sm">
-        <AllocationBar segments={demo} interactive={false} caption={t.app.allocation.caption} />
-      </div>
-    );
-  }
-  if (kind === "runway") {
-    return (
-      <div className="flex w-full max-w-sm flex-col gap-2">
-        <div className="relative h-6 w-full overflow-hidden rounded-full bg-white">
-          <div className="h-full rounded-full" style={{ width: "76%", backgroundColor: accent }} />
-          <span className="absolute top-0 h-full w-0.5 bg-[var(--fl-ink)]" style={{ left: "33%" }} aria-hidden="true" />
-        </div>
-        <span className="fl-tnum text-sm font-medium text-[var(--fl-ink)]">
-          {fill(t.home.howItWorks.visuals.runway, { months: "4,6" })}
-        </span>
-      </div>
-    );
-  }
-  if (kind === "decision") {
-    return (
-      <div className="flex flex-col items-center gap-3">
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold"
-          style={{ color: accent }}
-        >
-          <Check className="size-4" aria-hidden="true" />
-          {t.home.howItWorks.visuals.fits}
-        </span>
-        <span className="fl-tnum text-sm text-[var(--fl-ink)]">
-          {fill(t.home.howItWorks.visuals.decisionRoom, {
-            spend: formatEuro(toCents(3000)),
-            room: formatEuro(toCents(2700)),
-          })}
-        </span>
+        <AllocationBar
+          segments={paymentDemo}
+          interactive={false}
+          caption={t.app.allocation.caption}
+        />
       </div>
     );
   }
   return (
-    <div className="flex w-full max-w-sm flex-col gap-3">
-      <AllocationBar segments={demo} interactive={false} caption={t.app.allocation.caption} />
-      <span
-        className="inline-flex items-center gap-1.5 text-sm font-medium"
-        style={{ color: accent }}
-      >
-        <Lock className="size-4" aria-hidden="true" />
-        {t.home.howItWorks.visuals.everyEuro}
+    <div className="flex w-full max-w-sm flex-col gap-2">
+      <div className="relative h-6 w-full overflow-hidden rounded-full bg-white">
+        <div className="h-full rounded-full" style={{ width: "76%", backgroundColor: accent }} />
+        <span
+          className="absolute top-0 h-full w-0.5 bg-[var(--fl-ink)]"
+          style={{ left: "33%" }}
+          aria-hidden="true"
+        />
+      </div>
+      <span className="fl-tnum text-sm font-medium text-[var(--fl-ink)]">
+        {fill(t.home.howItWorks.visuals.runway, { months: "4,6" })}
       </span>
     </div>
   );

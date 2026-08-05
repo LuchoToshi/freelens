@@ -26,7 +26,10 @@ export function LivingHeadline() {
   const index = i % contexts.length;
 
   return (
-    <h1 className="font-serif text-5xl font-medium leading-[1.05] tracking-tight text-balance text-[var(--fl-ink)] sm:text-6xl lg:text-7xl">
+    // 48px on a 375px screen turned a two-sentence headline into eight lines
+    // and pushed the body copy, both calls to action and the trust row off the
+    // first viewport. The headline still leads the page; it no longer is the page.
+    <h1 className="font-serif text-4xl font-medium leading-[1.06] tracking-tight text-balance text-[var(--fl-ink)] sm:text-5xl lg:text-6xl">
       {reduce ? (
         <>{t.home.hero.headlineStatic}</>
       ) : (
