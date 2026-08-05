@@ -26,7 +26,7 @@ export function SiteHeader() {
 
         <nav
           aria-label={t.common.nav.ariaLabel}
-          className="order-last flex w-full items-center gap-x-4 sm:order-none sm:w-auto sm:gap-x-5"
+          className="order-last flex w-full items-center justify-end gap-x-4 sm:order-none sm:w-auto sm:gap-x-5"
         >
           <Link
             href="/tarief"
@@ -42,7 +42,7 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/about"
-            className="hidden min-h-11 items-center text-sm font-medium text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] sm:inline-flex"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--fl-slate)] hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
           >
             {t.common.nav.about}
           </Link>
