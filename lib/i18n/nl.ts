@@ -235,7 +235,7 @@ export const nl: DeepPartial<typeof en> = {
         },
         storeData: {
           q: "Slaat Freelens mijn financiële gegevens op?",
-          a: "Alleen op je eigen apparaat, in je browser, en alleen als je zelf kiest om op te slaan. Er wordt niets naar Freelens geüpload.",
+          a: "Alleen op je eigen apparaat, in je browser, en alleen als je zelf kiest om op te slaan. Je bedragen worden nooit geüpload. Freelens telt anonieme paginaweergaven, zonder cookie en zonder iets dat jou identificeert, en dat is alles wat je browser verlaat.",
         },
         deleteData: {
           q: "Kan ik mijn opgeslagen gegevens verwijderen?",
@@ -706,10 +706,10 @@ export const nl: DeepPartial<typeof en> = {
       payment: "Betaling",
       availableForPayout: "Beschikbaar voor eigen uitbetaling",
       recordedOn: "{date} · vastgelegd op dit apparaat.",
-      exampleIntro: "Een ingevulde week ziet er zo uit.",
+      exampleIntro: "Eén betaling, met een bestemming per euro. Dezelfde die de homepage doorrekent.",
       exampleVat: "Beschermde btw",
       exampleReserve: "Beschermde reservering",
-      exampleRunway: "{months} maanden",
+      exampleBusiness: "Zakelijke kosten gedekt",
       actions: {
         finishSetup: {
           title: "Maak je instellingen af, dan krijgen je cijfers verstandige standaardwaarden.",
@@ -830,9 +830,9 @@ export const nl: DeepPartial<typeof en> = {
       discardedCheckin:
         "Je laatste wekelijkse check-in kon niet gelezen worden en is weggelaten. Verder is er niets aangetast. Doe gerust een nieuwe check-in.",
       storageUnavailable:
-        "Opslag is niet beschikbaar in deze browser, dus je cijfers worden tussen bezoeken niet bewaard op dit apparaat. Er wordt hoe dan ook niets geüpload.",
+        "Opslag is niet beschikbaar in deze browser, dus je cijfers worden tussen bezoeken niet bewaard op dit apparaat. Ze worden hoe dan ook niet geüpload.",
       privacyToggle: "Privacy en gegevens",
-      privacySentence: "Alleen opgeslagen op dit apparaat. Er gaat niets naar Freelens.",
+      privacySentence: "Alleen opgeslagen op dit apparaat. Je bedragen worden nooit geüpload.",
       privacyDetail:
         "Freelens bewaart je cijfers, inclusief elke betaling die je opslaat, in de lokale opslag van deze browser zodat ze er de volgende keer weer zijn. Hieronder wissen verwijdert alles definitief en direct van dit apparaat. Er is geen account en geen kopie op een server, dus er valt verder niets te verwijderen en niets bij ons op te vragen.",
       clearConfirm:

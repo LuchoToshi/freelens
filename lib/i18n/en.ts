@@ -229,7 +229,7 @@ export const en = {
         },
         storeData: {
           q: "Does Freelens store my financial data?",
-          a: "Only on your own device, in your browser, and only when you choose to save. Nothing is uploaded to Freelens.",
+          a: "Only on your own device, in your browser, and only when you choose to save. Your figures are never uploaded. Freelens counts anonymous page views, with no cookie and nothing that identifies you, and that is the whole of what leaves your browser.",
         },
         deleteData: {
           q: "Can I delete my saved information?",
@@ -726,10 +726,10 @@ export const en = {
       payment: "Payment",
       availableForPayout: "Available for personal payout",
       recordedOn: "{date} · recorded on this device.",
-      exampleIntro: "A filled-in week looks like this.",
+      exampleIntro: "One payment, given a job. The same one the homepage works through.",
       exampleVat: "Protected VAT",
       exampleReserve: "Protected reserve",
-      exampleRunway: "{months} months",
+      exampleBusiness: "Business costs covered",
       actions: {
         finishSetup: {
           title: "Finish setting up so your numbers inherit sensible defaults.",
@@ -850,9 +850,9 @@ export const en = {
       discardedCheckin:
         "Your last weekly check-in could not be read and has been left out. Nothing else was affected. Run a new check-in whenever you like.",
       storageUnavailable:
-        "Storage is unavailable in this browser, so your figures won't be saved on this device between visits. Nothing is uploaded either way.",
+        "Storage is unavailable in this browser, so your figures won't be saved on this device between visits. They are not uploaded either way.",
       privacyToggle: "Privacy and data",
-      privacySentence: "Saved only on this device. Nothing is uploaded to Freelens.",
+      privacySentence: "Saved only on this device. Your figures are never uploaded.",
       privacyDetail:
         "Freelens stores your figures, including every payment you save, in this browser's local storage so they are here next time. Clearing them below removes all of it from this device, permanently and immediately. There is no account and no server copy, so there is nothing else to delete and nothing to request from us.",
       clearConfirm:

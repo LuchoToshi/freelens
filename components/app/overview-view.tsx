@@ -11,7 +11,8 @@ import {
   linkButtonClass,
   primaryButtonClass,
 } from "@/components/app/styles";
-import { formatEuro, toCents } from "@/lib/domain/money";
+import { formatEuro } from "@/lib/domain/money";
+import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { evaluateWeeklyPosition } from "@/lib/domain/allocation";
 import type { WeeklyPositionResult } from "@/lib/domain/allocation";
 import { isStale, type AppState } from "@/lib/domain/persistence";
@@ -195,9 +196,22 @@ export function OverviewView({
   );
 }
 
-/** A calm, clearly-labelled sample of the populated overview (audit). */
+/**
+ * A calm, clearly-labelled sample of the populated overview (audit).
+ *
+ * These were four invented figures (€2.400 available, €700 btw, €1.100
+ * reserved, 2,4 months). Anyone arriving from the homepage had just been shown
+ * €1.590 from a €2.500 payment and landed on a different story on the next
+ * click. It is now the same payment, through the same engine, so the workspace
+ * opens on the number that brought the visitor here.
+ *
+ * The runway line went with them: it cannot be derived from a single payment
+ * without inventing a monthly cost, and an invented figure is what this is
+ * fixing.
+ */
 function ExampleOverview() {
   const t = useT();
+  const split = examplePaymentSplit();
   return (
     <Card className="rounded-2xl border border-dashed border-[var(--fl-line)] bg-[var(--fl-surface-stage)]">
       <CardContent className="flex flex-col gap-3 p-6">
@@ -210,15 +224,12 @@ function ExampleOverview() {
             {t.app.overview.available}
           </span>
           <span className="fl-tnum font-serif text-3xl font-medium text-[var(--fl-ink)]">
-            {formatEuro(toCents(2400))}
+            {formatEuro(split.yours)}
           </span>
         </div>
-        <Figure label={t.app.overview.exampleVat} value={formatEuro(toCents(700))} />
-        <Figure label={t.app.overview.exampleReserve} value={formatEuro(toCents(1100))} />
-        <Figure
-          label={t.app.overview.runway}
-          value={fill(t.app.overview.exampleRunway, { months: "2,4" })}
-        />
+        <Figure label={t.app.overview.exampleVat} value={formatEuro(split.vat)} />
+        <Figure label={t.app.overview.exampleReserve} value={formatEuro(split.reserve)} />
+        <Figure label={t.app.overview.exampleBusiness} value={formatEuro(split.business)} />
       </CardContent>
     </Card>
   );

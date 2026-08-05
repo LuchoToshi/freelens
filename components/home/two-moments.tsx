@@ -54,6 +54,21 @@ export function TwoMoments() {
       ? { ...m.before, href: "/tarief" }
       : { ...m.after, href: "/tool" };
 
+  function onTablistKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    const step =
+      event.key === "ArrowRight" || event.key === "ArrowDown"
+        ? 1
+        : event.key === "ArrowLeft" || event.key === "ArrowUp"
+          ? -1
+          : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    const order: Moment[] = ["before", "after"];
+    const next = order[(order.indexOf(moment) + step + order.length) % order.length];
+    setMoment(next);
+    document.getElementById(TAB_ID[next])?.focus();
+  }
+
   return (
     <section
       id="start"
@@ -73,9 +88,13 @@ export function TwoMoments() {
           </p>
         </div>
 
+        {/* Arrow keys move between tabs and Tab leaves the set, per the ARIA
+            tabs pattern. Without the roving tabindex a keyboard user has to
+            step through every tab to reach the calculator inside the panel. */}
         <div
           role="tablist"
           aria-label={m.tablistLabel}
+          onKeyDown={onTablistKeyDown}
           className="mt-8 flex flex-col gap-2 sm:flex-row"
         >
           {tabs.map((tab) => {
@@ -88,6 +107,7 @@ export function TwoMoments() {
                 type="button"
                 aria-selected={selected}
                 aria-controls={PANEL_ID}
+                tabIndex={selected ? 0 : -1}
                 onClick={() => setMoment(tab.id)}
                 className={`flex min-h-14 flex-1 flex-col items-start justify-center gap-0.5 rounded-xl border px-4 py-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
                   selected
