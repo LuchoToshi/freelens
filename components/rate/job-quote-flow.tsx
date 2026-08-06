@@ -378,7 +378,13 @@ export function JobQuoteFlow({
         )}
         <button
           type="button"
-          onClick={() => setStep((s) => Math.min(STEP_COUNT, s + 1))}
+          onClick={() => {
+            // The denominator for the save-rate gate: a visitor who walked the
+            // steps and asked for the answer, as opposed to the auto-shown
+            // result on the homepage, which measures nothing about intent.
+            if (step === STEP_COUNT - 1) track("quote_calculated");
+            setStep((s) => Math.min(STEP_COUNT, s + 1));
+          }}
           className={`${primaryButtonClass} flex-1 sm:flex-none`}
         >
           {step === STEP_COUNT - 1 ? j.submit : j.next}
