@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/home/hero-section";
 import { TwoMoments } from "@/components/home/two-moments";
+import { FlatRuleTable } from "@/components/design/flat-rule-table";
 import { ProblemSection } from "@/components/home/problem-section";
 import { HowItWorksSection } from "@/components/home/how-it-works-section";
 import { PrivacySection } from "@/components/home/privacy-section";
@@ -14,13 +15,14 @@ import { container } from "@/components/container";
 /**
  * One narrative, in the order a visitor actually needs it.
  *
- *   1. Hero          the problem, and what they get instead
+ *   1. Hero          the claim, and what they get instead
  *   2. Two moments   something to act on, before any further reading
- *   3. Problem       why the number they just saw is that number
- *   4. How it works  what the rest of the product does with it
- *   5. Accuracy      why to believe the number
- *   6. Privacy       why it is safe to have typed it
- *   7. FAQ           the objections that are left
+ *   3. Flat rule     the claim proven, from the engine, both directions
+ *   4. Problem       why the number they just saw is that number
+ *   5. How it works  what the rest of the product does with it
+ *   6. Accuracy      why to believe the number
+ *   7. Privacy       why it is safe to have typed it
+ *   8. FAQ           the objections that are left
  *
  * Three sections were removed rather than reordered. A positioning strip that
  * said "the decision layer between your bank account and your bookkeeping" sat
@@ -35,12 +37,50 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
       <HeroSection />
       <TwoMoments />
+      <FlatRuleSection />
       <ProblemSection />
       <HowItWorksSection />
       <AccuracySection />
       <PrivacySection />
       <FaqSection />
     </main>
+  );
+}
+
+/**
+ * The strongest claim on the site, promoted from three clicks deep on
+ * /accuracy to directly under the calculator. The table is the shared
+ * engine-computed component, so this section and /accuracy can never disagree.
+ */
+function FlatRuleSection() {
+  const t = useT();
+  return (
+    <section
+      aria-label={t.home.flatRule.ariaLabel}
+      className="border-t border-[var(--fl-line)] bg-white"
+    >
+      <div className="mx-auto flex max-w-3xl flex-col gap-5 px-5 py-16 sm:px-8 sm:py-20">
+        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+          {t.home.flatRule.eyebrow}
+        </span>
+        <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+          {t.home.flatRule.heading}
+        </h2>
+        <p className="text-base leading-relaxed text-[var(--fl-slate)]">
+          {t.accuracyPage.flatRule.intro}
+        </p>
+        <FlatRuleTable />
+        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+          {t.accuracyPage.flatRule.whyItMatters}
+        </p>
+        <Link
+          href="/accuracy"
+          className="inline-flex min-h-11 w-fit items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+        >
+          {t.home.flatRule.link}
+        </Link>
+      </div>
+    </section>
   );
 }
 

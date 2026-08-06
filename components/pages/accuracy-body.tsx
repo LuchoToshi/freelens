@@ -7,8 +7,7 @@ import type { Locale } from "@/lib/i18n/types";
 import { fill } from "@/lib/i18n";
 import { ExternalLink, ShieldCheck, CircleAlert, CircleHelp } from "lucide-react";
 import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
-import { formatEuro, formatEuroExact, toCents, type Cents } from "@/lib/domain/money";
-import { headlineRows } from "@/lib/tax/oldVsNew";
+import { FlatRuleTable } from "@/components/design/flat-rule-table";
 import { DEFAULT_COUNTRY, latestProfileYear, loadProfile } from "@/lib/tax/loadProfile";
 import { container } from "@/components/container";
 
@@ -159,71 +158,7 @@ export function AccuracyPageBody() {
           <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
             {t.accuracyPage.flatRule.intro}
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--fl-line)] text-[var(--fl-slate)]">
-                  <th scope="col" className="py-2 pr-4 font-semibold">
-                    {t.accuracyPage.flatRule.colCase}
-                  </th>
-                  <th scope="col" className="py-2 pr-4 text-right font-semibold">
-                    {t.accuracyPage.flatRule.colOld}
-                  </th>
-                  <th scope="col" className="py-2 pr-4 text-right font-semibold">
-                    {t.accuracyPage.flatRule.colReal}
-                  </th>
-                  <th scope="col" className="py-2 text-right font-semibold">
-                    {t.accuracyPage.flatRule.colError}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {headlineRows().map((row) => {
-                  const id = String(row.testCase.id) as keyof typeof t.accuracyPage.flatRule.caseNames;
-                  const size = formatEuroExact(Math.abs(row.deltaA) as Cents);
-                  return (
-                    <tr key={row.testCase.id} className="border-b border-[var(--fl-line)] align-top">
-                      <th scope="row" className="py-3 pr-4 font-normal">
-                        <span className="block font-medium text-[var(--fl-ink)]">
-                          {t.accuracyPage.flatRule.caseNames[id]}
-                        </span>
-                        <span className="block text-xs text-[var(--fl-slate)]">
-                          {fill(t.accuracyPage.flatRule.profitLine, {
-                            revenue: formatEuro(toCents(row.testCase.revenueExVat)),
-                            costs: formatEuro(toCents(row.testCase.costsExVat)),
-                          })}
-                        </span>
-                      </th>
-                      <td className="fl-tnum py-3 pr-4 text-right font-mono text-[var(--fl-ink)]">
-                        {formatEuroExact(row.oldA)}
-                      </td>
-                      <td className="fl-tnum py-3 pr-4 text-right font-mono text-[var(--fl-ink)]">
-                        {formatEuroExact(row.actual)}
-                      </td>
-                      <td
-                        className="fl-tnum py-3 text-right font-mono font-medium"
-                        style={{
-                          color:
-                            row.deltaA < 0
-                              ? "var(--fl-short-text)"
-                              : "var(--fl-slate)",
-                        }}
-                      >
-                        {row.deltaA === 0
-                          ? t.accuracyPage.flatRule.exact
-                          : fill(
-                              row.deltaA > 0
-                                ? t.accuracyPage.flatRule.over
-                                : t.accuracyPage.flatRule.under,
-                              { amount: size }
-                            )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <FlatRuleTable />
           <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
             {t.accuracyPage.flatRule.whyItMatters}
           </p>

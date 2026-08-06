@@ -97,7 +97,7 @@ export const en = {
         "commission",
         "production day",
       ],
-      body: "Freelens runs the real Dutch tax rules in both directions. Put in a fee and see what survives it. Put in a payment and see what is genuinely yours.",
+      body: "Most freelancers reserve a flat 30%. On real numbers that misses by thousands of euros, in both directions. Freelens runs the actual Dutch rules: put in a fee and see what survives it, or a payment and see what is genuinely yours.",
       primaryCta: "Try it on your own numbers",
       secondaryCta: "See how it works",
       trust: {
@@ -281,6 +281,13 @@ export const en = {
         toggle: "Why do the two tabs show different percentages?",
         body: "Because they answer different questions. Quoting asks what one more job adds on top of the year you already expect, so it is taxed at the rate that job pushes you into. A payment that has arrived belongs to a year you are already committed to, so it carries its share of the whole year's bill instead. Same engine, same rules, two honest answers.",
       },
+    },
+
+    flatRule: {
+      ariaLabel: "What the flat rule costs",
+      eyebrow: "The evidence",
+      heading: "What the 30% rule actually costs.",
+      link: "How we know: every rate, source and case",
     },
 
     accuracy: {

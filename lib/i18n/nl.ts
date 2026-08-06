@@ -100,7 +100,7 @@ export const nl: DeepPartial<typeof en> = {
         "opdracht",
         "draaidag",
       ],
-      body: "Freelens rekent met de echte Nederlandse belastingregels, in twee richtingen. Vul een tarief in en zie wat er overblijft. Vul een betaling in en zie wat echt van jou is.",
+      body: "De meeste freelancers zetten vast 30% opzij. Op echte cijfers zit dat er duizenden euro's naast, in beide richtingen. Freelens rekent met de echte Nederlandse regels: vul een tarief in en zie wat ervan overblijft, of een betaling en zie wat echt van jou is.",
       primaryCta: "Probeer het met je eigen cijfers",
       secondaryCta: "Bekijk hoe het werkt",
       trust: {
@@ -275,6 +275,13 @@ export const nl: DeepPartial<typeof en> = {
         toggle: "Waarom laten de twee tabbladen andere percentages zien?",
         body: "Omdat ze een andere vraag beantwoorden. Bij offreren gaat het om wat één klus extra bovenop je verwachte jaar oplevert, dus die wordt belast tegen het tarief waar die klus je in duwt. Een betaling die al binnen is hoort bij een jaar waar je al aan vastzit, dus die draagt zijn deel van de hele jaarrekening. Dezelfde motor, dezelfde regels, twee eerlijke antwoorden.",
       },
+    },
+
+    flatRule: {
+      ariaLabel: "Wat de vaste regel kost",
+      eyebrow: "Het bewijs",
+      heading: "Wat de 30%-regel je echt kost.",
+      link: "Hoe we dit weten: elk tarief, elke bron, elk geval",
     },
 
     accuracy: {
