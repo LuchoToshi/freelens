@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleHelp, Plus } from "lucide-react";
 import { CurrencyField } from "@/components/app/fields";
 import { AllocationBar } from "@/components/app/allocation-bar";
 import { AnimatedAmount } from "@/components/design/animated-amount";
@@ -579,6 +579,37 @@ function JobResult({
         taxCents={result.additionalLiability}
         configVersion={result.configVersion}
       />
+
+      {/* The guardrail: the terms that decide whether this fee stays this fee.
+          Deterministic and unconditional; the product's job is that these
+          questions exist before the client answers them by default. */}
+      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-5">
+        <span className="text-sm font-semibold text-[var(--fl-ink)]">
+          {t.rate.job.guardrail.title}
+        </span>
+        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+          {t.rate.job.guardrail.intro}
+        </p>
+        <ul className="flex flex-col gap-2">
+          {([
+            t.rate.job.guardrail.rights,
+            t.rate.job.guardrail.revisions,
+            t.rate.job.guardrail.deposit,
+            t.rate.job.guardrail.killFee,
+          ]).map((q) => (
+            <li
+              key={q}
+              className="flex items-start gap-2.5 text-sm leading-relaxed text-[var(--fl-ink)]"
+            >
+              <CircleHelp
+                className="mt-0.5 size-4 shrink-0 text-[var(--fl-vat-text)]"
+                aria-hidden="true"
+              />
+              {q}
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/* Not collapsed. A zero-profit assumption makes this job look better
           than it is, which is the one direction the product must not be quiet

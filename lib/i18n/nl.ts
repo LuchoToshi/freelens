@@ -24,6 +24,7 @@ export const nl: DeepPartial<typeof en> = {
       beforeJob: "Voor de klus",
       afterPayment: "Na betaling",
       quotes: "Je offertes",
+      howItWorks: "Hoe het werkt",
       accuracy: "Nauwkeurigheid & bronnen",
       methodology: "Hoe we rekenen",
     },
@@ -61,9 +62,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "Freelens: wat een klus je echt oplevert, vooraf en achteraf",
+      title: "Freelens: de zakelijke kant van een creatieve klus, van begin tot eind",
       description:
-        "Voor Nederlandse freelancers en zzp'ers. Vul een tarief in en zie wat de belasting ervan overlaat. Vul een betaling in en zie wat echt van jou is. Met de echte schijven, aftrekposten en heffingskortingen van 2026, geen vast percentage. Schattingen om mee te plannen, geen belastingadvies, en je cijfers blijven op je apparaat.",
+        "Voor creatieve freelancers. Freelens prijst een klus op de echte Nederlandse regels van 2026, benoemt wat de offerte nog niet zegt, houdt de klok op het antwoord van de klant, en verdeelt de betaling eerlijk als die binnenkomt. Schattingen om mee te plannen, geen belastingadvies, en je cijfers blijven op je apparaat.",
     },
     about: {
       title: "Waarom Freelens bestaat: de beslislaag voor freelancers",
@@ -89,10 +90,10 @@ export const nl: DeepPartial<typeof en> = {
 
   home: {
     hero: {
-      eyebrow: "Voor Nederlandse freelancers en zzp'ers",
-      headlineStatic: "Wat je overhoudt aan een klus. Vóór de offerte, na de betaling.",
-      headlineLine1: "Wat je overhoudt aan een",
-      headlineLine3: "Vóór de offerte, na de betaling.",
+      eyebrow: "Voor creatieve freelancers, op de echte Nederlandse regels",
+      headlineStatic: "De zakelijke kant van een klus: geprijsd op de echte regels, bewaakt terwijl je wacht, eerlijk verdeeld als er betaald wordt.",
+      headlineLine1: "De zakelijke kant van een",
+      headlineLine3: "Geprijsd op de echte regels. Bewaakt terwijl je wacht. Eerlijk verdeeld als er betaald wordt.",
       contexts: [
         "shoot",
         "klus",
@@ -100,8 +101,8 @@ export const nl: DeepPartial<typeof en> = {
         "opdracht",
         "draaidag",
       ],
-      body: "De meeste freelancers zetten vast 30% opzij. Op echte cijfers zit dat er duizenden euro's naast, in beide richtingen. Freelens rekent met de echte Nederlandse regels: vul een tarief in en zie wat ervan overblijft, of een betaling en zie wat echt van jou is.",
-      primaryCta: "Probeer het met je eigen cijfers",
+      body: "Freelens draait de klus met je mee. Het prijst je tarief op de echte Nederlandse regels van 2026, benoemt wat je offerte nog niet zegt, houdt de klok op het antwoord van de klant, en laat zien wat echt van jou is als het geld binnenkomt.",
+      primaryCta: "Begin met een klus",
       secondaryCta: "Bekijk hoe het werkt",
       trust: {
         free: "Gratis te proberen",
@@ -127,43 +128,6 @@ export const nl: DeepPartial<typeof en> = {
       available: "Mogelijk beschikbaar om jezelf uit te betalen",
       footnote:
         "Een schatting om mee te plannen, geen aanslag. De echte tool gebruikt jouw eigen btw-behandeling en reserveringsregels. Je cijfers blijven op je apparaat.",
-    },
-    problem: {
-      eyebrow: "Het echte probleem",
-      heading: "Het bedrag dat je ziet is nooit het bedrag dat je houdt.",
-      body: "Een bedrag op een offerte en een saldo op je rekening hebben hetzelfde probleem. Allebei bruto. Btw, belasting en de kosten van het werk gaan er nog af, en geen van beide zegt wat er echt van jou is.",
-      claims: {
-        vat: "Wat je mogelijk nodig hebt voor de btw",
-        tax: "Wat van de Belastingdienst is",
-        costs: "Wat het kost om de zaak te runnen",
-        buffer: "Wat als buffer moet blijven staan",
-      },
-      closing:
-        "Freelens doet dezelfde aftreksom aan beide kanten: voordat je een prijs noemt, en nadat het geld binnen is.",
-      demoLabel: "Een betaling van {amount}",
-      demoYours: "{amount} voor jou",
-    },
-    howItWorks: {
-      eyebrow: "Hoe het werkt",
-      heading: "Voordat je offreert, en nadat je betaald krijgt.",
-      body: "Eén berekening, in twee richtingen. Voor de klus zie je wat er van een bedrag overblijft. Na de betaling krijgt elke euro een taak. En wat je eerder meetelde bepaalt in welke schijf de volgende klus valt, dus het zijn geen twee losse tools.",
-      steps: {
-        beforeQuote: {
-          title: "Voordat je een prijs noemt",
-          body: "Vul het tarief in waar je aan denkt. Freelens haalt eraf wat de klus je kost en welke belasting hij oplevert, over de echte schijven, zodat je ziet wat er overblijft vóór je de offerte stuurt.",
-        },
-        moneyArrives: {
-          title: "Nadat het geld binnen is",
-          body: "Vul de betaling in. Freelens haalt de btw eruit, zet een reservering opzij voor inkomstenbelasting en Zvw, en dekt je zakelijke kosten, zodat wat overblijft echt beschikbaar is om jezelf uit te betalen.",
-        },
-        overTime: {
-          title: "Door het jaar heen",
-          body: "Na betaling houdt je positie bij: wat beschermd is, wat vrij is, en hoeveel maanden je vooruit kunt. Toets een aankoop eraan vóór je hem doet. Opgeslagen op je apparaat, dus hij onthoudt het en jij hoeft dat niet.",
-        },
-      },
-      visuals: {
-        runway: "{months} maanden vooruit",
-      },
     },
     privacy: {
       ariaLabel: "Privacy",
@@ -258,8 +222,8 @@ export const nl: DeepPartial<typeof en> = {
     moments: {
       ariaLabel: "Probeer Freelens",
       eyebrow: "Probeer het",
-      heading: "Dezelfde motor, aan beide kanten van de klus.",
-      body: "Kies het moment waar je nu in zit. Allebei rekenen ze met de echte Nederlandse regels van {year}, en niets wat je hier invult wordt opgeslagen of verstuurd.",
+      heading: "Stap in waar de klus nu is.",
+      body: "Prijs een tarief waar je over nadenkt, of verdeel een betaling die binnenkwam. Dezelfde motor, dezelfde Nederlandse regels van {year}, één dossier, en niets wat je hier invult wordt opgeslagen of verstuurd tot jij dat zegt.",
       tablistLabel: "In welk moment zit je?",
       before: {
         tab: "Ik moet nog een prijs bepalen",
@@ -289,6 +253,39 @@ export const nl: DeepPartial<typeof en> = {
       done: "Genoteerd. Je hoort van ons zodra de cijfers verschuiven, en niet eerder.",
       error: "Dat ging niet door. Controleer het adres en probeer het opnieuw.",
       privacyNote: "Alleen voor dit ene doel bewaard, nooit gedeeld, en elke mail heeft een afmeldlink. Je berekeningen blijven hoe dan ook op je apparaat.",
+    },
+
+    lifecycle: {
+      ariaLabel: "Hoe Freelens een klus meedraait",
+      eyebrow: "Eén klus, van begin tot eind",
+      heading: "Freelens draait de klus met je mee.",
+      body: "Geen twee losse rekentools. Eén dossier dat de klus volgt van het eerste getal dat je intypt tot het geld op je rekening, en dat scherper wordt elke keer dat je vastlegt hoe een offerte afliep.",
+      stages: {
+        appears: {
+          title: "Er komt een klus binnen",
+          body: "Typ het tarief waar je aan denkt. Freelens prijst het op de echte schijven, aftrekposten en heffingskortingen, bovenop wat je dit jaar al verwacht, en laat zien wat je er werkelijk aan overhoudt.",
+        },
+        beforeSend: {
+          title: "Voordat de offerte de deur uitgaat",
+          body: "Het legt de vragen voor je klaar die creatieve offertes overslaan: gebruiksrechten, revisierondes, een aanbetaling, een annuleringsvergoeding. Onbeantwoord is prima. Ongesteld is hoe een klus twee keer zo groot wordt.",
+        },
+        waiting: {
+          title: "Terwijl je wacht",
+          body: "Bewaar de offerte en de klok loopt. Twee weken zonder antwoord en Freelens zegt het, voordat nabellen ongemakkelijk wordt. Een factuur krijgt dezelfde behandeling op 30 en 60 dagen.",
+        },
+        outcome: {
+          title: "Gewonnen, of verloren",
+          body: "Eén tik legt de uitkomst vast, en de prijs waar het echt op uitkwam. Het verschil tussen geoffreerd en afgesproken is jouw eigen kortingsgeschiedenis, en geen boekhoudpakket kan die bewaren, want een verloren offerte haalt de boekhouding nooit.",
+        },
+        lands: {
+          title: "Het geld komt binnen",
+          body: "De betaling valt uiteen in btw, een belastingreservering op de echte regels, zakelijke kosten en wat echt van jou is. Meegeteld in je jaar, zodat de volgende offerte in de juiste schijf valt.",
+        },
+        learns: {
+          title: "De volgende klus weet meer",
+          body: "Elke vastgelegde uitkomst maakt het beeld scherper: wat je vraagt, wat je wint, waar je op uitkomt. Dat is de dataset die niemand anders heeft, wat de markt van jouw prijzen vindt, en hij staat op jouw apparaat.",
+        },
+      },
     },
 
     flatRule: {
@@ -481,6 +478,15 @@ export const nl: DeepPartial<typeof en> = {
     emptyBody:
       "Reken een klus door met de calculator en bewaar de offerte. Eén tik, en je hebt iets om naar terug te komen zodra de klant antwoordt.",
     emptyCta: "Reken een klus door",
+    signals: {
+      ariaLabel: "Wat aandacht vraagt",
+      fallbackName: "Een bewaarde offerte",
+      quoteWaiting: "{name} is al {days} dagen stil over een offerte van {amount}. Tijd om te vragen.",
+      paymentWaiting: "{name}: {amount} gefactureerd, {days} dagen open. Een herinnering waard.",
+      paymentOverdue: "{name}: {amount} is over de vervaldatum heen.",
+      outstandingTotal: "{count} oudere facturen open, samen {amount}.",
+      recentlyPaid: "{name} heeft {amount} betaald.",
+    },
     status: {
       quoted: "Openstaand",
       accepted: "Gewonnen",
@@ -680,6 +686,15 @@ export const nl: DeepPartial<typeof en> = {
           rolledOver:
             "Het is een nieuw belastingjaar, dus je lopende totaal begint weer bij nul. Het bedrag van vorig jaar zou het werk van dit jaar in de verkeerde schijf zetten.",
           rolledOverDismiss: "Duidelijk",
+        },
+
+        guardrail: {
+          title: "Voordat dit de deur uitgaat",
+          intro: "De vier voorwaarden die creatieve offertes het vaakst vergeten. Freelens heeft geen mening over de antwoorden, alleen dat de vragen er zijn voordat de klant ze voor jou beantwoordt.",
+          rights: "Gebruik: wat mag de klant met het werk doen, waar, en hoe lang?",
+          revisions: "Revisies: hoeveel rondes zitten er in dit tarief?",
+          deposit: "Aanbetaling: welk deel wordt betaald voordat je begint?",
+          killFee: "Annuleringsvergoeding: wat staat er tegenover late afzegging?",
         },
 
         save: {

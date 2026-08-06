@@ -19,6 +19,7 @@ export const en = {
       beforeJob: "Before the job",
       afterPayment: "After payment",
       quotes: "Your quotes",
+      howItWorks: "How it works",
       accuracy: "Accuracy & sources",
       methodology: "How it's calculated",
     },
@@ -58,9 +59,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "Freelens: what a job actually leaves you, before and after",
+      title: "Freelens: the business side of a creative job, start to finish",
       description:
-        "For Dutch freelancers and ZZP'ers. Put in a fee and see what survives the tax on it. Put in a payment and see what is genuinely yours. Real 2026 brackets, deductions and credits, not a flat percentage. Planning estimates, not tax advice, and your figures stay on your device.",
+        "For creative freelancers. Freelens prices a job on the real 2026 Dutch rules, names what the quote leaves unsaid, keeps the clock on the client's answer, and splits the payment honestly when it lands. Planning estimates, not tax advice, and your figures stay on your device.",
     },
     about: {
       title: "Why Freelens exists: the decision layer for freelancers",
@@ -86,10 +87,10 @@ export const en = {
 
   home: {
     hero: {
-      eyebrow: "For Dutch freelancers and ZZP'ers",
-      headlineStatic: "What you keep from a job. Before the quote, after the payment.",
-      headlineLine1: "What you keep from a",
-      headlineLine3: "Before the quote, after the payment.",
+      eyebrow: "For creative freelancers, on the real Dutch rules",
+      headlineStatic: "The business side of a job: priced on the real rules, watched while you wait, split honestly when it pays.",
+      headlineLine1: "The business side of a",
+      headlineLine3: "Priced on the real rules. Watched while you wait. Split honestly when it pays.",
       contexts: [
         "shoot",
         "gig",
@@ -97,8 +98,8 @@ export const en = {
         "commission",
         "production day",
       ],
-      body: "Most freelancers reserve a flat 30%. On real numbers that misses by thousands of euros, in both directions. Freelens runs the actual Dutch rules: put in a fee and see what survives it, or a payment and see what is genuinely yours.",
-      primaryCta: "Try it on your own numbers",
+      body: "Freelens works the job with you. It prices your fee on the actual 2026 Dutch rules, names what your quote leaves unsaid, keeps the clock on the client's answer, and shows what is genuinely yours when the money lands.",
+      primaryCta: "Start with a job",
       secondaryCta: "See how it works",
       trust: {
         free: "Free to try",
@@ -123,43 +124,6 @@ export const en = {
       available: "May be available to pay yourself",
       footnote:
         "A planning estimate, not a tax assessment. The real tool uses your own VAT treatment and reserve rules. Your numbers stay on your device.",
-    },
-    problem: {
-      eyebrow: "The real problem",
-      heading: "The number you see is never the number you keep.",
-      body: "A fee on a quote and a balance in your account have the same problem. Both are gross. btw, tax and the cost of doing the work still come out, and neither figure tells you what is actually yours.",
-      claims: {
-        vat: "What may be needed for VAT",
-        tax: "What belongs to the tax authority",
-        costs: "What it costs to run the business",
-        buffer: "What should stay as a buffer",
-      },
-      closing:
-        "Freelens does the same subtraction at both ends: before you name a price, and after the money lands.",
-      demoLabel: "A {amount} payment",
-      demoYours: "{amount} yours",
-    },
-    howItWorks: {
-      eyebrow: "How it works",
-      heading: "Before you quote, and after you're paid.",
-      body: "One calculation, run in both directions. Before the job it tells you what a fee survives. After the payment it gives every euro a job. And what you counted before decides which bracket the next job lands in, so the two ends are not separate tools.",
-      steps: {
-        beforeQuote: {
-          title: "Before you name a price",
-          body: "Put in the fee you are considering. Freelens takes out what the job costs you and the tax it triggers across the real brackets, so you see what survives before you send the quote.",
-        },
-        moneyArrives: {
-          title: "After the money lands",
-          body: "Enter the payment. Freelens separates the btw, sets aside an income tax and Zvw reserve, and covers your business costs, so what is left is genuinely available to pay yourself.",
-        },
-        overTime: {
-          title: "Over the year",
-          body: "After payment keeps your position current: what is protected, what is free, and how many months of runway you have. Test a purchase against it before you make it. Saved on your device, so it remembers and you do not have to.",
-        },
-      },
-      visuals: {
-        runway: "{months} months of runway",
-      },
     },
     privacy: {
       ariaLabel: "Privacy",
@@ -264,8 +228,8 @@ export const en = {
     moments: {
       ariaLabel: "Try Freelens",
       eyebrow: "Try it",
-      heading: "Same engine, both ends of the job.",
-      body: "Pick the moment you are in. Both run on the real {year} Dutch rules, and nothing you type here is saved or sent anywhere.",
+      heading: "Step in where the job is.",
+      body: "Price a fee you are considering, or split a payment that landed. Same engine, same {year} Dutch rules, one record, and nothing you type here is saved or sent anywhere until you say so.",
       tablistLabel: "Which moment are you in?",
       before: {
         tab: "I still need to name a price",
@@ -295,6 +259,39 @@ export const en = {
       done: "Noted. You will hear from us when the figures move, and not before.",
       error: "That did not go through. Check the address and try again.",
       privacyNote: "Stored for this one purpose, never shared, and every mail has an unsubscribe. Your calculations stay on your device either way.",
+    },
+
+    lifecycle: {
+      ariaLabel: "How Freelens works a job",
+      eyebrow: "One job, start to finish",
+      heading: "Freelens works the job with you.",
+      body: "Not two calculators. One record that follows the job from the first number you type to the money in your account, and it gets sharper every time you tell it how a quote ended.",
+      stages: {
+        appears: {
+          title: "A job shows up",
+          body: "Type the fee you have in mind. Freelens prices it on the real brackets, deductions and credits, on top of what you already expect this year, and shows what you would actually keep.",
+        },
+        beforeSend: {
+          title: "Before the quote goes out",
+          body: "It puts the questions creative quotes skip in front of you: usage rights, revision rounds, a deposit, a kill fee. Unanswered is fine. Unasked is how a job doubles in size.",
+        },
+        waiting: {
+          title: "While you wait",
+          body: "Save the quote and the clock runs. Two weeks without an answer and Freelens says so, before following up gets awkward. An invoice gets the same treatment at 30 and 60 days.",
+        },
+        outcome: {
+          title: "Won, or lost",
+          body: "One tap records the outcome and the fee you actually settled on. The gap between quoted and agreed is your own discount history, and no bookkeeping tool can hold it, because a lost quote never reaches one.",
+        },
+        lands: {
+          title: "The money lands",
+          body: "The payment splits into btw, a tax reserve on the real rules, business costs, and what is genuinely yours. Counted into your year, so the next quote lands in the right bracket.",
+        },
+        learns: {
+          title: "The next job knows more",
+          body: "Every recorded outcome sharpens the picture: what you quote, what you win, what you settle for. That is the one dataset nobody else has, what the market says to your prices, and it lives on your device.",
+        },
+      },
     },
 
     flatRule: {
@@ -487,6 +484,15 @@ export const en = {
     emptyBody:
       "Price a job with the calculator, then save the quote. It takes one tap and gives you something to come back to when the client answers.",
     emptyCta: "Price a job",
+    signals: {
+      ariaLabel: "What needs attention",
+      fallbackName: "A saved quote",
+      quoteWaiting: "{name} has been quiet for {days} days on a {amount} quote. Time to ask.",
+      paymentWaiting: "{name}: {amount} invoiced, {days} days open. Worth a reminder.",
+      paymentOverdue: "{name}: {amount} is past its due date.",
+      outstandingTotal: "{count} older invoices open, {amount} in total.",
+      recentlyPaid: "{name} paid {amount}.",
+    },
     status: {
       quoted: "Open",
       accepted: "Won",
@@ -702,6 +708,15 @@ export const en = {
           rolledOver:
             "It is a new tax year, so your running total has started again at zero. Last year's figure would put this year's work in the wrong bracket.",
           rolledOverDismiss: "Got it",
+        },
+
+        guardrail: {
+          title: "Before this goes out",
+          intro: "The four terms creative quotes forget more than any others. Freelens has no view on the answers, only that the questions exist before the client settles them for you.",
+          rights: "Usage: what may the client do with the work, where, and for how long?",
+          revisions: "Revisions: how many rounds does this fee include?",
+          deposit: "Deposit: what part is paid before you start?",
+          killFee: "Kill fee: what is owed if the job is cancelled late?",
         },
 
         save: {

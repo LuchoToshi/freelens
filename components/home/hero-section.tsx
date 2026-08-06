@@ -84,7 +84,7 @@ export function HeroSection() {
             <ArrowRight className="size-4" aria-hidden="true" />
           </a>
           <a
-            href="#how-it-works"
+            href="#lifecycle"
             className="inline-flex min-h-12 items-center justify-center px-2 text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
           >
             {t.home.hero.secondaryCta}

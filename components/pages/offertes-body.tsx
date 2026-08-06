@@ -24,6 +24,7 @@ import {
   type JobRecord,
   type JobStatus,
 } from "@/lib/domain/jobs";
+import { jobSignals, type JobSignal } from "@/lib/domain/jobSignals";
 import {
   formatEuro,
   parseAmountInput,
@@ -60,6 +61,11 @@ export function OffertesPageBody() {
 
   const jobs = sortJobsForPipeline(store.jobs);
 
+  // The signals layer: what crossed a threshold since the last visit. Computed
+  // on load from the jobs themselves; silence is the default, so an empty list
+  // renders nothing at all.
+  const signals = jobSignals({ jobs: store.jobs, today: todayIso() });
+
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
       <div className={`${container} flex flex-col gap-8 py-12`}>
@@ -77,6 +83,17 @@ export function OffertesPageBody() {
           </p>
           <p className={hintClass}>{o.onDevice}</p>
         </header>
+
+        {signals.length > 0 && (
+          <ul
+            aria-label={o.signals.ariaLabel}
+            className="flex flex-col gap-2"
+          >
+            {signals.map((signal) => (
+              <SignalLine key={signal.key} signal={signal} jobs={store.jobs} />
+            ))}
+          </ul>
+        )}
 
         {store.hydrated && jobs.length === 0 && (
           <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-6">
@@ -265,6 +282,47 @@ function QuoteRow({
           </div>
         </div>
       )}
+    </li>
+  );
+}
+
+/**
+ * One threshold crossing, one sentence. The wording lives in the dictionary;
+ * this only decides which sentence and fills the numbers in.
+ */
+function SignalLine({
+  signal,
+  jobs,
+}: {
+  signal: JobSignal;
+  jobs: readonly JobRecord[];
+}) {
+  const t = useT();
+  const o = t.offertesPage;
+  const job = jobs.find((j) => j.id === signal.jobId);
+  const name = job?.client || job?.project || o.signals.fallbackName;
+  const amount = formatEuro(signal.amountCents ?? (0 as never));
+
+  const text =
+    signal.kind === "quote-waiting"
+      ? fill(o.signals.quoteWaiting, { name, days: signal.days ?? 0, amount })
+      : signal.kind === "payment-waiting"
+        ? fill(o.signals.paymentWaiting, { name, days: signal.days ?? 0, amount })
+        : signal.kind === "payment-overdue"
+          ? fill(o.signals.paymentOverdue, { name, amount })
+          : signal.kind === "outstanding-total"
+            ? fill(o.signals.outstandingTotal, { count: signal.count ?? 0, amount })
+            : fill(o.signals.recentlyPaid, { name, amount });
+
+  return (
+    <li
+      className={`rounded-xl border px-4 py-3 text-sm leading-relaxed ${
+        signal.tone === "attention"
+          ? "border-[var(--fl-vat-fill)] bg-[var(--fl-vat-tint)] text-[var(--fl-ink)]"
+          : "border-[var(--fl-line)] bg-white text-[var(--fl-ink)]"
+      }`}
+    >
+      {text}
     </li>
   );
 }

@@ -61,20 +61,19 @@ export function SiteHeader() {
           {t.common.brand}
         </Link>
 
-        {/* The two destinations carry the same two names here, in the footer,
-            in the page headings and in the metadata. They used to have five
-            between them ("After payment", "Open the workspace", "Your money
-            workspace", "I have been paid", "See what's actually mine"), which
-            is why the site read as more places than it has. */}
+        {/* One story, one record: the lifecycle explains the product, the
+            quote list is where it accumulates. The calculators stay reachable
+            from inside the flow and from the footer, where their search
+            traffic still lands. */}
         <nav
           aria-label={t.common.nav.ariaLabel}
           className="order-last flex w-full items-center justify-end gap-x-4 sm:order-none sm:w-auto sm:gap-x-5"
         >
-          <NavLink href="/tarief" pathname={pathname}>
-            {t.common.nav.beforeJob}
+          <NavLink href="/#lifecycle" pathname={pathname}>
+            {t.common.nav.howItWorks}
           </NavLink>
-          <NavLink href="/tool" pathname={pathname}>
-            {t.common.nav.afterPayment}
+          <NavLink href="/offertes" pathname={pathname}>
+            {t.common.nav.quotes}
           </NavLink>
           <NavLink href="/about" pathname={pathname}>
             {t.common.nav.about}

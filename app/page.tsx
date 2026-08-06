@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { HeroSection } from "@/components/home/hero-section";
 import { TwoMoments } from "@/components/home/two-moments";
+import { LifecycleSection } from "@/components/home/lifecycle-section";
 import { FlatRuleTable } from "@/components/design/flat-rule-table";
 import { SignupSection } from "@/components/home/signup-section";
-import { ProblemSection } from "@/components/home/problem-section";
-import { HowItWorksSection } from "@/components/home/how-it-works-section";
 import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
 import { ConfidenceBlock } from "@/components/design/confidence-block";
@@ -16,15 +15,14 @@ import { container } from "@/components/container";
 /**
  * One narrative, in the order a visitor actually needs it.
  *
- *   1. Hero          the claim, and what they get instead
+ *   1. Hero          the promise: one product that works the job with you
  *   2. Two moments   something to act on, before any further reading
- *   3. Flat rule     the claim proven, from the engine, both directions
- *   4. Problem       why the number they just saw is that number
- *   5. How it works  what the rest of the product does with it
- *   6. Accuracy      why to believe the number
- *   7. Signup        the one ask, tied to the config being checkable
- *   8. Privacy       why it is safe to have typed it
- *   9. FAQ           the objections that are left
+ *   3. Flat rule     the pricing claim proven, from the engine
+ *   4. Lifecycle     the job's timeline, every sentence true of today's build
+ *   5. Accuracy      why to believe the number
+ *   6. Signup        the one ask, tied to the config being checkable
+ *   7. Privacy       why it is safe to have typed it
+ *   8. FAQ           the objections that are left
  *
  * Three sections were removed rather than reordered. A positioning strip that
  * said "the decision layer between your bank account and your bookkeeping" sat
@@ -40,8 +38,7 @@ export default function Home() {
       <HeroSection />
       <TwoMoments />
       <FlatRuleSection />
-      <ProblemSection />
-      <HowItWorksSection />
+      <LifecycleSection />
       <AccuracySection />
       <SignupSection />
       <PrivacySection />
