@@ -165,7 +165,7 @@ export const en = {
       ariaLabel: "Privacy",
       eyebrow: "Are my numbers safe?",
       heading: "Your financial data never leaves your browser.",
-      body: "Your figures are never uploaded. They are saved in this browser, and you can clear them at any time. Freelens counts anonymous page views so we know the site is used, and that is the whole of what we collect.",
+      body: "Your figures are never uploaded. They are saved in this browser, and you can clear them at any time. Freelens counts anonymous page views, and keeps an email address only if you choose to leave one. That is the whole of what we collect.",
       points: ["No accounts.", "No bank connection.", "No figures uploaded."],
       thisDevice: "this device",
       demo: {
@@ -281,6 +281,20 @@ export const en = {
         toggle: "Why do the two tabs show different percentages?",
         body: "Because they answer different questions. Quoting asks what one more job adds on top of the year you already expect, so it is taxed at the rate that job pushes you into. A payment that has arrived belongs to a year you are already committed to, so it carries its share of the whole year's bill instead. Same engine, same rules, two honest answers.",
       },
+    },
+
+    signup: {
+      ariaLabel: "Hear when the rules change",
+      heading: "The rules move. This site moves with them.",
+      body: "Every figure here comes from config {version}, checked against belastingdienst.nl on {date}. Leave an email and we tell you when the rules change and the figures move. That is the only mail you will get.",
+      bodyFallback: "Every figure here is checked against belastingdienst.nl. Leave an email and we tell you when the rules change and the figures move. That is the only mail you will get.",
+      emailLabel: "Your email",
+      placeholder: "you@example.com",
+      submit: "Tell me when the rules change",
+      sending: "One moment",
+      done: "Noted. You will hear from us when the figures move, and not before.",
+      error: "That did not go through. Check the address and try again.",
+      privacyNote: "Stored for this one purpose, never shared, and every mail has an unsubscribe. Your calculations stay on your device either way.",
     },
 
     flatRule: {

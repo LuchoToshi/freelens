@@ -169,7 +169,7 @@ export const nl: DeepPartial<typeof en> = {
       ariaLabel: "Privacy",
       eyebrow: "Zijn mijn cijfers veilig?",
       heading: "Je financiële gegevens verlaten je browser nooit.",
-      body: "Je bedragen worden nooit geüpload. Ze staan in deze browser en je kunt ze altijd wissen. Freelens telt anonieme paginaweergaven zodat we weten dat de site gebruikt wordt, en dat is alles wat we verzamelen.",
+      body: "Je bedragen worden nooit geüpload. Ze staan in deze browser en je kunt ze altijd wissen. Freelens telt anonieme paginaweergaven, en bewaart een e-mailadres alleen als je dat zelf achterlaat. Dat is alles wat we verzamelen.",
       points: ["Geen accounts.", "Geen bankkoppeling.", "Geen bedragen geüpload."],
       thisDevice: "dit apparaat",
       demo: {
@@ -275,6 +275,20 @@ export const nl: DeepPartial<typeof en> = {
         toggle: "Waarom laten de twee tabbladen andere percentages zien?",
         body: "Omdat ze een andere vraag beantwoorden. Bij offreren gaat het om wat één klus extra bovenop je verwachte jaar oplevert, dus die wordt belast tegen het tarief waar die klus je in duwt. Een betaling die al binnen is hoort bij een jaar waar je al aan vastzit, dus die draagt zijn deel van de hele jaarrekening. Dezelfde motor, dezelfde regels, twee eerlijke antwoorden.",
       },
+    },
+
+    signup: {
+      ariaLabel: "Hoor het als de regels veranderen",
+      heading: "De regels schuiven. Deze site schuift mee.",
+      body: "Elk cijfer hier komt uit config {version}, gecontroleerd bij belastingdienst.nl op {date}. Laat een e-mailadres achter en we melden het als de regels veranderen en de cijfers verschuiven. Meer mail krijg je niet.",
+      bodyFallback: "Elk cijfer hier wordt gecontroleerd bij belastingdienst.nl. Laat een e-mailadres achter en we melden het als de regels veranderen en de cijfers verschuiven. Meer mail krijg je niet.",
+      emailLabel: "Je e-mailadres",
+      placeholder: "jij@voorbeeld.nl",
+      submit: "Meld me als de regels veranderen",
+      sending: "Momentje",
+      done: "Genoteerd. Je hoort van ons zodra de cijfers verschuiven, en niet eerder.",
+      error: "Dat ging niet door. Controleer het adres en probeer het opnieuw.",
+      privacyNote: "Alleen voor dit ene doel bewaard, nooit gedeeld, en elke mail heeft een afmeldlink. Je berekeningen blijven hoe dan ook op je apparaat.",
     },
 
     flatRule: {
