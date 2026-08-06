@@ -21,6 +21,7 @@ export type AnalyticsEvent =
   | "year_position_undone"
   | "year_position_prefilled"
   | "year_position_reset"
+  | "waitlist_submitted"
   | "quote_calculated"
   | "quote_saved"
   | "quote_won"

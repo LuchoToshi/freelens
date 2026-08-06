@@ -64,9 +64,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "Freelens: the business side of a creative job, start to finish",
+      title: "Freelens Rebooking: your past clients are your next booking",
       description:
-        "For creative freelancers. Freelens prices a job on the real 2026 Dutch rules, names what the quote leaves unsaid, keeps the clock on the client's answer, and splits the payment honestly when it lands. Planning estimates, not tax advice, and your figures stay on your device.",
+        "For creative freelancers. Freelens remembers your past clients, knows when a message is worth sending, and drafts it in your voice. You press send. Private beta, onboarding the first 25. Free Dutch tax calculators included.",
     },
     about: {
       title: "Why Freelens exists: the decision layer for freelancers",
@@ -274,6 +274,77 @@ export const en = {
       done: "Noted. You will hear from us when the figures move, and not before.",
       error: "That did not go through. Check the address and try again.",
       privacyNote: "Stored for this one purpose, never shared, and every mail has an unsubscribe. Your calculations stay on your device either way.",
+    },
+
+    rebooking: {
+      heroEyebrow: "For creative freelancers",
+      betaPill: "Private beta \u00b7 onboarding the first 25",
+      heroQuestion: "When did you last talk to your best client from last year?",
+      heroSub: "Your easiest next job is a client you already know. Freelens remembers who, knows when, and writes the first email \u2014 in your voice. You press send.",
+      heroCta: "Join the waitlist",
+      how: {
+        eyebrow: "How it will work",
+        heading: "Three steps, one of them yours.",
+        steps: [
+          {
+            title: "Give it your past clients, once",
+            body: "Name, what you did, when, roughly what it was worth. About fifteen minutes, and it never needs doing again.",
+          },
+          {
+            title: "Each week: two to four people worth a message",
+            body: "Chosen for a real reason \u2014 a year since the last shoot, briefing season in their world \u2014 never \u201cjust checking in\u201d.",
+          },
+          {
+            title: "It drafts, you send",
+            body: "The email arrives written in your voice. You edit what you want and send it from your own inbox. Freelens never sends anything to anyone.",
+          },
+        ],
+      },
+      offer: {
+        eyebrow: "Founding offer",
+        heading: "Freelens Rebooking is in private beta.",
+        body: "We are onboarding the first 25 freelancers. Nothing here is live yet, and we would rather say that plainly than pretend otherwise.",
+        priceLine: "Founding price: \u20ac99 for the first year.",
+        priceNote: "The standard price will be \u20ac190 a year or \u20ac19 a month. Founding spots are limited to 25 and only exist before launch.",
+      },
+      waitlist: {
+        heading: "Get one of the 25 spots",
+        nameLabel: "Your name",
+        namePlaceholder: "First name is fine",
+        emailLabel: "Your email",
+        emailPlaceholder: "you@example.com",
+        craftLabel: "What do you make?",
+        crafts: {
+          photographer: "Photographer",
+          videographer: "Videographer",
+          designer: "Designer",
+          illustrator: "Illustrator",
+          other: "Something else",
+        },
+        submit: "Put me on the waitlist",
+        sending: "One moment",
+        done: "Almost there: open your inbox and click the confirmation link. No confirmation, no spot \u2014 that is how we know the address is yours.",
+        error: "That did not go through. Check the fields and try again.",
+        privacyNote: "Used only to tell you about the beta. Confirmed by you, deleted on request, never shared.",
+      },
+      trust: {
+        eyebrow: "Where the line is",
+        heading: "The agent never sends anything.",
+        body: "You always send it yourself, from your own mail. Your client data is used for nothing else and can always be exported and deleted.",
+        points: [
+          "Every email leaves from your own inbox, pressed by you",
+          "Client records hold a name, a project, a date \u2014 never addresses, phone numbers or registration numbers",
+          "Export everything or delete everything, from day one",
+        ],
+      },
+      tools: {
+        eyebrow: "Meanwhile, free",
+        heading: "Free calculators for Dutch freelancers.",
+        body: "The deterministic tax engine behind Freelens is live today, checked against belastingdienst.nl.",
+        teaser: "The flat 30% rule misses by up to \u20ac16.720 on real numbers.",
+        teaserCta: "See the evidence",
+        allCta: "All calculators",
+      },
     },
 
     lifecycle: {

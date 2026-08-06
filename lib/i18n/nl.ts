@@ -67,9 +67,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "Freelens: de zakelijke kant van een creatieve klus, van begin tot eind",
+      title: "Freelens Rebooking: je oude klanten zijn je volgende boeking",
       description:
-        "Voor creatieve freelancers. Freelens prijst een klus op de echte Nederlandse regels van 2026, benoemt wat de offerte nog niet zegt, houdt de klok op het antwoord van de klant, en verdeelt de betaling eerlijk als die binnenkomt. Schattingen om mee te plannen, geen belastingadvies, en je cijfers blijven op je apparaat.",
+        "Voor creatieve freelancers. Freelens onthoudt je oude klanten, weet wanneer een berichtje het waard is, en schrijft het in jouw toon. Jij drukt op verzenden. Besloten b\u00e8ta, we onboarden de eerste 25. Gratis Nederlandse rekentools inbegrepen.",
     },
     about: {
       title: "Waarom Freelens bestaat: de beslislaag voor freelancers",
@@ -268,6 +268,77 @@ export const nl: DeepPartial<typeof en> = {
       done: "Genoteerd. Je hoort van ons zodra de cijfers verschuiven, en niet eerder.",
       error: "Dat ging niet door. Controleer het adres en probeer het opnieuw.",
       privacyNote: "Alleen voor dit ene doel bewaard, nooit gedeeld, en elke mail heeft een afmeldlink. Je berekeningen blijven hoe dan ook op je apparaat.",
+    },
+
+    rebooking: {
+      heroEyebrow: "Voor creatieve freelancers",
+      betaPill: "Besloten b\u00e8ta \u00b7 we onboarden de eerste 25",
+      heroQuestion: "Wanneer sprak je je beste klant van vorig jaar voor het laatst?",
+      heroSub: "Je makkelijkste volgende klus is een klant die je al kent. Freelens onthoudt wie, weet wanneer, en schrijft de eerste mail \u2014 in jouw toon. Jij drukt op verzenden.",
+      heroCta: "Zet me op de wachtlijst",
+      how: {
+        eyebrow: "Zo gaat het werken",
+        heading: "Drie stappen, waarvan \u00e9\u00e9n van jou.",
+        steps: [
+          {
+            title: "Geef \u00e9\u00e9n keer je oude klanten door",
+            body: "Naam, wat je deed, wanneer, ongeveer welk bedrag. Een kwartier werk, en daarna nooit meer.",
+          },
+          {
+            title: "Elke week: twee tot vier mensen die een berichtje waard zijn",
+            body: "Gekozen met een echte reden \u2014 een jaar na de vorige shoot, briefingseizoen in hun wereld \u2014 nooit \u201ceven checken\u201d.",
+          },
+          {
+            title: "Het schrijft, jij verstuurt",
+            body: "De mail staat klaar in jouw toon. Jij past aan wat je wilt en verstuurt hem vanuit je eigen inbox. Freelens verstuurt nooit iets naar wie dan ook.",
+          },
+        ],
+      },
+      offer: {
+        eyebrow: "Founding-aanbod",
+        heading: "Freelens Rebooking is in besloten b\u00e8ta.",
+        body: "We onboarden de eerste 25 freelancers. Er is nog niets live, en dat zeggen we liever hardop dan dat we doen alsof.",
+        priceLine: "Founding-prijs: \u20ac99 voor het eerste jaar.",
+        priceNote: "De standaardprijs wordt \u20ac190 per jaar of \u20ac19 per maand. Founding-plekken zijn beperkt tot 25 en bestaan alleen v\u00f3\u00f3r de lancering.",
+      },
+      waitlist: {
+        heading: "Pak een van de 25 plekken",
+        nameLabel: "Je naam",
+        namePlaceholder: "Voornaam is genoeg",
+        emailLabel: "Je e-mailadres",
+        emailPlaceholder: "jij@voorbeeld.nl",
+        craftLabel: "Wat maak je?",
+        crafts: {
+          photographer: "Fotograaf",
+          videographer: "Videograaf",
+          designer: "Ontwerper",
+          illustrator: "Illustrator",
+          other: "Iets anders",
+        },
+        submit: "Zet me op de wachtlijst",
+        sending: "Momentje",
+        done: "Bijna: open je inbox en klik op de bevestigingslink. Geen bevestiging, geen plek \u2014 zo weten we dat het adres van jou is.",
+        error: "Dat ging niet door. Controleer de velden en probeer het opnieuw.",
+        privacyNote: "Alleen gebruikt om je over de b\u00e8ta te vertellen. Door jou bevestigd, op verzoek verwijderd, nooit gedeeld.",
+      },
+      trust: {
+        eyebrow: "Waar de grens ligt",
+        heading: "De agent verstuurt nooit iets.",
+        body: "Jij verstuurt altijd zelf, vanuit je eigen mail. Je klantgegevens worden nergens anders voor gebruikt en zijn altijd te exporteren en te verwijderen.",
+        points: [
+          "Elke mail vertrekt uit je eigen inbox, verstuurd door jou",
+          "Klantrecords bevatten een naam, een project, een datum \u2014 nooit adressen, telefoonnummers of registratienummers",
+          "Alles exporteren of alles verwijderen, vanaf dag \u00e9\u00e9n",
+        ],
+      },
+      tools: {
+        eyebrow: "Ondertussen, gratis",
+        heading: "Gratis rekentools voor zzp'ers.",
+        body: "De deterministische belastingmotor achter Freelens is vandaag al live, gecontroleerd bij belastingdienst.nl.",
+        teaser: "De vaste 30%-regel zit er op echte cijfers tot \u20ac16.720 naast.",
+        teaserCta: "Bekijk het bewijs",
+        allCta: "Alle rekentools",
+      },
     },
 
     lifecycle: {

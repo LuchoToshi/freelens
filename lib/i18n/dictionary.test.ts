@@ -42,6 +42,7 @@ describe("the Dutch dictionary covers the English one", () => {
       "common.nav.contact",
       "meta.privacy.title",
       "privacyPage.eyebrow",
+      "home.rebooking.waitlist.crafts.illustrator",
       "app.shell.eyebrow",
       "meta.home.title",
       "home.privacy.ariaLabel",

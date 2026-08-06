@@ -1,114 +1,190 @@
 "use client";
 
 import Link from "next/link";
-import { HeroSection } from "@/components/home/hero-section";
-import { TwoMoments } from "@/components/home/two-moments";
-import { LifecycleSection } from "@/components/home/lifecycle-section";
-import { FlatRuleTable } from "@/components/design/flat-rule-table";
-import { SignupSection } from "@/components/home/signup-section";
-import { PrivacySection } from "@/components/home/privacy-section";
-import { FaqSection } from "@/components/home/faq-section";
-import { ConfidenceBlock } from "@/components/design/confidence-block";
-import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
+import { ArrowRight } from "lucide-react";
 import { container } from "@/components/container";
+import { WaitlistForm } from "@/components/rebooking/waitlist-form";
+import { linkButtonClass, primaryButtonClass } from "@/components/app/styles";
+import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 /**
- * One narrative, in the order a visitor actually needs it.
+ * The Rebooking front door.
  *
- *   1. Hero          the promise: one product that works the job with you
- *   2. Two moments   something to act on, before any further reading
- *   3. Flat rule     the pricing claim proven, from the engine
- *   4. Lifecycle     the job's timeline, every sentence true of today's build
- *   5. Accuracy      why to believe the number
- *   6. Signup        the one ask, tied to the config being checkable
- *   7. Privacy       why it is safe to have typed it
- *   8. FAQ           the objections that are left
+ * Everything above the fold is a question, a promise and a way onto the list.
+ * The product is pre-launch and the page says so out loud: private beta,
+ * first 25, founding price labelled founding. No screenshots of features that
+ * do not exist, no invented users, no metrics.
  *
- * Three sections were removed rather than reordered. A positioning strip that
- * said "the decision layer between your bank account and your bookkeeping" sat
- * second, which spent the most valuable slot on the page on an abstraction. A
- * "Real stories, coming soon" band was an empty state shipped as a section. A
- * separate final-CTA band duplicated the footer directly above it.
+ * The calculators — the part of Freelens that is live today — keep a section
+ * of their own near the end and their own routes; they are the proof that the
+ * deterministic engine underneath this is real.
  */
 export default function Home() {
   const t = useT();
+  const r = t.home.rebooking;
   useDocumentTitle(t.meta.home.title, t.meta.home.description);
+
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <HeroSection />
-      <TwoMoments />
-      <FlatRuleSection />
-      <LifecycleSection />
-      <AccuracySection />
-      <SignupSection />
-      <PrivacySection />
-      <FaqSection />
+      {/* Hero: the question. */}
+      <section className={`${container} flex flex-col gap-6 py-14 sm:py-20`}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex w-fit items-center rounded-full border border-[var(--fl-line)] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--fl-slate)]">
+            {r.heroEyebrow}
+          </span>
+          <span className="inline-flex w-fit items-center rounded-full bg-[var(--fl-ink)] px-3 py-1 text-xs font-semibold text-white">
+            {r.betaPill}
+          </span>
+        </div>
+        <h1 className="max-w-3xl font-serif text-4xl font-medium leading-[1.08] tracking-tight text-[var(--fl-ink)] sm:text-5xl lg:text-6xl">
+          {r.heroQuestion}
+        </h1>
+        <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
+          {r.heroSub}
+        </p>
+        <a href="#waitlist" className={`${primaryButtonClass} w-fit`}>
+          {r.heroCta}
+          <ArrowRight className="size-4" aria-hidden="true" />
+        </a>
+      </section>
+
+      {/* How it will work — future tense on purpose; nothing here is live. */}
+      <section
+        aria-label={r.how.heading}
+        className="border-t border-[var(--fl-line)] bg-white"
+      >
+        <div className={`${container} py-16 sm:py-20`}>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+            {r.how.eyebrow}
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+            {r.how.heading}
+          </h2>
+          <ol className="mt-10 grid gap-8 sm:grid-cols-3">
+            {r.how.steps.map((step, i) => (
+              <li key={step.title} className="flex flex-col gap-2">
+                <span className="fl-tnum font-serif text-5xl font-medium text-[var(--fl-payout-fill)]">
+                  {i + 1}
+                </span>
+                <h3 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                  {step.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* The honest status, the founding offer, and the list. */}
+      <section
+        id="waitlist"
+        aria-label={r.waitlist.heading}
+        className="scroll-mt-16 border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
+      >
+        <div className={`${container} flex flex-col gap-8 py-16 sm:py-20`}>
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+              {r.offer.eyebrow}
+            </span>
+            <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+              {r.offer.heading}
+            </h2>
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
+              {r.offer.body}
+            </p>
+            <p className="text-lg font-medium text-[var(--fl-ink)]">{r.offer.priceLine}</p>
+            <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">
+              {r.offer.priceNote}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-7">
+            <h3 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+              {r.waitlist.heading}
+            </h3>
+            <WaitlistForm />
+          </div>
+        </div>
+      </section>
+
+      {/* The line the product never crosses. */}
+      <section
+        aria-label={r.trust.heading}
+        className="border-t border-[var(--fl-line)] bg-[var(--fl-ink)] text-white"
+      >
+        <div className={`${container} flex flex-col gap-4 py-16 sm:py-20`}>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9db4d1]">
+            {r.trust.eyebrow}
+          </span>
+          <h2 className="max-w-2xl font-serif text-3xl font-medium leading-tight sm:text-4xl">
+            {r.trust.heading}
+          </h2>
+          <p className="max-w-2xl text-base leading-relaxed text-[#9db4d1]">
+            {r.trust.body}
+          </p>
+          <ul className="mt-2 flex flex-col gap-2.5">
+            {r.trust.points.map((point) => (
+              <li key={point} className="max-w-2xl text-base font-medium text-white/90">
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* The live half of Freelens: the calculators. */}
+      <section
+        aria-label={r.tools.heading}
+        className="border-t border-[var(--fl-line)] bg-white"
+      >
+        <div className={`${container} flex flex-col gap-5 py-16 sm:py-20`}>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+            {r.tools.eyebrow}
+          </span>
+          <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+            {r.tools.heading}
+          </h2>
+          <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
+            {r.tools.body}
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { card: t.rekentoolsPage.tarief, href: "/tarief" },
+              { card: t.rekentoolsPage.tool, href: "/tool" },
+            ].map(({ card, href }) => (
+              <div
+                key={href}
+                className="flex flex-col items-start gap-2 rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-5"
+              >
+                <h3 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
+                  {card.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{card.body}</p>
+                <Link href={href} className={`${linkButtonClass} mt-auto w-fit`}>
+                  {card.cta}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+            {r.tools.teaser}{" "}
+            <Link
+              href="/accuracy"
+              className="font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+            >
+              {r.tools.teaserCta}
+            </Link>
+          </p>
+          <Link href="/rekentools" className={`${linkButtonClass} w-fit`}>
+            {r.tools.allCta}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
     </main>
-  );
-}
-
-/**
- * The strongest claim on the site, promoted from three clicks deep on
- * /accuracy to directly under the calculator. The table is the shared
- * engine-computed component, so this section and /accuracy can never disagree.
- */
-function FlatRuleSection() {
-  const t = useT();
-  return (
-    <section
-      aria-label={t.home.flatRule.ariaLabel}
-      className="border-t border-[var(--fl-line)] bg-white"
-    >
-      <div className="mx-auto flex max-w-3xl flex-col gap-5 px-5 py-16 sm:px-8 sm:py-20">
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-          {t.home.flatRule.eyebrow}
-        </span>
-        <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
-          {t.home.flatRule.heading}
-        </h2>
-        <p className="text-base leading-relaxed text-[var(--fl-slate)]">
-          {t.accuracyPage.flatRule.intro}
-        </p>
-        <FlatRuleTable />
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-          {t.accuracyPage.flatRule.whyItMatters}
-        </p>
-        <Link
-          href="/accuracy"
-          className="inline-flex min-h-11 w-fit items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
-        >
-          {t.home.flatRule.link}
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-function AccuracySection() {
-  const t = useT();
-  return (
-    <section
-      aria-label={t.home.accuracy.ariaLabel}
-      className="border-t border-[var(--fl-line)] bg-white"
-    >
-      <div className={`${container} flex flex-col gap-5 py-16 sm:py-20`}>
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-          {t.home.accuracy.eyebrow}
-        </span>
-        <h2 className="font-serif text-2xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-3xl">
-          {t.home.accuracy.heading}
-        </h2>
-        <ConfidenceBlock
-          sentence={t.home.accuracy.sentence}
-          detail={t.home.accuracy.detail}
-        />
-        <Link
-          href="/accuracy"
-          className="inline-flex min-h-11 w-fit items-center text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
-        >
-          {t.home.accuracy.link}
-        </Link>
-      </div>
-    </section>
   );
 }
