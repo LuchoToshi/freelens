@@ -26,6 +26,8 @@ import {
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
 import { outcomeForJobFee } from "@/lib/tax/jobOutcome";
 import { useYearPosition } from "@/components/rate/use-year-position";
+import { useJobs } from "@/components/rate/use-jobs";
+import { SaveQuote } from "@/components/rate/save-quote";
 import { countKey, jobContribution } from "@/lib/domain/yearPosition";
 import { track } from "@/lib/analytics";
 import type { RateProfile } from "@/components/rate/guided-rate-calculator";
@@ -107,6 +109,7 @@ export function JobQuoteFlow({
   const [costs, setCosts] = useState("");
   const [profitEdited, setProfitEdited] = useState<number | null>(null);
   const year = useYearPosition(TAX_YEAR);
+  const jobsStore = useJobs();
 
   // What the user has actually counted beats the saved profile, which beats the
   // default. The whole point of the running total is to replace a guess.
@@ -182,6 +185,7 @@ export function JobQuoteFlow({
         }}
         showTariefLink={showTariefLink}
         year={year}
+        jobsStore={jobsStore}
         // Counting must not move the answer on screen. Without this the total
         // that now includes this job would become the basis for this job's own
         // calculation, taxing it on top of itself and swinging the headline.
@@ -452,6 +456,7 @@ function JobResult({
   onAdjust,
   showTariefLink,
   year,
+  jobsStore,
   onCounted,
   contribution,
   countKey: resultKey,
@@ -464,6 +469,7 @@ function JobResult({
   onAdjust: () => void;
   showTariefLink: boolean;
   year: ReturnType<typeof useYearPosition>;
+  jobsStore: ReturnType<typeof useJobs>;
   onCounted: () => void;
   contribution: Cents;
   countKey: string;
@@ -558,6 +564,16 @@ function JobResult({
         resultKey={resultKey}
       />
 
+      <SaveQuote
+        jobsStore={jobsStore}
+        feeExVatCents={result.feeExVat}
+        jobCostsCents={result.jobCosts}
+        vatRate={vatRate}
+        takeHomeCents={result.takeHome}
+        taxCents={result.additionalLiability}
+        configVersion={result.configVersion}
+      />
+
       {/* Not collapsed. A zero-profit assumption makes this job look better
           than it is, which is the one direction the product must not be quiet
           about. */}
@@ -633,10 +649,10 @@ function JobResult({
 /**
  * "Count this toward my year."
  *
- * The one place the running total is built, and deliberately the only new
- * control in this flow. It is not "save this job": nothing is filed, there is
- * no list to return to and nothing to keep tidy. The user is adding one number
- * to one number, which is the most this audience will do.
+ * The one place the running total is built. Distinct from "Save this quote"
+ * below it on purpose: counting adds one number to the year's running total,
+ * saving files a record on the quote list. Either can be used without the
+ * other, and the copy keeps them apart.
  *
  * Two safeguards, both load-bearing:
  *

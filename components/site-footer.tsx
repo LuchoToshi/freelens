@@ -21,6 +21,7 @@ export function SiteFooter() {
     // The same two names the header uses. These used to read "Before the job"
     // and "Open Freelens", so /tool had four different labels across the site.
     { href: "/tarief", label: t.common.nav.beforeJob },
+    { href: "/offertes", label: t.common.nav.quotes },
     { href: "/tool", label: t.common.nav.afterPayment },
   ];
 

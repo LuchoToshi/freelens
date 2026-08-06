@@ -23,6 +23,7 @@ export const nl: DeepPartial<typeof en> = {
       about: "Over ons",
       beforeJob: "Voor de klus",
       afterPayment: "Na betaling",
+      quotes: "Je offertes",
       accuracy: "Nauwkeurigheid & bronnen",
       methodology: "Hoe we rekenen",
     },
@@ -73,6 +74,11 @@ export const nl: DeepPartial<typeof en> = {
       title: "Na betaling · Freelens",
       description:
         "Geef een binnengekomen betaling een taak: haal de btw eruit, bescherm een reservering voor inkomstenbelasting en Zvw, dek je bedrijfskosten, en zie wat er veilig van jou is.",
+    },
+    offertes: {
+      title: "Je offertes · Freelens",
+      description:
+        "Elke offerte die je bewaarde: wat je vroeg, wat je eraan zou overhouden, en hoe het afliep. Alleen op dit apparaat opgeslagen.",
     },
     tarief: {
       title: "Wat moet ik vragen? Je dagtarief, op de echte Nederlandse belastingregels",
@@ -443,6 +449,45 @@ export const nl: DeepPartial<typeof en> = {
       "Voor wat Freelens in bredere zin wel en niet berekent, en wanneer je een boekhouder moet spreken, zie",
     footerLink: "nauwkeurigheid en bronnen",
   },
+
+  offertesPage: {
+    eyebrow: "Je offertes",
+    heading: "Elke prijs die je noemde.",
+    lead:
+      "Bewaarde offertes, met de cijfers bevroren op de dag dat je offreerde. Leg vast hoe elke offerte afliep en deze lijst wordt het enige dat geen boekhouding je laat zien: wat de markt van je prijzen vond.",
+    onDevice: "Alleen op dit apparaat opgeslagen. Browserdata wissen wist ook deze lijst.",
+    emptyTitle: "Nog geen offertes bewaard.",
+    emptyBody:
+      "Reken een klus door met de calculator en bewaar de offerte. Eén tik, en je hebt iets om naar terug te komen zodra de klant antwoordt.",
+    emptyCta: "Reken een klus door",
+    status: {
+      quoted: "Openstaand",
+      accepted: "Gewonnen",
+      invoiced: "Gefactureerd",
+      paid: "Betaald",
+      lost: "Verloren",
+      archived: "Gearchiveerd",
+    },
+    daysOpen: "Staat {days} dagen open",
+    savedOn: "Bewaard op {date}",
+    fee: "{amount} geoffreerd, exclusief btw",
+    takeHome: "{amount} van jou als het doorgaat zoals geoffreerd",
+    rightsMissing: "Gebruiksrechten waren nog niet besproken toen je dit offreerde.",
+    won: "Doorgegaan",
+    lost: "Niet doorgegaan",
+    finalFeeLabel: "Afgesproken prijs, exclusief btw",
+    finalFeeHint: "Wat het uiteindelijk werd. Vooraf ingevuld met de offerte.",
+    noteLabel: "Wat gaf de doorslag? (optioneel)",
+    noteHint: "E\u00e9n regel, voor jezelf. \u201cBudget ging naar video\u201d zegt meer dan de status.",
+    confirmWon: "Vastleggen als gewonnen",
+    confirmLost: "Vastleggen als verloren",
+    wonSummary: "Gewonnen voor {amount}",
+    wonBelowQuote: ", {diff} onder de offerte",
+    lostSummary: "Verloren",
+    reopen: "Heropenen",
+    outcomePrefix: "Je notitie: ",
+  },
+
   aboutPage: {
     eyebrow: "Waarom Freelens bestaat",
     heading: "Jezelf uitbetalen zou veilig moeten voelen, niet spannend.",
@@ -614,6 +659,21 @@ export const nl: DeepPartial<typeof en> = {
           rolledOver:
             "Het is een nieuw belastingjaar, dus je lopende totaal begint weer bij nul. Het bedrag van vorig jaar zou het werk van dit jaar in de verkeerde schijf zetten.",
           rolledOverDismiss: "Duidelijk",
+        },
+
+        save: {
+          cta: "Bewaar deze offerte",
+          why: "Bewaart deze offerte op dit apparaat, met de cijfers van vandaag bevroren, zodat je later kunt vastleggen of hij doorging.",
+          clientLabel: "Klant of project",
+          clientPlaceholder: "bijv. Studio Noord",
+          clientHint: "Optioneel. Een naam is genoeg om twee offertes uit elkaar te houden.",
+          rightsLabel: "Staat er in de offerte wat de klant met het werk mag doen?",
+          rightsHint: "Gebruik: waar, hoe lang, exclusief of niet. De voorwaarde die creatieve offertes het vaakst overslaan.",
+          rightsSpecified: "Ja, staat erin",
+          rightsMissing: "Nog niet besproken",
+          confirm: "Offerte bewaren",
+          savedNote: "Bewaard op dit apparaat. Kom terug om vast te leggen hoe het afliep.",
+          toList: "Bekijk je offertes",
         },
 
         result: {

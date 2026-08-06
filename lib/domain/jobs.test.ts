@@ -4,8 +4,11 @@ import {
   createJob,
   daysInStatus,
   isOverdue,
+  markJobLost,
   markJobPaid,
+  markJobWon,
   pipelineTotals,
+  reopenJob,
   sanitizeJobs,
   sortJobsForPipeline,
   transitionJob,
@@ -392,5 +395,101 @@ describe("daysInStatus", () => {
 
   it("never goes negative on a future-dated record", () => {
     expect(daysInStatus(quote({ createdAt: "2026-06-01" }), "2026-03-01")).toBe(0);
+  });
+});
+
+describe("quote outcomes", () => {
+  it("won records the agreed fee, even when it matches the quote", () => {
+    const won = markJobWon(quote(), "2026-03-10", toCents(1_800));
+    expect(won.status).toBe("accepted");
+    expect(won.finalFeeExVatCents).toBe(toCents(1_800));
+  });
+
+  it("won keeps the discount visible when the agreed fee is lower", () => {
+    const won = markJobWon(quote(), "2026-03-10", toCents(1_600), "Pushed back on the day rate");
+    expect(won.finalFeeExVatCents).toBe(toCents(1_600));
+    expect(won.outcomeNote).toBe("Pushed back on the day rate");
+    // The quote itself is never rewritten: the gap is the record.
+    expect(won.feeExVatCents).toBe(toCents(1_800));
+  });
+
+  it("lost keeps the quote and the reason", () => {
+    const lost = markJobLost(quote(), "2026-03-12", "Budget went to video");
+    expect(lost.status).toBe("lost");
+    expect(lost.outcomeNote).toBe("Budget went to video");
+    expect(lost.feeExVatCents).toBe(toCents(1_800));
+  });
+
+  it("a lost job carries no money in the pipeline", () => {
+    const totals = pipelineTotals(
+      [markJobLost(quote(), "2026-03-12")],
+      "2026-04-01",
+      2026
+    );
+    expect(totals.openCents).toBe(0);
+    expect(totals.expectedTakeHomeCents).toBe(0);
+  });
+
+  it("reopen clears the outcome, both ways", () => {
+    const back1 = reopenJob(markJobLost(quote(), "2026-03-12", "why"), "2026-03-13");
+    expect(back1.status).toBe("quoted");
+    expect(back1.outcomeNote).toBeUndefined();
+    const back2 = reopenJob(markJobWon(quote(), "2026-03-10", toCents(1_600)), "2026-03-13");
+    expect(back2.finalFeeExVatCents).toBeUndefined();
+  });
+
+  it("reopen refuses to touch a paid job", () => {
+    const paid = markJobPaid(transitionJob(quote(), "invoiced", "2026-03-15"), {
+      paidAt: "2026-04-01",
+      amountExVatCents: toCents(1_800),
+      paymentId: "p-1",
+    });
+    expect(reopenJob(paid, "2026-04-02")).toBe(paid);
+  });
+
+  it("an over-long outcome note is clamped, not rejected", () => {
+    const lost = markJobLost(quote(), "2026-03-12", "x".repeat(500));
+    expect(lost.outcomeNote).toHaveLength(200);
+  });
+});
+
+describe("creative fields survive storage", () => {
+  it("round-trips usage rights, revisions, client type and the outcome", () => {
+    const job = markJobWon(
+      quote({
+        usageRights: "not-discussed",
+        revisionRounds: 2,
+        clientType: "agency",
+      }),
+      "2026-03-10",
+      toCents(1_700),
+      "Two rounds included"
+    );
+    const { jobs, discarded } = sanitizeJobs(JSON.parse(JSON.stringify([job])));
+    expect(discarded).toBe(0);
+    expect(jobs[0].usageRights).toBe("not-discussed");
+    expect(jobs[0].revisionRounds).toBe(2);
+    expect(jobs[0].clientType).toBe("agency");
+    expect(jobs[0].finalFeeExVatCents).toBe(toCents(1_700));
+    expect(jobs[0].outcomeNote).toBe("Two rounds included");
+  });
+
+  it("drops a final fee that has no won or paid status to explain it", () => {
+    const raw = JSON.parse(JSON.stringify(quote()));
+    raw.finalFeeExVatCents = 160000;
+    const { jobs } = sanitizeJobs([raw]);
+    expect(jobs[0].finalFeeExVatCents).toBeUndefined();
+  });
+
+  it("rejects nonsense in the constrained fields without dropping the job", () => {
+    const raw = JSON.parse(JSON.stringify(quote()));
+    raw.usageRights = "everything";
+    raw.revisionRounds = -3;
+    raw.clientType = "friend";
+    const { jobs, discarded } = sanitizeJobs([raw]);
+    expect(discarded).toBe(0);
+    expect(jobs[0].usageRights).toBeUndefined();
+    expect(jobs[0].revisionRounds).toBeUndefined();
+    expect(jobs[0].clientType).toBeUndefined();
   });
 });

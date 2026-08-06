@@ -18,6 +18,7 @@ export const en = {
       about: "About",
       beforeJob: "Before the job",
       afterPayment: "After payment",
+      quotes: "Your quotes",
       accuracy: "Accuracy & sources",
       methodology: "How it's calculated",
     },
@@ -70,6 +71,11 @@ export const en = {
       title: "After payment · Freelens",
       description:
         "Give an incoming payment a job: separate the VAT, protect an income tax and Zvw reserve, cover business costs, and see what is safely yours.",
+    },
+    offertes: {
+      title: "Your quotes · Freelens",
+      description:
+        "Every quote you saved: what you asked, what it would leave you, and how it went. Stored on this device only.",
     },
     tarief: {
       title: "What should I charge? Your day rate, on the real Dutch tax rules",
@@ -449,6 +455,45 @@ export const en = {
       "For what Freelens does and does not calculate more broadly, and when to talk to an accountant, see",
     footerLink: "accuracy and sources",
   },
+
+  offertesPage: {
+    eyebrow: "Your quotes",
+    heading: "Every price you named.",
+    lead:
+      "Saved quotes, with the figures frozen the day you quoted. Record how each one went and this list becomes the one thing no bookkeeping shows: what the market said to your prices.",
+    onDevice: "Stored on this device only. Clearing your browser data clears this list.",
+    emptyTitle: "No quotes saved yet.",
+    emptyBody:
+      "Price a job with the calculator, then save the quote. It takes one tap and gives you something to come back to when the client answers.",
+    emptyCta: "Price a job",
+    status: {
+      quoted: "Open",
+      accepted: "Won",
+      invoiced: "Invoiced",
+      paid: "Paid",
+      lost: "Lost",
+      archived: "Archived",
+    },
+    daysOpen: "Open for {days} days",
+    savedOn: "Saved {date}",
+    fee: "{amount} quoted, excluding btw",
+    takeHome: "{amount} yours if it lands as quoted",
+    rightsMissing: "Usage rights were not discussed when this was quoted.",
+    won: "Went ahead",
+    lost: "Didn't go ahead",
+    finalFeeLabel: "Agreed fee, excluding btw",
+    finalFeeHint: "What you actually settled on. Pre-filled with the quote.",
+    noteLabel: "What decided it? (optional)",
+    noteHint: "One line, for yourself. \u201cBudget went to video\u201d teaches more than the status.",
+    confirmWon: "Record as won",
+    confirmLost: "Record as lost",
+    wonSummary: "Won at {amount}",
+    wonBelowQuote: ", {diff} under the quote",
+    lostSummary: "Lost",
+    reopen: "Reopen",
+    outcomePrefix: "Your note: ",
+  },
+
   aboutPage: {
     eyebrow: "Why Freelens exists",
     heading: "Paying yourself should feel safe, not stressful.",
@@ -636,6 +681,21 @@ export const en = {
           rolledOver:
             "It is a new tax year, so your running total has started again at zero. Last year's figure would put this year's work in the wrong bracket.",
           rolledOverDismiss: "Got it",
+        },
+
+        save: {
+          cta: "Save this quote",
+          why: "Keeps this quote on this device, with today's figures frozen, so you can record later whether it landed.",
+          clientLabel: "Client or project",
+          clientPlaceholder: "e.g. Studio Noord",
+          clientHint: "Optional. A name is enough to tell two quotes apart.",
+          rightsLabel: "Does the quote say what the client may do with the work?",
+          rightsHint: "Usage: where, how long, exclusive or not. The term creative quotes most often leave out.",
+          rightsSpecified: "Yes, it is in there",
+          rightsMissing: "Not discussed yet",
+          confirm: "Save quote",
+          savedNote: "Saved on this device. Come back to record how it went.",
+          toList: "See your quotes",
         },
 
         result: {

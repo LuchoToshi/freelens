@@ -14,8 +14,12 @@
  *              never be counted as outstanding.
  *   invoiced   The invoice is out. This, and only this, is money owed to you.
  *   paid       It arrived, and a payment record was written from it.
- *   archived   It will not happen. Kept, never deleted, so the history stays
- *              honest and an accidental archive can be undone.
+ *   lost       They said no. Kept on purpose: a lost quote, its price and the
+ *              reason are the only record of what the market said, and that
+ *              record is worth more than the win.
+ *   archived   It will not happen for some other reason. Kept, never deleted,
+ *              so the history stays honest and an accidental archive can be
+ *              undone.
  *
  * Everything here is pure. `today` is always passed in: a module that reads the
  * clock cannot be tested against a date that matters, and "47 days open" has to
@@ -26,7 +30,7 @@
  */
 import { asCentsUnsafe, type Cents } from "@/lib/domain/money";
 
-export type JobStatus = "quoted" | "accepted" | "invoiced" | "paid" | "archived";
+export type JobStatus = "quoted" | "accepted" | "invoiced" | "paid" | "lost" | "archived";
 
 /** Money is only owed to you in this state. Totals depend on it being exact. */
 export const OUTSTANDING_STATUS: JobStatus = "invoiced";
@@ -85,10 +89,39 @@ export interface JobRecord {
    */
   paymentId?: string;
 
+  /**
+   * The fee actually agreed on a won job, when it differs from the fee quoted.
+   * The gap between the two is the freelancer's own discount history.
+   */
+  finalFeeExVatCents?: Cents;
+  /**
+   * One free-text line on the outcome, written at the moment it is known.
+   * "Budget ging naar video" teaches more than any status field.
+   */
+  outcomeNote?: string;
+
+  /**
+   * Whether the quote said what the client may do with the work. The single
+   * most commonly omitted term in creative quotes, so it is the one creative
+   * field worth asking for by name.
+   */
+  usageRights?: "specified" | "not-discussed";
+  /** Revision rounds included in the fee. Absent means it was never pinned. */
+  revisionRounds?: number;
+  clientType?: ClientType;
+
   taxYear: number;
   /** Every state this job has been in, oldest first. Never rewritten. */
   history: JobEvent[];
 }
+
+export type ClientType = "direct" | "agency" | "brand" | "editorial";
+export const CLIENT_TYPES: readonly ClientType[] = [
+  "direct",
+  "agency",
+  "brand",
+  "editorial",
+];
 
 export function emptyJobs(): JobRecord[] {
   return [];
@@ -115,6 +148,9 @@ export interface CreateJobInput {
   dueDate?: string;
   status?: JobStatus;
   id?: string;
+  usageRights?: "specified" | "not-discussed";
+  revisionRounds?: number;
+  clientType?: ClientType;
 }
 
 export function createJob(input: CreateJobInput): JobRecord {
@@ -133,6 +169,9 @@ export function createJob(input: CreateJobInput): JobRecord {
     dueDate: input.dueDate,
     status,
     statusChangedAt: input.createdAt,
+    usageRights: input.usageRights,
+    revisionRounds: sanitizeRounds(input.revisionRounds),
+    clientType: input.clientType,
     taxYear: taxYearOfDate(input.createdAt),
     history: [{ status, at: input.createdAt }],
   };
@@ -208,6 +247,52 @@ export function unmarkJobPaid(job: JobRecord, at: string): JobRecord {
   };
 }
 
+/**
+ * The client said yes.
+ *
+ * The final fee is recorded even when it equals the quote: an explicit match
+ * and a missing answer must stay tellable apart, or the discount history reads
+ * absence as agreement.
+ */
+export function markJobWon(
+  job: JobRecord,
+  at: string,
+  finalFeeExVatCents: Cents,
+  note?: string
+): JobRecord {
+  const moved = transitionJob(job, "accepted", at);
+  return {
+    ...moved,
+    finalFeeExVatCents,
+    outcomeNote: clampText(note, 200) ?? moved.outcomeNote,
+  };
+}
+
+/** The client said no. The quote and the reason are kept, never deleted. */
+export function markJobLost(job: JobRecord, at: string, note?: string): JobRecord {
+  const moved = transitionJob(job, "lost", at);
+  return {
+    ...moved,
+    outcomeNote: clampText(note, 200) ?? moved.outcomeNote,
+  };
+}
+
+/**
+ * Walks an outcome back to an open quote, for the mis-tap noticed late.
+ * The outcome fields are cleared: a reopened quote has no outcome yet.
+ */
+export function reopenJob(job: JobRecord, at: string): JobRecord {
+  if (job.status !== "accepted" && job.status !== "lost") return job;
+  const moved = transitionJob(job, "quoted", at);
+  return { ...moved, finalFeeExVatCents: undefined, outcomeNote: undefined };
+}
+
+function sanitizeRounds(value: number | undefined): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const rounded = Math.round(value);
+  return rounded >= 0 && rounded <= 99 ? rounded : undefined;
+}
+
 /** Whole days between two ISO dates. Negative clamps to zero. */
 export function daysBetween(from: string, to: string): number {
   const a = Date.parse(`${from}T00:00:00Z`);
@@ -263,7 +348,7 @@ export function pipelineTotals(
   let oldestOutstandingDays = 0;
 
   for (const job of jobs) {
-    if (job.status === "archived") continue;
+    if (job.status === "archived" || job.status === "lost") continue;
 
     if (job.status === "paid") {
       if (job.taxYear === taxYear) {
@@ -308,7 +393,8 @@ const STATUS_ORDER: Record<JobStatus, number> = {
   accepted: 1,
   quoted: 2,
   paid: 3,
-  archived: 4,
+  lost: 4,
+  archived: 5,
 };
 
 export function sortJobsForPipeline(jobs: readonly JobRecord[]): JobRecord[] {
@@ -352,6 +438,7 @@ const STATUSES: readonly string[] = [
   "accepted",
   "invoiced",
   "paid",
+  "lost",
   "archived",
 ];
 
@@ -445,6 +532,24 @@ function sanitizeJob(raw: unknown): JobRecord | null {
         ? asCentsUnsafe(r.paidAmountExVatCents)
         : undefined,
     paymentId: settled === "paid" ? paymentId : undefined,
+    finalFeeExVatCents:
+      isCents(r.finalFeeExVatCents) && (settled === "accepted" || settled === "paid")
+        ? asCentsUnsafe(r.finalFeeExVatCents)
+        : undefined,
+    outcomeNote: clampText(
+      typeof r.outcomeNote === "string" ? r.outcomeNote : undefined,
+      200
+    ),
+    usageRights:
+      r.usageRights === "specified" || r.usageRights === "not-discussed"
+        ? r.usageRights
+        : undefined,
+    revisionRounds: sanitizeRounds(
+      typeof r.revisionRounds === "number" ? r.revisionRounds : undefined
+    ),
+    clientType: CLIENT_TYPES.includes(r.clientType as ClientType)
+      ? (r.clientType as ClientType)
+      : undefined,
     taxYear:
       typeof r.taxYear === "number" && Number.isFinite(r.taxYear)
         ? r.taxYear

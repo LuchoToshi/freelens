@@ -20,7 +20,11 @@ export type AnalyticsEvent =
   | "year_position_counted"
   | "year_position_undone"
   | "year_position_prefilled"
-  | "year_position_reset";
+  | "year_position_reset"
+  | "quote_saved"
+  | "quote_won"
+  | "quote_lost"
+  | "quote_reopened";
 
 type VercelAnalytics = (
   command: "event",
