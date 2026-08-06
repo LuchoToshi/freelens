@@ -14,15 +14,21 @@ import { useT } from "@/components/i18n/locale-provider";
 export function SiteFooter() {
   const t = useT();
   const pathname = usePathname();
+  // Every route the site has, plus privacy. Contact renders only when a real
+  // address is configured: a mailto that bounces is worse than none.
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
   const links = [
+    { href: "/rekentools", label: t.common.nav.tools },
+    { href: "/tarief", label: t.common.nav.beforeJob },
+    { href: "/tool", label: t.common.nav.afterPayment },
+    { href: "/offertes", label: t.common.nav.quotes },
     { href: "/about", label: t.common.nav.about },
     { href: "/accuracy", label: t.common.nav.accuracy },
     { href: "/methodology", label: t.common.nav.methodology },
-    // The same two names the header uses. These used to read "Before the job"
-    // and "Open Freelens", so /tool had four different labels across the site.
-    { href: "/tarief", label: t.common.nav.beforeJob },
-    { href: "/offertes", label: t.common.nav.quotes },
-    { href: "/tool", label: t.common.nav.afterPayment },
+    { href: "/privacy", label: t.common.nav.privacy },
+    ...(contactEmail
+      ? [{ href: `mailto:${contactEmail}`, label: t.common.nav.contact }]
+      : []),
   ];
 
   // A closing call to action that points at the page you are already reading is

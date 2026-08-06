@@ -20,6 +20,11 @@ export const en = {
       afterPayment: "After payment",
       quotes: "Your quotes",
       howItWorks: "How it works",
+      rebooking: "Rebooking",
+      tools: "Calculators",
+      menuLabel: "Open menu",
+      privacy: "Privacy",
+      contact: "Contact",
       accuracy: "Accuracy & sources",
       methodology: "How it's calculated",
     },
@@ -77,6 +82,16 @@ export const en = {
       title: "Your quotes · Freelens",
       description:
         "Every quote you saved: what you asked, what it would leave you, and how it went. Stored on this device only.",
+    },
+    rekentools: {
+      title: "Free calculators for Dutch freelancers · Freelens",
+      description:
+        "What to charge, and what is actually yours after a payment. Free, no account, on the real 2026 Dutch rules. Your figures stay on your device.",
+    },
+    privacy: {
+      title: "Privacy · Freelens",
+      description:
+        "What Freelens collects, what it never collects, and how to get your data out or gone.",
     },
     tarief: {
       title: "What should I charge? Your day rate, on the real Dutch tax rules",
@@ -519,6 +534,52 @@ export const en = {
     lostSummary: "Lost",
     reopen: "Reopen",
     outcomePrefix: "Your note: ",
+  },
+
+
+  rekentoolsPage: {
+    eyebrow: "Free calculators",
+    heading: "Free calculators for freelancers.",
+    lead: "No account, nothing uploaded, built on the real 2026 Dutch rules with every figure checked against belastingdienst.nl.",
+    tarief: {
+      title: "What do you need to charge?",
+      body: "Your day rate or a single project fee, worked out backwards from what you want to keep.",
+      cta: "Open the rate calculator",
+    },
+    tool: {
+      title: "A payment landed. What is yours?",
+      body: "Split a payment into btw, a tax reserve, business costs and what you can genuinely pay yourself.",
+      cta: "Open the workspace",
+    },
+    accuracyTeaser: "The flat 30% rule misses by up to €16.720 on real numbers. See the cases, the sources and every rate we use.",
+    accuracyCta: "Accuracy and sources",
+  },
+
+  privacyPage: {
+    eyebrow: "Privacy",
+    heading: "What we know, and what we never will.",
+    updated: "Version of {date}.",
+    calc: {
+      title: "The calculators",
+      body: "Everything you type into the calculators stays in your browser. It is saved on your device only when you choose to save, you can clear it at any time, and it is never uploaded to Freelens.",
+    },
+    analytics: {
+      title: "Page views",
+      body: "Freelens counts anonymous page views through Vercel Web Analytics: no cookies, no profile, nothing that identifies you. Custom events carry a name only, never an amount, a client, or an email address.",
+    },
+    email: {
+      title: "Your email address",
+      body: "We keep an email address only if you leave one yourself, on the waitlist or for rule-change updates, and only after you confirm it from your inbox. It is used for that one purpose, never shared, and deleted on request. Waitlist signups also record the craft you select.",
+    },
+    never: {
+      title: "What we never collect",
+      body: "No bank connection, no client addresses or phone numbers, no KvK or VAT numbers, no uploaded documents.",
+    },
+    rights: {
+      title: "Your rights",
+      body: "You can ask what we hold about you, have it corrected or deleted, and complain to the Autoriteit Persoonsgegevens. Every mail we send has an unsubscribe that works.",
+    },
+    contactNote: "Questions about this page: use the contact link in the footer.",
   },
 
   aboutPage: {

@@ -37,6 +37,11 @@ describe("the Dutch dictionary covers the English one", () => {
     // unchanged, a bare percentage, an acronym, or a numeric placeholder.
     const SAME_BY_DESIGN = new Set([
       "common.brand",
+      "common.nav.rebooking",
+      "common.nav.privacy",
+      "common.nav.contact",
+      "meta.privacy.title",
+      "privacyPage.eyebrow",
       "app.shell.eyebrow",
       "meta.home.title",
       "home.privacy.ariaLabel",

@@ -25,6 +25,11 @@ export const nl: DeepPartial<typeof en> = {
       afterPayment: "Na betaling",
       quotes: "Je offertes",
       howItWorks: "Hoe het werkt",
+      rebooking: "Rebooking",
+      tools: "Rekentools",
+      menuLabel: "Menu openen",
+      privacy: "Privacy",
+      contact: "Contact",
       accuracy: "Nauwkeurigheid & bronnen",
       methodology: "Hoe we rekenen",
     },
@@ -80,6 +85,16 @@ export const nl: DeepPartial<typeof en> = {
       title: "Je offertes · Freelens",
       description:
         "Elke offerte die je bewaarde: wat je vroeg, wat je eraan zou overhouden, en hoe het afliep. Alleen op dit apparaat opgeslagen.",
+    },
+    rekentools: {
+      title: "Gratis rekentools voor zzp'ers · Freelens",
+      description:
+        "Wat je moet vragen, en wat er na een betaling echt van jou is. Gratis, zonder account, op de echte Nederlandse regels van 2026. Je cijfers blijven op je apparaat.",
+    },
+    privacy: {
+      title: "Privacy · Freelens",
+      description:
+        "Wat Freelens verzamelt, wat het nooit verzamelt, en hoe je je gegevens meeneemt of laat verdwijnen.",
     },
     tarief: {
       title: "Wat moet ik vragen? Je dagtarief, op de echte Nederlandse belastingregels",
@@ -513,6 +528,52 @@ export const nl: DeepPartial<typeof en> = {
     lostSummary: "Verloren",
     reopen: "Heropenen",
     outcomePrefix: "Je notitie: ",
+  },
+
+
+  rekentoolsPage: {
+    eyebrow: "Gratis rekentools",
+    heading: "Gratis rekentools voor freelancers.",
+    lead: "Zonder account, niets wordt geüpload, gebouwd op de echte Nederlandse regels van 2026 en elk cijfer gecontroleerd bij belastingdienst.nl.",
+    tarief: {
+      title: "Wat moet je vragen?",
+      body: "Je dagtarief of de prijs van één klus, teruggerekend vanaf wat je wilt overhouden.",
+      cta: "Open de tariefcalculator",
+    },
+    tool: {
+      title: "Er is een betaling binnen. Wat is van jou?",
+      body: "Verdeel een betaling in btw, een belastingreservering, zakelijke kosten en wat je jezelf echt kunt uitbetalen.",
+      cta: "Open de werkruimte",
+    },
+    accuracyTeaser: "De vaste 30%-regel zit er op echte cijfers tot €16.720 naast. Bekijk de gevallen, de bronnen en elk tarief dat we gebruiken.",
+    accuracyCta: "Nauwkeurigheid en bronnen",
+  },
+
+  privacyPage: {
+    eyebrow: "Privacy",
+    heading: "Wat we weten, en wat we nooit zullen weten.",
+    updated: "Versie van {date}.",
+    calc: {
+      title: "De rekentools",
+      body: "Alles wat je in de rekentools invult blijft in je browser. Het wordt alleen op je apparaat bewaard als je zelf kiest voor opslaan, je kunt het altijd wissen, en het wordt nooit naar Freelens geüpload.",
+    },
+    analytics: {
+      title: "Paginaweergaven",
+      body: "Freelens telt anonieme paginaweergaven via Vercel Web Analytics: geen cookies, geen profiel, niets dat jou identificeert. Eigen events bevatten alleen een naam, nooit een bedrag, een klant of een e-mailadres.",
+    },
+    email: {
+      title: "Je e-mailadres",
+      body: "We bewaren een e-mailadres alleen als je het zelf achterlaat, op de wachtlijst of voor updates bij regelwijzigingen, en pas nadat je het vanuit je inbox bevestigt. Het wordt voor dat ene doel gebruikt, nooit gedeeld, en op verzoek verwijderd. Bij een wachtlijstaanmelding bewaren we ook het vak dat je kiest.",
+    },
+    never: {
+      title: "Wat we nooit verzamelen",
+      body: "Geen bankkoppeling, geen adressen of telefoonnummers van klanten, geen KvK- of btw-nummers, geen geüploade documenten.",
+    },
+    rights: {
+      title: "Je rechten",
+      body: "Je kunt opvragen wat we van je hebben, het laten corrigeren of verwijderen, en klagen bij de Autoriteit Persoonsgegevens. Elke mail die we sturen heeft een afmeldlink die werkt.",
+    },
+    contactNote: "Vragen over deze pagina: gebruik de contactlink in de footer.",
   },
 
   aboutPage: {
