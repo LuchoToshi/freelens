@@ -637,6 +637,10 @@ export const en = {
        * explains rather than asks belongs behind `whyAsk`.
        */
       /** Allocation-bar labels. Hardcoding these left English on Dutch screens. */
+      strip: {
+        heading: "Make this more accurate",
+        forThisCalc: "Applies to this calculation only. Save your answers for every calculation in the workspace settings.",
+      },
       segments: {
         annualCosts: "Business costs",
         jobCosts: "Job costs",

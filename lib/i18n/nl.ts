@@ -626,6 +626,10 @@ export const nl: DeepPartial<typeof en> = {
       profileSalary: "loon daarnaast",
       changeDetails: "Je gegevens aanpassen",
 
+      strip: {
+        heading: "Maak dit nauwkeuriger",
+        forThisCalc: "Geldt alleen voor deze berekening. Bewaar je antwoorden voor elke berekening bij de instellingen in de werkruimte.",
+      },
       segments: {
         annualCosts: "Zakelijke kosten",
         jobCosts: "Kosten voor deze opdracht",

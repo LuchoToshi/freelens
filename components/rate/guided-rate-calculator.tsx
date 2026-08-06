@@ -77,6 +77,14 @@ export function GuidedRateCalculator({
   const [billableDays, setBillableDays] = useState(DEFAULT_BILLABLE_DAYS);
   const [costs, setCosts] = useState("");
 
+  // Local overrides for the two deduction questions this flow never asks.
+  // Null means "whatever the saved profile says"; a tap answers for this
+  // calculation only, because /tarief reads the profile and never writes it.
+  const [hoursOverride, setHoursOverride] = useState<boolean | null>(null);
+  const [starterOverride, setStarterOverride] = useState<boolean | null>(null);
+  const meetsHours = hoursOverride ?? profile.meetsHoursCriterion;
+  const isStarter = starterOverride ?? profile.isStarter;
+
   // Focus moves to the heading of whatever just appeared, so a keyboard or
   // screen reader user is not left at the bottom of the previous step. Skipped
   // on first paint: stealing focus on page load would yank a homepage reader
@@ -99,8 +107,8 @@ export function GuidedRateCalculator({
     targetAnnualNet: targetNet,
     annualBusinessCosts: fromCents(costsCents),
     billableUnitsPerYear: billableDays,
-    meetsHoursCriterion: profile.meetsHoursCriterion,
-    isStarter: profile.isStarter,
+    meetsHoursCriterion: meetsHours,
+    isStarter: isStarter,
     otherIncome: profile.otherIncome,
     otherIncomeTaxWithheld: profile.otherIncomeTaxWithheld,
   });
@@ -110,13 +118,38 @@ export function GuidedRateCalculator({
 
   if (step === STEP_COUNT) {
     return (
-      <ResultPanel
-        headingRef={headingRef}
-        result={result}
-        billableDays={billableDays}
-        onAdjust={() => setStep(0)}
-        showTariefLink={showTariefLink}
-      />
+      <div className="flex flex-col gap-4">
+        <ResultPanel
+          headingRef={headingRef}
+          result={result}
+          billableDays={billableDays}
+          onAdjust={() => setStep(0)}
+          showTariefLink={showTariefLink}
+        />
+        {/* The breakdown may only claim the deductions the user has actually
+            confirmed, and this is where they confirm them. Result and claim
+            can no longer disagree, because both read the same two flags. */}
+        <div className="flex flex-col gap-2 rounded-xl border border-[var(--fl-line)] bg-white p-4">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+            {t.rate.strip.heading}
+          </span>
+          <AccuracyToggle
+            active={meetsHours}
+            onClick={() => setHoursOverride(!meetsHours)}
+            label={t.app.moneyArrived.strip.hours}
+            effect={t.app.moneyArrived.strip.lowers}
+          />
+          <AccuracyToggle
+            active={isStarter}
+            onClick={() => setStarterOverride(!isStarter)}
+            label={t.app.moneyArrived.strip.starter}
+            effect={t.app.moneyArrived.strip.lowers}
+          />
+          <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
+            {t.rate.strip.forThisCalc}
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -460,5 +493,36 @@ function ResultPanel({
         </Link>
       )}
     </div>
+  );
+}
+
+/** One yes/no that changes the number, with the direction it moves it. */
+function AccuracyToggle({
+  active,
+  onClick,
+  label,
+  effect,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  effect: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`flex min-h-11 items-center justify-between gap-3 rounded-lg border px-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+        active
+          ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
+          : "border-[var(--fl-line)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+      }`}
+    >
+      <span>{label}</span>
+      <span className={`shrink-0 text-xs ${active ? "text-white/70" : "text-[var(--fl-slate)]"}`}>
+        {effect}
+      </span>
+    </button>
   );
 }
