@@ -2,13 +2,14 @@
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { AllocationBar } from "@/components/app/allocation-bar";
-import type { Cents } from "@/lib/domain/money";
+import { formatMonths, type Cents } from "@/lib/domain/money";
 import {
   examplePaymentSplit,
   exampleQuoteSplit,
 } from "@/lib/domain/exampleScenario";
-import { useT } from "@/components/i18n/locale-provider";
+import { useLocale, useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
+import { container } from "@/components/container";
 
 const variants: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -87,7 +88,7 @@ export function HowItWorksSection() {
       id="how-it-works"
       className="scroll-mt-24 border-t border-[var(--fl-line)]"
     >
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+      <div className={`${container} py-16 sm:py-24`}>
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
           {t.home.howItWorks.eyebrow}
         </span>
@@ -156,7 +157,7 @@ function SceneVisual({
   paymentDemo: Segment[];
   quoteDemo: Segment[];
 }) {
-  const t = useT();
+  const { locale, t } = useLocale();
 
   if (kind === "quote") {
     return (
@@ -191,7 +192,9 @@ function SceneVisual({
         />
       </div>
       <span className="fl-tnum text-sm font-medium text-[var(--fl-ink)]">
-        {fill(t.home.howItWorks.visuals.runway, { months: "4,6" })}
+        {fill(t.home.howItWorks.visuals.runway, {
+          months: formatMonths(4.6, locale),
+        })}
       </span>
     </div>
   );

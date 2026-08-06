@@ -22,6 +22,7 @@ export const en = {
       methodology: "How it's calculated",
     },
     back: "Back",
+    skipToContent: "Skip to content",
     languageSwitcher: {
       label: "Language",
       switchTo: "Switch to",
@@ -30,7 +31,10 @@ export const en = {
     footer: {
       trustLine:
         "Not tax advice. A clear estimate to work from. Your numbers never leave your browser.",
-      cta: "Open the workspace",
+      // The destination's own name, not a fourth word for it. See the comment
+      // on the header nav.
+      cta: "After payment",
+      navLabel: "Site links",
     },
     confidence: {
       sentence:
@@ -63,7 +67,7 @@ export const en = {
         "Freelens is the decision layer between your bank account and your bookkeeping. It complements your tools and turns one incoming payment into a simple, trustworthy plan, so paying yourself feels safe, not stressful.",
     },
     tool: {
-      title: "Your money workspace · Freelens",
+      title: "After payment · Freelens",
       description:
         "Give an incoming payment a job: separate the VAT, protect an income tax and Zvw reserve, cover business costs, and see what is safely yours.",
     },
@@ -144,7 +148,7 @@ export const en = {
         },
         overTime: {
           title: "Over the year",
-          body: "The workspace keeps your position current: what is protected, what is free, and how many months of runway you have. Test a purchase against it before you make it. Saved on your device, so it remembers and you do not have to.",
+          body: "After payment keeps your position current: what is protected, what is free, and how many months of runway you have. Test a purchase against it before you make it. Saved on your device, so it remembers and you do not have to.",
         },
       },
       visuals: {
@@ -265,7 +269,7 @@ export const en = {
       after: {
         tab: "I have been paid",
         tabSub: "What here is actually mine?",
-        deepLink: "Open the full workspace",
+        deepLink: "See your whole position",
       },
       whyDifferent: {
         toggle: "Why do the two tabs show different percentages?",
@@ -818,7 +822,7 @@ export const en = {
       loading: "Loading your saved figures…",
       views: {
         overview: {
-          title: "Your money workspace",
+          title: "After payment",
           subtitle: "A calm read on what is protected and what is free.",
         },
         setup: {
@@ -1039,6 +1043,30 @@ export const en = {
       emptyPrompt: "Enter your business balance to see where you stand.",
       save: "Save this check-in",
       saved: "Saved on this device.",
+      // These six read out the result and were the last strings on the site
+      // still hardcoded in the component. On a Dutch page the primary line
+      // under the payout figure was an English sentence.
+      bufferTarget: "Buffer target: {amount} ({months} × monthly costs).",
+      runwayUnknown: "Add monthly costs to estimate your runway.",
+      runwaySentence: "You have {months} months of runway.",
+      runwayMeter: "{months} months of runway · buffer target {buffer} months.",
+      shortfallDetail:
+        "Keep the next {amount} of incoming cash in the business to restore your selected reserves.",
+      statusTail: {
+        covered: " Your selected reserves and buffer are covered.",
+        limited: " Reserves are covered, but spending room is tight.",
+        gap: " Your balance doesn't yet cover all selected reserves.",
+      },
+      reserveSource: {
+        ownRule:
+          "Reserve came from your own percentage rule (a planning rule, not a tax assessment).",
+        provisionalAssessment:
+          "Reserve came from your provisional assessment amount.",
+        guidedEstimate:
+          "Reserve came from the guided estimate (a planning estimate, not a final assessment).",
+        manual: "Reserve is the amount you entered.",
+        notTracked: "No reserve is being tracked yet.",
+      },
     },
     decision: {
       costLabel: "What does it cost?",

@@ -6,6 +6,7 @@ import { LivingHeadline } from "@/components/home/living-headline";
 import { HeroMedia } from "@/components/design/hero-media";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
+import { container } from "@/components/container";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -43,7 +44,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+    <section className={`${container} grid grid-cols-1 items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14`}>
       <motion.div
         className="flex flex-col gap-6"
         initial={prefersReducedMotion ? false : "hidden"}

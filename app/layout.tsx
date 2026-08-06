@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SkipLink } from "@/components/skip-link";
 import { Analytics } from "@vercel/analytics/next";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { en } from "@/lib/i18n/en";
@@ -44,8 +45,14 @@ export default function RootLayout({
         {/* `lang` above is the prerendered default. LocaleProvider rewrites it
             on the client once the visitor's choice is known. */}
         <LocaleProvider>
+          <SkipLink />
           <SiteHeader />
-          {children}
+          {/* Skip target. `tabIndex={-1}` because browsers do not reliably move
+              focus to a non-focusable fragment target, so without it the link
+              scrolls but leaves focus in the header. */}
+          <div id="main-content" tabIndex={-1} className="flex flex-1 flex-col outline-none">
+            {children}
+          </div>
           <SiteFooter />
         </LocaleProvider>
         {/* Cookieless, and every event this app sends is a bare name: see

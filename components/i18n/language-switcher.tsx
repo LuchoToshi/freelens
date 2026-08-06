@@ -17,7 +17,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label={t.common.languageSwitcher.label}
-      className={`inline-flex items-center rounded-lg border border-[var(--fl-line)] bg-white p-0.5 ${className}`}
+      className={`inline-flex items-center rounded-lg border border-[var(--fl-line-control)] bg-white p-0.5 ${className}`}
     >
       {LOCALES.map((option) => {
         const active = option === locale;

@@ -35,6 +35,17 @@ export function fromCents(cents: Cents): number {
   return cents / 100;
 }
 
+/**
+ * Money stays in Dutch notation in both languages, deliberately.
+ *
+ * Every document this sits beside — the invoice, the btw-aangifte, the
+ * Belastingdienst assessment — writes "€ 1.800,00". An English-reading ZZP'er
+ * still files in the Netherlands, so switching to "€1,800.00" for them would
+ * make the figures harder to reconcile, not easier. This is a decision, not an
+ * oversight: if it is ever revisited, it has to move for both locales at once.
+ *
+ * Counts that are not money do follow the locale. See `formatMonths`.
+ */
 const euroWhole = new Intl.NumberFormat("nl-NL", {
   style: "currency",
   currency: "EUR",
@@ -65,6 +76,21 @@ export function formatEuro(cents: Cents): string {
 export function formatEuroExact(cents: Cents): string {
   const euros = fromCents(cents);
   return euroExact.format(euros === 0 ? 0 : euros);
+}
+
+/**
+ * A month count to one decimal, in the reader's notation.
+ *
+ * Runway used to be written three ways: a hardcoded "4,6" on the homepage and
+ * `toFixed(1)` in the app, which always produces a point. The same figure read
+ * as "4,6" in one place and "4.0" in another, in both languages. One helper,
+ * one convention per locale.
+ */
+export function formatMonths(months: number, locale: "en" | "nl"): string {
+  return new Intl.NumberFormat(locale === "nl" ? "nl-NL" : "en-US", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(months);
 }
 
 export function addCents(...values: Cents[]): Cents {

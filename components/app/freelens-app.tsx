@@ -13,6 +13,7 @@ import { ConfidenceBlock } from "@/components/design/confidence-block";
 import { hintClass, linkButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
+import { container } from "@/components/container";
 
 /** Maps a view onto its dictionary key, so headers translate with everything else. */
 const VIEW_KEY: Record<AppView, "overview" | "setup" | "moneyArrived" | "weeklyCheckin" | "decision"> = {
@@ -39,7 +40,7 @@ export function FreelensApp() {
   if (!app.hydrated) {
     return (
       <main className="min-h-screen bg-[var(--fl-canvas)]">
-        <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
+        <div className={`${container} py-10`}>
           <p className={hintClass}>{t.app.shell.loading}</p>
         </div>
       </main>
@@ -50,7 +51,7 @@ export function FreelensApp() {
 
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 sm:px-6">
+      <div className={`${container} flex flex-col gap-6 py-10`}>
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
             {t.app.shell.eyebrow}
@@ -109,7 +110,11 @@ export function FreelensApp() {
 
         <NavTabs view={view === "setup" ? "overview" : view} onChange={setView} />
 
-        <div id="app-panel" role="tabpanel">
+        <div
+          id="app-panel"
+          role="tabpanel"
+          aria-labelledby={`tab-${view === "setup" ? "overview" : view}`}
+        >
           {view === "overview" && (
             <OverviewView state={app.state} onNavigate={setView} />
           )}

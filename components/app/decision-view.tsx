@@ -14,7 +14,7 @@ import {
   linkButtonClass,
   primaryButtonClass,
 } from "@/components/app/styles";
-import { formatEuro, parseAmountInput, toCents } from "@/lib/domain/money";
+import { formatEuro, formatMonths, parseAmountInput, toCents } from "@/lib/domain/money";
 import {
   evaluateWeeklyPosition,
   type WeeklyPositionResult,
@@ -27,7 +27,7 @@ import {
   type DecisionTiming,
 } from "@/lib/domain/affordability";
 import type { StoredWeeklyPosition } from "@/lib/domain/persistence";
-import { useT } from "@/components/i18n/locale-provider";
+import { useLocale, useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
 
 // Sample position for demo mode: €3.000 optional spending room, 4.0 runway.
@@ -338,9 +338,11 @@ function RunwayCompare({
   before: number | null;
   after: number | null;
 }) {
-  const t = useT();
+  const { locale, t } = useLocale();
   const fmt = (n: number | null) =>
-    n === null ? t.app.decision.notApplicable : fill(t.app.decision.months, { n: n.toFixed(1) });
+    n === null
+      ? t.app.decision.notApplicable
+      : fill(t.app.decision.months, { n: formatMonths(n, locale) });
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3">

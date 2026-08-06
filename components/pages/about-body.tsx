@@ -4,13 +4,14 @@ import Link from "next/link";
 import { BackLink } from "@/components/i18n/back-link";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 import { ArrowRight } from "lucide-react";
+import { container } from "@/components/container";
 
 export function AboutPageBody() {
   const t = useT();
   useDocumentTitle(t.meta.about.title, t.meta.about.description);
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-12 sm:px-8">
+      <div className={`${container} flex flex-col gap-10 py-12`}>
         <BackLink />
 
         {/* Intro */}

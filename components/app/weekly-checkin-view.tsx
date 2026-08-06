@@ -20,6 +20,7 @@ import {
 import {
   asCentsUnsafe,
   formatEuro,
+  formatMonths,
   fromCents,
   parseAmountInput,
   type Cents,
@@ -32,7 +33,10 @@ import {
 } from "@/lib/domain/allocation";
 import type { ReserveSource } from "@/lib/domain/reserves";
 import type { StoredWeeklyPosition, UserSetup } from "@/lib/domain/persistence";
-import { useT } from "@/components/i18n/locale-provider";
+import { useLocale, useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/types";
 
 const BUFFER_OPTIONS = [1, 2, 3, 6] as const;
 
@@ -87,7 +91,7 @@ export function WeeklyCheckinView({
   const [bufferMonths, setBufferMonths] = useState<number>(
     setup?.bufferMonths ?? 2
   );
-  const t = useT();
+  const { locale, t } = useLocale();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [recommendedPayout, setRecommendedPayout] = useState(
     centsToInput(prior?.recommendedPersonalPayoutCents)
@@ -214,8 +218,10 @@ export function WeeklyCheckinView({
               ))}
             </div>
             <p className={hintClass}>
-              Buffer target: {formatEuro(bufferTargetCents)} ({bufferMonths} ×
-              monthly costs).
+              {fill(t.app.weekly.bufferTarget, {
+                amount: formatEuro(bufferTargetCents),
+                months: bufferMonths,
+              })}
             </p>
           </div>
 
@@ -263,7 +269,9 @@ export function WeeklyCheckinView({
             status={result.status}
             detail={
               result.status === "reserve-gap" && result.shortfallCents !== null
-                ? `Keep the next ${formatEuro(result.shortfallCents)} of incoming cash in the business to restore your selected reserves.`
+                ? fill(t.app.weekly.shortfallDetail, {
+                    amount: formatEuro(result.shortfallCents),
+                  })
                 : undefined
             }
           />
@@ -287,7 +295,7 @@ export function WeeklyCheckinView({
                       : "text-[var(--fl-ink)]"
                   }`}
                 />
-                <p className={hintClass}>{interpret(result)}</p>
+                <p className={hintClass}>{interpret(result, t, locale)}</p>
               </div>
 
               <RunwayMeter
@@ -316,7 +324,7 @@ export function WeeklyCheckinView({
                 steps={result.breakdown}
                 resultLabel={t.app.weekly.available}
                 resultCents={result.availableForPersonalPayoutCents}
-                reserveSourceNote={reserveSourceNote(result.reserveSource)}
+                reserveSourceNote={reserveSourceNote(result.reserveSource, t)}
               />
 
               <p className={hintClass}>{t.app.weekly.confidence[COMPLETENESS_KEY[result.completeness]]}</p>
@@ -352,17 +360,24 @@ export function WeeklyCheckinView({
 }
 
 /** One plain-language read of the result, only from figures we actually have. */
-function interpret(result: WeeklyPositionResult): string {
+function interpret(
+  result: WeeklyPositionResult,
+  t: Dictionary,
+  locale: Locale
+): string {
+  const w = t.app.weekly;
   const runway =
     result.runwayMonths === null
-      ? "Add monthly costs to estimate your runway."
-      : `You have ${result.runwayMonths.toFixed(1)} months of runway.`;
+      ? w.runwayUnknown
+      : fill(w.runwaySentence, {
+          months: formatMonths(result.runwayMonths, locale),
+        });
   const tail =
     result.status === "reserves-covered"
-      ? " Your selected reserves and buffer are covered."
+      ? w.statusTail.covered
       : result.status === "limited-room"
-        ? " Reserves are covered, but spending room is tight."
-        : " Your balance doesn't yet cover all selected reserves.";
+        ? w.statusTail.limited
+        : w.statusTail.gap;
   return runway + tail;
 }
 
@@ -377,6 +392,7 @@ function RunwayMeter({
   color: string;
 }) {
   const reduce = useReducedMotion();
+  const { locale, t } = useLocale();
   if (runwayMonths === null) return null;
   const scale = Math.max(6, bufferMonths, Math.ceil(runwayMonths));
   const fillPct = Math.min(100, Math.max(0, (runwayMonths / scale) * 100));
@@ -398,8 +414,10 @@ function RunwayMeter({
         />
       </div>
       <p className={hintClass}>
-        {runwayMonths.toFixed(1)} months of runway · buffer target {bufferMonths}{" "}
-        months.
+        {fill(t.app.weekly.runwayMeter, {
+          months: formatMonths(runwayMonths, locale),
+          buffer: bufferMonths,
+        })}
       </p>
     </div>
   );
@@ -436,18 +454,22 @@ function ProgressRhythm({
   );
 }
 
-function reserveSourceNote(source: ReserveSource | "not-tracked"): string {
+function reserveSourceNote(
+  source: ReserveSource | "not-tracked",
+  t: Dictionary
+): string {
+  const s = t.app.weekly.reserveSource;
   switch (source) {
     case "own-rule":
-      return "Reserve came from your own percentage rule (a planning rule, not a tax assessment).";
+      return s.ownRule;
     case "provisional-assessment":
-      return "Reserve came from your provisional assessment amount.";
+      return s.provisionalAssessment;
     case "guided-estimate":
-      return "Reserve came from the guided estimate (a planning estimate, not a final assessment).";
+      return s.guidedEstimate;
     case "manual":
-      return "Reserve is the amount you entered.";
+      return s.manual;
     default:
-      return "No reserve is being tracked yet.";
+      return s.notTracked;
   }
 }
 

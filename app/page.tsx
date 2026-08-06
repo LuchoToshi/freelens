@@ -9,6 +9,7 @@ import { PrivacySection } from "@/components/home/privacy-section";
 import { FaqSection } from "@/components/home/faq-section";
 import { ConfidenceBlock } from "@/components/design/confidence-block";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
+import { container } from "@/components/container";
 
 /**
  * One narrative, in the order a visitor actually needs it.
@@ -50,7 +51,7 @@ function AccuracySection() {
       aria-label={t.home.accuracy.ariaLabel}
       className="border-t border-[var(--fl-line)] bg-white"
     >
-      <div className="mx-auto flex max-w-3xl flex-col gap-5 px-5 py-16 sm:px-8 sm:py-20">
+      <div className={`${container} flex flex-col gap-5 py-16 sm:py-20`}>
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
           {t.home.accuracy.eyebrow}
         </span>

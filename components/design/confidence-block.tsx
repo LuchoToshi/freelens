@@ -37,7 +37,10 @@ export function ConfidenceBlock({
           {detail ? (
             <Accordion.Root className="mt-1">
               <Accordion.Item>
-                <Accordion.Header>
+                {/* Base UI renders this as an <h3>. The toggle labels a
+                    disclosure, not a section, and /tool shows this block twice,
+                    which produced two identical H3s in the outline. */}
+                <Accordion.Header render={<div />}>
                   <Accordion.Trigger className="group flex min-h-11 items-center gap-1.5 bg-transparent py-1 text-sm font-medium text-[var(--fl-slate)] select-none hover:text-[var(--fl-ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]">
                     {t.common.confidence.toggle}
                     <ChevronDown

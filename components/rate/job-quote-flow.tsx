@@ -413,7 +413,7 @@ function Progress({
             key={i}
             aria-hidden="true"
             className={`h-1 flex-1 rounded-full transition-colors ${
-              i <= step ? "bg-[var(--fl-ink)]" : "bg-[var(--fl-line)]"
+              i <= step ? "bg-[var(--fl-ink)]" : "bg-[var(--fl-line-control)]"
             }`}
           />
         ))}

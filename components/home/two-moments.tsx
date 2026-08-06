@@ -10,6 +10,7 @@ import { linkButtonClass } from "@/components/app/styles";
 import { EXAMPLE_TAX_YEAR } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
+import { container } from "@/components/container";
 
 type Moment = "before" | "after";
 
@@ -75,7 +76,7 @@ export function TwoMoments() {
       aria-label={m.ariaLabel}
       className="scroll-mt-24 border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
     >
-      <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-20">
+      <div className={`${container} py-16 sm:py-20`}>
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
             {m.eyebrow}

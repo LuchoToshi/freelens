@@ -10,6 +10,7 @@ import { SOURCE_REGISTRY } from "@/lib/domain/sourceRegistry";
 import { formatEuro, formatEuroExact, toCents, type Cents } from "@/lib/domain/money";
 import { headlineRows } from "@/lib/tax/oldVsNew";
 import { DEFAULT_COUNTRY, latestProfileYear, loadProfile } from "@/lib/tax/loadProfile";
+import { container } from "@/components/container";
 
 const CATEGORY_KEYS = ["vat", "incomeTax", "deductions", "invoicing"] as const;
 const CATEGORY_SOURCE_NAME: Record<(typeof CATEGORY_KEYS)[number], string> = {
@@ -53,7 +54,7 @@ export function AccuracyPageBody() {
 
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 sm:px-6">
+      <div className={`${container} flex flex-col gap-8 py-12`}>
         <BackLink />
 
         <div className="flex flex-col gap-4">

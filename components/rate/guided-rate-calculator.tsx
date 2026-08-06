@@ -184,14 +184,14 @@ export function GuidedRateCalculator({
           supporting line, then the control. Nothing else competes. */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <h3
+          <h2
             id={HEADING_ID}
             ref={headingRef}
             tabIndex={-1}
             className="font-serif text-2xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] outline-none sm:text-3xl"
           >
             {current.question}
-          </h3>
+          </h2>
           {current.optional && (
             <span className="rounded-full border border-[var(--fl-line)] px-2 py-0.5 text-xs text-[var(--fl-slate)]">
               {g.optional}
@@ -252,7 +252,7 @@ function Progress({ step }: { step: number }) {
             key={i}
             aria-hidden="true"
             className={`h-1 flex-1 rounded-full transition-colors ${
-              i <= step ? "bg-[var(--fl-ink)]" : "bg-[var(--fl-line)]"
+              i <= step ? "bg-[var(--fl-ink)]" : "bg-[var(--fl-line-control)]"
             }`}
           />
         ))}
@@ -351,7 +351,7 @@ function ResultPanel({
           {r.eyebrow}
         </span>
 
-        <h3
+        <h2
           ref={headingRef}
           tabIndex={-1}
           className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 outline-none"
@@ -361,7 +361,7 @@ function ResultPanel({
             className="font-serif text-5xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-6xl"
           />
           <span className="text-sm text-[var(--fl-slate)]">{r.perDay}</span>
-        </h3>
+        </h2>
 
         <p className="mt-4 max-w-prose text-base leading-relaxed text-[var(--fl-ink)]">
           {fill(r.summary, {

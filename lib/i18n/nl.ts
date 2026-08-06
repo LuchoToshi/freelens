@@ -27,6 +27,7 @@ export const nl: DeepPartial<typeof en> = {
       methodology: "Hoe we rekenen",
     },
     back: "Terug",
+    skipToContent: "Naar de inhoud",
     languageSwitcher: {
       label: "Taal",
       switchTo: "Schakel over naar",
@@ -35,7 +36,8 @@ export const nl: DeepPartial<typeof en> = {
     footer: {
       trustLine:
         "Geen belastingadvies. Een heldere schatting om mee te werken. Je cijfers verlaten je browser nooit.",
-      cta: "Open de werkruimte",
+      cta: "Na betaling",
+      navLabel: "Sitelinks",
     },
     confidence: {
       sentence:
@@ -68,7 +70,7 @@ export const nl: DeepPartial<typeof en> = {
         "Freelens is de laag tussen je bankrekening en je boekhouding waarin je beslist. Het vult je bestaande tools aan en maakt van één binnengekomen betaling een eenvoudig, betrouwbaar plan, zodat jezelf uitbetalen veilig voelt in plaats van spannend.",
     },
     tool: {
-      title: "Je geldoverzicht · Freelens",
+      title: "Na betaling · Freelens",
       description:
         "Geef een binnengekomen betaling een taak: haal de btw eruit, bescherm een reservering voor inkomstenbelasting en Zvw, dek je bedrijfskosten, en zie wat er veilig van jou is.",
     },
@@ -150,7 +152,7 @@ export const nl: DeepPartial<typeof en> = {
         },
         overTime: {
           title: "Door het jaar heen",
-          body: "De werkruimte houdt je positie bij: wat beschermd is, wat vrij is, en hoeveel maanden je vooruit kunt. Toets een aankoop eraan vóór je hem doet. Opgeslagen op je apparaat, dus hij onthoudt het en jij hoeft dat niet.",
+          body: "Na betaling houdt je positie bij: wat beschermd is, wat vrij is, en hoeveel maanden je vooruit kunt. Toets een aankoop eraan vóór je hem doet. Opgeslagen op je apparaat, dus hij onthoudt het en jij hoeft dat niet.",
         },
       },
       visuals: {
@@ -261,7 +263,7 @@ export const nl: DeepPartial<typeof en> = {
       after: {
         tab: "Ik ben betaald",
         tabSub: "Wat is hier echt van mij?",
-        deepLink: "Open de volledige werkruimte",
+        deepLink: "Bekijk je hele positie",
       },
       whyDifferent: {
         toggle: "Waarom laten de twee tabbladen andere percentages zien?",
@@ -798,7 +800,7 @@ export const nl: DeepPartial<typeof en> = {
       loading: "Je opgeslagen cijfers worden geladen…",
       views: {
         overview: {
-          title: "Je geldoverzicht",
+          title: "Na betaling",
           subtitle: "Een rustig beeld van wat beschermd is en wat vrij is.",
         },
         setup: {
@@ -1019,6 +1021,27 @@ export const nl: DeepPartial<typeof en> = {
       emptyPrompt: "Vul je zakelijke saldo in om te zien hoe je ervoor staat.",
       save: "Deze check-in opslaan",
       saved: "Opgeslagen op dit apparaat.",
+      bufferTarget: "Bufferdoel: {amount} ({months} × je maandlasten).",
+      runwayUnknown: "Vul je maandlasten in om je financiële adem te schatten.",
+      runwaySentence: "Je hebt {months} maanden financiële adem.",
+      runwayMeter: "{months} maanden financiële adem · buffer van {buffer} maanden.",
+      shortfallDetail:
+        "Houd de volgende {amount} aan binnenkomend geld in de zaak om je gekozen reserveringen weer op peil te brengen.",
+      statusTail: {
+        covered: " Je gekozen reserveringen en buffer zijn gedekt.",
+        limited: " Je reserveringen zijn gedekt, maar er is weinig ruimte over.",
+        gap: " Je saldo dekt nog niet al je gekozen reserveringen.",
+      },
+      reserveSource: {
+        ownRule:
+          "De reservering komt uit je eigen percentageregel: een planningsregel, geen aanslag.",
+        provisionalAssessment:
+          "De reservering komt uit het bedrag van je voorlopige aanslag.",
+        guidedEstimate:
+          "De reservering komt uit de begeleide schatting: een planningsschatting, geen definitieve aanslag.",
+        manual: "De reservering is het bedrag dat je zelf hebt ingevuld.",
+        notTracked: "Er wordt nog geen reservering bijgehouden.",
+      },
     },
     decision: {
       costLabel: "Wat kost het?",

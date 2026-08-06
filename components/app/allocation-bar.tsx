@@ -14,10 +14,15 @@ export interface AllocationSegment {
 
 /**
  * The Freelens signature (audit Q2 / Signature A): a tall, tactile, proportional
- * allocation bar. Segments slide into place, reveal their share on hover / focus
- * / tap, and are keyboard-focusable. Meaning is never carried by color alone-
- * every segment has a text label in the always-visible legend and a full
- * `aria-label`. Respects `prefers-reduced-motion`.
+ * allocation bar. Segments slide into place and reveal their share on hover.
+ * Meaning is never carried by color alone: every segment has a text label in the
+ * always-visible legend below. Respects `prefers-reduced-motion`.
+ *
+ * The segments used to be `tabIndex={0}` divs with an `aria-label` and no role,
+ * so a keyboard user collected one dead tab stop per segment on the way to the
+ * next control, and each announced a name with nothing to do. The bar is now one
+ * `role="img"` with the whole split in its label, and the legend underneath
+ * carries the same figures as real text.
  *
  * The `segments` API is unchanged from the previous thin bar; `height` and
  * `interactive` are optional additions with backward-compatible defaults.
@@ -64,6 +69,10 @@ export function AllocationBar({
       </div>
 
       <div
+        role="img"
+        aria-label={positive
+          .map((s) => `${s.label}: ${pct(s.cents)} percent, ${formatEuro(s.cents)}`)
+          .join(". ")}
         className="flex w-full gap-px overflow-hidden rounded-full bg-[var(--fl-line)]"
         style={{ height }}
       >
@@ -80,12 +89,9 @@ export function AllocationBar({
                 filter: isActive ? "brightness(1.06)" : "brightness(1)",
               }}
               transition={allocate(reduce)}
-              tabIndex={interactive ? 0 : -1}
-              aria-label={`${s.label}: ${pct(s.cents)} percent, ${formatEuro(s.cents)}`}
+              aria-hidden="true"
               onMouseEnter={interactive ? () => setActive(i) : undefined}
               onMouseLeave={interactive ? () => setActive(null) : undefined}
-              onFocus={interactive ? () => setActive(i) : undefined}
-              onBlur={interactive ? () => setActive(null) : undefined}
             />
           );
         })}

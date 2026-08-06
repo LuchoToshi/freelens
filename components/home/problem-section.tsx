@@ -5,6 +5,7 @@ import { formatEuro } from "@/lib/domain/money";
 import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
 import { fill } from "@/lib/i18n";
+import { container } from "@/components/container";
 
 export function ProblemSection() {
   const t = useT();
@@ -29,7 +30,7 @@ export function ProblemSection() {
 
   return (
     <section className="border-t border-[var(--fl-line)] bg-white">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div className={`${container} grid gap-12 py-16 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-16`}>
         <div>
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
             {t.home.problem.eyebrow}

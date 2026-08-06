@@ -88,7 +88,14 @@
   --fl-ink: #122540;
   --fl-ink-hover: #0d1b30;
   --fl-slate: #5b6472;
+  /* Decorative hairlines only: dividers, section rules, chart tracks. At 1.24:1
+     against the canvas this is far too faint to identify a control, which is
+     what it used to draw. */
   --fl-line: #e3e1da;
+  /* Anything whose boundary a user has to find: input borders, button outlines,
+     the unfilled part of a progress bar. Clears the 3:1 WCAG 1.4.11 threshold
+     on all three surfaces: 3.48:1 on white, 3.31:1 on canvas, 3.11:1 on stage. */
+  --fl-line-control: #8e897e;
   --fl-text: #1c1e21;
   --fl-good-tint: #eaf4ee;
   --fl-good-text: #1f7a4d;
@@ -130,6 +137,41 @@
   --fl-motion-protect: 220ms;
   --fl-motion-navigate: 320ms;
   --fl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/**
+ * Framer Motion is gated on `useReducedMotion()` throughout, but the ~36
+ * Tailwind `transition` utilities on buttons, links, tabs and accordions were
+ * not, so "reduce motion" only ever applied to half the interface. Opacity and
+ * color changes are kept: they aid comprehension and are not vestibular.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* The sticky header is the only translucent surface. When a reader has asked
+   for less transparency it becomes solid rather than merely frostier. */
+@media (prefers-reduced-transparency: reduce) {
+  .fl-chrome {
+    background-color: var(--fl-canvas) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* High contrast: give the chrome and every control a defined edge. */
+@media (prefers-contrast: more) {
+  .fl-chrome {
+    background-color: var(--fl-canvas) !important;
+    backdrop-filter: none !important;
+    border-bottom-color: var(--fl-ink) !important;
+  }
 }
 
 /* Money and any changing figure: tabular numerals so digits never reflow. */

@@ -4,6 +4,7 @@ import { Monitor, RotateCcw } from "lucide-react";
 import { formatEuro } from "@/lib/domain/money";
 import { examplePaymentSplit } from "@/lib/domain/exampleScenario";
 import { useT } from "@/components/i18n/locale-provider";
+import { container } from "@/components/container";
 
 export function PrivacySection() {
   const t = useT();
@@ -22,7 +23,7 @@ export function PrivacySection() {
       aria-label={t.home.privacy.ariaLabel}
       className="border-t border-[var(--fl-line)] bg-[var(--fl-ink)] text-white"
     >
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div className={`${container} grid gap-12 py-16 sm:py-24 lg:grid-cols-2 lg:items-center lg:gap-16`}>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9db4d1]">
             {t.home.privacy.eyebrow}

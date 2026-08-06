@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Accordion } from "@base-ui/react/accordion";
 import { useT } from "@/components/i18n/locale-provider";
+import { container } from "@/components/container";
 
 type GroupId = "number" | "vat" | "privacy";
 
@@ -62,7 +63,7 @@ export function FaqSection() {
       aria-label={t.home.faq.ariaLabel}
       className="border-t border-[var(--fl-line)]"
     >
-      <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+      <div className={`${container} py-16 sm:py-24`}>
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
           {t.home.faq.eyebrow}
         </span>

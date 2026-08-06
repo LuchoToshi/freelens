@@ -9,6 +9,7 @@ import { ExternalLink, TriangleAlert } from "lucide-react";
 import { formatEuro, toCents } from "@/lib/domain/money";
 import { calculateTaxReserve } from "@/lib/tax/engine";
 import { DEFAULT_COUNTRY, latestProfileYear, loadProfile } from "@/lib/tax/loadProfile";
+import { container } from "@/components/container";
 
 const TAX_YEAR = latestProfileYear(DEFAULT_COUNTRY) ?? 0;
 
@@ -41,7 +42,7 @@ export function MethodologyPageBody() {
 
   return (
     <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 sm:px-6">
+      <div className={`${container} flex flex-col gap-8 py-12`}>
         <BackLink />
 
         <div className="flex flex-col gap-4">
