@@ -935,7 +935,7 @@ function ResultCard({
           steps={result.breakdown}
           resultLabel={t.app.moneyArrived.result.available}
           resultCents={result.availableForPersonalPayoutCents}
-          reserveSourceNote={t.app.moneyArrived.result.reserveSourceNote}
+          reserveSourceNote={t.app.moneyArrived.result.reserveSourceNotes[result.reserveSource]}
         />
 
         {treatment !== "21" && treatment !== "9" && (

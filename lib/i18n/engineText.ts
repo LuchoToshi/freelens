@@ -122,7 +122,7 @@ const NL_BREAKDOWN_EXPLANATIONS: Record<string, string> = {
     "Software, verzekeringen, apparatuur, werkplek, je boekhouder. Aftrekbaar, dus ze verlagen je aanslag, maar je moet ze nog steeds verdienen voordat er iets van jou is.",
   "rate-profit": "Omzet min je kosten. Over dit bedrag wordt de belasting berekend.",
   "rate-tax":
-    "Berekend over de echte schijven voor het hele jaar, met de aftrekposten en heffingskortingen waar je recht op hebt. Geen vast percentage.",
+    "Berekend over de echte schijven voor het hele jaar, met de heffingskortingen, en met de ondernemersaftrek zodra je die hebt bevestigd. Geen vast percentage.",
   "rate-take-home": "Winst min de belasting hierboven. Dit is het bedrag waar je om vroeg.",
 };
 

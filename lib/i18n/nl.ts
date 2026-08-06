@@ -296,7 +296,7 @@ export const nl: DeepPartial<typeof en> = {
       "Freelens geeft schattingen om mee te plannen, op basis van de gegevens en reserveringsregels die je zelf invult. Het berekent niet je definitieve aanslag en is geen belastingadvies.",
     isHeading: "Wat Freelens is",
     is: [
-      "Het past de reserveringsregels die jij kiest consequent toe.",
+      "Het berekent de reservering over de echte schijven, aftrekposten en heffingskortingen, of past de regel toe die jij koos.",
       "Het haalt de btw eruit en maakt je reserveringen zichtbaar.",
       "Het maakt van een betaling een helder verdeelplan.",
       "Het houdt lokaal bij hoe je ervoor staat, alleen op je eigen apparaat.",
@@ -320,7 +320,7 @@ export const nl: DeepPartial<typeof en> = {
     flatRule: {
       heading: "Wat de vaste 30%-regel fout deed",
       intro:
-        "Freelens reserveerde vroeger 30% van de omzet. Dat zit tegelijk in twee richtingen fout, en de fout is het grootst precies daar waar het geld zit. Deze drie gevallen komen rechtstreeks uit de engine; alle tien staan in OLD_VS_NEW.md.",
+        "Freelens reserveerde vroeger 30% van de omzet. Dat zit tegelijk in twee richtingen fout, en de fout is het grootst precies daar waar het geld zit. Deze drie gevallen komen rechtstreeks uit de engine, en de engine wordt op alle tien getest.",
       colCase: "Situatie",
       colOld: "Oude regel",
       colReal: "Werkelijk verschuldigd",
@@ -430,7 +430,7 @@ export const nl: DeepPartial<typeof en> = {
     mkb: "{pct}% van wat er na die aftrekposten overblijft.",
     exampleHeading: "Een uitgewerkt voorbeeld",
     exampleNote:
-      "Dat is {effective}% van de winst in totaal, terwijl over de volgende verdiende euro {marginal}% wordt geheven. Freelens reserveert bij een betaling tegen dat tweede tarief, omdat een nieuwe betaling bovenop alles komt wat je dit jaar al verdiend hebt.",
+      "Dat is {effective}% van de winst in totaal, terwijl over de volgende verdiende euro {marginal}% wordt geheven. Een betaling die al in je verwachte winst zit, draagt haar aandeel in de rekening van het hele jaar, het eerste cijfer. Alleen inkomen boven die verwachting wordt tegen het tweede tarief gereserveerd, omdat het bovenop alles komt wat al is meegeteld.",
     assumesHeading: "Waar deze schatting van uitgaat",
     assumesIntro:
       "Er is hier niets verborgen om het bedrag mooier te laten lijken. Dit zijn de aannames die bij elk resultaat van de app horen.",
@@ -914,8 +914,15 @@ export const nl: DeepPartial<typeof en> = {
         businessSetAside: "Opzij gezet voor bedrijfskosten",
         short: "Deze betaling dekt je reserveringen niet",
         available: "Geschat bedrag om jezelf uit te betalen",
-        reserveSourceNote:
-          "Reservering op basis van het percentage dat jij hebt ingesteld (een planningsregel, geen aanslag).",
+        reserveSourceNotes: {
+          "guided-estimate":
+            "Reservering uit de begeleide schatting: het aandeel van deze betaling in wat je dit jaar naar verwachting verschuldigd bent, over de echte schijven.",
+          "own-rule":
+            "Reservering op basis van het percentage dat jij hebt ingesteld (een planningsregel, geen aanslag).",
+          "provisional-assessment":
+            "Reservering op basis van je voorlopige aanslag.",
+          manual: "Reservering handmatig ingevoerd voor deze betaling.",
+        },
         markHandled: "Verdeling afgehandeld",
         savedOnDevice: "Opgeslagen op dit apparaat.",
         movesMoneyNote:
@@ -924,7 +931,7 @@ export const nl: DeepPartial<typeof en> = {
       sample: {
         intro:
           "Zo valt een betaling van {amount} met 21% btw uiteen, voor iemand die dit jaar {profit} winst verwacht{rate}.",
-        rateNote: " (gereserveerd tegen {pct}%, het tarief over hun volgende euro)",
+        rateNote: " (dus {pct}% van deze betaling opzij)",
       },
       assumptions: {
         deductible: "Reservering toegepast op {base} na {costs} aftrekbare kosten.",

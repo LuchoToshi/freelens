@@ -302,7 +302,7 @@ export const en = {
       "Freelens provides planning estimates based on the information and reserve rules you enter. It does not calculate your final tax assessment and is not tax advice.",
     isHeading: "What Freelens is",
     is: [
-      "It applies your chosen reserve rules consistently.",
+      "It works the reserve out on the real brackets, deductions and credits, or applies a rule you chose instead.",
       "It separates VAT and makes your reserves visible.",
       "It turns a payment into a clear allocation plan.",
       "It keeps a local record of your position, on your device only.",
@@ -326,7 +326,7 @@ export const en = {
     flatRule: {
       heading: "What the flat 30% rule got wrong",
       intro:
-        "Freelens used to reserve 30% of revenue. That is wrong in both directions at once, and the error is largest exactly where the money is. These three cases come straight from the engine, and the full ten are in OLD_VS_NEW.md.",
+        "Freelens used to reserve 30% of revenue. That is wrong in both directions at once, and the error is largest exactly where the money is. These three cases come straight from the engine, which is tested against all ten.",
       colCase: "Case",
       colOld: "Old rule",
       colReal: "Really owed",
@@ -436,7 +436,7 @@ export const en = {
     mkb: "{pct}% of what is left after those deductions.",
     exampleHeading: "A worked example",
     exampleNote:
-      "That is {effective}% of the profit overall, while the next euro earned is taxed at {marginal}%. Freelens reserves from a payment at the second rate, because a new payment sits on top of everything already earned this year.",
+      "That is {effective}% of the profit overall, while the next euro earned is taxed at {marginal}%. A payment already counted in the profit you expect carries its share of the whole year's bill, the first figure. Only income beyond that expectation is reserved at the second rate, because it lands on top of everything already counted.",
     assumesHeading: "What this estimate assumes",
     assumesIntro:
       "Nothing here is hidden to make the number look cleaner. These are the assumptions attached to every result the app produces.",
@@ -936,8 +936,15 @@ export const en = {
         businessSetAside: "Set aside for business costs",
         short: "This payment doesn't cover your set-asides",
         available: "Estimated amount available to pay yourself",
-        reserveSourceNote:
-          "Reserve based on the percentage you set (a planning rule, not a tax assessment).",
+        reserveSourceNotes: {
+          "guided-estimate":
+            "Reserve from the guided estimate: this payment's share of what you are on track to owe for the year, on the real brackets.",
+          "own-rule":
+            "Reserve based on the percentage you set (a planning rule, not a tax assessment).",
+          "provisional-assessment":
+            "Reserve based on your provisional assessment (voorlopige aanslag).",
+          manual: "Reserve entered by hand for this payment.",
+        },
         markHandled: "Mark allocation as handled",
         savedOnDevice: "Saved on this device.",
         movesMoneyNote:
@@ -946,7 +953,7 @@ export const en = {
       sample: {
         intro:
           "Here's how a {amount} payment at 21% VAT splits, for someone expecting {profit} profit this year{rate}.",
-        rateNote: " (reserved at {pct}%, the rate on their next euro)",
+        rateNote: " (so {pct}% of this payment set aside)",
       },
       assumptions: {
         deductible: "Reserve applied to {base} after {costs} deductible costs.",

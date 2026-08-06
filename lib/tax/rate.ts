@@ -193,7 +193,7 @@ function buildRateBreakdown(parts: {
       label: "Income tax and Zvw",
       amount: parts.totalTaxLiability,
       explanation:
-        "Worked out across the real brackets for the whole year, with the deductions and credits you qualify for. Not a flat percentage.",
+        "Worked out across the real brackets for the whole year, with the tax credits, and with the entrepreneur deductions once you have confirmed them. Not a flat percentage.",
     },
     {
       id: "rate-take-home",
