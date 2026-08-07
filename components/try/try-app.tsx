@@ -9,6 +9,7 @@ import { reasonTextFor } from "@/lib/rebooking/reasonText";
 import type { Craft, Relationship } from "@/lib/rebooking/types";
 import { fill } from "@/lib/i18n";
 import { OFFER } from "@/lib/offer";
+import { salutationFor } from "@/lib/rebooking/salutation";
 import {
   cardClass,
   hintClass,
@@ -28,7 +29,15 @@ import {
  * cycle. The only server round-trip is the single draft call, which sends one
  * record (name, project, month) and stores nothing.
  */
-type ClientRow = { name: string; project: string; month: string };
+type ClientType = "business" | "private";
+type ClientRow = {
+  name: string;
+  project: string;
+  month: string;
+  contact: string;
+  email: string;
+  clientType: ClientType;
+};
 type Stage = "clients" | "voice" | "queue";
 type DraftState =
   | { kind: "idle" }
@@ -45,11 +54,15 @@ const CRAFT_IDS: Craft[] = [
   "other",
 ];
 
-const EMPTY_ROWS: ClientRow[] = [
-  { name: "", project: "", month: "" },
-  { name: "", project: "", month: "" },
-  { name: "", project: "", month: "" },
-];
+const EMPTY_ROW: Omit<ClientRow, never> = {
+  name: "",
+  project: "",
+  month: "",
+  contact: "",
+  email: "",
+  clientType: "business",
+};
+const EMPTY_ROWS: ClientRow[] = [{ ...EMPTY_ROW }, { ...EMPTY_ROW }, { ...EMPTY_ROW }];
 
 function monthsAgo(n: number): string {
   const d = new Date();
@@ -64,9 +77,9 @@ function sampleRows(locale: "en" | "nl"): ClientRow[] {
       ? ["Merkcampagne", "Productfoto's", "Bruiloft"]
       : ["Brand campaign", "Product photos", "Wedding"];
   return [
-    { name: "Studio Vondel", project: projects[0], month: monthsAgo(12) },
-    { name: "Bakkerij De Groot", project: projects[1], month: monthsAgo(8) },
-    { name: "Marieke Jansen", project: projects[2], month: monthsAgo(3) },
+    { name: "Studio Vondel", project: projects[0], month: monthsAgo(12), contact: "Emma", email: "emma@studiovondel.nl", clientType: "business" as const },
+    { name: "Bakkerij De Groot", project: projects[1], month: monthsAgo(8), contact: "", email: "", clientType: "business" as const },
+    { name: "Marieke Jansen", project: projects[2], month: monthsAgo(3), contact: "Marieke", email: "", clientType: "private" as const },
   ];
 }
 
@@ -110,6 +123,8 @@ export function TryApp() {
       ? rankQueue({ relationships, craft, config: SEASONALITY_NL_V1, today })
       : [];
   const rankedIds = new Set(ranked.map((s) => s.relationshipId));
+  const rowFor = (rel: Relationship): ClientRow | undefined =>
+    filled[Number(rel.id.slice("trial-".length))];
   const notRanked = relationships.filter((r) => !rankedIds.has(r.id));
 
   function goTo(next: Stage) {
@@ -136,6 +151,8 @@ export function TryApp() {
       const response = await fetch("/api/try/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // The email address is deliberately absent: it exists only in the
+        // browser, for the mailto handoff. It is never sent to any server.
         body: JSON.stringify({
           name: rel.clientName,
           project: rel.lastProjectTitle ?? "",
@@ -145,6 +162,14 @@ export function TryApp() {
           greeting,
           signoff,
           locale,
+          clientType: rowFor(rel)?.clientType ?? "business",
+          salutation: salutationFor({
+            clientName: rel.clientName,
+            contactName: rowFor(rel)?.contact || undefined,
+            formality,
+            locale,
+            greetingOverride: greeting,
+          }),
         }),
       });
       if (response.status === 429) {
@@ -204,7 +229,8 @@ export function TryApp() {
           </div>
           <div className="flex flex-col gap-4">
             {rows.map((row, i) => (
-              <div key={i} className="grid gap-3 sm:grid-cols-3">
+              <div key={i} className="flex flex-col gap-2">
+                <div className="grid gap-3 sm:grid-cols-3">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor={`try-name-${i}`} className={labelClass}>
                     {p.clients.nameLabel} {i + 1}
@@ -241,6 +267,47 @@ export function TryApp() {
                     onChange={(e) => setRow(i, { month: e.target.value })}
                     className={`${inputClass} min-h-11 px-3 text-sm`}
                   />
+                </div>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-[1fr_1.3fr_auto]">
+                  <input
+                    aria-label={`${p.clients.contactLabel} ${i + 1}`}
+                    value={row.contact}
+                    maxLength={60}
+                    placeholder={p.clients.contactPlaceholder}
+                    onChange={(e) => setRow(i, { contact: e.target.value })}
+                    className={`${inputClass} min-h-10 px-3 text-xs`}
+                  />
+                  <input
+                    type="email"
+                    aria-label={`${p.clients.emailLabel} ${i + 1}`}
+                    value={row.email}
+                    maxLength={254}
+                    placeholder={p.clients.emailPlaceholder}
+                    onChange={(e) => setRow(i, { email: e.target.value })}
+                    className={`${inputClass} min-h-10 px-3 text-xs`}
+                  />
+                  <div
+                    role="group"
+                    aria-label={`${p.clients.typeLabel} ${i + 1}`}
+                    className="inline-flex items-center rounded-lg border border-[var(--fl-line-control)] bg-white p-0.5"
+                  >
+                    {(["business", "private"] as const).map((ct) => (
+                      <button
+                        key={ct}
+                        type="button"
+                        aria-pressed={row.clientType === ct}
+                        onClick={() => setRow(i, { clientType: ct })}
+                        className={`min-h-9 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+                          row.clientType === ct
+                            ? "bg-[var(--fl-ink)] text-white"
+                            : "text-[var(--fl-slate)] hover:text-[var(--fl-ink)]"
+                        }`}
+                      >
+                        {ct === "business" ? p.clients.typeBusiness : p.clients.typePrivate}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}

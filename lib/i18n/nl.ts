@@ -72,10 +72,17 @@ export const nl: DeepPartial<typeof en> = {
       "Vul drie oude klanten in. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon. Wat je invult blijft in je browser.",
     clients: {
       heading: "Stap 1 \u2014 drie oude klanten",
-      hint: "Echte klanten werken het best. Iedereen van een half jaar geleden of langer geeft de rangschikking iets om over na te denken.",
+      hint: "Echte klanten werken het best. Een voornaam maakt de aanhef persoonlijk; een e-mailadres maakt de verzendknop mogelijk. Allebei optioneel.",
       nameLabel: "Naam klant",
       projectLabel: "Laatste klus",
       monthLabel: "Wanneer was dat?",
+      contactLabel: "Voornaam contactpersoon",
+      contactPlaceholder: "Voor de aanhef",
+      emailLabel: "E-mailadres",
+      emailPlaceholder: "Voor de verzendknop (optioneel)",
+      typeLabel: "Type klant",
+      typeBusiness: "Zakelijk",
+      typePrivate: "Particulier",
       sample: "Gebruik voorbeelddata",
       next: "Verder: hoe jij schrijft",
     },
@@ -120,7 +127,7 @@ export const nl: DeepPartial<typeof en> = {
       again: "Nog een keer met andere klanten",
     },
     privacyNote:
-      "Wat je invult verlaat je browser niet, behalve de ene klant voor wie je een concept maakt: naam, klus en datum gaan \u00e9\u00e9n keer mee om de e-mail te schrijven en worden niet opgeslagen.",
+      "Wat je invult verlaat je browser niet, behalve de ene klant voor wie je een concept maakt: naam, contactpersoon, klus en datum gaan \u00e9\u00e9n keer mee om de e-mail te schrijven en worden niet opgeslagen. E-mailadressen gaan nooit mee.",
   },
 
   meta: {

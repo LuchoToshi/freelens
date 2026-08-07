@@ -69,10 +69,17 @@ export const en = {
       "Enter three past clients. Freelens ranks who is worth a message right now, says why, and writes one draft in your tone. What you type stays in your browser.",
     clients: {
       heading: "Step 1 — three past clients",
-      hint: "Real clients work best. Anyone from six months ago or longer gives the ranking something to reason about.",
+      hint: "Real clients work best. A first name makes the greeting personal; an email address enables the send button. Both optional.",
       nameLabel: "Client name",
       projectLabel: "Last project",
       monthLabel: "When was that?",
+      contactLabel: "Contact first name",
+      contactPlaceholder: "For the greeting",
+      emailLabel: "Email address",
+      emailPlaceholder: "For the send button (optional)",
+      typeLabel: "Client type",
+      typeBusiness: "Business",
+      typePrivate: "Private",
       sample: "Use sample data instead",
       next: "Next: how you write",
     },
@@ -117,7 +124,7 @@ export const en = {
       again: "Run it again with different clients",
     },
     privacyNote:
-      "Your entries never leave your browser, except the one client you draft for: name, project and date are sent once to write the email and are not stored.",
+      "What you type never leaves your browser, except the one client you draft for: name, contact person, project and date are sent once to write the email and are not stored. Email addresses never leave your browser.",
   },
 
   meta: {
