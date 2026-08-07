@@ -85,6 +85,16 @@ function sampleRows(locale: "en" | "nl"): ClientRow[] {
 }
 
 const PLACEHOLDER = /\[(fill in|vul in):/i;
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Assembled entirely from local state: the address never appears in any
+ * network request, only in this link the user's own mail app opens.
+ */
+function mailtoHref(email: string, subject: string, body: string): string {
+  const crlf = body.replace(/\n/g, "\r\n");
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(crlf)}`;
+}
 
 export function TryApp() {
   const { locale, t } = useLocale();
@@ -100,6 +110,7 @@ export function TryApp() {
   const [draftFor, setDraftFor] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftState>({ kind: "idle" });
   const [copied, setCopied] = useState(false);
+  const [handedOff, setHandedOff] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -161,6 +172,7 @@ export function TryApp() {
     setDraft({ kind: "idle" });
     setDraftFor(null);
     setCopied(false);
+    setHandedOff(false);
     goTo("clients");
   }
 
@@ -218,6 +230,7 @@ export function TryApp() {
     if (draft.kind !== "done" || locked) return;
     await navigator.clipboard.writeText(`${draft.subject}\n\n${draft.body}`);
     setCopied(true);
+    setHandedOff(true);
     setTimeout(() => setCopied(false), 2500);
   }
 
@@ -543,14 +556,43 @@ export function TryApp() {
                       className={`${inputClass} px-3 py-2 text-sm leading-relaxed`}
                     />
                     {locked && <p className={hintClass}>{p.draft.locked}</p>}
-                    <button
-                      type="button"
-                      disabled={locked}
-                      onClick={copyDraft}
-                      className={`${primaryButtonClass} w-fit`}
-                    >
-                      {copied ? p.draft.copied : p.draft.copy}
-                    </button>
+                    {(() => {
+                      const email = rowFor(rel)?.email.trim() ?? "";
+                      const hasEmail = EMAIL_SHAPE.test(email);
+                      return (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex flex-wrap items-center gap-3">
+                            {hasEmail && !locked ? (
+                              <a
+                                href={mailtoHref(email, draft.subject, draft.body)}
+                                onClick={() => setHandedOff(true)}
+                                className={`${primaryButtonClass} w-fit`}
+                              >
+                                {p.draft.openMail}
+                              </a>
+                            ) : hasEmail ? (
+                              <button type="button" disabled className={`${primaryButtonClass} w-fit`}>
+                                {p.draft.openMail}
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              disabled={locked}
+                              onClick={copyDraft}
+                              className={`${hasEmail ? secondaryButtonClass : primaryButtonClass} w-fit`}
+                            >
+                              {copied ? p.draft.copied : p.draft.copy}
+                            </button>
+                          </div>
+                          {!hasEmail && <p className={hintClass}>{p.draft.mailHint}</p>}
+                          {handedOff && (
+                            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                              {p.draft.loopTeaser}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </article>
