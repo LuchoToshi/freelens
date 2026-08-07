@@ -709,6 +709,23 @@ export const en = {
       snooze: "Snooze {months}m",
       tracking: "Tracking {count} of {limit} relationships in the beta.",
     },
+    outcomes: {
+      heading: "How did these go?",
+      intro: "Sent a while back, no outcome recorded. Two clicks, and the numbers below start meaning something.",
+      results: { reply_positive: "Positive reply", reply_neutral: "Neutral reply", reply_negative: "Negative reply", booked: "Booked", no_reply: "No reply" },
+      valueLabel: "Booked value, excluding btw (optional)",
+      save: "Record",
+      saved: "Recorded",
+    },
+    numbers: {
+      heading: "The numbers",
+      relationships: "Relationships tracked",
+      sent: "Touches sent",
+      replyRate: "Reply rate",
+      booked: "Booked this quarter",
+      taxNote: "\u2248 {net} for you after btw and reserve, on your saved tax profile.",
+      noData: "\u2014",
+    },
     account: {
       heading: "Your data",
       export: "Export everything (JSON)",

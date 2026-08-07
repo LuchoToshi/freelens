@@ -39,6 +39,7 @@ describe("the Dutch dictionary covers the English one", () => {
       "common.brand",
       "common.nav.rebooking",
       "agent.title",
+      "agent.numbers.noData",
       "agent.onboarding.importPlaceholder",
       "common.nav.privacy",
       "common.nav.contact",

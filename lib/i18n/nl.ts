@@ -703,6 +703,23 @@ export const nl: DeepPartial<typeof en> = {
       snooze: "Snooze {months} mnd",
       tracking: "Je volgt {count} van {limit} relaties in de b\u00e8ta.",
     },
+    outcomes: {
+      heading: "Hoe zijn deze afgelopen?",
+      intro: "Een tijdje terug verstuurd, nog geen uitkomst vastgelegd. Twee klikken, en de cijfers hieronder gaan iets betekenen.",
+      results: { reply_positive: "Positief antwoord", reply_neutral: "Neutraal antwoord", reply_negative: "Negatief antwoord", booked: "Geboekt", no_reply: "Geen antwoord" },
+      valueLabel: "Geboekt bedrag, exclusief btw (optioneel)",
+      save: "Vastleggen",
+      saved: "Vastgelegd",
+    },
+    numbers: {
+      heading: "De cijfers",
+      relationships: "Relaties gevolgd",
+      sent: "Berichten verstuurd",
+      replyRate: "Antwoordpercentage",
+      booked: "Geboekt dit kwartaal",
+      taxNote: "\u2248 {net} voor jou na btw en reservering, op je opgeslagen belastingprofiel.",
+      noData: "\u2014",
+    },
     account: {
       heading: "Je gegevens",
       export: "Exporteer alles (JSON)",

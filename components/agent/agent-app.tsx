@@ -15,6 +15,7 @@ import {
   secondaryButtonClass,
 } from "@/components/app/styles";
 import { supabaseBrowser } from "@/lib/agent/supabase";
+import { OutcomesAndNumbers } from "@/components/agent/outcomes-numbers";
 import { deriveVoice } from "@/lib/agent/voiceProfile";
 import { parseImport, type ParsedRow } from "@/lib/agent/importParse";
 import { rankQueue, type RankedTouchSuggestion } from "@/lib/rebooking/ranking";
@@ -50,6 +51,7 @@ export function AgentApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [stage, setStage] = useState<Stage>("loading");
   const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [craft, setCraft] = useState<Craft | null>(null);
 
   const load = useCallback(async () => {
@@ -120,8 +122,12 @@ export function AgentApp() {
               relationships={relationships}
               craft={craft}
               session={session}
-              onChanged={() => void load()}
+              onChanged={() => {
+                void load();
+                setRefreshKey((k) => k + 1);
+              }}
             />
+            <OutcomesAndNumbers refreshKey={refreshKey} />
             <AccountSection session={session} />
           </>
         )}
