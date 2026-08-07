@@ -139,9 +139,7 @@ export function AccuracyPageBody() {
             })}
           </p>
           <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
-            All calculations are deterministic: the same inputs always produce the
-            same numbers, with no guessing and no hidden model. Every result shows
-            a &ldquo;Why this number?&rdquo; breakdown you can check.
+            {t.accuracyPage.deterministic}
           </p>
           <Link
             href="/methodology"
