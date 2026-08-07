@@ -7,6 +7,8 @@ import { rankQueue, type RankedTouchSuggestion } from "@/lib/rebooking/ranking";
 import { SEASONALITY_NL_V1 } from "@/lib/rebooking/seasonality";
 import { reasonTextFor } from "@/lib/rebooking/reasonText";
 import type { Craft, Relationship } from "@/lib/rebooking/types";
+import { fill } from "@/lib/i18n";
+import { OFFER } from "@/lib/offer";
 import {
   cardClass,
   hintClass,
@@ -480,7 +482,7 @@ export function TryApp() {
                 {p.gate.heading}
               </h3>
               <p className="max-w-xl text-sm leading-relaxed text-[var(--fl-slate)]">
-                {p.gate.body}
+                {fill(p.gate.body, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Link href="/#waitlist" className={primaryButtonClass}>

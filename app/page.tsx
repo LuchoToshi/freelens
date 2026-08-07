@@ -6,6 +6,8 @@ import { container } from "@/components/container";
 import { WaitlistForm } from "@/components/rebooking/waitlist-form";
 import { linkButtonClass, primaryButtonClass, secondaryButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
+import { fill } from "@/lib/i18n";
+import { OFFER } from "@/lib/offer";
 
 /**
  * The Rebooking front door.
@@ -148,9 +150,9 @@ export default function Home() {
             <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
               {r.offer.body}
             </p>
-            <p className="text-lg font-medium text-[var(--fl-ink)]">{r.offer.priceLine}</p>
+            <p className="text-lg font-medium text-[var(--fl-ink)]">{fill(r.offer.priceLine, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}</p>
             <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">
-              {r.offer.priceNote}
+              {fill(r.offer.priceNote, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}
             </p>
           </div>
 

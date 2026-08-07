@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { fill } from "@/lib/i18n";
+import { OFFER } from "@/lib/offer";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -138,7 +140,7 @@ export function WaitlistForm() {
         {state === "sending" ? w.sending : w.submit}
       </button>
 
-      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{w.noCommit}</p>
+      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{fill(w.noCommit, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}</p>
 
       {state === "error" && (
         <p role="alert" className="text-sm text-[var(--fl-short-text)]">
