@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Check, Copy, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ import { fill } from "@/lib/i18n";
 /** Free tier: everything works, up to this many relationships. */
 const FREE_LIMIT = 5;
 
-type Stage = "loading" | "login" | "onboarding" | "queue";
+type Stage = "loading" | "login" | "onboarding" | "queue" | "error";
 
 /**
  * The Rebooking app, v1: login → 15-minute onboarding → the weekly queue.
@@ -55,15 +55,21 @@ export function AgentApp() {
   const [craft, setCraft] = useState<Craft | null>(null);
 
   const load = useCallback(async () => {
-    const { data: voice } = await sb.from("voice_profiles").select("craft").maybeSingle();
-    const { data: rows } = await sb
-      .from("relationships")
-      .select("*")
-      .order("created_at", { ascending: true });
-    const mapped = (rows ?? []).map(mapRow);
-    setRelationships(mapped);
-    setCraft((voice?.craft as Craft) ?? null);
-    setStage(voice && mapped.length > 0 ? "queue" : "onboarding");
+    // A failed load must land somewhere a user can act on, not an eternal
+    // "One moment.": that was findable by pulling the network cable once.
+    try {
+      const [{ data: voice, error: e1 }, { data: rows, error: e2 }] = await Promise.all([
+        sb.from("voice_profiles").select("craft").maybeSingle(),
+        sb.from("relationships").select("*").order("created_at", { ascending: true }),
+      ]);
+      if (e1 || e2) throw e1 ?? e2;
+      const mapped = (rows ?? []).map(mapRow);
+      setRelationships(mapped);
+      setCraft((voice?.craft as Craft) ?? null);
+      setStage(voice && mapped.length > 0 ? "queue" : "onboarding");
+    } catch {
+      setStage("error");
+    }
   }, [sb]);
 
   useEffect(() => {
@@ -109,6 +115,14 @@ export function AgentApp() {
         </header>
 
         {stage === "loading" && <p className={hintClass}>{a.loading}</p>}
+        {stage === "error" && (
+          <div className="flex flex-col items-start gap-3">
+            <p role="alert" className="text-sm text-[var(--fl-short-text)]">{a.loadError}</p>
+            <button type="button" onClick={() => void load()} className={secondaryButtonClass}>
+              {a.retry}
+            </button>
+          </div>
+        )}
         {stage === "login" && <Login />}
         {stage === "onboarding" && session && (
           <Onboarding
@@ -219,6 +233,18 @@ function Onboarding({
   const sb = supabaseBrowser();
 
   const [step, setStep] = useState(existingCraft ? 1 : 0);
+  // Focus follows the step, same pattern as every other wizard on the site,
+  // so keyboard and screen-reader users land on the new question rather than
+  // at the bottom of the old one. Skipped on first paint.
+  const stepRef = useRef<HTMLParagraphElement>(null);
+  const firstPaint = useRef(true);
+  useEffect(() => {
+    if (firstPaint.current) {
+      firstPaint.current = false;
+      return;
+    }
+    stepRef.current?.focus();
+  }, [step]);
   const [craft, setCraft] = useState<Craft | null>(existingCraft);
   const [voiceText, setVoiceText] = useState("");
   const [importText, setImportText] = useState("");
@@ -232,7 +258,12 @@ function Onboarding({
     setError(false);
     const { data: userData } = await sb.auth.getUser();
     const userId = userData?.user?.id;
-    if (!userId) return;
+    if (!userId) {
+      // Session lapsed during a 15-minute onboarding: say so, stay clickable.
+      setSaving(false);
+      setError(true);
+      return;
+    }
 
     // The raw voice text stays in this browser; only the derivation is saved.
     const voice = deriveVoice([voiceText]);
@@ -273,17 +304,20 @@ function Onboarding({
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">
-      <p className={hintClass}>{fill(a.progress, { n: step + 1, total: steps.length, name: steps[step] })}</p>
+      <p ref={stepRef} tabIndex={-1} className={`${hintClass} outline-none`}>
+        {fill(a.progress, { n: step + 1, total: steps.length, name: steps[step] })}
+      </p>
 
       {step === 0 && (
         <fieldset className="flex flex-col gap-3">
           <legend className="text-base font-medium text-[var(--fl-ink)]">{a.craftQuestion}</legend>
-          <div className="flex flex-wrap gap-2">
+          <div role="radiogroup" aria-label={a.craftQuestion} className="flex flex-wrap gap-2">
             {CRAFTS.map((c) => (
               <button
                 key={c}
                 type="button"
-                aria-pressed={craft === c}
+                role="radio"
+                aria-checked={craft === c}
                 onClick={() => setCraft(c)}
                 className={`min-h-11 rounded-lg border px-3 text-sm font-medium ${
                   craft === c
@@ -391,7 +425,9 @@ function Onboarding({
             ))}
           </ul>
           {rows.length > FREE_LIMIT && (
-            <p className={hintClass}>{fill(a.freeLimitNote, { limit: FREE_LIMIT })}</p>
+            <p role="alert" className="text-sm font-medium text-[var(--fl-vat-text)]">
+              {fill(a.freeLimitNote, { limit: FREE_LIMIT, dropped: rows.length - FREE_LIMIT })}
+            </p>
           )}
           <div className="flex items-center gap-3">
             <button type="button" onClick={() => setStep(2)} className={secondaryButtonClass}>
@@ -434,6 +470,8 @@ function Queue({
     [relationships]
   );
 
+  const [lastSnooze, setLastSnooze] = useState<{ id: string; name: string } | null>(null);
+
   const snooze = async (relationshipId: string, months: number) => {
     const until = new Date();
     until.setMonth(until.getMonth() + months);
@@ -441,6 +479,14 @@ function Queue({
       .from("relationships")
       .update({ snoozed_until: until.toISOString().slice(0, 10) })
       .eq("id", relationshipId);
+    setLastSnooze({ id: relationshipId, name: byId.get(relationshipId)?.clientName ?? "" });
+    onChanged();
+  };
+
+  const undoSnooze = async () => {
+    if (!lastSnooze) return;
+    await sb.from("relationships").update({ snoozed_until: null }).eq("id", lastSnooze.id);
+    setLastSnooze(null);
     onChanged();
   };
 
@@ -449,6 +495,14 @@ function Queue({
       <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
         {a.heading}
       </h2>
+      {lastSnooze && (
+        <p role="status" className="flex items-center gap-3 text-sm text-[var(--fl-ink)]">
+          {fill(a.snoozed, { name: lastSnooze.name })}
+          <button type="button" onClick={() => void undoSnooze()} className={linkButtonClass}>
+            {a.undo}
+          </button>
+        </p>
+      )}
       {suggestions.length === 0 && (
         <p className="max-w-xl text-base leading-relaxed text-[var(--fl-slate)]">{a.empty}</p>
       )}
@@ -562,7 +616,7 @@ function QueueItem({
           ))}
         </div>
       )}
-      {state === "drafting" && <p className={hintClass}>{a.drafting}</p>}
+      {state === "drafting" && <p role="status" className={hintClass}>{a.drafting}</p>}
       {state === "error" && (
         <p role="alert" className="text-sm text-[var(--fl-short-text)]">{a.draftError}</p>
       )}

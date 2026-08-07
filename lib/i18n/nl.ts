@@ -656,6 +656,8 @@ export const nl: DeepPartial<typeof en> = {
     title: "Rebooking",
     signOut: "Uitloggen",
     loading: "Momentje.",
+    loadError: "Je gegevens laden lukte niet. De verbinding of je sessie haperde; er is niets verloren.",
+    retry: "Probeer opnieuw",
     login: {
       intro: "Besloten b\u00e8ta. Log in met een magic link; er bestaat geen wachtwoord dat kan lekken.",
       emailLabel: "Je e-mailadres",
@@ -682,7 +684,7 @@ export const nl: DeepPartial<typeof en> = {
       confirmHint: "Niets gaat de database in zonder bevestiging. Pas inline aan, verwijder wat niet klopt.",
       confirmEmpty: "Nog niets leesbaars. Ga terug en zet \u00e9\u00e9n regel per klant neer.",
       fields: { name: "Klant", email: "E-mail (optioneel)", project: "Laatste klus", date: "Wanneer (jjjj-mm-dd)" },
-      freeLimitNote: "De b\u00e8ta volgt {limit} relaties; de eerste {limit} rijen worden bewaard.",
+      freeLimitNote: "De b\u00e8ta volgt {limit} relaties. {dropped} van deze rijen worden NIET bewaard; verwijder rijen tot er {limit} overblijven om zelf te kiezen welke.",
       next: "Verder",
       back: "Terug",
       skip: "Sla over",
@@ -705,6 +707,8 @@ export const nl: DeepPartial<typeof en> = {
       markSent: "Ik heb hem verstuurd",
       sentNoted: "Genoteerd",
       snooze: "Snooze {months} mnd",
+      snoozed: "{name} gesnoozed.",
+      undo: "Ongedaan maken",
       tracking: "Je volgt {count} van {limit} relaties in de b\u00e8ta.",
     },
     outcomes: {

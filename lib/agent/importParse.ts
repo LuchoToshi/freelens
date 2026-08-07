@@ -30,7 +30,10 @@ export function parseImport(text: string): ParsedRow[] {
     .split("\n")
     .map((l) => l.trim())
     .filter((l) => l.length > 1)
-    .filter((l, i) => !(i === 0 && HEADER_WORDS.test(l.split(/[,;]/)[0] ?? "")))
+    // A header row is label words without data: "Klant 1, klus, 2025" is a
+    // client whose name merely starts with a header word, and eating it
+    // silently was a real bug this comment commemorates.
+    .filter((l, i) => !(i === 0 && HEADER_WORDS.test(l.split(/[,;]/)[0] ?? "") && !/[\d@]/.test(l)))
     .map(parseLine)
     .filter((r): r is ParsedRow => r !== null);
 }

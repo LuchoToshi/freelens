@@ -662,6 +662,8 @@ export const en = {
     title: "Rebooking",
     signOut: "Sign out",
     loading: "One moment.",
+    loadError: "Could not load your data. Your connection or the session hiccuped; nothing is lost.",
+    retry: "Try again",
     login: {
       intro: "Private beta. Sign in with a magic link; no password exists to leak.",
       emailLabel: "Your email",
@@ -688,7 +690,7 @@ export const en = {
       confirmHint: "Nothing enters the database unconfirmed. Edit inline, delete what is wrong.",
       confirmEmpty: "Nothing readable yet. Go back and add a line per client.",
       fields: { name: "Client", email: "Email (optional)", project: "Last project", date: "When (yyyy-mm-dd)" },
-      freeLimitNote: "The beta tracks {limit} relationships; the first {limit} rows are saved.",
+      freeLimitNote: "The beta tracks {limit} relationships. {dropped} of these rows will NOT be saved; delete rows until {limit} remain to choose which.",
       next: "Next",
       back: "Back",
       skip: "Skip for now",
@@ -711,6 +713,8 @@ export const en = {
       markSent: "I sent it",
       sentNoted: "Noted",
       snooze: "Snooze {months}m",
+      snoozed: "{name} snoozed.",
+      undo: "Undo",
       tracking: "Tracking {count} of {limit} relationships in the beta.",
     },
     outcomes: {

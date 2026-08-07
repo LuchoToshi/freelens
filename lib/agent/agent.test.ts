@@ -34,6 +34,12 @@ describe("parseImport", () => {
     });
   });
 
+  it("keeps a first line that starts with a header word but carries data", () => {
+    const rows = parseImport("Klant 1, klus, augustus 2025, \u20ac1000\nKlant 2, klus, augustus 2025, \u20ac1000");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].clientName).toBe("Klant 1");
+  });
+
   it("skips a header row and never invents a name", () => {
     const rows = parseImport("naam, project, datum\nStudio Noord, draaidag, 2025-06");
     expect(rows).toHaveLength(1);
