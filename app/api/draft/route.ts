@@ -3,6 +3,7 @@ import { rankQueue } from "@/lib/rebooking/ranking";
 import { SEASONALITY_NL_V1 } from "@/lib/rebooking/seasonality";
 import { reasonTextFor } from "@/lib/rebooking/reasonText";
 import { generateDraft, DraftGenerationError } from "@/lib/rebooking/generateDraft";
+import { salutationFor } from "@/lib/rebooking/salutation";
 import type { Craft, Relationship } from "@/lib/rebooking/types";
 
 /**
@@ -98,6 +99,12 @@ export async function POST(request: Request) {
         formality: voiceRow?.formality ?? undefined,
         styleNotes: voiceRow?.style_notes ?? undefined,
       },
+      salutation: salutationFor({
+        clientName: relationship.clientName,
+        formality: (voiceRow?.formality as "je" | "u" | undefined) ?? "je",
+        locale,
+        greetingOverride: voiceRow?.greeting ?? undefined,
+      }),
       locale,
     });
 

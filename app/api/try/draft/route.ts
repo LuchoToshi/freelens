@@ -4,6 +4,7 @@ import { reasonTextFor } from "@/lib/rebooking/reasonText";
 import { generateDraft, DraftGenerationError } from "@/lib/rebooking/generateDraft";
 import type { Craft, Relationship } from "@/lib/rebooking/types";
 import { CRAFTS } from "@/lib/server/waitlist";
+import { salutationFor } from "@/lib/rebooking/salutation";
 
 /**
  * The one server round-trip of the anonymous trial.
@@ -71,6 +72,16 @@ export async function POST(request: Request) {
       ? b.signoff.trim().slice(0, 40)
       : undefined;
   const locale = b.locale === "nl" ? "nl" : "en";
+  const clientType = b.clientType === "private" ? ("private" as const) : ("direct" as const);
+  // The salutation arrives precomputed from the same deterministic rule the
+  // client ran; a missing or malformed one is rederived here, never trusted.
+  const sentSalutation =
+    typeof b.salutation === "string" &&
+    b.salutation.trim().length > 0 &&
+    b.salutation.length <= 60 &&
+    !b.salutation.includes("\n")
+      ? b.salutation.trim()
+      : null;
 
   const today = new Date().toISOString().slice(0, 10);
   if (!name || !MONTH_SHAPE.test(month) || `${month}-01` > today) {
@@ -82,6 +93,7 @@ export async function POST(request: Request) {
     id: "trial",
     userId: "trial",
     clientName: name,
+    clientType,
     lastProjectTitle: project || undefined,
     lastProjectDate: `${month}-01`,
     temperature: "cold",
@@ -111,6 +123,14 @@ export async function POST(request: Request) {
       reasonText,
       voice: { craft, greeting, signoff, formality },
       locale,
+      salutation:
+        sentSalutation ??
+        salutationFor({
+          clientName: name,
+          formality: formality ?? "je",
+          locale,
+          greetingOverride: greeting,
+        }),
     });
     return Response.json({ ok: true, subject: draft.subject, body: draft.body });
   } catch (error) {

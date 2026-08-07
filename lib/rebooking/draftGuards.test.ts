@@ -76,6 +76,7 @@ describe("the prompt boundary", () => {
     reasonText: "Bijna een jaar geleden: campagneshoot zomer voor Lisa.",
     voice: { craft: "photographer", greeting: "Hoi", signoff: "Groet", formality: "je" },
     locale: "nl",
+    salutation: "Hoi Emma,",
   });
 
   it("carries every allowlisted fact and nothing money-shaped", () => {
@@ -104,6 +105,7 @@ describe("the prompt boundary", () => {
       reasonText: "8 maanden stil.",
       voice: { craft: "photographer" },
       locale: "nl",
+      salutation: "Hoi,",
     });
     // The hostile text is present — as fenced data — and the fences plus the
     // rule line are intact around it.
@@ -130,3 +132,34 @@ describe("validateDraft", () => {
     ).toBe(true);
   });
 });
+
+describe("the new validators", () => {
+  const ok = {
+    subject: "Een jaar na de merkcampagne",
+    body: "Hoi Emma,\n\nVorig jaar augustus schoten we de merkcampagne. Zal ik ruimte vrijhouden voor een vervolg?\n\nGroet,",
+  };
+
+  it("accepts a clean draft that opens with the salutation", () => {
+    expect(validateDraft(ok, { salutation: "Hoi Emma," }).ok).toBe(true);
+  });
+
+  it("rejects any catch-up phrase anywhere in the draft", () => {
+    for (const phrase of ["even bijpraten", "even checken", "hoe gaat het ermee", "just checking in"]) {
+      const draft = { ...ok, body: ok.body.replace("Zal ik", `Zullen we ${phrase}? Zal ik`) };
+      expect(validateDraft(draft).ok, phrase).toBe(false);
+    }
+  });
+
+  it("rejects a draft that ignores its salutation", () => {
+    const draft = { ...ok, body: "Hoi Studio Vondel,\n\nVorig jaar..." };
+    expect(validateDraft(draft, { salutation: "Hoi Emma," }).reason).toBe("wrong-salutation");
+  });
+
+  it("caps placeholders at one and subjects at six words", () => {
+    const two = { ...ok, body: `${ok.body} [vul in: a] [vul in: b]` };
+    expect(validateDraft(two).reason).toBe("more-than-one-placeholder");
+    const longSubject = { ...ok, subject: "Een hele erg veel te lange onderwerpregel" };
+    expect(validateDraft(longSubject).reason).toBe("subject-over-6-words");
+  });
+});
+

@@ -48,7 +48,7 @@ export async function generateDraft(request: DraftRequest): Promise<Draft> {
       lastReason = "unparseable";
       continue;
     }
-    const verdict = validateDraft(draft);
+    const verdict = validateDraft(draft, { salutation: request.salutation });
     if (verdict.ok) return draft;
     lastReason = verdict.reason ?? "invalid";
   }
