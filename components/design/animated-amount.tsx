@@ -23,13 +23,16 @@ import { asCentsUnsafe, formatEuro, type Cents } from "@/lib/domain/money";
 export function AnimatedAmount({
   cents,
   className = "",
+  format = formatEuro,
 }: {
   cents: Cents;
   className?: string;
+  /** Amount formatter; defaults to euro. Estimate mode passes its own currency. */
+  format?: (cents: Cents) => string;
 }) {
   const reduce = useReducedMotion();
   const mv = useMotionValue(cents as number);
-  const text = useTransform(mv, (v) => formatEuro(asCentsUnsafe(Math.round(v))));
+  const text = useTransform(mv, (v) => format(asCentsUnsafe(Math.round(v))));
 
   useEffect(() => {
     if (reduce) {

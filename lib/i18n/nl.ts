@@ -1033,6 +1033,21 @@ export const nl: DeepPartial<typeof en> = {
         },
       },
 
+      estimateResult: {
+        perDay: "per declarabele dag",
+        eyebrow: "Je basistarief \u00b7 schatting",
+        summary: "Bij {days} declarabele dagen per jaar moet het werk {revenue} aan omzet opleveren om {take} voor jou over te houden \u2014 met jouw schatting van {pct}% belasting.",
+        taxRateLabel: "Effectief belastingpercentage op winst",
+        taxRateHint: "Jouw schatting van inkomstenbelasting plus premies waar jij werkt. Pas het aan en het tarief beweegt mee.",
+        provenance: "Het belastingdeel hier is jouw schatting, geen geverifieerde regels \u2014 alleen voor Nederland claimen we geverifieerde cijfers. De rest op deze pagina is puur rekenwerk met wat je invulde.",
+        switchNl: "Werk je in Nederland? Gebruik de geverifieerde berekening",
+        lines: {
+          revenue: "Omzet die het jaar nodig heeft",
+          costs: "Zakelijke kosten",
+          tax: "Belasting, volgens jouw schatting",
+          takeHome: "Voor jou om van te leven",
+        },
+      },
       guided: {
         progressLabel: "Waar je bent",
         stepOf: "Stap {n} van {total}",
@@ -1042,6 +1057,17 @@ export const nl: DeepPartial<typeof en> = {
         submit: "Laat mijn tarief zien",
         whyAsk: "Waarom vragen we dit?",
         optional: "Optioneel",
+
+        market: {
+          question: "Waar werk je?",
+          helper: "Belastingregels zijn nationaal. We tonen alleen geverifieerde cijfers waar we ze echt hebben.",
+          nl: "Nederland",
+          nlNote: "Geverifieerde regels \u2014 gecontroleerd bij belastingdienst.nl",
+          other: "Ergens anders",
+          otherNote: "Schattingsmodus \u2014 jij bepaalt het belastingpercentage, wij doen het rekenwerk",
+          currencyLabel: "Jouw valuta",
+          why: "De Nederlandse berekening draait op regels die we regel voor regel bij de bron hebben gecontroleerd. Dat werk hebben we voor andere landen nog niet gedaan, en we doen niet alsof. Buiten Nederland is het belastingdeel een schatting die jij instelt \u2014 de rest is rekenwerk dat overal klopt.",
+        },
 
         target: {
           question: "Wat wil je overhouden?",

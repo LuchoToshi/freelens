@@ -32,6 +32,7 @@ export function AllocationBar({
   height = 32,
   interactive = true,
   caption,
+  format = formatEuro,
 }: {
   segments: AllocationSegment[];
   height?: number;
@@ -41,6 +42,8 @@ export function AllocationBar({
    * means a piece of client work, so the default reads as the wrong noun.
    */
   caption?: string;
+  /** Amount formatter; defaults to euro. Estimate mode passes its own currency. */
+  format?: (cents: Cents) => string;
 }) {
   const t = useT();
   const reduce = useReducedMotion();
@@ -61,7 +64,7 @@ export function AllocationBar({
         {active !== null && positive[active] ? (
           <span>
             {positive[active].label}: {pct(positive[active].cents)}% ·{" "}
-            <span className="fl-tnum">{formatEuro(positive[active].cents)}</span>
+            <span className="fl-tnum">{format(positive[active].cents)}</span>
           </span>
         ) : (
           <span className="text-[var(--fl-slate)]">{caption ?? t.app.allocation.caption}</span>
@@ -71,7 +74,7 @@ export function AllocationBar({
       <div
         role="img"
         aria-label={positive
-          .map((s) => `${s.label}: ${pct(s.cents)} percent, ${formatEuro(s.cents)}`)
+          .map((s) => `${s.label}: ${pct(s.cents)} percent, ${format(s.cents)}`)
           .join(". ")}
         className="flex w-full gap-px overflow-hidden rounded-full bg-[var(--fl-line)]"
         style={{ height }}
@@ -108,7 +111,7 @@ export function AllocationBar({
               style={{ backgroundColor: s.color }}
               aria-hidden="true"
             />
-            {s.label}: <span className="fl-tnum">{formatEuro(s.cents)}</span>
+            {s.label}: <span className="fl-tnum">{format(s.cents)}</span>
           </li>
         ))}
       </ul>

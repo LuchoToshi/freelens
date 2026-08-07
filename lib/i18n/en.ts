@@ -1055,6 +1055,21 @@ export const en = {
         },
       },
 
+      estimateResult: {
+        perDay: "per billable day",
+        eyebrow: "Your baseline rate \u00b7 estimate",
+        summary: "At {days} billable days a year, the work needs {revenue} in revenue for {take} to be yours \u2014 using your {pct}% tax estimate.",
+        taxRateLabel: "Effective tax rate on profit",
+        taxRateHint: "Your estimate of income tax plus contributions where you work. Adjust it and the rate follows.",
+        provenance: "The tax line here is your estimate, not verified rules \u2014 we only claim verified numbers for the Netherlands. Everything else on this page is plain arithmetic on what you entered.",
+        switchNl: "Work in the Netherlands? Use the verified calculation",
+        lines: {
+          revenue: "Revenue the year needs",
+          costs: "Business costs",
+          tax: "Tax, at your estimate",
+          takeHome: "Yours to live on",
+        },
+      },
       guided: {
         progressLabel: "Where you are",
         stepOf: "Step {n} of {total}",
@@ -1064,6 +1079,17 @@ export const en = {
         submit: "Show my rate",
         whyAsk: "Why are we asking?",
         optional: "Optional",
+
+        market: {
+          question: "Where do you work?",
+          helper: "Tax rules are national. We only show verified numbers where we actually have them.",
+          nl: "The Netherlands",
+          nlNote: "Verified rules \u2014 checked against belastingdienst.nl",
+          other: "Somewhere else",
+          otherNote: "Estimate mode \u2014 you set the tax rate, we do the arithmetic",
+          currencyLabel: "Your currency",
+          why: "The Dutch calculation runs on rules we verified at the source, line by line. We have not done that work for other countries yet, and we will not pretend otherwise. Outside the Netherlands the tax share is an estimate you control \u2014 everything else is arithmetic that holds anywhere.",
+        },
 
         target: {
           question: "What do you want to earn?",

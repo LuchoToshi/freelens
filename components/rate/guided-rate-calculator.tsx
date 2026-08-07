@@ -18,8 +18,10 @@ import {
   formatEuroExact,
   fromCents,
   parseAmountInput,
+  type Cents,
 } from "@/lib/domain/money";
 import { DEFAULT_COUNTRY, latestProfileYear } from "@/lib/tax/loadProfile";
+import { rateEstimateForTargetNet, type RateEstimateResult } from "@/lib/domain/rateEstimate";
 import { rateForTargetAnnualNet } from "@/lib/tax/rate";
 import { useLocale, useT } from "@/components/i18n/locale-provider";
 import {
@@ -42,7 +44,11 @@ export interface RateProfile {
   otherIncomeTaxWithheld: number;
 }
 
-const STEP_COUNT = 3;
+const STEP_COUNT = 4;
+
+/** Display symbols only — no conversion happens anywhere. */
+const CURRENCIES = ["\u20ac", "\u00a3", "CHF", "kr", "$"] as const;
+const plainNumber = new Intl.NumberFormat("nl-NL", { maximumFractionDigits: 0 });
 const HEADING_ID = "guided-step-question";
 
 /**
@@ -77,6 +83,12 @@ export function GuidedRateCalculator({
   const [billableDays, setBillableDays] = useState(DEFAULT_BILLABLE_DAYS);
   const [costs, setCosts] = useState("");
 
+  // The market split. NL runs the verified engine; anywhere else runs the same
+  // arithmetic with a user-owned tax estimate, and the UI says so.
+  const [market, setMarket] = useState<"nl" | "other">("nl");
+  const [currency, setCurrency] = useState<string>("\u20ac");
+  const [taxRatePct, setTaxRatePct] = useState(30);
+
   // Local overrides for the two deduction questions this flow never asks.
   // Null means "whatever the saved profile says"; a tap answers for this
   // calculation only, because /tarief reads the profile and never writes it.
@@ -101,6 +113,18 @@ export function GuidedRateCalculator({
 
   const costsCents = parseAmountInput(costs).cents ?? asCentsUnsafe(0);
 
+  const fmtMoney =
+    market === "other" && currency !== "\u20ac"
+      ? (c: Cents) => `${currency} ${plainNumber.format(fromCents(c))}`
+      : formatEuro;
+
+  const estimate = rateEstimateForTargetNet({
+    targetAnnualNet: targetNet,
+    billableUnitsPerYear: billableDays,
+    annualBusinessCosts: fromCents(costsCents),
+    effectiveTaxRatePercent: taxRatePct,
+  });
+
   const result = rateForTargetAnnualNet({
     taxYear: TAX_YEAR,
     country: DEFAULT_COUNTRY,
@@ -117,6 +141,20 @@ export function GuidedRateCalculator({
   const next = useCallback(() => setStep((s) => Math.min(STEP_COUNT, s + 1)), []);
 
   if (step === STEP_COUNT) {
+    if (market === "other") {
+      return (
+        <EstimateResultPanel
+          headingRef={headingRef}
+          estimate={estimate}
+          billableDays={billableDays}
+          taxRatePct={taxRatePct}
+          onTaxRate={setTaxRatePct}
+          fmtMoney={fmtMoney}
+          onAdjust={() => setStep(0)}
+          onSwitchNl={() => setMarket("nl")}
+        />
+      );
+    }
     return (
       <div className="flex flex-col gap-4">
         <ResultPanel
@@ -155,6 +193,19 @@ export function GuidedRateCalculator({
 
   const steps = [
     {
+      question: g.market.question,
+      helper: g.market.helper,
+      why: g.market.why,
+      field: (
+        <MarketField
+          market={market}
+          onMarket={setMarket}
+          currency={currency}
+          onCurrency={setCurrency}
+        />
+      ),
+    },
+    {
       question: g.target.question,
       helper: g.target.helper,
       why: g.target.why,
@@ -167,7 +218,7 @@ export function GuidedRateCalculator({
           min={10_000}
           max={150_000}
           step={1_000}
-          display={formatEuro(asCentsUnsafe(targetNet * 100))}
+          display={fmtMoney(asCentsUnsafe(targetNet * 100))}
         />
       ),
     },
@@ -198,7 +249,7 @@ export function GuidedRateCalculator({
           id="guided-annual-costs"
           label={g.costs.fieldLabel}
           placeholder={g.costs.placeholder}
-          leadingSymbol="€"
+          leadingSymbol={currency}
           size="lg"
           value={costs}
           onChange={setCosts}
@@ -526,3 +577,225 @@ function AccuracyToggle({
     </button>
   );
 }
+
+/**
+ * Where you work. Two honest options: verified rules, or your own estimate.
+ * Choosing "somewhere else" reveals the currency chips — display only, since
+ * nothing here converts anything.
+ */
+function MarketField({
+  market,
+  onMarket,
+  currency,
+  onCurrency,
+}: {
+  market: "nl" | "other";
+  onMarket: (m: "nl" | "other") => void;
+  currency: string;
+  onCurrency: (c: string) => void;
+}) {
+  const t = useT();
+  const m = t.rate.guided.market;
+  const options = [
+    { id: "nl" as const, label: m.nl, note: m.nlNote },
+    { id: "other" as const, label: m.other, note: m.otherNote },
+  ];
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        {options.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={market === o.id}
+            onClick={() => onMarket(o.id)}
+            className={`flex min-h-14 flex-col items-start justify-center gap-0.5 rounded-xl border px-4 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+              market === o.id
+                ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
+                : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+            }`}
+          >
+            <span className="text-sm font-semibold">{o.label}</span>
+            <span className={`text-xs ${market === o.id ? "text-white/70" : "text-[var(--fl-slate)]"}`}>
+              {o.note}
+            </span>
+          </button>
+        ))}
+      </div>
+      {market === "other" && (
+        <fieldset className="flex flex-col gap-2">
+          <legend className="text-sm font-medium text-[var(--fl-ink)]">{m.currencyLabel}</legend>
+          <div className="flex flex-wrap gap-2">
+            {CURRENCIES.map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-pressed={currency === c}
+                onClick={() => onCurrency(c)}
+                className={`min-h-11 min-w-14 rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+                  currency === c
+                    ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
+                    : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The estimate-mode result. Same hierarchy as the verified panel — rate first,
+ * one sentence, the split — but the tax line is visibly the user's own number,
+ * adjustable right here, and the provenance box says exactly what is and is
+ * not verified.
+ */
+function EstimateResultPanel({
+  headingRef,
+  estimate,
+  billableDays,
+  taxRatePct,
+  onTaxRate,
+  fmtMoney,
+  onAdjust,
+  onSwitchNl,
+}: {
+  headingRef: React.RefObject<HTMLHeadingElement | null>;
+  estimate: RateEstimateResult;
+  billableDays: number;
+  taxRatePct: number;
+  onTaxRate: (pct: number) => void;
+  fmtMoney: (c: Cents) => string;
+  onAdjust: () => void;
+  onSwitchNl: () => void;
+}) {
+  const t = useT();
+  const er = t.rate.estimateResult;
+  const g = t.rate.guided;
+
+  const lines = [
+    { id: "revenue", label: er.lines.revenue, amount: estimate.requiredGrossRevenue },
+    { id: "costs", label: er.lines.costs, amount: estimate.annualBusinessCosts },
+    { id: "tax", label: er.lines.tax, amount: estimate.estimatedTax },
+    { id: "take", label: er.lines.takeHome, amount: estimate.takeHome },
+  ];
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="rounded-2xl border border-[var(--fl-line)] bg-[var(--fl-surface-stage)] p-6 shadow-sm sm:p-8">
+        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+          {er.eyebrow}
+        </span>
+
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 outline-none"
+        >
+          <AnimatedAmount
+            cents={estimate.requiredRatePerUnit}
+            format={fmtMoney}
+            className="font-serif text-5xl font-medium tracking-tight text-[var(--fl-ink)] sm:text-6xl"
+          />
+          <span className="text-sm text-[var(--fl-slate)]">{er.perDay}</span>
+        </h2>
+
+        <p className="mt-4 max-w-prose text-base leading-relaxed text-[var(--fl-ink)]">
+          {fill(er.summary, {
+            days: billableDays,
+            revenue: fmtMoney(estimate.requiredGrossRevenue),
+            take: fmtMoney(estimate.takeHome),
+            pct: estimate.effectiveTaxRatePercent,
+          })}
+        </p>
+
+        <div className="mt-6">
+          <AllocationBar
+            caption={t.rate.rateCaption}
+            format={fmtMoney}
+            segments={[
+              estimate.annualBusinessCosts > 0
+                ? {
+                    label: t.rate.segments.annualCosts,
+                    cents: estimate.annualBusinessCosts,
+                    color: "var(--fl-costs-fill)",
+                  }
+                : null,
+              {
+                label: t.rate.segments.tax,
+                cents: estimate.estimatedTax,
+                color: "var(--fl-reserve-fill)",
+              },
+              {
+                label: t.rate.segments.yours,
+                cents: estimate.takeHome,
+                color: "var(--fl-payout-fill)",
+              },
+            ].filter((s): s is NonNullable<typeof s> => s !== null)}
+          />
+        </div>
+
+        <div className="mt-6 flex flex-col gap-2 border-t border-[var(--fl-line)] pt-5">
+          <label
+            htmlFor="estimate-tax-rate"
+            id="estimate-tax-rate-label"
+            className="text-sm font-medium text-[var(--fl-ink)]"
+          >
+            {er.taxRateLabel}
+          </label>
+          <SliderField
+            id="estimate-tax-rate"
+            labelledBy="estimate-tax-rate-label"
+            value={taxRatePct}
+            onChange={onTaxRate}
+            min={0}
+            max={70}
+            step={1}
+            display={`${taxRatePct}%`}
+          />
+          <p className={hintClass}>{er.taxRateHint}</p>
+        </div>
+
+        <p className="mt-5 border-t border-[var(--fl-line)] pt-4 text-sm leading-relaxed text-[var(--fl-slate)]">
+          {g.result.notMarket}
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-6">
+        <dl className="flex flex-col gap-3">
+          {lines.map((line) => (
+            <div
+              key={line.id}
+              className={`flex items-baseline justify-between gap-4 text-sm ${
+                line.id === "take" ? "font-semibold" : ""
+              }`}
+            >
+              <dt className="text-[var(--fl-ink)]">{line.label}</dt>
+              <dd className="fl-tnum shrink-0 font-mono tabular-nums text-[var(--fl-ink)]">
+                {fmtMoney(line.amount)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className={`${hintClass} mt-4 border-t border-[var(--fl-line)] pt-3`}>
+          {er.provenance}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="button" onClick={onAdjust} className={secondaryButtonClass}>
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {g.result.adjust}
+        </button>
+        <button type="button" onClick={onSwitchNl} className={`${linkButtonClass} w-fit`}>
+          {er.switchNl}
+        </button>
+      </div>
+    </div>
+  );
+}
+
