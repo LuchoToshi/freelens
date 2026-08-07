@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Compass, ArrowDownToLine, CalendarCheck, Scale } from "lucide-react";
+import { Compass, ArrowDownToLine } from "lucide-react";
 import { ModeCard, type ModeAccent } from "@/components/design/mode-card";
 import { useT } from "@/components/i18n/locale-provider";
 
@@ -37,11 +37,12 @@ const ACCENTS: Record<TabId, ModeAccent> = {
   },
 };
 
+// The workspace is two surfaces. The check-in and decision views still exist
+// behind these ids (components, state, engine untouched) — only their entry
+// points are gone. Restoring a tab is one line here.
 const TABS: { id: TabId; key: "overview" | "moneyArrived" | "weeklyCheckin" | "decision"; icon: typeof Compass }[] = [
   { id: "overview", key: "overview", icon: Compass },
   { id: "money-arrived", key: "moneyArrived", icon: ArrowDownToLine },
-  { id: "weekly-checkin", key: "weeklyCheckin", icon: CalendarCheck },
-  { id: "decision", key: "decision", icon: Scale },
 ];
 
 /**

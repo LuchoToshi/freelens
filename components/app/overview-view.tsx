@@ -243,9 +243,8 @@ function pickNextAction(
 ): { title: string; cta: string; view: AppView } {
   const a = t.app.overview.actions;
   if (!state.setup) return { ...a.finishSetup, view: "setup" };
-  if (status === "reserve-gap") return { ...a.reserveGap, view: "weekly-checkin" };
-  if (!state.weeklyPosition) return { ...a.firstCheckin, view: "weekly-checkin" };
-  if (stale) return { ...a.stale, view: "weekly-checkin" };
+  // The check-in surface is demoted: the one next step this workspace pushes
+  // is giving an incoming payment its tasks.
   return { ...a.payment, view: "money-arrived" };
 }
 

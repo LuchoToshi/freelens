@@ -1168,8 +1168,8 @@ export const nl: DeepPartial<typeof en> = {
           cta: "Check-in bijwerken",
         },
         payment: {
-          title: "Er is een betaling binnen? Geef die een taak.",
-          cta: "Bekijk wat ik mezelf kan uitbetalen",
+          title: "Er is een betaling binnen? Geef elke euro een taak.",
+          cta: "Geld binnen",
         },
       },
     },

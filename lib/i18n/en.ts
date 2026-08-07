@@ -1190,8 +1190,8 @@ export const en = {
           cta: "Update your check-in",
         },
         payment: {
-          title: "A payment came in? Give it a job.",
-          cta: "See what I can pay myself",
+          title: "A payment came in? Give every euro a job.",
+          cta: "Money in",
         },
       },
     },
