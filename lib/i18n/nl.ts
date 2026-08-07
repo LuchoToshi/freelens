@@ -72,7 +72,7 @@ export const nl: DeepPartial<typeof en> = {
         "Voor creatieve freelancers. Freelens onthoudt je oude klanten, weet wanneer een berichtje het waard is, en schrijft het in jouw toon. Jij drukt op verzenden. Besloten b\u00e8ta, we onboarden de eerste 25. Gratis Nederlandse rekentools inbegrepen.",
     },
     about: {
-      title: "Waarom Freelens bestaat: de beslislaag voor freelancers",
+      title: "Je oude klanten zijn je volgende boeking \u00b7 Freelens",
       description:
         "Freelens is de laag tussen je bankrekening en je boekhouding waarin je beslist. Het vult je bestaande tools aan en maakt van één binnengekomen betaling een eenvoudig, betrouwbaar plan, zodat jezelf uitbetalen veilig voelt in plaats van spannend.",
     },
@@ -407,7 +407,37 @@ export const nl: DeepPartial<typeof en> = {
     },
   },
 
-    accuracyPage: {
+    aboutPage: {
+    eyebrow: "Waarom Freelens bestaat",
+    heading: "Je oude klanten zijn je volgende boeking.",
+    intro: "De stilste maanden van een creatieve freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die onthoudt wanneer het logische moment is om weer contact te leggen \u2014 en dus gebeurt het niet, of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",
+    what: {
+      h: "Wat Freelens doet",
+      p1: "Freelens onthoudt wie je klanten zijn, weet wanneer een berichtje ergens op slaat, en schrijft de eerste mail \u2014 in jouw toon. Elke week: twee tot vier mensen die een bericht waard zijn, elk met een echte reden. Een jaar na de vorige shoot. Briefingseizoen in hun wereld. Nooit \u201ceven checken\u201d.",
+      p2: "Jij past aan wat je wilt en verstuurt zelf, vanuit je eigen inbox. Freelens verstuurt nooit iets, naar niemand.",
+    },
+    boundary: {
+      h: "Waar de grens ligt",
+      p1: "Klantrecords bevatten een naam, een project, een datum en ongeveer een bedrag. Geen adressen, geen telefoonnummers, geen registratienummers. Alles is vanaf dag \u00e9\u00e9n te exporteren en te verwijderen, en je klantgegevens worden nergens anders voor gebruikt.",
+    },
+    trust: {
+      h: "Waarom je ons met je klanten zou vertrouwen",
+      p1: "De belastingmotor achter onze gratis rekentools rekent met de echte Nederlandse schijven, aftrekposten en heffingskortingen van 2026 \u2014 elk cijfer gecontroleerd bij belastingdienst.nl, elke uitkomst met een uitleg die je kunt nalopen. We hebben zelfs een pagina die voorrekent waar de populaire 30%-vuistregel er tot \u20ac 16.720 naast zit.",
+      p2: "Diezelfde standaard geldt voor de agent: elke reden komt uit jouw eigen gegevens, elke mail is gebonden aan wat er echt gebeurd is, en niets wordt verzonnen. Klopt een datum niet, dan pas je hem aan en onthoudt Freelens dat.",
+    },
+    tools: {
+      h: "De gratis rekentools blijven gratis",
+      p1: "Wat moet je vragen v\u00f3\u00f3r de klus, en wat is er echt van jou na de betaling \u2014 dezelfde berekening, beide kanten op. Zonder account, en je cijfers blijven in je browser. Dat blijft zo.",
+    },
+    going: {
+      h: "Waar dit heen gaat",
+      p1: "Freelens Rebooking is in besloten b\u00e8ta. We onboarden de eerste 25 freelancers en zeggen liever hardop dat er nog niets live is dan dat we doen alsof. Als je fotograaf, videograaf, ontwerper of illustrator bent en je wilt dat je beste klanten je niet vergeten: zet je op de lijst.",
+    },
+    ctaPrimary: "Zet me op de wachtlijst",
+    ctaSecondary: "Bekijk de gratis rekentools",
+  },
+
+  accuracyPage: {
     metaTitle: "Nauwkeurigheid en bronnen · Freelens",
     metaDescription:
       "Wat Freelens wel en niet berekent, welke reserveringsregels het toepast, en de officiële Nederlandse bronnen daarachter.",
@@ -751,45 +781,6 @@ export const nl: DeepPartial<typeof en> = {
     },
   },
 
-  aboutPage: {
-    eyebrow: "Waarom Freelens bestaat",
-    heading: "Jezelf uitbetalen zou veilig moeten voelen, niet spannend.",
-    lead:
-      "Freelens bestaat om één terugkerend moment rustig te maken: een klant betaalt eindelijk, en jij moet weten wat je met dat geld echt kunt doen.",
-    moment:
-      "Een klant betaalt eindelijk. Het banksaldo ziet er ineens gezond uit. Even voelt het alsof je het gemaakt hebt.",
-    questions:
-      "Dan beginnen de vragen. Hoeveel is btw? Kan ik mezelf eindelijk uitbetalen? Kan ik die nieuwe lens kopen, of moet ik wachten? Heb ik hier over drie maanden spijt van?",
-    heldBack:
-      "Creatieve freelancers worden zelden geremd door hun vak. Ze worden geremd door onzekerheid over geld, niet omdat ze onverantwoordelijk zijn, maar omdat het antwoord echt lastig te zien is.",
-    toolsHeading: "De gebruikelijke tools beantwoorden een andere vraag.",
-    tools: [
-      "Bankapps laten je saldo zien.",
-      "Boekhoudsoftware legt vast wat er gebeurd is.",
-      "Aangiftesoftware helpt je met je aangifte.",
-    ],
-    layerHeading: "Freelens is de laag tussen je bankrekening en je boekhouding waarin je beslist.",
-    layerBody:
-      "Het zit tussen die twee in en vertaalt ruwe financiële gegevens naar iets waar je naar kunt handelen. Eén binnengekomen betaling wordt een eenvoudig plan: dit opzij voor de btw, dat beschermd voor de belasting, dit blijft in de zaak, en dit deel is veilig van jou.",
-    complements:
-      "Het vult de rest van je tools aan: bankapps, boekhoudsoftware, factuurprogramma's en spreadsheets houden allemaal hun plek. Freelens vervangt ze niet, het beantwoordt de vraag die geen van hen beantwoordt.",
-    trustHeading: "Gebouwd op vertrouwen en helderheid.",
-    trustBody:
-      "Het product kiest voor voorspelbare logica, transparante aannames en uitlegbare uitkomsten in plaats van “magie”. Waar automatisering helpt, blijft die achter een heldere beslissing die je zelf kunt nalopen.",
-    opinionated:
-      "Freelens heeft bewust een mening. Het richt zich op één terugkerende beslissing in plaats van te proberen nóg een financieel platform te worden.",
-    privacyHeading: "Je cijfers blijven op je apparaat.",
-    privacyBody:
-      "Geen account. Geen bankkoppeling. Geen cloud nodig. Je cijfers worden lokaal in je browser opgeslagen en gaan nooit naar Freelens, en je kunt ze op elk moment wissen.",
-    futureHeading: "Waar dit heen gaat.",
-    futureBody:
-      "Freelens wil de vertrouwde financiële beslislaag worden voor zelfstandige creatieven. Niet als vervanging van boekhouders of administratie, maar om alledaagse geldbeslissingen rustig en helder te maken.",
-    futureNote:
-      "Vandaag vul je alles handmatig in. Op termijn kunnen optionele gemakken volgen, zoals csv-import en alleen-lezen koppelingen. Altijd optioneel, nooit verplicht, en nooit ten koste van de helderheid.",
-    ctaHeading: "Probeer het met je laatste betaling.",
-    ctaBody: "Zie in ongeveer een minuut wat je jezelf veilig kunt uitbetalen.",
-    cta: "Bekijk wat ik mezelf kan uitbetalen",
-  },
   rate: {
       eyebrow: "Vóór de opdracht",
       heading: "Wat moet je vragen?",

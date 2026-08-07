@@ -69,7 +69,7 @@ export const en = {
         "For creative freelancers. Freelens remembers your past clients, knows when a message is worth sending, and drafts it in your voice. You press send. Private beta, onboarding the first 25. Free Dutch tax calculators included.",
     },
     about: {
-      title: "Why Freelens exists: the decision layer for freelancers",
+      title: "Your past clients are your next booking \u00b7 Freelens",
       description:
         "Freelens is the decision layer between your bank account and your bookkeeping. It complements your tools and turns one incoming payment into a simple, trustworthy plan, so paying yourself feels safe, not stressful.",
     },
@@ -413,7 +413,37 @@ export const en = {
     },
   },
 
-    accuracyPage: {
+    aboutPage: {
+    eyebrow: "Why Freelens exists",
+    heading: "Your past clients are your next booking.",
+    intro: "A creative freelancer's quietest months are rarely a quality problem. The work was good. The client was happy. There is just nobody who remembers when the natural moment is to get back in touch \u2014 so it doesn't happen, or it happens as \u201cjust checking in\u201d, and that feels awkward for everyone.",
+    what: {
+      h: "What Freelens does",
+      p1: "Freelens remembers who your clients are, knows when a message makes sense, and writes the first email \u2014 in your voice. Each week: two to four people worth a message, each with a real reason. A year since the last shoot. Briefing season in their world. Never \u201cjust checking in\u201d.",
+      p2: "You edit what you want and send it yourself, from your own inbox. Freelens never sends anything, to anyone.",
+    },
+    boundary: {
+      h: "Where the line is",
+      p1: "Client records hold a name, a project, a date and a rough value. No addresses, no phone numbers, no registration numbers. Everything can be exported and deleted from day one, and your client data is used for nothing else.",
+    },
+    trust: {
+      h: "Why you would trust us with your clients",
+      p1: "The tax engine behind our free calculators works with the real Dutch brackets, deductions and credits for 2026 \u2014 every figure checked against belastingdienst.nl, every result with an explanation you can verify. We even have a page showing where the popular 30% rule of thumb misses by up to \u20ac 16,720.",
+      p2: "The same standard applies to the agent: every reason comes from your own records, every email is bound to what actually happened, and nothing is invented. If a date is off, you correct it and Freelens remembers.",
+    },
+    tools: {
+      h: "The free calculators stay free",
+      p1: "What to charge before the job, and what is genuinely yours after the payment \u2014 the same calculation, both directions. No account, and your figures stay in your browser. That stays true.",
+    },
+    going: {
+      h: "Where this is going",
+      p1: "Freelens Rebooking is in private beta. We are onboarding the first 25 freelancers, and we would rather say out loud that nothing is live yet than pretend otherwise. If you are a photographer, videographer, designer or illustrator and you want your best clients not to forget you: get on the list.",
+    },
+    ctaPrimary: "Put me on the waitlist",
+    ctaSecondary: "See the free calculators",
+  },
+
+  accuracyPage: {
     metaTitle: "Accuracy and sources · Freelens",
     metaDescription:
       "What Freelens does and does not calculate, the reserve rules it applies, and the official Dutch sources behind them.",
@@ -757,45 +787,6 @@ export const en = {
     },
   },
 
-  aboutPage: {
-    eyebrow: "Why Freelens exists",
-    heading: "Paying yourself should feel safe, not stressful.",
-    lead:
-      "Freelens exists to make one recurring moment calm: a client finally pays, and you need to know what you can actually do with the money.",
-    moment:
-      "A client finally pays. The bank balance suddenly looks healthy. For a moment it feels like you've made it.",
-    questions:
-      "Then the questions start. How much belongs to VAT? Can I finally pay myself? Can I buy that new lens, or should I wait? Will I regret this in three months?",
-    heldBack:
-      "Creative freelancers are rarely held back by their craft. They're held back by uncertainty around money, not because they're irresponsible, but because the answer is genuinely hard to see.",
-    toolsHeading: "The usual tools answer a different question.",
-    tools: [
-      "Banking apps show your balance.",
-      "Accounting software records what happened.",
-      "Tax software helps you file.",
-    ],
-    layerHeading: "Freelens is the decision layer between your bank account and your bookkeeping.",
-    layerBody:
-      "It sits between the two and turns raw financial activity into actionable guidance. One incoming payment becomes a simple plan: reserve this for VAT, protect that for tax, keep this for the business, and this part is safely yours.",
-    complements:
-      "It complements the rest of your stack: banking apps, accounting software, invoicing tools, spreadsheets all keep their place. Freelens doesn't replace them, it answers the question none of them answer.",
-    trustHeading: "Built on trust and clarity.",
-    trustBody:
-      "The product favours deterministic logic, transparent assumptions, and explainable outputs over “magic.” Where automation helps, it stays behind a clear, reviewable decision.",
-    opinionated:
-      "Freelens is intentionally opinionated. It focuses on one recurring decision instead of trying to become another finance platform.",
-    privacyHeading: "Your numbers stay on your device.",
-    privacyBody:
-      "No account. No bank connection. No cloud required. Your figures are saved locally in your browser and never uploaded to Freelens, and you can clear them at any time.",
-    futureHeading: "Where this is going.",
-    futureBody:
-      "Freelens wants to become the trusted financial decision layer for independent creatives, not replacing accountants or bookkeeping, but making everyday money decisions calm and clear.",
-    futureNote:
-      "Today everything is entered manually. Over time, optional conveniences like CSV import and read-only imports may follow, always optional, never required, and never at the cost of clarity.",
-    ctaHeading: "Try your latest payment.",
-    ctaBody: "See what you can safely pay yourself in about a minute.",
-    cta: "See what I can pay myself",
-  },
   rate: {
       eyebrow: "Before the job",
       heading: "What do you need to charge?",
