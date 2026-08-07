@@ -38,6 +38,8 @@ describe("the Dutch dictionary covers the English one", () => {
     const SAME_BY_DESIGN = new Set([
       "common.brand",
       "common.nav.rebooking",
+      "agent.title",
+      "agent.onboarding.importPlaceholder",
       "common.nav.privacy",
       "common.nav.contact",
       "meta.privacy.title",
