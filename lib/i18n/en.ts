@@ -321,7 +321,8 @@ export const en = {
         priceNote: "The standard price will be \u20ac190 a year or \u20ac19 a month. Founding spots are limited to 25 and only exist before launch.",
       },
       waitlist: {
-        heading: "Get one of the 25 spots",
+        heading: "Get on the list for one of the 25 spots",
+        noCommit: "Signing up is free and commits you to nothing. When the beta opens, we offer the 25 founding spots (\u20ac 99 for the first year) in order of signup \u2014 you decide then.",
         nameLabel: "Your name",
         namePlaceholder: "First name is fine",
         emailLabel: "Your email",

@@ -138,6 +138,8 @@ export function WaitlistForm() {
         {state === "sending" ? w.sending : w.submit}
       </button>
 
+      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{w.noCommit}</p>
+
       {state === "error" && (
         <p role="alert" className="text-sm text-[var(--fl-short-text)]">
           {w.error}

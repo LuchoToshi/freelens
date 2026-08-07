@@ -315,7 +315,8 @@ export const nl: DeepPartial<typeof en> = {
         priceNote: "De standaardprijs wordt \u20ac190 per jaar of \u20ac19 per maand. Founding-plekken zijn beperkt tot 25 en bestaan alleen v\u00f3\u00f3r de lancering.",
       },
       waitlist: {
-        heading: "Pak een van de 25 plekken",
+        heading: "Zet je op de lijst voor een van de 25 plekken",
+        noCommit: "Aanmelden is gratis en verplicht je tot niets. Zodra de b\u00e8ta opent, bieden we de 25 founding-plekken (\u20ac 99 voor het eerste jaar) aan in volgorde van aanmelding \u2014 je beslist dan pas.",
         nameLabel: "Je naam",
         namePlaceholder: "Voornaam is genoeg",
         emailLabel: "Je e-mailadres",
