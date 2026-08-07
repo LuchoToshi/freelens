@@ -78,6 +78,54 @@ export default function Home() {
         </div>
       </section>
 
+      {/* The worked example: the record, the reason, the draft. The email may
+          only reference facts in the record card above it — the product's
+          no-fabrication rule applies to the marketing example too. */}
+      <section
+        aria-label={r.example.heading}
+        className="border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
+      >
+        <div className={`${container} flex flex-col gap-6 py-16 sm:py-20`}>
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+              {r.example.kicker}
+            </span>
+            <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+              {r.example.heading}
+            </h2>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+            <div className="flex flex-col gap-5 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-6">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+                  {r.example.recordLabel}
+                </span>
+                <p className="text-sm font-medium text-[var(--fl-ink)]">{r.example.recordName}</p>
+                <p className="fl-tnum text-sm text-[var(--fl-slate)]">{r.example.recordProject}</p>
+              </div>
+              <div className="flex flex-col gap-1.5 border-t border-[var(--fl-line)] pt-4">
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+                  {r.example.reasonLabel}
+                </span>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fl-ink)]">
+                  {r.example.reasonText}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-6">
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+                {r.example.draftLabel}
+              </span>
+              <p className="text-sm font-medium text-[var(--fl-ink)]">{r.example.draftSubject}</p>
+              <p className="whitespace-pre-line border-t border-[var(--fl-line)] pt-3 text-sm leading-relaxed text-[var(--fl-ink)]">
+                {r.example.draftBody}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{r.example.micro}</p>
+        </div>
+      </section>
+
       {/* The honest status, the founding offer, and the list. */}
       <section
         id="waitlist"
