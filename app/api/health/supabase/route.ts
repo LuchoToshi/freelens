@@ -16,7 +16,10 @@ import { createHash, timingSafeEqual } from "node:crypto";
 export const dynamic = "force-dynamic";
 
 function authorised(request: Request): boolean {
-  const secret = process.env.WAITLIST_SECRET;
+  // A dedicated key, not WAITLIST_SECRET: signing secrets should not double as
+  // access credentials, and this one is kept where `vercel env pull` cannot
+  // overwrite the local copy.
+  const secret = process.env.HEALTH_KEY;
   if (!secret) return false;
   const offered = request.headers.get("x-health-key") ?? "";
   const a = createHash("sha256").update(offered).digest();
