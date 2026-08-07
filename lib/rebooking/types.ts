@@ -16,7 +16,12 @@ export type Craft =
   | "illustrator"
   | "other";
 
-export type ClientType = "direct" | "agency" | "brand" | "editorial" | "other";
+/**
+ * "private" is a particulier client (wedding, family shoot). It exists in the
+ * type so ranking can treat consumers differently; the app's forms and the
+ * database do not offer it yet — today only the /try demo sets it.
+ */
+export type ClientType = "direct" | "agency" | "brand" | "editorial" | "other" | "private";
 
 export type Temperature = "warm" | "cooling" | "cold";
 
@@ -41,7 +46,7 @@ export interface Relationship {
   updatedAt: string;
 }
 
-export type ReasonCode = "anniversary" | "season" | "gap" | "manual";
+export type ReasonCode = "anniversary" | "season" | "gap" | "referral" | "manual";
 
 export type TouchStatus =
   | "suggested"

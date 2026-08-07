@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useDocumentTitle, useLocale } from "@/components/i18n/locale-provider";
-import { rankQueue, type RankedTouchSuggestion } from "@/lib/rebooking/ranking";
+import { rankQueue, wholeMonthsBetween, RECENCY_FLOOR_MONTHS, type RankedTouchSuggestion } from "@/lib/rebooking/ranking";
 import { SEASONALITY_NL_V1 } from "@/lib/rebooking/seasonality";
 import { reasonTextFor } from "@/lib/rebooking/reasonText";
 import type { Craft, Relationship } from "@/lib/rebooking/types";
@@ -65,10 +65,11 @@ const EMPTY_ROW: Omit<ClientRow, never> = {
 const EMPTY_ROWS: ClientRow[] = [{ ...EMPTY_ROW }, { ...EMPTY_ROW }, { ...EMPTY_ROW }];
 
 function monthsAgo(n: number): string {
-  const d = new Date();
-  d.setDate(1);
-  d.setMonth(d.getMonth() - n);
-  return d.toISOString().slice(0, 7);
+  // Local-calendar arithmetic, formatted by hand: toISOString() is UTC and
+  // shifts the month for anyone west of it near midnight.
+  const now = new Date();
+  const d = new Date(now.getFullYear(), now.getMonth() - n, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function sampleRows(locale: "en" | "nl"): ClientRow[] {
@@ -111,6 +112,7 @@ export function TryApp() {
     id: `trial-${i}`,
     userId: "trial",
     clientName: r.name.trim(),
+    clientType: r.clientType === "private" ? "private" : "direct",
     lastProjectTitle: r.project.trim() || undefined,
     lastProjectDate: `${r.month}-01`,
     temperature: "cold",
@@ -125,7 +127,25 @@ export function TryApp() {
   const rankedIds = new Set(ranked.map((s) => s.relationshipId));
   const rowFor = (rel: Relationship): ClientRow | undefined =>
     filled[Number(rel.id.slice("trial-".length))];
-  const notRanked = relationships.filter((r) => !rankedIds.has(r.id));
+  const monthsFor = (rel: Relationship): number | undefined =>
+    rel.lastProjectDate ? wholeMonthsBetween(rel.lastProjectDate, today) : undefined;
+  const freshClients = relationships.filter((r) => {
+    const m = monthsFor(r);
+    return !rankedIds.has(r.id) && m !== undefined && m >= 0 && m < RECENCY_FLOOR_MONTHS;
+  });
+  const notRanked = relationships.filter(
+    (r) => !rankedIds.has(r.id) && !freshClients.some((f) => f.id === r.id)
+  );
+
+  const monthLabel = (iso: string): string =>
+    new Intl.DateTimeFormat(locale === "nl" ? "nl-NL" : "en-GB", {
+      month: "long",
+      year: "numeric",
+    }).format(new Date(`${iso.slice(0, 7)}-01T12:00:00`));
+  const plusOneYear = (iso: string): string => {
+    const y = Number(iso.slice(0, 4)) + 1;
+    return `${y}${iso.slice(4, 7)}-01`;
+  };
 
   function goTo(next: Stage) {
     setStage(next);
@@ -536,6 +556,37 @@ export function TryApp() {
               </article>
             );
           })}
+
+          {freshClients.length > 0 && (
+            <div className="flex flex-col gap-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+                {p.queue.fresh.heading}
+              </h3>
+              {freshClients.map((rel) => {
+                const m = monthsFor(rel) ?? 0;
+                const date = rel.lastProjectDate ?? today;
+                return (
+                  <article
+                    key={rel.id}
+                    className="flex flex-col gap-1.5 rounded-2xl border border-dashed border-[var(--fl-line)] bg-transparent p-5 opacity-80"
+                  >
+                    <h4 className="text-sm font-medium text-[var(--fl-slate)]">
+                      {rel.clientName}
+                    </h4>
+                    <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                      {fill(p.queue.fresh.body, {
+                        project: rel.lastProjectTitle ?? rel.clientName,
+                        month: monthLabel(date),
+                        n: m,
+                        next: monthLabel(plusOneYear(date)),
+                      })}
+                      {rel.clientType === "private" && ` ${p.queue.fresh.privateExtra}`}
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
           {ranked.length > 0 && notRanked.length > 0 && (
             <p className={hintClass}>

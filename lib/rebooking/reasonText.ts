@@ -58,15 +58,26 @@ export function reasonTextFor(
     }
     case "season": {
       const line = SEASON_LINES[suggestion.seasonReason ?? "spring-campaign-briefing"][locale];
+      // The checkable fact rides along: the season alone is a calendar claim,
+      // the months of silence are this client's own number.
+      const months = suggestion.monthsSince ?? 6;
       return locale === "nl"
-        ? `${line} ${name} hoort nu van je, niet als het al vergeven is.`
-        : `${line} ${name} should hear from you now, not after it is all assigned.`;
+        ? `${line} En het is al ${months} maanden stil sinds ${project ?? "de laatste klus"} — ${name} hoort nu van je, niet als het al vergeven is.`
+        : `${line} And it has been ${months} months of quiet since ${project ?? "the last job"} — ${name} should hear from you now, not after it is all assigned.`;
     }
     case "gap": {
       const months = suggestion.monthsSince ?? 6;
+      const about = project ?? (locale === "nl" ? "de laatste klus" : "the last job");
       return locale === "nl"
-        ? `${months} maanden stil met ${name}. Lang genoeg dat een berichtje een gebeurtenis is, kort genoeg dat het warm is.`
-        : `${months} months of quiet with ${name}. Long enough that a note is an event, short enough that it is still warm.`;
+        ? `Al ${months} maanden stil sinds ${about}. Een kort berichtje houdt de relatie warm — met een concrete aanleiding, geen "even checken".`
+        : `Quiet for ${months} months since ${about}. A short note keeps the relationship warm — with a concrete reason, not a "just checking in".`;
+    }
+    case "referral": {
+      const months = suggestion.monthsSince ?? 6;
+      const about = project ?? (locale === "nl" ? "De laatste klus" : "The last job");
+      return locale === "nl"
+        ? `${about} was ${months} maanden geleden. Een bedankje plus de vraag om een aanbeveling is nu natuurlijk.`
+        : `${about} was ${months} months ago. A thank-you plus asking for a referral is natural now.`;
     }
     case "manual":
       return locale === "nl" ? `Door jou gekozen.` : `Picked by you.`;

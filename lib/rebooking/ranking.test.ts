@@ -172,3 +172,96 @@ describe("reasonText", () => {
     expect(reasonTextFor(suggestion, r, "en")).toContain("Almost a year");
   });
 });
+
+describe("recency floor and type-aware reasons", () => {
+  it("excludes anything fresher than 6 whole months, even in a season window", () => {
+    // August, photographer: the autumn window is open, and still no.
+    const fresh = rel({ id: "a", lastProjectDate: "2026-05-01" }); // 3 months
+    const atFive = rel({ id: "b", lastProjectDate: "2026-03-01" }); // 5 months
+    const out = rankQueue({
+      relationships: [fresh, atFive],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+    });
+    expect(out).toHaveLength(0);
+  });
+
+  it("ranks at exactly 6 months, the floor boundary", () => {
+    const [s] = rankQueue({
+      relationships: [rel({ id: "a", lastProjectDate: "2026-02-01" })],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+    });
+    expect(s).toBeDefined();
+    expect(s.monthsSince).toBe(6);
+  });
+
+  it("never gives a private client a seasonal reason", () => {
+    // 8 months dormant, photographer, August: a business client gets season,
+    // a private one gets the referral framing instead.
+    const business = rel({ id: "a", lastProjectDate: "2025-12-01" });
+    const priv = rel({ id: "b", lastProjectDate: "2025-12-01", clientType: "private" });
+    const out = rankQueue({
+      relationships: [business, priv],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+    });
+    const byId = Object.fromEntries(out.map((s) => [s.relationshipId, s]));
+    expect(byId.a.reasonCode).toBe("season");
+    expect(byId.b.reasonCode).toBe("referral");
+  });
+
+  it("anniversary window is 10 to 14 whole months, inclusive", () => {
+    const cases: [string, string][] = [
+      ["2025-10-01", "anniversary"], // 10 months
+      ["2025-06-01", "anniversary"], // 14 months
+      ["2025-05-01", "season"], // 15 months: outside window, business, August
+    ];
+    for (const [date, expected] of cases) {
+      const [s] = rankQueue({
+        relationships: [rel({ id: "a", lastProjectDate: date })],
+        craft: "photographer",
+        config: SEASONALITY_NL_V1,
+        today: TODAY,
+      });
+      expect(s.reasonCode, date).toBe(expected);
+    }
+    // 9 months, designer in an off-window month (April): falls to gap.
+    const [gap] = rankQueue({
+      relationships: [rel({ id: "a", lastProjectDate: "2025-07-01" })],
+      craft: "designer",
+      config: SEASONALITY_NL_V1,
+      today: "2026-04-06",
+    });
+    expect(gap.reasonCode).toBe("gap");
+    expect(gap.monthsSince).toBe(9);
+  });
+
+  it("every reason text carries its checkable date fact", () => {
+    const r = rel({ id: "a", lastProjectTitle: "de merkcampagne" });
+    const cases = [
+      { reasonCode: "anniversary" as const, monthsSince: 12, seasonReason: undefined },
+      { reasonCode: "season" as const, monthsSince: 8, seasonReason: "autumn-campaign-briefing" as const },
+      { reasonCode: "gap" as const, monthsSince: 9, seasonReason: undefined },
+      { reasonCode: "referral" as const, monthsSince: 7, seasonReason: undefined },
+    ];
+    for (const s of cases) {
+      for (const locale of ["nl", "en"] as const) {
+        const text = reasonTextFor(s, r, locale);
+        const hasFact =
+          text.includes(String(s.monthsSince)) || /jaar|year/i.test(text);
+        expect(hasFact, `${s.reasonCode}/${locale}: ${text}`).toBe(true);
+      }
+    }
+  });
+
+  it("referral text asks for a recommendation, not a season", () => {
+    const r = rel({ id: "a", lastProjectTitle: "Bruiloft" });
+    const s = { reasonCode: "referral" as const, monthsSince: 7, seasonReason: undefined };
+    expect(reasonTextFor(s, r, "nl")).toContain("aanbeveling");
+    expect(reasonTextFor(s, r, "en")).toContain("referral");
+  });
+});

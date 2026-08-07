@@ -108,6 +108,11 @@ export const en = {
       draftCta: "Write the draft",
       drafting: "Writing in your tone…",
       notThisWeek: "No reason this week:",
+      fresh: {
+        heading: "Too recent for a note",
+        body: "{project} was in {month} — that is {n} months ago. Next natural moment: {next}, a year after the job.",
+        privateExtra: "Until then: a short thank-you with a request for a referral is always fine.",
+      },
     },
     draft: {
       heading: "Your draft",
@@ -822,7 +827,7 @@ export const en = {
     queue: {
       heading: "Worth a message this week",
       empty: "Nothing this week. That is the design: when there is no honest reason to write anyone, this page says so instead of inventing one.",
-      reasons: { anniversary: "Anniversary", season: "Season", gap: "Long quiet", manual: "Your pick" },
+      reasons: { anniversary: "Anniversary", season: "Season", gap: "Long quiet", referral: "Referral", manual: "Your pick" },
       writeDraft: "Write the email",
       drafting: "Writing, in your tone",
       draftError: "Drafting failed. Try again in a minute.",

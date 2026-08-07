@@ -110,6 +110,11 @@ export const nl: DeepPartial<typeof en> = {
       },
       draftCta: "Schrijf het concept",
       notThisWeek: "Geen reden deze week:",
+      fresh: {
+        heading: "Nog te vers voor een berichtje",
+        body: "{project} was in {month} \u2014 dat is {n} maanden geleden. Eerstvolgend logisch moment: {next}, een jaar na de klus.",
+        privateExtra: "Tot die tijd: een korte bedankmail met de vraag om een aanbeveling kan altijd.",
+      },
       drafting: "Aan het schrijven in jouw toon\u2026",
     },
     draft: {
@@ -816,7 +821,7 @@ export const nl: DeepPartial<typeof en> = {
     queue: {
       heading: "Deze week een berichtje waard",
       empty: "Deze week niets. Dat is de bedoeling: als er geen eerlijke reden is om iemand te schrijven, zegt deze pagina dat, in plaats van er een te verzinnen.",
-      reasons: { anniversary: "Verjaardag van de klus", season: "Seizoen", gap: "Lange stilte", manual: "Jouw keuze" },
+      reasons: { anniversary: "Verjaardag van de klus", season: "Seizoen", gap: "Lange stilte", referral: "Aanbeveling", manual: "Jouw keuze" },
       writeDraft: "Schrijf de mail",
       drafting: "Aan het schrijven, in jouw toon",
       draftError: "Schrijven mislukte. Probeer het over een minuut opnieuw.",

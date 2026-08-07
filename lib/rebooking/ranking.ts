@@ -7,7 +7,7 @@
  *
  * The shape of the scoring, and why:
  *
- *   anniversary  strongest. 11–13 months after the last project is the one
+ *   anniversary  strongest. 10–14 months after the last project is the one
  *                moment a note is an event rather than an interruption, and
  *                "a year since X" is the most natural sentence in outreach.
  *   season       the craft's briefing windows. True for whole months, so it
@@ -46,6 +46,9 @@ export interface RankInput {
   recentlyTouchedIds?: readonly string[];
 }
 
+/** Under this many whole months since the last project, silence is the advice. */
+export const RECENCY_FLOOR_MONTHS = 6;
+
 export const WEEKLY_MIN = 2;
 export const WEEKLY_MAX = 4;
 
@@ -79,19 +82,31 @@ function scoreOne(
   // A future project date is data entry, not time travel; it cannot rank.
   if (monthsSince !== undefined && monthsSince < 0) return null;
 
+  // The recency floor: fresher than six whole months is never "worth a
+  // message" — not even in a season window. Declining to suggest is the
+  // judgment this product sells. A client without a date cannot prove
+  // dormancy, so it cannot rank either.
+  if (monthsSince === undefined || monthsSince < RECENCY_FLOOR_MONTHS) return null;
+
+  const isPrivate = r.clientType === "private";
   const window = seasonWindowFor(config, craft, month);
 
   let reasonCode: RankedTouchSuggestion["reasonCode"] | null = null;
   let base = 0;
 
-  if (monthsSince !== undefined && monthsSince >= 11 && monthsSince <= 13) {
+  if (monthsSince >= 10 && monthsSince <= 14) {
     reasonCode = "anniversary";
     base = 100;
-  } else if (window) {
+  } else if (window && !isPrivate) {
+    // Season windows are trade talk — briefing calendars, campaign planning.
+    // A consumer who booked a wedding has no autumn campaign; a seasonal
+    // reason on a private client is structurally impossible now.
     reasonCode = "season";
     base = 70;
-  } else if (monthsSince !== undefined && monthsSince >= 6) {
-    reasonCode = "gap";
+  } else {
+    // Six months or more of silence, no better reason. For a private client
+    // the honest angle is gratitude plus a referral, not "the season".
+    reasonCode = isPrivate ? "referral" : "gap";
     // 6 months → 40, growing to 60 at 24 months, flat past that.
     base = 40 + Math.min(monthsSince - 6, 18) * (20 / 18);
   }
@@ -100,7 +115,7 @@ function scoreOne(
 
   // Season on top of a real gap beats season alone: the reason is the season,
   // the urgency is the silence.
-  if (reasonCode === "season" && monthsSince !== undefined && monthsSince >= 6) {
+  if (reasonCode === "season") {
     base += Math.min(monthsSince - 6, 12);
   }
 
