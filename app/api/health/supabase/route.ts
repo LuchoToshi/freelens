@@ -15,6 +15,18 @@ import { createHash, timingSafeEqual } from "node:crypto";
  */
 export const dynamic = "force-dynamic";
 
+/**
+ * Production never runs this, key or no key.
+ *
+ * The rlsProof path creates and deletes real auth users with the service-role
+ * key. That is a privileged operation, and a privileged operation reachable
+ * over the internet behind one static header does not belong in production no
+ * matter how strong the header is. Diagnostics run where mistakes are cheap.
+ */
+function allowedHere(): boolean {
+  return process.env.VERCEL_ENV !== "production";
+}
+
 function authorised(request: Request): boolean {
   // A dedicated key, not WAITLIST_SECRET: signing secrets should not double as
   // access credentials, and this one is kept where `vercel env pull` cannot
@@ -28,7 +40,9 @@ function authorised(request: Request): boolean {
 }
 
 export async function GET(request: Request) {
-  if (!authorised(request)) {
+  // Indistinguishable 404s: production and a bad key look identical from
+  // outside, so this reveals neither the endpoint nor the environment.
+  if (!allowedHere() || !authorised(request)) {
     return Response.json({ ok: false }, { status: 404 });
   }
 
