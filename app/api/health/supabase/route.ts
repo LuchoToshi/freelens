@@ -60,13 +60,83 @@ export async function GET(request: Request) {
     `${url}/rest/v1/relationships?select=id&limit=1`,
     { apikey: service, Authorization: `Bearer ${service}` }
   );
-  // RLS proof: the anon key must NOT read rows. 200 with data would be a leak.
-  checks.anonBlockedByRls = await probe(
-    `${url}/rest/v1/relationships?select=id&limit=1`,
-    { apikey: anon, Authorization: `Bearer ${anon}` }
-  );
+  // An empty table returns [] to everyone, so reading it proves nothing about
+  // RLS. ?rlsProof=1 creates a real user and a real row, checks that the anon
+  // key still sees nothing, and removes both. Only ever run deliberately.
+  if (new URL(request.url).searchParams.get("rlsProof") === "1") {
+    checks.rlsProof = await proveRls(url, anon, service);
+  } else {
+    checks.anonReadsEmptyTable = await probe(
+      `${url}/rest/v1/relationships?select=id&limit=1`,
+      { apikey: anon, Authorization: `Bearer ${anon}` }
+    );
+  }
 
   return Response.json({ ok: true, env, checks });
+}
+
+/**
+ * The acceptance criterion "one user can never read another's rows", executed
+ * rather than asserted. Cleans up after itself in a finally block: a
+ * diagnostic that leaves users behind is worse than no diagnostic.
+ */
+async function proveRls(url: string, anon: string, service: string) {
+  const admin = { apikey: service, Authorization: `Bearer ${service}`, "Content-Type": "application/json" };
+  const email = `rls-proof-${Date.now()}@freelens.invalid`;
+  let userId: string | null = null;
+
+  try {
+    const created = await fetch(`${url}/auth/v1/admin/users`, {
+      method: "POST",
+      headers: admin,
+      body: JSON.stringify({ email, password: crypto.randomUUID(), email_confirm: true }),
+    });
+    if (!created.ok) return { step: "create-user", status: created.status, body: (await created.text()).slice(0, 200) };
+    userId = ((await created.json()) as { id: string }).id;
+
+    const inserted = await fetch(`${url}/rest/v1/relationships`, {
+      method: "POST",
+      headers: { ...admin, Prefer: "return=representation" },
+      body: JSON.stringify({ user_id: userId, client_name: "RLS proof" }),
+    });
+    if (!inserted.ok) return { step: "insert", status: inserted.status, body: (await inserted.text()).slice(0, 200) };
+
+    const asService = await probe(`${url}/rest/v1/relationships?select=id`, {
+      apikey: service,
+      Authorization: `Bearer ${service}`,
+    });
+    const asAnon = await probe(`${url}/rest/v1/relationships?select=id`, {
+      apikey: anon,
+      Authorization: `Bearer ${anon}`,
+    });
+
+    const serviceRows = countRows(asService.body);
+    const anonRows = countRows(asAnon.body);
+
+    return {
+      rowExists: serviceRows >= 1,
+      anonSees: anonRows,
+      passed: serviceRows >= 1 && anonRows === 0,
+    };
+  } catch (error) {
+    return { step: "exception", error: error instanceof Error ? error.message : "failed" };
+  } finally {
+    // Deleting the user cascades to the relationship row.
+    if (userId) {
+      await fetch(`${url}/auth/v1/admin/users/${userId}`, { method: "DELETE", headers: admin }).catch(
+        () => undefined
+      );
+    }
+  }
+}
+
+function countRows(body: unknown): number {
+  try {
+    const parsed = JSON.parse(String(body));
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
 }
 
 async function probe(target: string, headers: Record<string, string>) {
