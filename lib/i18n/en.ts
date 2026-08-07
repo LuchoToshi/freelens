@@ -62,11 +62,74 @@ export const en = {
     },
   },
 
+  tryPage: {
+    eyebrow: "Try Freelens",
+    heading: "One week of Freelens, in three minutes.",
+    intro:
+      "Enter three past clients. Freelens ranks who is worth a message right now, says why, and writes one draft in your tone. What you type stays in your browser.",
+    clients: {
+      heading: "Step 1 — three past clients",
+      hint: "Real clients work best. Anyone from six months ago or longer gives the ranking something to reason about.",
+      nameLabel: "Client name",
+      projectLabel: "Last project",
+      monthLabel: "When was that?",
+      sample: "Use sample data instead",
+      next: "Next: how you write",
+    },
+    voice: {
+      heading: "Step 2 — how you write",
+      hint: "Three choices, so the draft sounds like you instead of like software.",
+      craftLabel: "Your craft",
+      toneLabel: "Tone",
+      toneInformal: "Informal",
+      toneFormal: "Formal",
+      greetingLabel: "Greeting (optional)",
+      greetingPlaceholder: "Hi",
+      signoffLabel: "Sign-off (optional)",
+      signoffPlaceholder: "Best,",
+      back: "Back",
+      submit: "Show my week",
+    },
+    queue: {
+      heading: "Who is worth a message this week",
+      hint: "Ranked by the same rules as the real product: anniversaries first, then season, then silence. No AI in the ranking — every reason is checkable.",
+      empty: {
+        title: "Honest answer: nobody, this week.",
+        body: "None of these three hit an anniversary, a season window, or six months of silence. That is the product working — quiet weeks stay quiet. Try a client from last year, or load the sample data.",
+        edit: "Edit clients",
+      },
+      draftCta: "Write the draft",
+      drafting: "Writing in your tone…",
+      notThisWeek: "No reason this week:",
+    },
+    draft: {
+      heading: "Your draft",
+      copy: "Copy email",
+      copied: "Copied",
+      locked: "Fill in the [fill in:] parts first — Freelens does not invent facts.",
+      error: "The draft did not pass our checks. Try once more.",
+      limit: "That was today's free draft. The queue and the reasons stay open — for more drafts, get on the list below.",
+    },
+    gate: {
+      heading: "Nothing was saved. That is the point — and the limit.",
+      body: "This trial ran in your browser. The real Freelens keeps your client list, redoes this every Monday, and mails you the queue. It is in private beta: 25 founding spots, € 99 once, every future plan included.",
+      cta: "Get on the list",
+      again: "Run it again with different clients",
+    },
+    privacyNote:
+      "Your entries never leave your browser, except the one client you draft for: name, project and date are sent once to write the email and are not stored.",
+  },
+
   meta: {
     home: {
       title: "Freelens Rebooking: your past clients are your next booking",
       description:
         "For creative freelancers. Freelens remembers your past clients, knows when a message is worth sending, and drafts it in your voice. You press send. Private beta, onboarding the first 25. Free Dutch tax calculators included.",
+    },
+    try: {
+      title: "Try Freelens with 3 clients \u00b7 Freelens",
+      description:
+        "Enter three past clients and see who is worth a message this week, why, and get one draft in your tone. No account needed.",
     },
     about: {
       title: "Your past clients are your next booking \u00b7 Freelens",
@@ -282,6 +345,7 @@ export const en = {
       heroQuestion: "When did you last talk to your best client from last year?",
       heroSub: "Your easiest next job is a client you already know. Freelens remembers who, knows when, and writes the first email \u2014 in your voice. You press send.",
       heroCta: "Join the waitlist",
+      heroCtaTry: "Try it with 3 clients — no account",
       how: {
         eyebrow: "How it will work",
         heading: "Three steps, one of them yours.",

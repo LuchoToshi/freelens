@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { container } from "@/components/container";
 import { WaitlistForm } from "@/components/rebooking/waitlist-form";
-import { linkButtonClass, primaryButtonClass } from "@/components/app/styles";
+import { linkButtonClass, primaryButtonClass, secondaryButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 /**
@@ -42,10 +42,15 @@ export default function Home() {
         <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">
           {r.heroSub}
         </p>
-        <a href="#waitlist" className={`${primaryButtonClass} w-fit`}>
-          {r.heroCta}
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/try" className={primaryButtonClass}>
+            {r.heroCtaTry}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+          <a href="#waitlist" className={secondaryButtonClass}>
+            {r.heroCta}
+          </a>
+        </div>
       </section>
 
       {/* How it will work — future tense on purpose; nothing here is live. */}

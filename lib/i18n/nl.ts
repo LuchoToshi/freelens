@@ -65,11 +65,74 @@ export const nl: DeepPartial<typeof en> = {
     },
   },
 
+  tryPage: {
+    eyebrow: "Probeer Freelens",
+    heading: "E\u00e9n week Freelens, in drie minuten.",
+    intro:
+      "Vul drie oude klanten in. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon. Wat je invult blijft in je browser.",
+    clients: {
+      heading: "Stap 1 \u2014 drie oude klanten",
+      hint: "Echte klanten werken het best. Iedereen van een half jaar geleden of langer geeft de rangschikking iets om over na te denken.",
+      nameLabel: "Naam klant",
+      projectLabel: "Laatste klus",
+      monthLabel: "Wanneer was dat?",
+      sample: "Gebruik voorbeelddata",
+      next: "Verder: hoe jij schrijft",
+    },
+    voice: {
+      heading: "Stap 2 \u2014 hoe jij schrijft",
+      hint: "Drie keuzes, zodat het concept klinkt als jij en niet als software.",
+      craftLabel: "Jouw vak",
+      toneLabel: "Toon",
+      toneInformal: "Je",
+      toneFormal: "U",
+      greetingLabel: "Aanhef (optioneel)",
+      greetingPlaceholder: "Hoi",
+      signoffLabel: "Afsluiting (optioneel)",
+      signoffPlaceholder: "Groet,",
+      back: "Terug",
+      submit: "Laat mijn week zien",
+    },
+    queue: {
+      heading: "Wie is deze week een bericht waard",
+      hint: "Gerangschikt volgens dezelfde regels als het echte product: eerst verjaardagen, dan seizoen, dan stilte. Geen AI in de rangschikking \u2014 elke reden is controleerbaar.",
+      empty: {
+        title: "Eerlijk antwoord: niemand, deze week.",
+        body: "Geen van deze drie zit op een verjaardag, een seizoensvenster of een half jaar stilte. Zo hoort het te werken \u2014 rustige weken blijven rustig. Probeer een klant van vorig jaar, of laad de voorbeelddata.",
+        edit: "Klanten aanpassen",
+      },
+      draftCta: "Schrijf het concept",
+      notThisWeek: "Geen reden deze week:",
+      drafting: "Aan het schrijven in jouw toon\u2026",
+    },
+    draft: {
+      heading: "Jouw concept",
+      copy: "Kopieer e-mail",
+      copied: "Gekopieerd",
+      locked: "Vul eerst de [vul in:]-delen in \u2014 Freelens verzint geen feiten.",
+      error: "Het concept kwam niet door onze controles. Probeer het nog een keer.",
+      limit: "Dat was het gratis concept voor vandaag. De lijst en de redenen blijven open \u2014 voor meer concepten: zet je op de lijst hieronder.",
+    },
+    gate: {
+      heading: "Er is niets opgeslagen. Dat is het idee \u2014 en de grens.",
+      body: "Deze proef draaide in je browser. Het echte Freelens bewaart je klantenlijst, doet dit elke maandag opnieuw en mailt je de lijst. Het zit in besloten b\u00e8ta: 25 founding-plekken, \u20ac 99 eenmalig, elk toekomstig abonnement inbegrepen.",
+      cta: "Zet me op de lijst",
+      again: "Nog een keer met andere klanten",
+    },
+    privacyNote:
+      "Wat je invult verlaat je browser niet, behalve de ene klant voor wie je een concept maakt: naam, klus en datum gaan \u00e9\u00e9n keer mee om de e-mail te schrijven en worden niet opgeslagen.",
+  },
+
   meta: {
     home: {
       title: "Freelens Rebooking: je oude klanten zijn je volgende boeking",
       description:
         "Voor creatieve freelancers. Freelens onthoudt je oude klanten, weet wanneer een berichtje het waard is, en schrijft het in jouw toon. Jij drukt op verzenden. Besloten b\u00e8ta, we onboarden de eerste 25. Gratis Nederlandse rekentools inbegrepen.",
+    },
+    try: {
+      title: "Probeer Freelens met 3 klanten \u00b7 Freelens",
+      description:
+        "Vul drie oude klanten in en zie wie deze week een bericht waard is, waarom, en krijg \u00e9\u00e9n concept in jouw toon. Zonder account.",
     },
     about: {
       title: "Je oude klanten zijn je volgende boeking \u00b7 Freelens",
@@ -276,6 +339,7 @@ export const nl: DeepPartial<typeof en> = {
       heroQuestion: "Wanneer sprak je je beste klant van vorig jaar voor het laatst?",
       heroSub: "Je makkelijkste volgende klus is een klant die je al kent. Freelens onthoudt wie, weet wanneer, en schrijft de eerste mail \u2014 in jouw toon. Jij drukt op verzenden.",
       heroCta: "Zet me op de wachtlijst",
+      heroCtaTry: "Probeer het met 3 klanten \u2014 zonder account",
       how: {
         eyebrow: "Zo gaat het werken",
         heading: "Drie stappen, waarvan \u00e9\u00e9n van jou.",
