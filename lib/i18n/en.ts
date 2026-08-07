@@ -642,6 +642,10 @@ export const en = {
       title: "Your email address",
       body: "We keep an email address only if you leave one yourself, on the waitlist or for rule-change updates, and only after you confirm it from your inbox. It is used for that one purpose, never shared, and deleted on request. Waitlist signups also record the craft you select.",
     },
+    app: {
+      title: "The Rebooking app (private beta)",
+      body: "If you use the app at /app: your account is an email address with a magic link, no password. Client records you enter (name, project, date, value, notes \u2014 never addresses, phone or registration numbers) are stored with Supabase in the EU, readable only by you. Draft emails are written by Anthropic's Claude API, configured without training on your data; the model sees only the record you entered. The weekly email goes through Resend, only when there is something to say, with a one-click stop. Export everything or delete your account, immediately and permanently, from inside the app.",
+    },
     never: {
       title: "What we never collect",
       body: "No bank connection, no client addresses or phone numbers, no KvK or VAT numbers, no uploaded documents.",

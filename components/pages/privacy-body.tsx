@@ -12,9 +12,9 @@ import { fill } from "@/lib/i18n";
  * Rebooking app ships (auth, database, model provider, Stripe), this page
  * grows the full processor list — it does not get vaguer.
  */
-const VERSION_DATE = "2026-08-06";
+const VERSION_DATE = "2026-08-07";
 
-const SECTION_KEYS = ["calc", "analytics", "email", "never", "rights"] as const;
+const SECTION_KEYS = ["calc", "analytics", "email", "app", "never", "rights"] as const;
 
 export function PrivacyPageBody() {
   const t = useT();

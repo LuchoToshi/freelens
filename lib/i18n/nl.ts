@@ -636,6 +636,10 @@ export const nl: DeepPartial<typeof en> = {
       title: "Je e-mailadres",
       body: "We bewaren een e-mailadres alleen als je het zelf achterlaat, op de wachtlijst of voor updates bij regelwijzigingen, en pas nadat je het vanuit je inbox bevestigt. Het wordt voor dat ene doel gebruikt, nooit gedeeld, en op verzoek verwijderd. Bij een wachtlijstaanmelding bewaren we ook het vak dat je kiest.",
     },
+    app: {
+      title: "De Rebooking-app (besloten b\u00e8ta)",
+      body: "Gebruik je de app op /app: je account is een e-mailadres met een magic link, zonder wachtwoord. Klantrecords die je invoert (naam, klus, datum, bedrag, notities \u2014 nooit adressen, telefoonnummers of registratienummers) staan bij Supabase in de EU en zijn alleen door jou leesbaar. Conceptmails schrijft de Claude-API van Anthropic, ingesteld zonder training op jouw gegevens; het model ziet alleen het record dat jij invoerde. De wekelijkse mail loopt via Resend, alleen als er iets te melden is, met \u00e9\u00e9n klik om te stoppen. Alles exporteren of je account verwijderen, direct en definitief, kan in de app zelf.",
+    },
     never: {
       title: "Wat we nooit verzamelen",
       body: "Geen bankkoppeling, geen adressen of telefoonnummers van klanten, geen KvK- of btw-nummers, geen geüploade documenten.",
