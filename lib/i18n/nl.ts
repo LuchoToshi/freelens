@@ -407,7 +407,13 @@ export const nl: DeepPartial<typeof en> = {
     },
   },
 
-    aboutPage: {
+    notFound: {
+    title: "Pagina niet gevonden \u00b7 Freelens",
+    body: "Deze pagina bestaat niet.",
+    back: "Terug naar Freelens",
+  },
+
+  aboutPage: {
     eyebrow: "Waarom Freelens bestaat",
     heading: "Je oude klanten zijn je volgende boeking.",
     intro: "De stilste maanden van een creatieve freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die onthoudt wanneer het logische moment is om weer contact te leggen \u2014 en dus gebeurt het niet, of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",

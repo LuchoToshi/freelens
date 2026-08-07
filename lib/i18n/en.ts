@@ -413,7 +413,13 @@ export const en = {
     },
   },
 
-    aboutPage: {
+    notFound: {
+    title: "Page not found \u00b7 Freelens",
+    body: "This page doesn't exist.",
+    back: "Back to Freelens",
+  },
+
+  aboutPage: {
     eyebrow: "Why Freelens exists",
     heading: "Your past clients are your next booking.",
     intro: "A creative freelancer's quietest months are rarely a quality problem. The work was good. The client was happy. There is just nobody who remembers when the natural moment is to get back in touch \u2014 so it doesn't happen, or it happens as \u201cjust checking in\u201d, and that feels awkward for everyone.",
