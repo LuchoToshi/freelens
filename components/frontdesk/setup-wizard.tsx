@@ -7,6 +7,7 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import { VoiceStep } from "@/components/frontdesk/voice-step";
+import { RevealStep } from "@/components/frontdesk/reveal-step";
 import { ShareStep } from "@/components/frontdesk/share-step";
 
 /**
@@ -56,6 +57,9 @@ export function SetupWizard({
     { label: "", price: "", unit: "", notes: "" },
   ]);
   const [saving, setSaving] = useState(false);
+  // How many times the reveal has been entered: from the second visit on,
+  // the sample draft is regenerated so voice edits are visibly cause→effect.
+  const [revealVisits, setRevealVisits] = useState(0);
   const [error, setError] = useState<"" | "handle" | "generic" | "packages">("");
 
   const t = fdDict(locale).setup;
@@ -169,7 +173,7 @@ export function SetupWizard({
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
       {step >= 1 && (
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-          {t.stepOf.replace("{n}", String(Math.min(step, 4)))}
+          {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4)))}
         </p>
       )}
 
@@ -392,9 +396,21 @@ export function SetupWizard({
           existingProfile={freelancer?.voice_profile ?? null}
           onDone={() => {
             onFreelancerChanged();
-            setStep(4);
+            setRevealVisits((n) => n + 1);
+            setStep(35);
           }}
           onBack={() => setStep(2)}
+        />
+      )}
+
+      {step === 35 && (
+        <RevealStep
+          key={revealVisits}
+          locale={locale}
+          session={session}
+          regenerate={revealVisits > 1}
+          onContinue={() => setStep(4)}
+          onAdjust={() => setStep(3)}
         />
       )}
 
