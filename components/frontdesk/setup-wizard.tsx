@@ -6,6 +6,8 @@ import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
+import { VoiceStep } from "@/components/frontdesk/voice-step";
+import { ShareStep } from "@/components/frontdesk/share-step";
 
 /**
  * Onboarding, four steps, nothing external. The locale question comes first
@@ -360,10 +362,20 @@ export function SetupWizard({
         </section>
       )}
 
-      {/* Steps 3 (voice) and 4 (share links) land in the next commit. */}
-      {step >= 3 && (
-        <p className="text-sm text-[var(--fl-slate)]">{t.stepOf.replace("{n}", String(step))}…</p>
+      {step === 3 && (
+        <VoiceStep
+          locale={locale}
+          session={session}
+          existingProfile={freelancer?.voice_profile ?? null}
+          onDone={() => {
+            onFreelancerChanged();
+            setStep(4);
+          }}
+          onBack={() => setStep(2)}
+        />
       )}
+
+      {step === 4 && <ShareStep locale={locale} handle={handle} />}
     </main>
   );
 }
