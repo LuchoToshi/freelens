@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SkipLink } from "@/components/skip-link";
 import { Analytics } from "@vercel/analytics/next";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
+import { ChromeGate } from "@/components/frontdesk/chrome-gate";
 import { en } from "@/lib/i18n/en";
 import "./globals.css";
 
@@ -46,14 +47,20 @@ export default function RootLayout({
             on the client once the visitor's choice is known. */}
         <LocaleProvider>
           <SkipLink />
-          <SiteHeader />
+          {/* FrontDesk surfaces render without site chrome: the client of a
+              freelancer never sees the product name. See ChromeGate. */}
+          <ChromeGate>
+            <SiteHeader />
+          </ChromeGate>
           {/* Skip target. `tabIndex={-1}` because browsers do not reliably move
               focus to a non-focusable fragment target, so without it the link
               scrolls but leaves focus in the header. */}
           <div id="main-content" tabIndex={-1} className="flex flex-1 flex-col outline-none">
             {children}
           </div>
-          <SiteFooter />
+          <ChromeGate>
+            <SiteFooter />
+          </ChromeGate>
         </LocaleProvider>
         {/* Cookieless, and every event this app sends is a bare name: see
             lib/analytics.ts, where `track` has no second parameter. No figure
