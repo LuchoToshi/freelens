@@ -39,7 +39,7 @@ export function SetupWizard({
   freelancer: FreelancerRow | null;
   onFreelancerChanged: () => void;
 }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(freelancer ? 1 : 0);
   const [locale, setLocale] = useState<FrontdeskLocale>(freelancer?.locale ?? "nl");
   const [handle, setHandle] = useState(freelancer?.handle ?? "");
   const [displayName, setDisplayName] = useState(freelancer?.display_name ?? "");
@@ -167,15 +167,38 @@ export function SetupWizard({
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
-        {t.stepOf.replace("{n}", String(step))}
-      </p>
+      {step >= 1 && (
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+          {t.stepOf.replace("{n}", String(Math.min(step, 4)))}
+        </p>
+      )}
+
+      {step === 0 && (
+        <section className="flex flex-col gap-5">
+          <h1 className="font-serif text-3xl font-medium leading-tight text-[var(--fl-ink)]">
+            {t.welcome.heading}
+          </h1>
+          <div className="flex flex-col gap-3">
+            {[t.welcome.line1, t.welcome.line2, t.welcome.line3].map((line, i) => (
+              <p key={i} className="text-base leading-relaxed text-[var(--fl-slate)]">
+                {line}
+              </p>
+            ))}
+          </div>
+          <button type="button" onClick={() => setStep(1)} className={`${primaryClass} w-fit`}>
+            {t.welcome.cta}
+          </button>
+        </section>
+      )}
 
       {step === 1 && (
         <section className="flex flex-col gap-5">
-          <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
-            {t.profile.heading}
-          </h1>
+          <div className="flex flex-col gap-1">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
+              {t.profile.heading}
+            </h1>
+            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.profile.clientsSee}</p>
+          </div>
 
           <fieldset className="flex flex-col gap-2">
             <legend className={labelClass}>{t.profile.localeLabel}</legend>

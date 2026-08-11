@@ -93,6 +93,21 @@ const en = {
     loading: "One moment.",
   },
   setup: {
+    welcome: {
+      heading: "Your front desk for new inquiries",
+      line1: "One link for every bio. Clients inquire through a short page with your name on it — no product name, no fuss.",
+      line2: "Setup takes about ten minutes: your page, your packages, and how you write.",
+      line3: "After that, every inquiry arrives with a reply ready in your style, using your real prices. Sending stays yours.",
+      cta: "Get started",
+    },
+    reveal: {
+      heading: "This is how you'll reply from now on",
+      sub: "Generated with your voice profile and your real prices.",
+      primary: "Sounds like me",
+      secondary: "Adjust my voice",
+      pending: "The sample draft is still being written. You can continue — it will be waiting in your inbox.",
+      retry: "Try again",
+    },
     stepOf: "Step {n} of 4",
     next: "Next",
     back: "Back",
@@ -100,6 +115,7 @@ const en = {
     profile: {
       heading: "Your page",
       localeLabel: "Language of your page and drafts",
+      clientsSee: "This is what clients see.",
       handleLabel: "Your link name",
       handleHint: "Lowercase letters, digits and dashes. This becomes your public link.",
       handleTaken: "That link name is taken or not allowed.",
@@ -145,7 +161,7 @@ const en = {
     },
     packages: {
       heading: "Your packages",
-      hint: "The only prices the assistant may ever name are the ones you put here. At least one to continue.",
+      hint: "Drafts only ever use these prices — nothing is invented. At least one package to continue.",
       labelLabel: "Name",
       priceLabel: "From (\u20ac)",
       unitLabel: "Unit (optional)",
@@ -243,6 +259,21 @@ const nl: typeof en = {
     loading: "Momentje.",
   },
   setup: {
+    welcome: {
+      heading: "Je front desk voor nieuwe aanvragen",
+      line1: "E\u00e9n link voor al je bio's. Klanten vragen aan via een korte pagina met jouw naam erop \u2014 geen productnaam, geen gedoe.",
+      line2: "Instellen kost een minuut of tien: je pagina, je pakketten, en hoe jij schrijft.",
+      line3: "Daarna ligt er bij elke aanvraag een antwoord klaar in jouw stijl, met jouw echte prijzen. Versturen doe jij.",
+      cta: "Aan de slag",
+    },
+    reveal: {
+      heading: "Zo ga je vanaf nu antwoorden",
+      sub: "Gegenereerd met jouw stijlprofiel en jouw echte prijzen.",
+      primary: "Klinkt als mij",
+      secondary: "Pas mijn stijl aan",
+      pending: "Het voorbeeldconcept wordt nog geschreven. Je kunt gewoon verdergaan \u2014 het staat zo in je inbox.",
+      retry: "Probeer opnieuw",
+    },
     stepOf: "Stap {n} van 4",
     next: "Verder",
     back: "Terug",
@@ -250,6 +281,7 @@ const nl: typeof en = {
     profile: {
       heading: "Jouw pagina",
       localeLabel: "Taal van je pagina en concepten",
+      clientsSee: "Dit zien je klanten.",
       handleLabel: "Je linknaam",
       handleHint: "Kleine letters, cijfers en streepjes. Dit wordt je publieke link.",
       handleTaken: "Die linknaam is bezet of niet toegestaan.",
@@ -295,7 +327,7 @@ const nl: typeof en = {
     },
     packages: {
       heading: "Jouw pakketten",
-      hint: "De enige prijzen die de assistent ooit mag noemen zijn de prijzen die jij hier zet. Minstens \u00e9\u00e9n om verder te gaan.",
+      hint: "Concepten gebruiken alleen deze prijzen \u2014 er wordt nooit een bedrag verzonnen. Minstens \u00e9\u00e9n pakket om verder te gaan.",
       labelLabel: "Naam",
       priceLabel: "Vanaf (\u20ac)",
       unitLabel: "Eenheid (optioneel)",
