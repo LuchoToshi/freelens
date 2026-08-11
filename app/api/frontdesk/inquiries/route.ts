@@ -2,6 +2,8 @@ import { isValidHandle } from "@/lib/frontdesk/handles";
 import { serviceClient } from "@/lib/frontdesk/server/clients";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import { sendEmail } from "@/lib/server/sendEmail";
+import { after } from "next/server";
+import { generateAndStoreDraft } from "@/lib/frontdesk/server/draftPipeline";
 
 /**
  * The public inquiry submit. No auth by design — the client of a freelancer
@@ -173,7 +175,13 @@ export async function POST(request: Request) {
   }
   console.log(`frontdesk/inquiries: created notified:${notified}`);
 
-  // Draft generation is wired here in the next phase, via after().
+  // Draft generation runs after the response: the client's confirmation never
+  // waits on a model. Failures are logged as codes; the inbox renders a
+  // draft-less inquiry as "pending" with a regenerate action.
+  after(async () => {
+    const outcome = await generateAndStoreDraft(inquiry.id, "reply").catch(() => "generation_failed");
+    console.log(`frontdesk/inquiries: draft:${outcome}`);
+  });
 
   return Response.json(GENERIC_OK);
 }
