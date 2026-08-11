@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import { shareLinks } from "@/lib/frontdesk/shareLinks";
 
 /**
  * Step 4: the link, three source-tagged variants, done. The ?src= tag is how
@@ -12,19 +13,13 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
   const t = fdDict(locale).setup.share;
   const [copied, setCopied] = useState<string | null>(null);
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const base = `${origin}/${handle}`;
+  const { base, variants } = shareLinks(origin, handle);
 
   async function copy(url: string, tag: string) {
     await navigator.clipboard.writeText(url);
     setCopied(tag);
     setTimeout(() => setCopied(null), 2000);
   }
-
-  const variants = [
-    { tag: "ig", url: `${base}?src=ig` },
-    { tag: "tt", url: `${base}?src=tt` },
-    { tag: "sig", url: `${base}?src=sig` },
-  ] as const;
 
   return (
     <section className="flex flex-col gap-5">

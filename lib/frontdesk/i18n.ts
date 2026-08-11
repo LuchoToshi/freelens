@@ -50,6 +50,15 @@ const en = {
     heading: "Inbox",
     empty: "No inquiries yet. Put your link in your bio and they will land here.",
     loading: "One moment.",
+    sampleBadge: "Example",
+    checklist: {
+      heading: "Go live",
+      bio: "Put your link in your bio",
+      bioDone: "Done",
+      test: "Send a test inquiry from your own page",
+      openPage: "Open your page",
+      reply: "Send your first real reply",
+    },
     status: {
       new: "New",
       replied: "Replied",
@@ -216,6 +225,15 @@ const nl: typeof en = {
     heading: "Inbox",
     empty: "Nog geen aanvragen. Zet je link in je bio en ze komen hier binnen.",
     loading: "Momentje.",
+    sampleBadge: "Voorbeeld",
+    checklist: {
+      heading: "Ga live",
+      bio: "Zet je link in je bio",
+      bioDone: "Gedaan",
+      test: "Doe een testaanvraag via je eigen pagina",
+      openPage: "Open je pagina",
+      reply: "Verstuur je eerste echte antwoord",
+    },
     status: {
       new: "Nieuw",
       replied: "Beantwoord",

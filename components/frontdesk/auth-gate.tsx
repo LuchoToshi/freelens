@@ -25,6 +25,7 @@ export interface FreelancerRow {
   locale: FrontdeskLocale;
   sign_off: string | null;
   voice_profile: Record<string, unknown> | null;
+  link_in_bio_confirmed_at: string | null;
 }
 
 type GateState =
@@ -55,7 +56,7 @@ export function AuthGate({
       }
       const { data } = await sb
         .from("freelancers")
-        .select("id, handle, display_name, craft, city, photo_url, locale, sign_off, voice_profile")
+        .select("id, handle, display_name, craft, city, photo_url, locale, sign_off, voice_profile, link_in_bio_confirmed_at")
         .maybeSingle();
       if (cancelled) return;
       setState({ stage: "ready", session, freelancer: (data as FreelancerRow | null) ?? null });

@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
+import { shareLinks } from "@/lib/frontdesk/shareLinks";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -18,6 +19,8 @@ import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
  */
 interface InquiryRow {
   id: string;
+  source: "form" | "email" | "sample";
+  src_channel: string | null;
   client_name: string;
   client_email: string | null;
   event_date: string | null;
@@ -67,6 +70,10 @@ export function InboxApp({
   const t = dict.inbox;
   const [inquiries, setInquiries] = useState<InquiryRow[] | null>(null);
   const [drafts, setDrafts] = useState<Record<string, DraftRow>>({});
+  const [allDrafts, setAllDrafts] = useState<DraftRow[]>([]);
+  const [bioConfirmedAt, setBioConfirmedAt] = useState<string | null>(
+    freelancer.link_in_bio_confirmed_at
+  );
   const [openId, setOpenId] = useState<string | null>(null);
   const [editedBody, setEditedBody] = useState("");
   const [copied, setCopied] = useState(false);
@@ -77,7 +84,7 @@ export function InboxApp({
   const load = useCallback(async () => {
     const { data: rows } = await sb
       .from("inquiries")
-      .select("id, client_name, client_email, event_date, event_type, budget_band, message, status, created_at")
+      .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at")
       .order("created_at", { ascending: false });
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows } = await sb
@@ -89,12 +96,17 @@ export function InboxApp({
       if (!latest[d.inquiry_id]) latest[d.inquiry_id] = d;
     }
     setDrafts(latest);
+    setAllDrafts((draftRows as DraftRow[] | null) ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sb is a singleton
   }, []);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  const sorted = inquiries
+    ? [...inquiries.filter((i) => i.source !== "sample"), ...inquiries.filter((i) => i.source === "sample")]
+    : null;
 
   const open = openId ? inquiries?.find((i) => i.id === openId) : null;
   const openDraft = openId ? drafts[openId] : null;
@@ -178,8 +190,13 @@ export function InboxApp({
         </button>
 
         <header className="flex flex-col gap-1">
-          <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
+          <h1 className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fl-ink)]">
             {open.client_name}
+            {open.source === "sample" && (
+              <span className="rounded-full border border-[var(--fl-line-control)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+                {t.sampleBadge}
+              </span>
+            )}
           </h1>
           <p className="text-sm text-[var(--fl-slate)]">
             {typeLabel}
@@ -264,13 +281,28 @@ export function InboxApp({
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
       <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
 
+      <ChecklistCard
+        freelancer={freelancer}
+        inquiries={inquiries}
+        allDrafts={allDrafts}
+        bioConfirmedAt={bioConfirmedAt}
+        onBioConfirmed={async () => {
+          const now = new Date().toISOString();
+          setBioConfirmedAt(now);
+          await sb
+            .from("freelancers")
+            .update({ link_in_bio_confirmed_at: now })
+            .eq("auth_user_id", session.user.id);
+        }}
+      />
+
       {inquiries.length === 0 ? (
         <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fl-slate)]">
           {t.empty}
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
-          {inquiries.map((inquiry) => (
+          {(sorted ?? []).map((inquiry) => (
             <li key={inquiry.id}>
               <button
                 type="button"
@@ -282,8 +314,15 @@ export function InboxApp({
                   className={`size-2.5 shrink-0 rounded-full ${STATUS_DOT[inquiry.status]}`}
                 />
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-sm font-semibold text-[var(--fl-ink)]">
-                    {inquiry.client_name}
+                  <span className="flex items-center gap-2">
+                    <span className="truncate text-sm font-semibold text-[var(--fl-ink)]">
+                      {inquiry.client_name}
+                    </span>
+                    {inquiry.source === "sample" && (
+                      <span className="shrink-0 rounded-full border border-[var(--fl-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+                        {t.sampleBadge}
+                      </span>
+                    )}
                   </span>
                   <span className="truncate text-xs text-[var(--fl-slate)]">
                     {dict.public.form.types[inquiry.event_type]}
@@ -306,3 +345,126 @@ export function InboxApp({
     </main>
   );
 }
+
+/**
+ * The "Go live" card: three derived checkmarks, gone forever once all three
+ * are true. Item 1 is manual-or-auto: the freelancer ticks it, or any
+ * inquiry arriving with a ?src= tag proves the link works and completes it
+ * without them.
+ */
+function ChecklistCard({
+  freelancer,
+  inquiries,
+  allDrafts,
+  bioConfirmedAt,
+  onBioConfirmed,
+}: {
+  freelancer: FreelancerRow;
+  inquiries: { id: string; source: string; src_channel: string | null }[];
+  allDrafts: { inquiry_id: string; outcome: string | null }[];
+  bioConfirmedAt: string | null;
+  onBioConfirmed: () => Promise<void>;
+}) {
+  const dict = fdDict(freelancer.locale);
+  const c = dict.inbox.checklist;
+  const share = dict.setup.share;
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const bioDone =
+    bioConfirmedAt !== null || inquiries.some((i) => i.src_channel !== null);
+  const formIds = new Set(inquiries.filter((i) => i.source === "form").map((i) => i.id));
+  const testDone = formIds.size > 0;
+  const replyDone = allDrafts.some(
+    (d) => formIds.has(d.inquiry_id) && (d.outcome === "sent_as_is" || d.outcome === "edited")
+  );
+
+  if (bioDone && testDone && replyDone) return null;
+
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const { variants } = shareLinks(origin, freelancer.handle);
+
+  async function copyLink(url: string, tag: string) {
+    await navigator.clipboard.writeText(url);
+    setCopied(tag);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
+  const itemClass = "flex flex-col gap-2";
+  const rowClass = "flex flex-wrap items-center gap-2";
+
+  function Mark({ done }: { done: boolean }) {
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold ${
+          done
+            ? "border-[#22c55e] bg-[#22c55e] text-white"
+            : "border-[var(--fl-line-control)] text-transparent"
+        }`}
+      >
+        ✓
+      </span>
+    );
+  }
+
+  return (
+    <section className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-ink)] bg-white p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-ink)]">
+        {c.heading}
+      </h2>
+
+      <div className={itemClass}>
+        <div className={rowClass}>
+          <Mark done={bioDone} />
+          <span className="text-sm font-medium text-[var(--fl-ink)]">{c.bio}</span>
+          {!bioDone && (
+            <button
+              type="button"
+              onClick={() => void onBioConfirmed()}
+              className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+            >
+              {c.bioDone}
+            </button>
+          )}
+        </div>
+        {!bioDone && (
+          <div className="flex flex-wrap gap-2 pl-7">
+            {variants.map(({ tag, url }) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => void copyLink(url, tag)}
+                className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-slate)] transition hover:border-[var(--fl-ink)] hover:text-[var(--fl-ink)]"
+              >
+                {copied === tag ? share.copied : share.variants[tag]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className={itemClass}>
+        <div className={rowClass}>
+          <Mark done={testDone} />
+          <span className="text-sm font-medium text-[var(--fl-ink)]">{c.test}</span>
+          {!testDone && (
+            <a
+              href={`/${freelancer.handle}`}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+            >
+              {c.openPage}
+            </a>
+          )}
+        </div>
+      </div>
+
+      <div className={rowClass}>
+        <Mark done={replyDone} />
+        <span className="text-sm font-medium text-[var(--fl-ink)]">{c.reply}</span>
+      </div>
+    </section>
+  );
+}
+
