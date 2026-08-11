@@ -32,6 +32,8 @@ export async function GET(request: Request) {
     .from("inquiries")
     .select("id, drafts(kind)")
     .eq("status", "replied")
+    // Practice data never nudges anyone: the sample inquiry is invisible here.
+    .neq("source", "sample")
     .lt("replied_at", threshold)
     .limit(200);
   if (error) {

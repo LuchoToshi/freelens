@@ -77,6 +77,10 @@ const en = {
       markLost: "Mark as lost",
     },
   },
+  sample: {
+    clientName: "Lisa (example)",
+    message: "Hi! We are getting married next year and we love your style. Would you be available, and what would it roughly cost?",
+  },
   auth: {
     heading: "Sign in",
     intro: "One email, no password. We send you a sign-in link.",
@@ -222,6 +226,10 @@ const nl: typeof en = {
       markBooked: "Markeer als geboekt",
       markLost: "Markeer als vervallen",
     },
+  },
+  sample: {
+    clientName: "Lisa (voorbeeld)",
+    message: "Hoi! We trouwen volgend jaar en je stijl spreekt ons erg aan. Zou je beschikbaar zijn, en wat zijn ongeveer de kosten?",
   },
   auth: {
     heading: "Inloggen",

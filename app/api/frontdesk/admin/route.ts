@@ -31,6 +31,8 @@ export async function GET(request: Request) {
     .select(
       "id, freelancer_id, source, src_channel, status, created_at, replied_at, freelancers(handle), drafts(kind, outcome, created_at)"
     )
+    // Practice data is not signal: samples never reach the founder's numbers.
+    .neq("source", "sample")
     .order("created_at", { ascending: false })
     .limit(200);
 
