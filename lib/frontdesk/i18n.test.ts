@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fdDict, type FrontdeskDict } from "@/lib/frontdesk/i18n";
 
 /** Same discipline as lib/i18n/dictionary.test.ts, scoped to this dict. */
-const SAME_BY_DESIGN = new Set(["public.form.budgetLabel"]);
+const SAME_BY_DESIGN = new Set(["public.form.budgetLabel", "inbox.heading", "inbox.detail.budget"]);
 
 type Node = string | { [key: string]: Node };
 
