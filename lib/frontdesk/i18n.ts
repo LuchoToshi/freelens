@@ -40,6 +40,11 @@ const en = {
       error: "Something went wrong. Please try again.",
       confirmation: "Thanks! {name} will get back to you personally.",
     },
+    notify: {
+      subject: "New inquiry from {name} — {type}, {date}",
+      noDate: "date unknown",
+      bodyLine: "Open your inbox to reply with the prepared draft.",
+    },
   },
 };
 
@@ -73,6 +78,11 @@ const nl: typeof en = {
       sending: "Versturen…",
       error: "Er ging iets mis. Probeer het nog een keer.",
       confirmation: "Dank je wel! {name} komt er persoonlijk bij je op terug.",
+    },
+    notify: {
+      subject: "Nieuwe aanvraag van {name} — {type}, {date}",
+      noDate: "datum onbekend",
+      bodyLine: "Open je inbox om te antwoorden met het klaargezette concept.",
     },
   },
 };
