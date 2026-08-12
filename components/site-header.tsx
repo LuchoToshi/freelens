@@ -42,11 +42,10 @@ function NavLink({
   );
 }
 
-const LINKS = [
-  { href: "/", key: "rebooking" },
-  { href: "/rekentools", key: "tools" },
-  { href: "/about", key: "about" },
-] as const;
+// The homepage sells one product (FrontDesk), so the primary nav carries no
+// second-product entries: the wordmark is the way home, the calculators and
+// rebooking surfaces keep their routes and their quiet footer links.
+const LINKS = [{ href: "/about", key: "about" }] as const;
 
 /**
  * Sticky from 420px up; below that it scrolls with the page and the links

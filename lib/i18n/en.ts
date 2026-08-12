@@ -137,9 +137,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "Freelens Rebooking: your past clients are your next booking",
+      title: "Freelens FrontDesk: stop losing jobs to a slow reply",
       description:
-        "For creative freelancers. Freelens remembers your past clients, knows when a message is worth sending, and drafts it in your voice. You press send. Private beta, onboarding the first 25. Free Dutch tax calculators included.",
+        "For creative freelancers — photographers, videographers, and others who book work by inquiry. Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
     },
     try: {
       title: "Try Freelens with 3 clients \u00b7 Freelens",
@@ -352,6 +352,35 @@ export const en = {
       done: "Noted. You will hear from us when the figures move, and not before.",
       error: "That did not go through. Check the address and try again.",
       privacyNote: "Stored for this one purpose, never shared, and every mail has an unsubscribe. Your calculations stay on your device either way.",
+    },
+
+    frontdesk: {
+      heroEyebrow: "FrontDesk",
+      heroTitle: "Stop losing jobs to a slow reply.",
+      heroSub:
+        "Every inquiry gets a fast, personal reply with your real prices — ready to send. You just tap send.",
+      heroCta: "Get early access",
+      waitlist: {
+        heading: "FrontDesk opens soon",
+        sub: "Get on the list and we'll email you when it's your turn. Signing up is free and commits you to nothing.",
+        nameLabel: "Your name",
+        namePlaceholder: "First name is fine",
+        emailLabel: "Your email",
+        emailPlaceholder: "you@example.com",
+        craftLabel: "What do you make?",
+        crafts: {
+          photographer: "Photographer",
+          videographer: "Videographer",
+          designer: "Designer",
+          illustrator: "Illustrator",
+          other: "Something else",
+        },
+        submit: "Get early access",
+        sending: "One moment",
+        done: "Almost there: open your inbox and click the confirmation link. That is how we know the address is yours.",
+        error: "That did not go through. Check the fields and try again.",
+        privacyNote: "Used only to tell you about FrontDesk. Confirmed by you, deleted on request, never shared.",
+      },
     },
 
     rebooking: {

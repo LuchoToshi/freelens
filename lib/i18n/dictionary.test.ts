@@ -46,6 +46,8 @@ describe("the Dutch dictionary covers the English one", () => {
       "meta.privacy.title",
       "privacyPage.eyebrow",
       "home.rebooking.waitlist.crafts.illustrator",
+      "home.frontdesk.heroEyebrow",
+      "home.frontdesk.waitlist.crafts.illustrator",
       "app.shell.eyebrow",
       "meta.home.title",
       "home.privacy.ariaLabel",

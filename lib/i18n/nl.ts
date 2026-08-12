@@ -140,9 +140,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "Freelens Rebooking: je oude klanten zijn je volgende boeking",
+      title: "Freelens FrontDesk: verlies geen klussen meer aan een traag antwoord",
       description:
-        "Voor creatieve freelancers. Freelens onthoudt je oude klanten, weet wanneer een berichtje het waard is, en schrijft het in jouw toon. Jij drukt op verzenden. Besloten b\u00e8ta, we onboarden de eerste 25. Gratis Nederlandse rekentools inbegrepen.",
+        "Voor creatieve freelancers \u2014 fotografen, videografen, en anderen die op aanvraag werken. Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
     },
     try: {
       title: "Probeer Freelens met 3 klanten \u00b7 Freelens",
@@ -346,6 +346,35 @@ export const nl: DeepPartial<typeof en> = {
       done: "Genoteerd. Je hoort van ons zodra de cijfers verschuiven, en niet eerder.",
       error: "Dat ging niet door. Controleer het adres en probeer het opnieuw.",
       privacyNote: "Alleen voor dit ene doel bewaard, nooit gedeeld, en elke mail heeft een afmeldlink. Je berekeningen blijven hoe dan ook op je apparaat.",
+    },
+
+    frontdesk: {
+      heroEyebrow: "FrontDesk",
+      heroTitle: "Verlies geen klussen meer aan een traag antwoord.",
+      heroSub:
+        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen — klaar om te versturen. Jij tikt alleen op verzenden.",
+      heroCta: "Zet me op de lijst",
+      waitlist: {
+        heading: "FrontDesk opent binnenkort",
+        sub: "Zet je op de lijst en we mailen je zodra je aan de beurt bent. Aanmelden is gratis en verplicht je tot niets.",
+        nameLabel: "Je naam",
+        namePlaceholder: "Voornaam is genoeg",
+        emailLabel: "Je e-mailadres",
+        emailPlaceholder: "jij@voorbeeld.nl",
+        craftLabel: "Wat maak je?",
+        crafts: {
+          photographer: "Fotograaf",
+          videographer: "Videograaf",
+          designer: "Ontwerper",
+          illustrator: "Illustrator",
+          other: "Iets anders",
+        },
+        submit: "Zet me op de lijst",
+        sending: "Momentje",
+        done: "Bijna: open je inbox en klik op de bevestigingslink. Zo weten we dat het adres van jou is.",
+        error: "Dat ging niet goed. Check de velden en probeer het nog eens.",
+        privacyNote: "Alleen gebruikt om je over FrontDesk te vertellen. Door jou bevestigd, op verzoek verwijderd, nooit gedeeld.",
+      },
     },
 
     rebooking: {

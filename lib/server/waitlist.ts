@@ -32,6 +32,8 @@ export interface WaitlistRecord {
   email: string;
   craft: Craft;
   locale: "en" | "nl";
+  /** Which list this signup is for. Absent on records written before FrontDesk. */
+  product?: "rebooking" | "frontdesk";
   requestedAt: string;
 }
 

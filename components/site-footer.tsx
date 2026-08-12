@@ -33,8 +33,10 @@ export function SiteFooter() {
 
   // A closing call to action that points at the page you are already reading is
   // not an action. On /tool the band keeps the wordmark and the trust line and
-  // drops the button.
-  const showCta = pathname !== "/tool";
+  // drops the button. On the homepage it drops too: the front door sells
+  // FrontDesk only, and a prominent button to the rebooking demo would put a
+  // second product on it.
+  const showCta = pathname !== "/tool" && pathname !== "/";
 
   return (
     <footer className="mt-auto bg-[var(--fl-ink)] text-white">

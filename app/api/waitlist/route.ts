@@ -83,12 +83,15 @@ export async function POST(request: Request) {
     return Response.json(GENERIC_OK);
   }
 
+  const product = b.product === "frontdesk" ? ("frontdesk" as const) : ("rebooking" as const);
+
   const record: WaitlistRecord = {
     id: randomUUID(),
     name,
     email,
     craft,
     locale,
+    product,
     requestedAt: new Date().toISOString(),
   };
 
@@ -103,17 +106,21 @@ export async function POST(request: Request) {
   }
 
   const confirmUrl = `${new URL(request.url).origin}/api/waitlist/confirm?token=${signToken(record.id)}`;
+  // The confirmation names the product the signup was for; a FrontDesk signup
+  // must never receive a Rebooking-branded mail.
+  const productName = product === "frontdesk" ? "FrontDesk van Freelens" : "Freelens Rebooking";
+  const productNameEn = product === "frontdesk" ? "FrontDesk by Freelens" : "Freelens Rebooking";
   const sent = await sendEmail(
     locale === "nl"
       ? {
           to: email,
           subject: "Bevestig je plek op de Freelens-wachtlijst",
-          html: `<p>Hoi ${escapeHtml(name)},</p><p>Nog één klik en je staat op de wachtlijst voor Freelens Rebooking. Zo weten we zeker dat dit adres van jou is.</p><p><a href="${confirmUrl}">Bevestig mijn aanmelding</a></p><p>Niet aangemeld? Dan kun je deze mail negeren; zonder bevestiging bewaren we niets blijvend.</p>`,
+          html: `<p>Hoi ${escapeHtml(name)},</p><p>Nog één klik en je staat op de wachtlijst voor ${productName}. Zo weten we zeker dat dit adres van jou is.</p><p><a href="${confirmUrl}">Bevestig mijn aanmelding</a></p><p>Niet aangemeld? Dan kun je deze mail negeren; zonder bevestiging bewaren we niets blijvend.</p>`,
         }
       : {
           to: email,
           subject: "Confirm your spot on the Freelens waitlist",
-          html: `<p>Hi ${escapeHtml(name)},</p><p>One click left and you are on the waitlist for Freelens Rebooking. This is how we know this address is yours.</p><p><a href="${confirmUrl}">Confirm my signup</a></p><p>Didn't sign up? Ignore this mail; without confirmation nothing is kept for good.</p>`,
+          html: `<p>Hi ${escapeHtml(name)},</p><p>One click left and you are on the waitlist for ${productNameEn}. This is how we know this address is yours.</p><p><a href="${confirmUrl}">Confirm my signup</a></p><p>Didn't sign up? Ignore this mail; without confirmation nothing is kept for good.</p>`,
         }
   );
   if (!sent) {
