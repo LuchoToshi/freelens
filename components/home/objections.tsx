@@ -2,13 +2,13 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { container } from "@/components/container";
-import { riseIn } from "@/components/home/home-motion";
+import { riseIn, stagger } from "@/components/home/home-motion";
 
 /**
- * Three objections as an editorial Q&A — numbered spreads with an offset
- * rhythm, not feature cards. The big Fraunces questions carry the section;
- * the answers stay quiet, constrained to a readable measure. Each spread
- * rises in once as it enters the viewport.
+ * Three objections as an editorial Q&A. Each spread layers the question over
+ * an oversized ghost numeral — depth from typography, not shadows — with an
+ * accent tick between question and answer and an alternating indent rhythm.
+ * Reveals are sequenced (numeral, question, tick, answer) and fire once.
  */
 export function Objections({ items }: { items: { q: string; a: string }[] }) {
   const reduce = useReducedMotion();
@@ -18,28 +18,43 @@ export function Objections({ items }: { items: { q: string; a: string }[] }) {
       {items.map((item, i) => (
         <motion.div
           key={item.q}
-          variants={riseIn(reduce)}
+          variants={stagger(reduce, 0.12)}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
-          className={`flex flex-col gap-4 border-t border-[var(--fd-line)] py-14 first:border-t-0 sm:py-20 ${
-            i === 1 ? "sm:pl-[14%]" : i === 2 ? "sm:pl-[7%]" : ""
+          className={`relative border-t border-[var(--fd-line)] py-16 first:border-t-0 sm:py-24 ${
+            i === 1 ? "sm:pl-[18%]" : i === 2 ? "sm:pl-[9%]" : ""
           }`}
         >
-          <div className="flex items-baseline gap-5">
-            <span
-              aria-hidden="true"
-              className="fl-tnum font-serif text-5xl font-medium leading-none text-[var(--fd-ink)]/15 sm:text-7xl"
+          <motion.span
+            aria-hidden="true"
+            variants={riseIn(reduce, 16)}
+            className={`pointer-events-none absolute top-6 select-none font-serif text-[7rem] font-semibold leading-none text-[var(--fd-ink)]/[0.07] sm:top-2 sm:text-[13rem] ${
+              i === 1 ? "left-0 sm:left-[18%]" : i === 2 ? "left-0 sm:left-[9%]" : "left-0"
+            }`}
+          >
+            0{i + 1}
+          </motion.span>
+
+          <div className="relative flex flex-col gap-5 pt-10 sm:pt-20">
+            <motion.h2
+              variants={riseIn(reduce)}
+              className="max-w-[18ch] font-serif text-[clamp(2.1rem,4.8vw,4.25rem)] font-medium leading-[1.02] tracking-tight text-[var(--fd-ink)]"
             >
-              0{i + 1}
-            </span>
-            <h2 className="max-w-[22ch] font-serif text-3xl font-medium leading-[1.05] tracking-tight text-[var(--fd-ink)] sm:text-5xl">
               {item.q}
-            </h2>
+            </motion.h2>
+            <motion.span
+              aria-hidden="true"
+              variants={riseIn(reduce, 8)}
+              className="h-[2px] w-10 bg-[var(--fd-accent)]"
+            />
+            <motion.p
+              variants={riseIn(reduce)}
+              className="max-w-xl text-lg leading-relaxed text-[var(--fd-slate)] sm:text-xl"
+            >
+              {item.a}
+            </motion.p>
           </div>
-          <p className="max-w-xl text-base leading-relaxed text-[var(--fd-slate)] sm:pl-[4.5rem] sm:text-lg">
-            {item.a}
-          </p>
         </motion.div>
       ))}
     </div>
