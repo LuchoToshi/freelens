@@ -3,9 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { primaryButtonClass } from "@/components/app/styles";
 import { CRAFTS, type Craft } from "@/lib/server/waitlist";
 import { track } from "@/lib/analytics";
 import { useLocale, useT } from "@/components/i18n/locale-provider";
@@ -16,7 +13,14 @@ import { useLocale, useT } from "@/components/i18n/locale-provider";
  * the signup is stored on the right list and the confirmation mail names the
  * right product. The craft picker doubles as the overflow capture: "Something
  * else" is how adjacent crafts tell us what they do.
+ *
+ * Editorial restyle: underline fields instead of boxes, sharp chips, accent
+ * submit. Every id, handler and payload byte is the pre-redesign plumbing.
  */
+const underlineField =
+  "w-full border-0 border-b border-[var(--fd-ink)]/30 bg-transparent pb-2 text-lg text-[var(--fd-ink)] placeholder:text-[var(--fd-slate)]/60 focus:border-[var(--fd-ink)] focus:outline-none";
+const fieldLabel = "text-xs font-semibold uppercase tracking-[0.2em] text-[var(--fd-slate)]";
+
 export function FrontdeskWaitlistForm() {
   const t = useT();
   const w = t.home.frontdesk.waitlist;
@@ -51,21 +55,21 @@ export function FrontdeskWaitlistForm() {
 
   if (state === "done") {
     return (
-      <p className="flex max-w-xl items-start gap-2 text-base font-medium leading-relaxed text-[var(--fl-ink)]">
-        <Check className="mt-1 size-4 shrink-0 text-[var(--fl-payout-text)]" aria-hidden="true" />
+      <p className="flex max-w-xl items-start gap-2 font-serif text-xl font-medium leading-relaxed text-[var(--fd-ink)]">
+        <Check className="mt-1.5 size-5 shrink-0 text-[var(--fd-accent)]" aria-hidden="true" />
         {w.done}
       </p>
     );
   }
 
   return (
-    <form onSubmit={submit} className="flex w-full max-w-xl flex-col gap-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="fd-wl-name" className="text-sm font-medium text-[var(--fl-ink)]">
+    <form onSubmit={submit} className="flex w-full max-w-xl flex-col gap-8">
+      <div className="grid gap-8 sm:grid-cols-2">
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="fd-wl-name" className={fieldLabel}>
             {w.nameLabel}
-          </Label>
-          <Input
+          </label>
+          <input
             id="fd-wl-name"
             type="text"
             required
@@ -74,14 +78,14 @@ export function FrontdeskWaitlistForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={w.namePlaceholder}
-            className="rounded-lg border border-[var(--fl-line-control)] bg-white"
+            className={underlineField}
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="fd-wl-email" className="text-sm font-medium text-[var(--fl-ink)]">
+        <div className="flex flex-col gap-2.5">
+          <label htmlFor="fd-wl-email" className={fieldLabel}>
             {w.emailLabel}
-          </Label>
-          <Input
+          </label>
+          <input
             id="fd-wl-email"
             type="email"
             required
@@ -89,13 +93,13 @@ export function FrontdeskWaitlistForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={w.emailPlaceholder}
-            className="rounded-lg border border-[var(--fl-line-control)] bg-white"
+            className={underlineField}
           />
         </div>
       </div>
 
-      <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-[var(--fl-ink)]">{w.craftLabel}</legend>
+      <fieldset className="flex flex-col gap-3">
+        <legend className={`${fieldLabel} mb-3`}>{w.craftLabel}</legend>
         <div className="flex flex-wrap gap-2">
           {CRAFTS.map((c) => (
             <button
@@ -103,19 +107,19 @@ export function FrontdeskWaitlistForm() {
               type="button"
               aria-pressed={craft === c}
               onClick={() => setCraft(c)}
-              className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+              className={`min-h-11 border px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-ink)] ${
                 craft === c
-                  ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                  : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+                  ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                  : "border-[var(--fd-ink)]/25 bg-transparent text-[var(--fd-ink)] hover:border-[var(--fd-ink)]"
               }`}
             >
               {w.crafts[c]}
             </button>
           ))}
         </div>
-        {/* Closes the loop from the overflow line above the card: at 390px the
+        {/* Closes the loop from the overflow line above the form: at 390px the
             name/email fields sit between them, so the chip needs its own hint. */}
-        <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{w.otherHint}</p>
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{w.otherHint}</p>
       </fieldset>
 
       {/* Honeypot — humans never see or reach this field. */}
@@ -134,7 +138,7 @@ export function FrontdeskWaitlistForm() {
       <button
         type="submit"
         disabled={state === "sending" || !craft}
-        className={`${primaryButtonClass} w-fit disabled:opacity-60`}
+        className="inline-flex min-h-14 w-fit items-center bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
       >
         {state === "sending" ? w.sending : w.submit}
       </button>
@@ -145,11 +149,11 @@ export function FrontdeskWaitlistForm() {
         </p>
       )}
 
-      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
+      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
         {w.privacyNote}{" "}
         <Link
           href="/privacy"
-          className="font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+          className="font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-ink)]/30 underline-offset-4 hover:decoration-[var(--fd-ink)]"
         >
           {t.common.nav.privacy}
         </Link>

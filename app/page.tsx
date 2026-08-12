@@ -1,56 +1,61 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { container } from "@/components/container";
 import { FrontdeskWaitlistForm } from "@/components/home/frontdesk-waitlist-form";
+import { HomeHero } from "@/components/home/hero";
+import { Objections } from "@/components/home/objections";
+import { FollowupHook } from "@/components/home/followup";
 import { WorkedExample } from "@/components/home/worked-example";
-import { primaryButtonClass } from "@/components/app/styles";
+import { riseIn } from "@/components/home/home-motion";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 /**
- * The FrontDesk front door. One product, one story.
+ * The FrontDesk front door — bold editorial cut.
  *
- * Freelens is the brand; FrontDesk is what this page sells. The word "AI"
- * appears nowhere above the trust line: the drafted reply on the page is the
- * pitch, the mechanism is named honestly at the bottom. The page never claims
- * the product sends anything by itself or knows anyone's calendar — the same
- * honesty rules that govern the drafts govern this copy.
+ * One product, one story, one token set: warm paper, near-black ink, burnt
+ * orange as the single accent, Fraunces at display scale, choreographed
+ * scroll reveals (framer-motion, transform/opacity only, once). Surface
+ * rhythm: paper hero → ink gallery (the worked example) → paper Q&A →
+ * accent band (the follow-up) → dim-paper capture → quiet trust line.
  *
- * The product is concierge-onboarded and pre-launch, so the primary CTA is
- * the early-access list (the existing double-opt-in waitlist), not the setup
- * wizard.
+ * The rules that govern the drafts govern this page: no "AI" above the trust
+ * line, no send/availability claims, no fabricated proof. The worked example
+ * is bold FRAME, calm CONTENT — its text never moves after arrival. All
+ * motion collapses under prefers-reduced-motion.
  */
+const FD_TOKENS = {
+  "--fd-paper": "#FAF8F4",
+  "--fd-paper-dim": "#F2EEE6",
+  "--fd-ink": "#1A1A1A",
+  "--fd-accent": "#E4572E",
+  "--fd-line": "#E5DFD3",
+  "--fd-slate": "#6E675C",
+} as React.CSSProperties;
+
 export default function Home() {
   const t = useT();
   const f = t.home.frontdesk;
+  const reduce = useReducedMotion();
   useDocumentTitle(t.meta.home.title, t.meta.home.description);
 
   return (
-    <main className="min-h-screen bg-[var(--fl-canvas)] text-[var(--fl-text)]">
-      {/* Hero: the pain, the promise, the list. */}
-      <section className={`${container} flex flex-col gap-6 py-14 sm:py-20`}>
-        <span className="inline-flex w-fit items-center rounded-full border border-[var(--fl-line)] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--fl-slate)]">
-          {f.heroEyebrow}
-        </span>
-        <h1 className="max-w-3xl font-serif text-4xl font-medium leading-[1.08] tracking-tight text-[var(--fl-ink)] sm:text-5xl lg:text-6xl">
-          {f.heroTitle}
-        </h1>
-        <p className="max-w-2xl text-lg leading-relaxed text-[var(--fl-slate)]">{f.heroSub}</p>
-        <a href="#early-access" className={`${primaryButtonClass} w-fit`}>
-          {f.heroCta}
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </a>
-      </section>
+    <main style={FD_TOKENS} className="min-h-screen bg-[var(--fd-paper)] text-[var(--fd-ink)]">
+      {/* 1 · The statement. */}
+      <HomeHero eyebrow={f.heroEyebrow} title={f.heroTitle} sub={f.heroSub} cta={f.heroCta} />
 
-      {/* The worked example: an inquiry, the reply beneath it. The pitch. */}
-      <section
-        aria-label={f.example.label}
-        className="border-t border-[var(--fl-line)] bg-white"
-      >
-        <div className={`${container} flex flex-col gap-6 py-16 sm:py-20`}>
-          <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+      {/* 2 · The worked example: an ink gallery wall around a calm, readable draft. */}
+      <section aria-label={f.example.label} className="bg-[var(--fd-ink)] text-white">
+        <div className={`${container} flex flex-col gap-12 py-24 sm:py-32`}>
+          <motion.h2
+            variants={riseIn(reduce)}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="max-w-[18ch] font-serif text-[clamp(2rem,5vw,3.75rem)] font-medium leading-[1.05] tracking-tight text-[var(--fd-paper)]"
+          >
             {f.example.label}
-          </h2>
+          </motion.h2>
           <WorkedExample data={f.example} />
         </div>
       </section>
@@ -61,70 +66,51 @@ export default function Home() {
         renders nothing until then.
       */}
 
-      {/* Three objections, answered in the order they surface. */}
-      <section
-        aria-label={f.objections.items[0].q}
-        className="border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
-      >
-        <div className={`${container} py-16 sm:py-20`}>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {f.objections.items.map((item) => (
-              <div
-                key={item.q}
-                className="flex flex-col gap-2 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-6"
-              >
-                <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">{item.q}</h2>
-                <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* 3 · Three objections, editorial Q&A. */}
+      <section aria-label={f.objections.items[0].q} className="py-8 sm:py-12">
+        <Objections items={f.objections.items} />
       </section>
 
-      {/* The follow-up hook: its own moment, the strongest treatment left. */}
-      <section
-        aria-label={f.followup.q}
-        className="border-t border-[var(--fl-line)] bg-[var(--fl-ink)] text-white"
-      >
-        <div className={`${container} flex flex-col gap-4 py-16 sm:py-20`}>
-          <h2 className="max-w-2xl font-serif text-3xl font-medium leading-tight sm:text-4xl">
-            {f.followup.q}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-[#9db4d1]">{f.followup.a}</p>
-        </div>
-      </section>
+      {/* 4 · The follow-up hook: the one accent-surface moment. */}
+      <FollowupHook q={f.followup.q} a={f.followup.a} />
 
-      {/* Who it's for, the overflow capture, and the list: the soft close. */}
+      {/* 5 · Who it's for + the early-access capture: the soft close. */}
       <section
         id="early-access"
         aria-label={f.waitlist.heading}
-        className="scroll-mt-16 border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
+        className="scroll-mt-16 bg-[var(--fd-paper-dim)]"
       >
-        <div className={`${container} flex flex-col gap-6 py-16 sm:py-20`}>
-          <div className="flex flex-col gap-3">
-            <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+        <motion.div
+          variants={riseIn(reduce)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className={`${container} flex flex-col gap-10 py-24 sm:py-32`}
+        >
+          <div className="flex flex-col gap-4">
+            <h2 className="max-w-[18ch] font-serif text-[clamp(2.2rem,5.5vw,4.5rem)] font-medium leading-[1.02] tracking-tight text-[var(--fd-ink)]">
               {f.waitlist.heading}
             </h2>
-            <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-ink)]">
+            <p className="max-w-2xl text-lg leading-relaxed text-[var(--fd-ink)]">
               {f.audience.line}
             </p>
-            <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--fd-slate)]">
               {f.waitlist.sub}
             </p>
             {/* Overflow capture: visually secondary, same form — the craft
                 picker's "something else" is how adjacent crafts answer. */}
-            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{f.audience.overflow}</p>
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{f.audience.overflow}</p>
           </div>
-          <div className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-7">
-            <FrontdeskWaitlistForm />
-          </div>
-        </div>
+          <FrontdeskWaitlistForm />
+        </motion.div>
       </section>
 
-      {/* The mechanism, named honestly — the only "AI" on the page. */}
-      <section aria-label={f.trust} className="border-t border-[var(--fl-line)] bg-white">
-        <div className={`${container} py-10 sm:py-12`}>
-          <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">{f.trust}</p>
+      {/* 6 · The mechanism, named honestly — the only "AI" on the page. */}
+      <section aria-label={f.trust} className="border-t border-[var(--fd-line)]">
+        <div className={`${container} py-12 sm:py-16`}>
+          <p className="mx-auto max-w-xl text-center text-sm leading-relaxed text-[var(--fd-slate)]">
+            {f.trust}
+          </p>
         </div>
       </section>
     </main>
