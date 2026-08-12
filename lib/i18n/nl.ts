@@ -366,6 +366,32 @@ export const nl: DeepPartial<typeof en> = {
           "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni — bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
         caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
       },
+      objections: {
+        items: [
+          {
+            q: "Klinkt het echt als jij?",
+            a: "Ja. Je plakt een paar van je eigen antwoorden, en FrontDesk leert je toon. Warm of zakelijk, kort of uitgebreid, met of zonder emoji: het schrijft zoals jij schrijft.",
+          },
+          {
+            q: "Verzint het prijzen of belooft het datums?",
+            a: "Nooit. Het gebruikt alleen de prijzen die jij instelt, en het zegt nooit dat een datum vrij is. Dat check je zelf.",
+          },
+          {
+            q: "Verlies ik de controle?",
+            a: "Nee. Er gaat niks weg zonder jou. Elk antwoord is één tik — vanuit jouw eigen inbox.",
+          },
+        ],
+      },
+      followup: {
+        q: "En als een klant stil valt?",
+        a: "Dan ligt de follow-up al klaar. Dat ene berichtje dat je eigenlijk nooit stuurt, is precies waar klussen terugkomen.",
+      },
+      audience: {
+        line: "Voor creatieve freelancers — fotografen, videografen, en anderen die op aanvraag werken.",
+        overflow: "Geen fotograaf of videograaf? Vertel ons wat je doet →",
+      },
+      trust:
+        "Antwoorden worden met AI opgesteld — jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",
       waitlist: {
         heading: "FrontDesk opent binnenkort",
         sub: "Zet je op de lijst en we mailen je zodra je aan de beurt bent. Aanmelden is gratis en verplicht je tot niets.",

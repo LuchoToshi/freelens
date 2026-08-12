@@ -61,24 +61,70 @@ export default function Home() {
         renders nothing until then.
       */}
 
-      {/* The early-access list: the one thing a visitor can do today. */}
+      {/* Three objections, answered in the order they surface. */}
+      <section
+        aria-label={f.objections.items[0].q}
+        className="border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
+      >
+        <div className={`${container} py-16 sm:py-20`}>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {f.objections.items.map((item) => (
+              <div
+                key={item.q}
+                className="flex flex-col gap-2 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-6"
+              >
+                <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">{item.q}</h2>
+                <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The follow-up hook: its own moment, the strongest treatment left. */}
+      <section
+        aria-label={f.followup.q}
+        className="border-t border-[var(--fl-line)] bg-[var(--fl-ink)] text-white"
+      >
+        <div className={`${container} flex flex-col gap-4 py-16 sm:py-20`}>
+          <h2 className="max-w-2xl font-serif text-3xl font-medium leading-tight sm:text-4xl">
+            {f.followup.q}
+          </h2>
+          <p className="max-w-2xl text-lg leading-relaxed text-[#9db4d1]">{f.followup.a}</p>
+        </div>
+      </section>
+
+      {/* Who it's for, the overflow capture, and the list: the soft close. */}
       <section
         id="early-access"
         aria-label={f.waitlist.heading}
         className="scroll-mt-16 border-t border-[var(--fl-line)] bg-[var(--fl-surface-stage)]"
       >
         <div className={`${container} flex flex-col gap-6 py-16 sm:py-20`}>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
               {f.waitlist.heading}
             </h2>
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-ink)]">
+              {f.audience.line}
+            </p>
             <p className="max-w-2xl text-base leading-relaxed text-[var(--fl-slate)]">
               {f.waitlist.sub}
             </p>
+            {/* Overflow capture: visually secondary, same form — the craft
+                picker's "something else" is how adjacent crafts answer. */}
+            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{f.audience.overflow}</p>
           </div>
           <div className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-line)] bg-white p-5 sm:p-7">
             <FrontdeskWaitlistForm />
           </div>
+        </div>
+      </section>
+
+      {/* The mechanism, named honestly — the only "AI" on the page. */}
+      <section aria-label={f.trust} className="border-t border-[var(--fl-line)] bg-white">
+        <div className={`${container} py-10 sm:py-12`}>
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--fl-slate)]">{f.trust}</p>
         </div>
       </section>
     </main>

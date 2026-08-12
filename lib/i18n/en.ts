@@ -372,6 +372,32 @@ export const en = {
           "Hi Lisa! Love that you're thinking of me for June 14 — weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
         caption: "Ready in ~20 seconds. Sent from your own inbox.",
       },
+      objections: {
+        items: [
+          {
+            q: "Does it really sound like you?",
+            a: "Yes. You paste a few of your own replies, and FrontDesk learns your tone. Warm or businesslike, short or detailed, emoji or no emoji: it writes the way you write.",
+          },
+          {
+            q: "Does it invent prices or promise dates?",
+            a: "Never. It only uses the prices you set, and it never says a date is free. You check that yourself.",
+          },
+          {
+            q: "Do I lose control?",
+            a: "No. Nothing goes out without you. Every reply is one tap — from your own inbox.",
+          },
+        ],
+      },
+      followup: {
+        q: "And when a client goes quiet?",
+        a: "The follow-up is already waiting. That one message you never quite get around to is exactly where jobs come back.",
+      },
+      audience: {
+        line: "For creative freelancers — photographers, videographers, and others who book work by inquiry.",
+        overflow: "Not a photographer or videographer? Tell us what you do →",
+      },
+      trust:
+        "Replies are drafted with AI — you approve and send every one yourself. Your client's email address is never sent to the AI.",
       waitlist: {
         heading: "FrontDesk opens soon",
         sub: "Get on the list and we'll email you when it's your turn. Signing up is free and commits you to nothing.",
