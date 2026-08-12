@@ -140,9 +140,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "Freelens FrontDesk: verlies geen klussen meer aan een traag antwoord",
+      title: "FrontDesk \u2014 verlies geen klussen meer aan een traag antwoord",
       description:
-        "Voor creatieve freelancers \u2014 fotografen, videografen, en anderen die op aanvraag werken. Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
+        "Voor creatieve freelancers zoals fotografen en videografen: elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen.",
     },
     try: {
       title: "Probeer Freelens met 3 klanten \u00b7 Freelens",
@@ -393,8 +393,8 @@ export const nl: DeepPartial<typeof en> = {
       trust:
         "Antwoorden worden met AI opgesteld — jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",
       waitlist: {
-        heading: "FrontDesk opent binnenkort",
-        sub: "Zet je op de lijst en we mailen je zodra je aan de beurt bent. Aanmelden is gratis en verplicht je tot niets.",
+        heading: "FrontDesk opent binnenkort.",
+        sub: "Zet je op de lijst en je bent er als eerste bij. Geen spam, alleen een berichtje als je aan de beurt bent.",
         nameLabel: "Je naam",
         namePlaceholder: "Voornaam is genoeg",
         emailLabel: "Je e-mailadres",
@@ -407,11 +407,12 @@ export const nl: DeepPartial<typeof en> = {
           illustrator: "Illustrator",
           other: "Iets anders",
         },
+        otherHint: "Kies dit als je iets anders doet.",
         submit: "Zet me op de lijst",
         sending: "Momentje",
-        done: "Bijna: open je inbox en klik op de bevestigingslink. Zo weten we dat het adres van jou is.",
-        error: "Dat ging niet goed. Check de velden en probeer het nog eens.",
-        privacyNote: "Alleen gebruikt om je over FrontDesk te vertellen. Door jou bevestigd, op verzoek verwijderd, nooit gedeeld.",
+        done: "Je staat op de lijst. We laten van ons horen.",
+        error: "Er ging iets mis. Probeer het zo nog eens.",
+        privacyNote: "We gebruiken je e-mailadres alleen om je op de hoogte te houden van FrontDesk. Uitschrijven kan altijd.",
       },
     },
 

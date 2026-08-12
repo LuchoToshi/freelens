@@ -106,23 +106,35 @@ export async function POST(request: Request) {
   }
 
   const confirmUrl = `${new URL(request.url).origin}/api/waitlist/confirm?token=${signToken(record.id)}`;
-  // The confirmation names the product the signup was for; a FrontDesk signup
-  // must never receive a Rebooking-branded mail.
-  const productName = product === "frontdesk" ? "FrontDesk van Freelens" : "Freelens Rebooking";
-  const productNameEn = product === "frontdesk" ? "FrontDesk by Freelens" : "Freelens Rebooking";
-  const sent = await sendEmail(
-    locale === "nl"
-      ? {
-          to: email,
-          subject: "Bevestig je plek op de Freelens-wachtlijst",
-          html: `<p>Hoi ${escapeHtml(name)},</p><p>Nog één klik en je staat op de wachtlijst voor ${productName}. Zo weten we zeker dat dit adres van jou is.</p><p><a href="${confirmUrl}">Bevestig mijn aanmelding</a></p><p>Niet aangemeld? Dan kun je deze mail negeren; zonder bevestiging bewaren we niets blijvend.</p>`,
-        }
-      : {
-          to: email,
-          subject: "Confirm your spot on the Freelens waitlist",
-          html: `<p>Hi ${escapeHtml(name)},</p><p>One click left and you are on the waitlist for ${productNameEn}. This is how we know this address is yours.</p><p><a href="${confirmUrl}">Confirm my signup</a></p><p>Didn't sign up? Ignore this mail; without confirmation nothing is kept for good.</p>`,
-        }
-  );
+  // Two different mails on purpose. The rebooking one is the double-opt-in
+  // confirm with the link. The FrontDesk one is the founder-approved welcome:
+  // it names no confirm link, so a FrontDesk signup completes on submit as far
+  // as the reader is concerned — the record itself still lands as pending.
+  const mail =
+    product === "frontdesk"
+      ? locale === "nl"
+        ? {
+            to: email,
+            subject: "Je staat op de lijst voor FrontDesk",
+            html: `<p>Hoi,</p><p>Bedankt voor je aanmelding. Je staat op de lijst voor FrontDesk — de snelste manier voor creatieve freelancers om elke aanvraag persoonlijk te beantwoorden, met je eigen prijzen, klaar om te versturen.</p><p>We laten van ons horen zodra je aan de beurt bent.</p><p>Freelens</p>`,
+          }
+        : {
+            to: email,
+            subject: "You're on the FrontDesk early list",
+            html: `<p>Hi,</p><p>Thanks for signing up. You're on the early list for FrontDesk — the fastest way for creative freelancers to answer every inquiry personally, with your own prices, ready to send.</p><p>We'll be in touch as soon as it's your turn.</p><p>Freelens</p>`,
+          }
+      : locale === "nl"
+        ? {
+            to: email,
+            subject: "Bevestig je plek op de Freelens-wachtlijst",
+            html: `<p>Hoi ${escapeHtml(name)},</p><p>Nog één klik en je staat op de wachtlijst voor Freelens Rebooking. Zo weten we zeker dat dit adres van jou is.</p><p><a href="${confirmUrl}">Bevestig mijn aanmelding</a></p><p>Niet aangemeld? Dan kun je deze mail negeren; zonder bevestiging bewaren we niets blijvend.</p>`,
+          }
+        : {
+            to: email,
+            subject: "Confirm your spot on the Freelens waitlist",
+            html: `<p>Hi ${escapeHtml(name)},</p><p>One click left and you are on the waitlist for Freelens Rebooking. This is how we know this address is yours.</p><p><a href="${confirmUrl}">Confirm my signup</a></p><p>Didn't sign up? Ignore this mail; without confirmation nothing is kept for good.</p>`,
+          };
+  const sent = await sendEmail(mail);
   if (!sent) {
     // Stored as pending; the confirmation cannot arrive until the provider is
     // configured. Logged without the address, answered generically.

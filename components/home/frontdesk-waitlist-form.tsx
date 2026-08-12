@@ -113,6 +113,9 @@ export function FrontdeskWaitlistForm() {
             </button>
           ))}
         </div>
+        {/* Closes the loop from the overflow line above the card: at 390px the
+            name/email fields sit between them, so the chip needs its own hint. */}
+        <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{w.otherHint}</p>
       </fieldset>
 
       {/* Honeypot — humans never see or reach this field. */}

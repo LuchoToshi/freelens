@@ -137,9 +137,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "Freelens FrontDesk: stop losing jobs to a slow reply",
+      title: "FrontDesk — stop losing jobs to a slow reply",
       description:
-        "For creative freelancers — photographers, videographers, and others who book work by inquiry. Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
+        "For creative freelancers like photographers and videographers: every inquiry gets a fast, personal reply with your real prices, ready to send.",
     },
     try: {
       title: "Try Freelens with 3 clients \u00b7 Freelens",
@@ -399,8 +399,8 @@ export const en = {
       trust:
         "Replies are drafted with AI — you approve and send every one yourself. Your client's email address is never sent to the AI.",
       waitlist: {
-        heading: "FrontDesk opens soon",
-        sub: "Get on the list and we'll email you when it's your turn. Signing up is free and commits you to nothing.",
+        heading: "FrontDesk is opening soon.",
+        sub: "Get on the list and you'll be first in. No spam — just a note when it's your turn.",
         nameLabel: "Your name",
         namePlaceholder: "First name is fine",
         emailLabel: "Your email",
@@ -413,11 +413,12 @@ export const en = {
           illustrator: "Illustrator",
           other: "Something else",
         },
+        otherHint: "Pick this if you do something else.",
         submit: "Get early access",
         sending: "One moment",
-        done: "Almost there: open your inbox and click the confirmation link. That is how we know the address is yours.",
-        error: "That did not go through. Check the fields and try again.",
-        privacyNote: "Used only to tell you about FrontDesk. Confirmed by you, deleted on request, never shared.",
+        done: "You're on the list. We'll be in touch.",
+        error: "Something went wrong. Please try again in a moment.",
+        privacyNote: "We only use your email to keep you posted about FrontDesk. You can unsubscribe anytime.",
       },
     },
 
