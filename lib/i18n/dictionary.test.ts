@@ -48,6 +48,8 @@ describe("the Dutch dictionary covers the English one", () => {
       "home.rebooking.waitlist.crafts.illustrator",
       "home.frontdesk.heroEyebrow",
       "home.frontdesk.waitlist.crafts.illustrator",
+      // A first name is not copy; the mock client is Lisa in both languages.
+      "home.frontdesk.example.clientName",
       "app.shell.eyebrow",
       "meta.home.title",
       "home.privacy.ariaLabel",

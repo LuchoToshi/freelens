@@ -360,6 +360,18 @@ export const en = {
       heroSub:
         "Every inquiry gets a fast, personal reply with your real prices — ready to send. You just tap send.",
       heroCta: "Get early access",
+      example: {
+        label: "This is what one inquiry looks like.",
+        inquiryLabel: "Inquiry",
+        clientName: "Lisa",
+        eventType: "Wedding",
+        eventDate: "June 14, 2026",
+        budget: "€1,000–2,500",
+        draftLabel: "The reply",
+        draft:
+          "Hi Lisa! Love that you're thinking of me for June 14 — weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
+        caption: "Ready in ~20 seconds. Sent from your own inbox.",
+      },
       waitlist: {
         heading: "FrontDesk opens soon",
         sub: "Get on the list and we'll email you when it's your turn. Signing up is free and commits you to nothing.",

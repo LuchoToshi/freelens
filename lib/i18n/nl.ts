@@ -354,6 +354,18 @@ export const nl: DeepPartial<typeof en> = {
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen — klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
+      example: {
+        label: "Zo ziet één aanvraag eruit.",
+        inquiryLabel: "Aanvraag",
+        clientName: "Lisa",
+        eventType: "Bruiloft",
+        eventDate: "14 juni 2026",
+        budget: "€1.000–2.500",
+        draftLabel: "Het antwoord",
+        draft:
+          "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni — bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
+        caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
+      },
       waitlist: {
         heading: "FrontDesk opent binnenkort",
         sub: "Zet je op de lijst en we mailen je zodra je aan de beurt bent. Aanmelden is gratis en verplicht je tot niets.",

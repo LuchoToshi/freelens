@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { container } from "@/components/container";
 import { FrontdeskWaitlistForm } from "@/components/home/frontdesk-waitlist-form";
+import { WorkedExample } from "@/components/home/worked-example";
 import { primaryButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
@@ -40,6 +41,25 @@ export default function Home() {
           <ArrowRight className="size-4" aria-hidden="true" />
         </a>
       </section>
+
+      {/* The worked example: an inquiry, the reply beneath it. The pitch. */}
+      <section
+        aria-label={f.example.label}
+        className="border-t border-[var(--fl-line)] bg-white"
+      >
+        <div className={`${container} flex flex-col gap-6 py-16 sm:py-20`}>
+          <h2 className="font-serif text-3xl font-medium leading-tight tracking-tight text-[var(--fl-ink)] sm:text-4xl">
+            {f.example.label}
+          </h2>
+          <WorkedExample data={f.example} />
+        </div>
+      </section>
+
+      {/*
+        Placeholder: a real receipt goes here once one exists — a named tester,
+        a real booked job, a real number. Nothing fabricated ships; this slot
+        renders nothing until then.
+      */}
 
       {/* The early-access list: the one thing a visitor can do today. */}
       <section
