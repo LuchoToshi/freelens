@@ -116,12 +116,12 @@ export async function POST(request: Request) {
         ? {
             to: email,
             subject: "Je staat op de lijst voor FrontDesk",
-            html: `<p>Hoi,</p><p>Bedankt voor je aanmelding. Je staat op de lijst voor FrontDesk — de snelste manier voor creatieve freelancers om elke aanvraag persoonlijk te beantwoorden, met je eigen prijzen, klaar om te versturen.</p><p>We laten van ons horen zodra je aan de beurt bent.</p><p>Freelens</p>`,
+            html: `<p>Hoi,</p><p>Bedankt voor je aanmelding. Je staat op de lijst voor FrontDesk, de snelste manier voor creatieve freelancers om elke aanvraag persoonlijk te beantwoorden, met je eigen prijzen, klaar om te versturen.</p><p>We laten van ons horen zodra je aan de beurt bent.</p><p>Freelens</p>`,
           }
         : {
             to: email,
             subject: "You're on the FrontDesk early list",
-            html: `<p>Hi,</p><p>Thanks for signing up. You're on the early list for FrontDesk — the fastest way for creative freelancers to answer every inquiry personally, with your own prices, ready to send.</p><p>We'll be in touch as soon as it's your turn.</p><p>Freelens</p>`,
+            html: `<p>Hi,</p><p>Thanks for signing up. You're on the early list for FrontDesk, the fastest way for creative freelancers to answer every inquiry personally, with your own prices, ready to send.</p><p>We'll be in touch as soon as it's your turn.</p><p>Freelens</p>`,
           }
       : locale === "nl"
         ? {

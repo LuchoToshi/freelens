@@ -140,9 +140,9 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "FrontDesk \u2014 verlies geen klussen meer aan een traag antwoord",
+      title: "FrontDesk: verlies geen klussen meer aan een traag antwoord",
       description:
-        "Voor creatieve freelancers zoals fotografen en videografen: elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen.",
+        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Gebouwd voor creatieve freelancers zoals fotografen, videografen, designers en illustratoren.",
     },
     try: {
       title: "Probeer Freelens met 3 klanten \u00b7 Freelens",
@@ -352,7 +352,7 @@ export const nl: DeepPartial<typeof en> = {
       heroEyebrow: "FrontDesk",
       heroTitle: "Verlies geen klussen meer aan een traag antwoord.",
       heroSub:
-        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen — klaar om te versturen. Jij tikt alleen op verzenden.",
+        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
       example: {
         label: "Zo ziet één aanvraag eruit.",
@@ -363,7 +363,7 @@ export const nl: DeepPartial<typeof en> = {
         budget: "€1.000–2.500",
         draftLabel: "Het antwoord",
         draft:
-          "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni — bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
+          "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
         caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
       },
       objections: {
@@ -378,7 +378,7 @@ export const nl: DeepPartial<typeof en> = {
           },
           {
             q: "Verlies ik de controle?",
-            a: "Nee. Er gaat niks weg zonder jou. Elk antwoord is één tik — vanuit jouw eigen inbox.",
+            a: "Nee. Er gaat niks weg zonder jou. Elk antwoord is één tik, vanuit jouw eigen inbox.",
           },
         ],
       },
@@ -387,8 +387,8 @@ export const nl: DeepPartial<typeof en> = {
         a: "Dan ligt de follow-up al klaar. Dat ene berichtje dat je eigenlijk nooit stuurt, is precies waar klussen terugkomen.",
       },
       audience: {
-        line: "Voor creatieve freelancers — fotografen, videografen, en anderen die op aanvraag werken.",
-        overflow: "Geen fotograaf of videograaf? Vertel ons wat je doet →",
+        line: "Voor creatieve freelancers: fotografen, videografen, designers, illustratoren en iedereen die op aanvraag werkt.",
+        overflow: "Doe je iets anders? Vertel ons wat je maakt →",
       },
       trust:
         "Antwoorden worden met AI opgesteld. Jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",

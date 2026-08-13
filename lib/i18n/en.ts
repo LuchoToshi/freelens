@@ -137,9 +137,9 @@ export const en = {
 
   meta: {
     home: {
-      title: "FrontDesk — stop losing jobs to a slow reply",
+      title: "FrontDesk: stop losing jobs to a slow reply",
       description:
-        "For creative freelancers like photographers and videographers: every inquiry gets a fast, personal reply with your real prices, ready to send.",
+        "Every inquiry gets a fast, personal reply with your real prices, ready to send. Built for creative freelancers such as photographers, videographers, designers and illustrators.",
     },
     try: {
       title: "Try Freelens with 3 clients \u00b7 Freelens",
@@ -358,7 +358,7 @@ export const en = {
       heroEyebrow: "FrontDesk",
       heroTitle: "Stop losing jobs to a slow reply.",
       heroSub:
-        "Every inquiry gets a fast, personal reply with your real prices — ready to send. You just tap send.",
+        "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
       example: {
         label: "This is what one inquiry looks like.",
@@ -369,7 +369,7 @@ export const en = {
         budget: "€1,000–2,500",
         draftLabel: "The reply",
         draft:
-          "Hi Lisa! Love that you're thinking of me for June 14 — weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
+          "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
         caption: "Ready in ~20 seconds. Sent from your own inbox.",
       },
       objections: {
@@ -384,7 +384,7 @@ export const en = {
           },
           {
             q: "Do I lose control?",
-            a: "No. Nothing goes out without you. Every reply is one tap — from your own inbox.",
+            a: "No. Nothing goes out without you. Every reply is one tap, from your own inbox.",
           },
         ],
       },
@@ -393,14 +393,14 @@ export const en = {
         a: "The follow-up is already waiting. That one message you never quite get around to is exactly where jobs come back.",
       },
       audience: {
-        line: "For creative freelancers — photographers, videographers, and others who book work by inquiry.",
-        overflow: "Not a photographer or videographer? Tell us what you do →",
+        line: "For creative freelancers: photographers, videographers, designers, illustrators, and anyone else who books work by inquiry.",
+        overflow: "Do something else? Tell us what you make →",
       },
       trust:
         "Replies are drafted with AI. You approve and send every one yourself. Your client's email address is never sent to the AI.",
       waitlist: {
         heading: "FrontDesk is opening soon.",
-        sub: "Get on the list and you'll be first in. No spam — just a note when it's your turn.",
+        sub: "Get on the list and you'll be first in. No spam, just a note when it's your turn.",
         nameLabel: "Your name",
         namePlaceholder: "First name is fine",
         emailLabel: "Your email",
