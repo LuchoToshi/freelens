@@ -64,23 +64,9 @@ export function FrontdeskWaitlistForm() {
 
   return (
     <form onSubmit={submit} className="flex w-full max-w-xl flex-col gap-8">
-      <div className="grid gap-8 sm:grid-cols-2">
-        <div className="flex flex-col gap-2.5">
-          <label htmlFor="fd-wl-name" className={fieldLabel}>
-            {w.nameLabel}
-          </label>
-          <input
-            id="fd-wl-name"
-            type="text"
-            required
-            maxLength={80}
-            autoComplete="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={w.namePlaceholder}
-            className={underlineField}
-          />
-        </div>
+      {/* The email line is the moment: one oversized underline field, the
+          name tucked beneath it. Same fields, same ids, same payload. */}
+      <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2.5">
           <label htmlFor="fd-wl-email" className={fieldLabel}>
             {w.emailLabel}
@@ -93,6 +79,22 @@ export function FrontdeskWaitlistForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={w.emailPlaceholder}
+            className={`${underlineField} text-xl sm:text-2xl`}
+          />
+        </div>
+        <div className="flex flex-col gap-2.5 sm:max-w-xs">
+          <label htmlFor="fd-wl-name" className={fieldLabel}>
+            {w.nameLabel}
+          </label>
+          <input
+            id="fd-wl-name"
+            type="text"
+            required
+            maxLength={80}
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={w.namePlaceholder}
             className={underlineField}
           />
         </div>
