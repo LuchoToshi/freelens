@@ -138,7 +138,7 @@ export function FrontdeskWaitlistForm() {
       <button
         type="submit"
         disabled={state === "sending" || !craft}
-        className="inline-flex min-h-14 w-fit items-center bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
+        className="inline-flex min-h-14 w-fit items-center bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
       >
         {state === "sending" ? w.sending : w.submit}
       </button>

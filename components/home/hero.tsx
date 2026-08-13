@@ -94,28 +94,32 @@ export function HomeHero({
           className="h-[3px] w-24 origin-left bg-[var(--fd-accent)]"
         />
 
-        <motion.p
-          variants={riseIn(reduce)}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: reduce ? 0 : 0.5 }}
-          className="max-w-xl text-lg leading-relaxed text-[var(--fd-slate)] sm:text-xl"
-        >
-          {sub}
-        </motion.p>
-
-        <motion.div variants={riseIn(reduce)} initial="hidden" animate="visible">
-          <a
-            href="#early-access"
-            className="group inline-flex min-h-14 items-center gap-3 bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
+        {/* The editorial counter-move: promise and action step off the left
+            rail the headline owns, into their own offset column. */}
+        <div className="flex flex-col gap-8 lg:ml-[38%]">
+          <motion.p
+            variants={riseIn(reduce)}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: reduce ? 0 : 0.5 }}
+            className="max-w-xl text-lg leading-relaxed text-[var(--fd-slate)] sm:text-xl"
           >
-            {cta}
-            <ArrowRight
-              className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-              aria-hidden="true"
-            />
-          </a>
-        </motion.div>
+            {sub}
+          </motion.p>
+
+          <motion.div variants={riseIn(reduce)} initial="hidden" animate="visible">
+            <a
+              href="#early-access"
+              className="group inline-flex min-h-14 items-center gap-3 bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
+            >
+              {cta}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+                aria-hidden="true"
+              />
+            </a>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
