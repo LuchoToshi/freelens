@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isFrontdeskPath, isValidHandle } from "@/lib/frontdesk/handles";
+import { chromeVariant, isFrontdeskPath, isValidHandle } from "@/lib/frontdesk/handles";
 
 describe("handles", () => {
   it("accepts normal handles", () => {
@@ -30,5 +30,21 @@ describe("handles", () => {
     expect(isFrontdeskPath("/try")).toBe(false);
     expect(isFrontdeskPath("/demo-emma/extra")).toBe(false);
     expect(isFrontdeskPath("/Not-A-Handle")).toBe(false);
+  });
+
+  it("classifies chrome variants from one source", () => {
+    // App surfaces: no chrome at all.
+    for (const p of ["/inbox", "/setup", "/admin", "/demo-emma"]) {
+      expect(chromeVariant(p), p).toBe("app");
+    }
+    // FrontDesk marketing pages get the FrontDesk footer.
+    expect(chromeVariant("/")).toBe("frontdesk");
+    expect(chromeVariant("/about")).toBe("frontdesk");
+    // Known legacy routes keep the original footer.
+    for (const p of ["/rekentools", "/tarief", "/tool", "/offertes", "/accuracy", "/methodology", "/try", "/privacy"]) {
+      expect(chromeVariant(p), p).toBe("legacy");
+    }
+    // Unknown routes default to legacy, never to the FrontDesk variant.
+    expect(chromeVariant("/some/unknown/route")).toBe("legacy");
   });
 });

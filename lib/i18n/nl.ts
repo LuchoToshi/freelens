@@ -391,7 +391,7 @@ export const nl: DeepPartial<typeof en> = {
         overflow: "Geen fotograaf of videograaf? Vertel ons wat je doet →",
       },
       trust:
-        "Antwoorden worden met AI opgesteld — jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",
+        "Antwoorden worden met AI opgesteld. Jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",
       waitlist: {
         heading: "FrontDesk opent binnenkort.",
         sub: "Zet je op de lijst en je bent er als eerste bij. Geen spam, alleen een berichtje als je aan de beurt bent.",

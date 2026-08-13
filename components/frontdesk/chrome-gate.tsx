@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { isFrontdeskPath } from "@/lib/frontdesk/handles";
+import { chromeVariant } from "@/lib/frontdesk/handles";
 
 /**
  * Keeps the Freelens site chrome off FrontDesk surfaces.
@@ -13,6 +13,6 @@ import { isFrontdeskPath } from "@/lib/frontdesk/handles";
  */
 export function ChromeGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (isFrontdeskPath(pathname ?? "")) return null;
+  if (chromeVariant(pathname ?? "") === "app") return null;
   return <>{children}</>;
 }

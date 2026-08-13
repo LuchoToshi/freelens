@@ -397,7 +397,7 @@ export const en = {
         overflow: "Not a photographer or videographer? Tell us what you do →",
       },
       trust:
-        "Replies are drafted with AI — you approve and send every one yourself. Your client's email address is never sent to the AI.",
+        "Replies are drafted with AI. You approve and send every one yourself. Your client's email address is never sent to the AI.",
       waitlist: {
         heading: "FrontDesk is opening soon.",
         sub: "Get on the list and you'll be first in. No spam — just a note when it's your turn.",

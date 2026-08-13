@@ -47,3 +47,24 @@ export function isFrontdeskPath(pathname: string): boolean {
   if (first === "inbox" || first === "setup" || first === "admin") return true;
   return isValidHandle(first);
 }
+
+/**
+ * The single route-classification source for site chrome. Register new
+ * routes here — nowhere else.
+ *
+ *   "app"       → FrontDesk product surfaces (/[handle], /inbox, /setup,
+ *                 /admin): no Freelens chrome at all (ChromeGate).
+ *   "frontdesk" → FrontDesk marketing pages: FrontDesk footer variant
+ *                 (wordmark, About, Privacy, trust line).
+ *   "legacy"    → everything else, including unknown routes: the original
+ *                 Freelens footer with the calculator links and tax strip.
+ */
+export type ChromeVariant = "app" | "frontdesk" | "legacy";
+
+const FRONTDESK_MARKETING_PATHS = new Set(["/", "/about"]);
+
+export function chromeVariant(pathname: string): ChromeVariant {
+  if (isFrontdeskPath(pathname)) return "app";
+  if (FRONTDESK_MARKETING_PATHS.has(pathname)) return "frontdesk";
+  return "legacy";
+}

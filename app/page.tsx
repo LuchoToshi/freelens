@@ -105,14 +105,8 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* 6 · The mechanism, named honestly — the only "AI" on the page. */}
-      <section aria-label={f.trust} className="border-t border-[var(--fd-line)]">
-        <div className={`${container} py-12 sm:py-16`}>
-          <p className="mx-auto max-w-xl text-center text-sm leading-relaxed text-[var(--fd-slate)]">
-            {f.trust}
-          </p>
-        </div>
-      </section>
+      {/* 6 · The trust line renders in the FrontDesk footer variant — the
+          mechanism named honestly, exactly once per page. */}
     </main>
   );
 }
