@@ -366,6 +366,44 @@ export const nl: DeepPartial<typeof en> = {
           "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
         caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
       },
+      demo: {
+        types: {
+          wedding: {
+            label: "Bruiloft",
+            clientName: "Lisa",
+            eventDate: "14 juni 2026",
+            budget: "€1.000–2.500",
+            draft:
+              "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
+          },
+          party: {
+            label: "Feest",
+            clientName: "Sanne",
+            eventDate: "21 maart 2026",
+            budget: "€500–1.000",
+            draft:
+              "Hoi Sanne! Wat leuk, een feest vastleggen is altijd goud: echte momenten, geen poses. Vertel me iets meer over wat jullie vieren en hoe groot het gezelschap is, dan denk ik met je mee over de aanpak. Voor feesten stel ik het pakket meestal op maat samen, afhankelijk van het aantal uren en wat je met de foto's wilt. Ik check de datum graag even. Zullen we deze week kort bellen of mailen? — Emma",
+          },
+          business: {
+            label: "Zakelijk",
+            clientName: "Mark",
+            eventDate: "9 april 2026",
+            budget: "€1.000–2.500",
+            draft:
+              "Hoi Mark! Goed om van je te horen. Zakelijke shoots doe ik regelmatig, van teamportretten tot beeld voor je website, en ik hoor graag wat jullie precies zoeken. Vertel me iets over jullie merk en waar de foto's voor bedoeld zijn, dan maak ik een voorstel op maat dat past bij jullie doel en budget. De datum check ik graag even. Zal ik je deze week bellen om het door te nemen? — Emma",
+          },
+          portrait: {
+            label: "Portret",
+            clientName: "Nadia",
+            eventDate: "2 mei 2026",
+            budget: "€250–500",
+            draft:
+              "Hoi Nadia! Leuk dat je een portretshoot wilt plannen. Een goede portretsessie voelt meer als een goed gesprek dan als een fotoshoot, en dat zie je terug in de beelden. Voor een portretsessie werk ik met een pakket vanaf €350, inclusief nabewerking van de beste foto's. Vertel me iets over waar de portretten voor zijn, dan stem ik de aanpak daarop af. Ik check de datum graag even. Wanneer schikt het jou? — Emma",
+          },
+        },
+        caption: "Klaar in ongeveer 20 seconden. Verstuurd vanuit je eigen inbox.",
+        bridge: "Zo werkt het straks met jouw prijzen en jouw stijl.",
+      },
       objections: {
         items: [
           {

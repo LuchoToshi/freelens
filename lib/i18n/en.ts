@@ -372,6 +372,44 @@ export const en = {
           "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
         caption: "Ready in ~20 seconds. Sent from your own inbox.",
       },
+      demo: {
+        types: {
+          wedding: {
+            label: "Wedding",
+            clientName: "Lisa",
+            eventDate: "June 14, 2026",
+            budget: "€1,000–2,500",
+            draft:
+              "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
+          },
+          party: {
+            label: "Party",
+            clientName: "Sophie",
+            eventDate: "March 21, 2026",
+            budget: "€500–1,000",
+            draft:
+              "Hi Sophie! A party is my favourite kind of shoot: real moments, no posing. Tell me a little more about what you're celebrating and how many people are coming, and I'll think along with you on the approach. For parties I usually put a package together to fit, depending on the hours and what you want to do with the photos. I'd love to check the date. Shall we hop on a quick call this week? — Emma",
+          },
+          business: {
+            label: "Business",
+            clientName: "James",
+            eventDate: "April 9, 2026",
+            budget: "€1,000–2,500",
+            draft:
+              "Hi James! Great to hear from you. I shoot business work regularly, from team portraits to imagery for your website, and I'd love to hear what you're after. Tell me a bit about your brand and where the photos will live, and I'll put together a proposal that fits your goal and budget. I'd be happy to check the date. Shall I give you a call this week to talk it through? — Emma",
+          },
+          portrait: {
+            label: "Portrait",
+            clientName: "Amber",
+            eventDate: "May 2, 2026",
+            budget: "€250–500",
+            draft:
+              "Hi Amber! Lovely that you want to plan a portrait session. A good portrait session feels more like a good conversation than a photo shoot, and you can see that in the images. For portraits I work with a package from €350, editing of the best photos included. Tell me a little about what the portraits are for and I'll shape the session around it. I'd love to check the date. When works for you? — Emma",
+          },
+        },
+        caption: "Ready in about 20 seconds. Sent from your own inbox.",
+        bridge: "This is how it will work with your prices and your style.",
+      },
       objections: {
         items: [
           {

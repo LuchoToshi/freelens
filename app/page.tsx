@@ -56,7 +56,11 @@ export default function Home() {
           >
             {f.example.label}
           </motion.h2>
-          <WorkedExample data={f.example} />
+          <WorkedExample
+            demo={f.demo}
+            inquiryLabel={f.example.inquiryLabel}
+            draftLabel={f.example.draftLabel}
+          />
         </div>
       </section>
 

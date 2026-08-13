@@ -50,6 +50,9 @@ describe("the Dutch dictionary covers the English one", () => {
       "home.frontdesk.waitlist.crafts.illustrator",
       // A first name is not copy; the mock client is Lisa in both languages.
       "home.frontdesk.example.clientName",
+      "home.frontdesk.demo.types.wedding.clientName",
+      // A number range with no thousands separator reads the same in both.
+      "home.frontdesk.demo.types.portrait.budget",
       "app.shell.eyebrow",
       "meta.home.title",
       "home.privacy.ariaLabel",

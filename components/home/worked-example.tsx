@@ -1,38 +1,70 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ExampleBadge } from "@/components/example-badge";
-import { riseIn, stagger } from "@/components/home/home-motion";
+import { EASE, riseIn, stagger } from "@/components/home/home-motion";
 
 /**
- * The centerpiece: bold FRAME, calm CONTENT. The frame is an ink gallery
- * wall — the darkest, most dramatic surface on the page — and the reveal is a
- * single choreographed rise. The inquiry card and the drafted reply inside
- * stay white, sharp and perfectly still: seeing and READING the draft is the
- * conversion, so nothing ever moves or obscures the text after arrival.
+ * The centerpiece, now interactive: pick an event type, see the inquiry and
+ * the drafted reply swap. An INTERACTIVE CANNED demo by deliberate decision:
+ * every pair is pre-written dictionary copy, checked in the test suite
+ * against the product's real draft guards. No API calls, no per-visit cost,
+ * no latency, no abuse surface. The live-generation version is explicitly
+ * out of scope.
  *
- * Static and presentational on purpose: hardcoded dictionary copy marked with
- * the Example badge, never the live pipeline. The renderer takes a data
- * object, so a later interactive demo (pick an event type, a draft forms up)
- * only swaps the object.
+ * Bold FRAME, calm CONTENT still holds: the swap is one brief reveal (blur
+ * settling into place, so it feels generated), and after it the text is
+ * perfectly still and legible. Reduced motion swaps instantly. The reply
+ * card carries a min-height sized to the longest draft so switching never
+ * shifts the layout below.
  *
- * The draft models the product's honesty rules in the marketing itself: it
- * names a real package price and makes zero availability claims ("I'd love to
- * check the date", never "that date is open"). Do not alter that balance.
+ * Honesty rules, load-bearing: wedding names €1.950 and portrait €350
+ * because matching packages exist; party and business name none; no draft
+ * ever claims a date is free. The Example badge persists across all chips.
+ * Do not alter that balance.
  */
-export interface WorkedExampleData {
-  inquiryLabel: string;
+export interface DemoType {
+  label: string;
   clientName: string;
-  eventType: string;
   eventDate: string;
   budget: string;
-  draftLabel: string;
   draft: string;
-  caption: string;
 }
 
-export function WorkedExample({ data }: { data: WorkedExampleData }) {
+export interface WorkedExampleDemo {
+  types: Record<"wedding" | "party" | "business" | "portrait", DemoType>;
+  caption: string;
+  bridge: string;
+}
+
+const TYPE_KEYS = ["wedding", "party", "business", "portrait"] as const;
+
+export function WorkedExample({
+  demo,
+  inquiryLabel,
+  draftLabel,
+}: {
+  demo: WorkedExampleDemo;
+  inquiryLabel: string;
+  draftLabel: string;
+}) {
   const reduce = useReducedMotion();
+  const [selected, setSelected] = useState<(typeof TYPE_KEYS)[number]>("wedding");
+  const active = demo.types[selected];
+
+  const swap = reduce
+    ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } }
+    : {
+        initial: { opacity: 0, y: 10, filter: "blur(5px)" },
+        animate: {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          transition: { duration: 0.45, ease: EASE },
+        },
+        exit: { opacity: 0, transition: { duration: 0.1 } },
+      };
 
   return (
     <motion.div
@@ -42,20 +74,45 @@ export function WorkedExample({ data }: { data: WorkedExampleData }) {
       viewport={{ once: true, margin: "-80px" }}
       className="mx-auto flex w-full max-w-2xl flex-col gap-5"
     >
+      {/* The pick: four event types, wedding preselected so the section
+          works with zero interaction. Plain buttons, so keyboard access is
+          the platform's own. */}
+      <motion.div variants={riseIn(reduce)} className="flex flex-wrap gap-2">
+        {TYPE_KEYS.map((key) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={selected === key}
+            onClick={() => setSelected(key)}
+            className={`min-h-11 border px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+              selected === key
+                ? "border-white bg-white text-[var(--fd-ink)]"
+                : "border-white/30 bg-transparent text-white hover:border-white"
+            }`}
+          >
+            {demo.types[key].label}
+          </button>
+        ))}
+      </motion.div>
+
       <motion.div
         variants={riseIn(reduce)}
         className="flex flex-col gap-1.5 border border-white/15 bg-white p-5 sm:p-6"
       >
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--fd-slate)]">
-            {data.inquiryLabel}
+            {inquiryLabel}
           </span>
           <ExampleBadge />
         </div>
-        <p className="text-sm font-medium text-[var(--fd-ink)]">{data.clientName}</p>
-        <p className="fl-tnum text-sm text-[var(--fd-slate)]">
-          {data.eventType} · {data.eventDate} · {data.budget}
-        </p>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={selected} {...swap} className="flex flex-col gap-1.5">
+            <p className="text-sm font-medium text-[var(--fd-ink)]">{active.clientName}</p>
+            <p className="fl-tnum text-sm text-[var(--fd-slate)]">
+              {active.label} · {active.eventDate} · {active.budget}
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
 
       <motion.div
@@ -64,16 +121,27 @@ export function WorkedExample({ data }: { data: WorkedExampleData }) {
       >
         <span aria-hidden="true" className="absolute left-0 top-0 h-[3px] w-16 bg-[var(--fd-accent)]" />
         <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--fd-slate)]">
-          {data.draftLabel}
+          {draftLabel}
         </span>
-        <p className="whitespace-pre-line border-t border-[var(--fd-line)] pt-4 font-serif text-[1.15rem] leading-[1.75] text-[var(--fd-ink)]">
-          {data.draft}
-        </p>
+        {/* min-height fits the longest draft at each breakpoint, so switching
+            chips never moves the content below the card. */}
+        <div className="min-h-[29rem] border-t border-[var(--fd-line)] pt-4 sm:min-h-[19rem]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.p
+              key={selected}
+              {...swap}
+              className="whitespace-pre-line font-serif text-[1.15rem] leading-[1.75] text-[var(--fd-ink)]"
+            >
+              {active.draft}
+            </motion.p>
+          </AnimatePresence>
+        </div>
       </motion.div>
 
-      <motion.p variants={riseIn(reduce)} className="text-sm leading-relaxed text-white/60">
-        {data.caption}
-      </motion.p>
+      <motion.div variants={riseIn(reduce)} className="flex flex-col gap-1.5">
+        <p className="text-sm leading-relaxed text-white/60">{demo.caption}</p>
+        <p className="text-sm font-medium leading-relaxed text-white/85">{demo.bridge}</p>
+      </motion.div>
     </motion.div>
   );
 }
