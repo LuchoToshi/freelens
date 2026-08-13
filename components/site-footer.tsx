@@ -37,6 +37,10 @@ export function SiteFooter() {
   // FrontDesk only, and a prominent button to the rebooking demo would put a
   // second product on it.
   const showCta = pathname !== "/tool" && pathname !== "/";
+  // The trust line speaks for the calculators ("not tax advice"), which is the
+  // wrong closing note under the FrontDesk story — the homepage footer keeps
+  // only the wordmark and the quiet links. Every other page is unchanged.
+  const showTrustLine = pathname !== "/";
 
   return (
     <footer className="mt-auto bg-[var(--fl-ink)] text-white">
@@ -48,9 +52,11 @@ export function SiteFooter() {
           {t.common.brand}
         </Link>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <p className="max-w-md text-base leading-relaxed text-white/70">
-            {t.common.footer.trustLine}
-          </p>
+          {showTrustLine && (
+            <p className="max-w-md text-base leading-relaxed text-white/70">
+              {t.common.footer.trustLine}
+            </p>
+          )}
           {showCta && (
             <Link
               href="/tool"
