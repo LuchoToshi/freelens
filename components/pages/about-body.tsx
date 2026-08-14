@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BackLink } from "@/components/i18n/back-link";
 import { container } from "@/components/container";
-import { linkButtonClass, primaryButtonClass } from "@/components/app/styles";
+import { primaryButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 const SECTIONS = ["what", "boundary", "trust", "tools", "going"] as const;
@@ -47,9 +47,6 @@ export function AboutPageBody() {
           <Link href="/#waitlist" className={primaryButtonClass}>
             {a.ctaPrimary}
             <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-          <Link href="/rekentools" className={linkButtonClass}>
-            {a.ctaSecondary}
           </Link>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fromCents, toCents } from "@/lib/domain/money";
+import { toCents } from "@/lib/domain/money";
 import { outcomeForJobFee, type JobOutcomeRequest } from "@/lib/tax/jobOutcome";
-import { quoteForTargetNet } from "@/lib/tax/quote";
 
 const base = (overrides: Partial<JobOutcomeRequest> = {}): JobOutcomeRequest => ({
   taxYear: 2026,
@@ -90,71 +89,5 @@ describe("outcomeForJobFee", () => {
     const r = outcomeForJobFee(base());
     expect(r.configVersion).toBe("nl-2026.1");
     expect(r.configRetrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  });
-});
-
-/**
- * The invariant that keeps the two directions honest.
- *
- * `quoteForTargetNet` says what to charge to keep X. Feeding that quote back in
- * here must return X. If these ever disagree, one of them is lying to a
- * freelancer about the same job.
- */
-describe("round trip against quoteForTargetNet", () => {
-  const cases = [
-    { target: 1_000, profit: 0 },
-    { target: 2_000, profit: 40_000 },
-    { target: 5_000, profit: 36_000 }, // straddles a bracket edge
-    { target: 10_000, profit: 75_000 }, // top bracket
-    { target: 500, profit: 120_000 }, // past the Zvw ceiling
-  ];
-
-  for (const { target, profit } of cases) {
-    it(`keeps €${target} at €${profit} of existing profit`, () => {
-      const quote = quoteForTargetNet({
-        taxYear: 2026,
-        country: "NL",
-        targetNet: target,
-        currentProjectedProfit: profit,
-        vatRate: 21,
-        meetsHoursCriterion: true,
-        isStarter: false,
-      });
-
-      const back = outcomeForJobFee(
-        base({
-          feeExVat: fromCents(quote.quoteExVat),
-          currentProjectedProfit: profit,
-        })
-      );
-
-      // One cent of slack: the solve stops within a cent, and both sides round
-      // to whole cents independently.
-      expect(Math.abs(back.takeHome - toCents(target))).toBeLessThanOrEqual(1);
-      expect(back.feeInclVat).toBe(quote.quoteInclVat);
-    });
-  }
-
-  it("agrees on the job costs path too", () => {
-    const quote = quoteForTargetNet({
-      taxYear: 2026,
-      country: "NL",
-      targetNet: 3_000,
-      jobCosts: 750,
-      currentProjectedProfit: 45_000,
-      vatRate: 21,
-      meetsHoursCriterion: true,
-      isStarter: false,
-    });
-
-    const back = outcomeForJobFee(
-      base({
-        feeExVat: fromCents(quote.quoteExVat),
-        jobCosts: 750,
-        currentProjectedProfit: 45_000,
-      })
-    );
-
-    expect(Math.abs(back.takeHome - toCents(3_000))).toBeLessThanOrEqual(1);
   });
 });

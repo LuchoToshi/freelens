@@ -210,10 +210,9 @@ export function isValidAppState(value: unknown): value is AppState {
 /**
  * Drops a stored weekly position that cannot be evaluated.
  *
- * `evaluateWeeklyPosition` reads `obligations` as an array and several fields
- * as numbers. A record written by an older build, or truncated mid-write, kills
- * the whole /tool page with no way back except clearing storage by hand. Saved
- * payments already get this treatment; the check-in deserves the same.
+ * A record written by an older build, or truncated mid-write, otherwise has
+ * no way back except clearing storage by hand. Saved payments already get
+ * this treatment; the check-in deserves the same.
  *
  * Returns null when the record is unusable, which the UI shows as "no check-in
  * yet" rather than a blank screen.

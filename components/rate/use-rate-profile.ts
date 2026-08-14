@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { loadAppState } from "@/lib/domain/persistence";
 import { asCentsUnsafe, fromCents } from "@/lib/domain/money";
-import type { RateProfile } from "@/components/rate/guided-rate-calculator";
+
+export interface RateProfile {
+  meetsHoursCriterion: boolean;
+  isStarter: boolean;
+  otherIncome: number;
+  otherIncomeTaxWithheld: number;
+}
 
 export interface RateProfileState {
   profile: RateProfile;

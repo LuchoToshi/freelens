@@ -3,7 +3,6 @@ import { asCentsUnsafe, fromCents, toCents } from "@/lib/domain/money";
 import { detectBracketCrossing } from "@/lib/tax/bracketCrossing";
 import { calculateTaxReserve } from "@/lib/tax/engine";
 import { loadProfile } from "@/lib/tax/loadProfile";
-import { quoteForTargetNet, type QuoteRequest } from "@/lib/tax/quote";
 
 const profile = loadProfile("NL", 2026);
 
@@ -24,17 +23,6 @@ function taxableIncomeAt(profitCents: number, hours = true, starter = false) {
 }
 
 const measure = (profit: number) => taxableIncomeAt(profit);
-
-const request = (overrides: Partial<QuoteRequest> = {}): QuoteRequest => ({
-  taxYear: 2026,
-  country: "NL",
-  targetNet: 2000,
-  currentProjectedProfit: 40_000,
-  vatRate: 21,
-  meetsHoursCriterion: true,
-  isStarter: false,
-  ...overrides,
-});
 
 describe("thresholds are taxable-income thresholds, not profit thresholds", () => {
   it("needs more than a euro of profit to add a euro of taxable income", () => {
@@ -179,46 +167,5 @@ describe("detecting a crossing", () => {
     );
     if (!plain || !starter) throw new Error("expected crossings");
     expect(starter.amountBelow).toBeGreaterThan(plain.amountBelow);
-  });
-});
-
-describe("the quote reports its crossing", () => {
-  it("flags a job that pushes the freelancer into the next bracket", () => {
-    const quote = quoteForTargetNet(
-      request({ currentProjectedProfit: 36_000, targetNet: 10_000 })
-    );
-    expect(quote.bracketCrossing).not.toBeNull();
-    expect(quote.bracketCrossing?.threshold).toBe(38_883);
-    expect(
-      quote.bracketCrossing!.amountBelow + quote.bracketCrossing!.amountAbove
-    ).toBe(quote.taxableDelta);
-    expect(quote.assumptions.some((a) => a.includes("38.883"))).toBe(true);
-  });
-
-  it("leaves it null for a job that changes nothing about the bracket", () => {
-    const quote = quoteForTargetNet(
-      request({ currentProjectedProfit: 20_000, targetNet: 1000 })
-    );
-    expect(quote.bracketCrossing).toBeNull();
-    expect(quote.assumptions.some((a) => a.includes("higher bracket"))).toBe(false);
-  });
-
-  it("explains the gap a flat percentage cannot", () => {
-    // The crossing is the reason the blended rate on this job sits above the
-    // marginal rate the freelancer started the year on. Same evidence, two
-    // outputs, so the UI can state the cause next to the number.
-    const base = 36_000;
-    const quote = quoteForTargetNet(request({ currentProjectedProfit: base, targetNet: 10_000 }));
-    const rateAtStart = calculateTaxReserve({
-      taxYear: 2026,
-      country: "NL",
-      projectedAnnualProfit: base,
-      ytdReserved: 0,
-      meetsHoursCriterion: true,
-      isStarter: false,
-    }).marginalRate;
-
-    expect(quote.bracketCrossing).not.toBeNull();
-    expect(quote.effectiveJobRate).toBeGreaterThan(rateAtStart);
   });
 });

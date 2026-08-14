@@ -15,11 +15,6 @@ import {
   unmarkJobPaid,
   type JobRecord,
 } from "@/lib/domain/jobs";
-import {
-  jobSignals,
-  OUTSTANDING_TOTAL_FLOOR,
-  QUOTE_WAITING_DAYS,
-} from "@/lib/domain/jobSignals";
 
 const quote = (overrides: Partial<Parameters<typeof createJob>[0]> = {}) =>
   createJob({
@@ -290,100 +285,6 @@ describe("sanitizeJobs", () => {
     const { jobs, discarded } = sanitizeJobs(JSON.parse(JSON.stringify([job])));
     expect(discarded).toBe(0);
     expect(jobs[0]).toEqual(job);
-  });
-});
-
-describe("jobSignals", () => {
-  it("says nothing when there are no jobs", () => {
-    expect(jobSignals({ jobs: [], today: "2026-03-15" })).toEqual([]);
-  });
-
-  it("says nothing about a quote sent yesterday", () => {
-    const jobs = [quote({ createdAt: "2026-03-14" })];
-    expect(jobSignals({ jobs, today: "2026-03-15" })).toEqual([]);
-  });
-
-  it("mentions a quote that has waited two weeks", () => {
-    const jobs = [quote({ createdAt: "2026-03-01" })];
-    const signals = jobSignals({ jobs, today: `2026-03-${14 + QUOTE_WAITING_DAYS + 1}` });
-    expect(signals[0]).toMatchObject({ kind: "quote-waiting", tone: "neutral" });
-  });
-
-  it("never calls an unanswered quote overdue", () => {
-    const jobs = [quote({ createdAt: "2026-01-01", dueDate: "2026-01-10" })];
-    const kinds = jobSignals({ jobs, today: "2026-06-01" }).map((s) => s.kind);
-    expect(kinds).not.toContain("payment-overdue");
-  });
-
-  it("escalates an unpaid invoice one rung at a time", () => {
-    const jobs = [transitionJob(quote(), "invoiced", "2026-01-01")];
-
-    expect(jobSignals({ jobs, today: "2026-01-20" })).toEqual([]);
-    expect(jobSignals({ jobs, today: "2026-02-05" })[0]).toMatchObject({
-      kind: "payment-waiting",
-      key: expect.stringContaining(":30"),
-    });
-    expect(jobSignals({ jobs, today: "2026-03-10" })[0]).toMatchObject({
-      key: expect.stringContaining(":60"),
-    });
-  });
-
-  it("prefers the overdue statement when a real due date has passed", () => {
-    const jobs = [
-      transitionJob(quote({ dueDate: "2026-02-01" }), "invoiced", "2026-01-01"),
-    ];
-    const signals = jobSignals({ jobs, today: "2026-03-10" });
-    expect(signals).toHaveLength(1);
-    expect(signals[0].kind).toBe("payment-overdue");
-  });
-
-  it("does not repeat a dismissed signal", () => {
-    const jobs = [transitionJob(quote(), "invoiced", "2026-01-01")];
-    const [signal] = jobSignals({ jobs, today: "2026-02-05" });
-    expect(jobSignals({ jobs, today: "2026-02-06", dismissed: [signal.key] })).toEqual([]);
-  });
-
-  it("lets a dismissed signal speak again at the next rung", () => {
-    const jobs = [transitionJob(quote(), "invoiced", "2026-01-01")];
-    const [first] = jobSignals({ jobs, today: "2026-02-05" });
-    const later = jobSignals({ jobs, today: "2026-03-10", dismissed: [first.key] });
-    expect(later).toHaveLength(1);
-    expect(later[0].key).not.toBe(first.key);
-  });
-
-  it("summarises only when more than one item is old and the total matters", () => {
-    const one = [transitionJob(quote({ id: "a" }), "invoiced", "2026-01-01")];
-    expect(jobSignals({ jobs: one, today: "2026-03-01" }).map((s) => s.kind)).not.toContain(
-      "outstanding-total"
-    );
-
-    const many = [
-      transitionJob(quote({ id: "a" }), "invoiced", "2026-01-01"),
-      transitionJob(quote({ id: "b" }), "invoiced", "2026-01-02"),
-    ];
-    const summary = jobSignals({ jobs: many, today: "2026-03-01" }).find(
-      (s) => s.kind === "outstanding-total"
-    );
-    expect(summary).toMatchObject({ count: 2, amountCents: toCents(3_600) });
-    expect(summary!.amountCents!).toBeGreaterThanOrEqual(OUTSTANDING_TOTAL_FLOOR);
-  });
-
-  it("mentions a payment that just arrived, then stops", () => {
-    const paid = markJobPaid(transitionJob(quote(), "invoiced", "2026-03-01"), {
-      paidAt: "2026-04-01",
-      amountExVatCents: toCents(1_800),
-      paymentId: "pay-1",
-    });
-
-    expect(jobSignals({ jobs: [paid], today: "2026-04-03" })[0]).toMatchObject({
-      kind: "recently-paid",
-    });
-    expect(jobSignals({ jobs: [paid], today: "2026-05-01" })).toEqual([]);
-  });
-
-  it("stays quiet about archived work", () => {
-    const jobs = [transitionJob(quote({ createdAt: "2026-01-01" }), "archived", "2026-01-02")];
-    expect(jobSignals({ jobs, today: "2026-06-01" })).toEqual([]);
   });
 });
 

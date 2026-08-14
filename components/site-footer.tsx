@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight } from "lucide-react";
 import { container } from "@/components/container";
 import { useT } from "@/components/i18n/locale-provider";
 import { chromeVariant } from "@/lib/frontdesk/handles";
@@ -15,10 +14,8 @@ import { chromeVariant } from "@/lib/frontdesk/handles";
  * line. No calculator links, no tax strip — the FrontDesk story ends on its
  * own note, and the trust line lives here exactly once per page.
  *
- * "legacy" (calculators, rebooking, offertes, privacy, and any unknown
- * route): the original closing band, unchanged except that the "After
- * payment" link list entry yields to the CTA button pointing at the same
- * place — one destination, one element.
+ * "legacy" (rebooking, /try, privacy, and any unknown route): the original
+ * closing band, wordmark plus a plain link list — About, Privacy, Contact.
  *
  * "app" paths never reach this component; ChromeGate suppresses all chrome.
  */
@@ -73,26 +70,12 @@ function LegacyFooter({
   t: ReturnType<typeof useT>;
   pathname: string | null;
 }) {
-  // Every route the site has, plus privacy. Contact renders only when a real
-  // address is configured: a mailto that bounces is worse than none.
+  // Contact renders only when a real address is configured: a mailto that
+  // bounces is worse than none.
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
-  // A closing call to action that points at the page you are already reading is
-  // not an action. On /tool the band keeps the wordmark and the trust line and
-  // drops the button.
-  const showCta = pathname !== "/tool";
-
-  // The CTA button and the "After payment" list link share a destination;
-  // only one of the two renders. Where the button shows, the list entry
-  // yields; on /tool the button is gone and the list entry stays.
   const links = [
-    { href: "/rekentools", label: t.common.nav.tools },
-    { href: "/tarief", label: t.common.nav.beforeJob },
-    ...(showCta ? [] : [{ href: "/tool", label: t.common.nav.afterPayment }]),
-    { href: "/offertes", label: t.common.nav.quotes },
     { href: "/about", label: t.common.nav.about },
-    { href: "/accuracy", label: t.common.nav.accuracy },
-    { href: "/methodology", label: t.common.nav.methodology },
     { href: "/privacy", label: t.common.nav.privacy },
     ...(contactEmail
       ? [{ href: `mailto:${contactEmail}`, label: t.common.nav.contact }]
@@ -108,20 +91,9 @@ function LegacyFooter({
         >
           {t.common.brand}
         </Link>
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <p className="max-w-md text-base leading-relaxed text-white/70">
-            {t.common.footer.trustLine}
-          </p>
-          {showCta && (
-            <Link
-              href="/tool"
-              className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
-            >
-              {t.common.footer.cta}
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          )}
-        </div>
+        <p className="max-w-md text-base leading-relaxed text-white/70">
+          {t.common.footer.trustLine}
+        </p>
         <nav
           aria-label={t.common.footer.navLabel}
           className="flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6"
