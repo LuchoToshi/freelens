@@ -17,7 +17,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label={t.common.languageSwitcher.label}
-      className={`inline-flex items-center rounded-lg border border-[var(--fl-line-control)] bg-white p-0.5 ${className}`}
+      className={`inline-flex items-center rounded-lg border border-[var(--fd-line-control)] bg-white p-0.5 ${className}`}
     >
       {LOCALES.map((option) => {
         const active = option === locale;
@@ -29,10 +29,10 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
             aria-pressed={active}
             aria-label={`${t.common.languageSwitcher.switchTo} ${LOCALE_NAMES[option]}`}
             onClick={() => setLocale(option)}
-            className={`min-h-9 rounded-md px-2.5 text-xs font-semibold tracking-wide transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+            className={`min-h-9 rounded-md px-2.5 text-xs font-semibold tracking-wide transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
               active
-                ? "bg-[var(--fl-ink)] text-white"
-                : "text-[var(--fl-slate)] hover:text-[var(--fl-ink)]"
+                ? "bg-[var(--fd-ink)] text-white"
+                : "text-[var(--fd-slate)] hover:text-[var(--fd-ink)]"
             }`}
           >
             {LOCALE_LABELS[option]}

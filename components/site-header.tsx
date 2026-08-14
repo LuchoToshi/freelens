@@ -31,10 +31,10 @@ function NavLink({
       href={href}
       aria-current={current ? "page" : undefined}
       onClick={onNavigate}
-      className={`inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+      className={`inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
         current
-          ? "text-[var(--fl-ink)] underline decoration-[var(--fl-ink)] decoration-2"
-          : "text-[var(--fl-slate)] hover:text-[var(--fl-ink)]"
+          ? "text-[var(--fd-ink)] underline decoration-[var(--fd-ink)] decoration-2"
+          : "text-[var(--fd-slate)] hover:text-[var(--fd-ink)]"
       }`}
     >
       {children}
@@ -66,11 +66,11 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="fl-chrome relative border-b border-[var(--fl-line)] bg-[var(--fl-canvas)]/85 backdrop-blur-sm min-[420px]:sticky min-[420px]:top-0 min-[420px]:z-40">
+    <header className="fl-chrome relative border-b border-[var(--fd-line)] bg-[var(--fd-paper)]/85 backdrop-blur-sm min-[420px]:sticky min-[420px]:top-0 min-[420px]:z-40">
       <div className={`${container} flex items-center gap-x-4 py-2 sm:gap-x-5 sm:py-4`}>
         <Link
           href="/"
-          className="mr-auto inline-flex min-h-11 items-center font-serif text-xl font-medium tracking-tight text-[var(--fl-ink)] hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          className="mr-auto inline-flex min-h-11 items-center font-serif text-xl font-medium tracking-tight text-[var(--fd-ink)] hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)]"
         >
           {t.common.brand}
         </Link>
@@ -94,7 +94,7 @@ export function SiteHeader() {
           aria-controls="mobile-nav"
           aria-label={t.common.nav.menuLabel}
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--fl-line-control)] text-[var(--fl-ink)] min-[420px]:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)]"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--fd-line-control)] text-[var(--fd-ink)] min-[420px]:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)]"
         >
           {open ? (
             <X className="size-5" aria-hidden="true" />
@@ -108,7 +108,7 @@ export function SiteHeader() {
         <nav
           id="mobile-nav"
           aria-label={t.common.nav.ariaLabel}
-          className={`${container} flex flex-col gap-1 border-t border-[var(--fl-line)] pb-3 pt-2 min-[420px]:hidden`}
+          className={`${container} flex flex-col gap-1 border-t border-[var(--fd-line)] pb-3 pt-2 min-[420px]:hidden`}
         >
           {LINKS.map(({ href, key }) => (
             <NavLink

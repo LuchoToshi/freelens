@@ -38,7 +38,7 @@ function FrontdeskFooter() {
     { href: "/privacy", label: t.common.nav.privacy },
   ];
   return (
-    <footer className="mt-auto bg-[var(--fl-ink)] text-white">
+    <footer className="mt-auto bg-[var(--fd-ink)] text-white">
       <div className={`${container} flex flex-col gap-8 py-14 sm:py-16`}>
         <Link
           href="/"

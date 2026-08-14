@@ -174,7 +174,7 @@
    for less transparency it becomes solid rather than merely frostier. */
 @media (prefers-reduced-transparency: reduce) {
   .fl-chrome {
-    background-color: var(--fl-canvas) !important;
+    background-color: var(--fd-paper) !important;
     backdrop-filter: none !important;
   }
 }
@@ -182,9 +182,9 @@
 /* High contrast: give the chrome and every control a defined edge. */
 @media (prefers-contrast: more) {
   .fl-chrome {
-    background-color: var(--fl-canvas) !important;
+    background-color: var(--fd-paper) !important;
     backdrop-filter: none !important;
-    border-bottom-color: var(--fl-ink) !important;
+    border-bottom-color: var(--fd-ink) !important;
   }
 }
 
