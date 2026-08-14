@@ -41,7 +41,7 @@ interface DraftRow {
 
 const STATUS_DOT: Record<InquiryRow["status"], string> = {
   new: "bg-[#3b82f6]",
-  replied: "bg-[var(--fl-line-control)]",
+  replied: "bg-[var(--fd-line-control)]",
   nudge_due: "bg-[#f59e0b]",
   booked: "bg-[#22c55e]",
   lost: "bg-[#9ca3af]",
@@ -53,11 +53,11 @@ function mailtoHref(email: string, subject: string, body: string): string {
 }
 
 const primaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-5 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)] disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-5 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50";
 const secondaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fl-line-control)] bg-white px-5 text-base font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]";
+  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-5 text-base font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
 const linkClass =
-  "w-fit text-sm font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]";
+  "w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]";
 
 export function InboxApp({
   session,
@@ -175,7 +175,7 @@ export function InboxApp({
   if (inquiries === null) {
     return (
       <main className="mx-auto w-full max-w-2xl px-4 py-10">
-        <p className="text-sm text-[var(--fl-slate)]">{t.loading}</p>
+        <p className="text-sm text-[var(--fd-slate)]">{t.loading}</p>
       </main>
     );
   }
@@ -191,26 +191,26 @@ export function InboxApp({
         </button>
 
         <header className="flex flex-col gap-1">
-          <h1 className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fl-ink)]">
+          <h1 className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fd-ink)]">
             {open.client_name}
             {open.source === "sample" && (
-              <span className="rounded-full border border-[var(--fl-line-control)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+              <span className="rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
                 {t.sampleBadge}
               </span>
             )}
           </h1>
-          <p className="text-sm text-[var(--fl-slate)]">
+          <p className="text-sm text-[var(--fd-slate)]">
             {typeLabel}
             {open.event_date ? ` · ${d.date}: ${open.event_date}` : ""} · {d.budget}: {open.budget_band}
           </p>
         </header>
 
         {open.message && (
-          <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fl-line)] bg-white p-4">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+          <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
               {d.message}
             </span>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fl-ink)]">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fd-ink)]">
               {open.message}
             </p>
           </div>
@@ -218,7 +218,7 @@ export function InboxApp({
 
         {openDraft ? (
           <div className="flex flex-col gap-3">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
               {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
             </span>
             <textarea
@@ -226,7 +226,7 @@ export function InboxApp({
               rows={10}
               value={editedBody}
               onChange={(e) => setEditedBody(e.target.value)}
-              className="min-h-56 w-full rounded-2xl border border-[var(--fl-line-control)] bg-white px-4 py-3 text-sm leading-relaxed focus-visible:border-[var(--fl-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fl-focus-ring)]/25 focus-visible:outline-none"
+              className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-sm leading-relaxed focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
             />
             <div className="flex flex-wrap items-center gap-3">
               {open.client_email && (
@@ -249,11 +249,11 @@ export function InboxApp({
                 {d.skip}
               </button>
             </div>
-            <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{d.copyHint}</p>
+            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.copyHint}</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fl-line)] p-5">
-            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{d.draftPending}</p>
+          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.draftPending}</p>
             <button
               type="button"
               disabled={regenerating}
@@ -265,7 +265,7 @@ export function InboxApp({
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--fl-line)] pt-4">
+        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--fd-line)] pt-4">
           <button type="button" onClick={() => void setStatus("booked")} className={secondaryClass}>
             {d.markBooked}
           </button>
@@ -280,7 +280,7 @@ export function InboxApp({
   // -------------------------------------------------------------- list view
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
-      <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
+      <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
 
       <ChecklistCard
         freelancer={freelancer}
@@ -298,7 +298,7 @@ export function InboxApp({
       />
 
       {inquiries.length === 0 ? (
-        <p className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fl-slate)]">
+        <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-slate)]">
           {t.empty}
         </p>
       ) : (
@@ -308,7 +308,7 @@ export function InboxApp({
               <button
                 type="button"
                 onClick={() => openDetail(inquiry)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-4 text-left transition hover:border-[var(--fl-ink)]"
+                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-4 text-left transition hover:border-[var(--fd-ink)]"
               >
                 <span
                   aria-hidden="true"
@@ -316,25 +316,25 @@ export function InboxApp({
                 />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="flex items-center gap-2">
-                    <span className="truncate text-sm font-semibold text-[var(--fl-ink)]">
+                    <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
                       {inquiry.client_name}
                     </span>
                     {inquiry.source === "sample" && (
-                      <span className="shrink-0 rounded-full border border-[var(--fl-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+                      <span className="shrink-0 rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
                         {t.sampleBadge}
                       </span>
                     )}
                   </span>
-                  <span className="truncate text-xs text-[var(--fl-slate)]">
+                  <span className="truncate text-xs text-[var(--fd-slate)]">
                     {dict.public.form.types[inquiry.event_type]}
                     {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
                   </span>
                 </span>
                 <span className="flex shrink-0 flex-col items-end gap-0.5">
-                  <span className="text-xs font-medium text-[var(--fl-slate)]">
+                  <span className="text-xs font-medium text-[var(--fd-slate)]">
                     {t.status[inquiry.status]}
                   </span>
-                  <span className="text-xs text-[var(--fl-slate)]">
+                  <span className="text-xs text-[var(--fd-slate)]">
                     {inquiry.created_at.slice(0, 10)}
                   </span>
                 </span>
@@ -360,7 +360,7 @@ function Mark({ done }: { done: boolean }) {
       className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold ${
         done
           ? "border-[#22c55e] bg-[#22c55e] text-white"
-          : "border-[var(--fl-line-control)] text-transparent"
+          : "border-[var(--fd-line-control)] text-transparent"
       }`}
     >
       ✓
@@ -409,20 +409,20 @@ function ChecklistCard({
   const rowClass = "flex flex-wrap items-center gap-2";
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-ink)] bg-white p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-ink)]">
+    <section className="flex flex-col gap-4 rounded-2xl border border-[var(--fd-ink)] bg-white p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-ink)]">
         {c.heading}
       </h2>
 
       <div className={itemClass}>
         <div className={rowClass}>
           <Mark done={bioDone} />
-          <span className="text-sm font-medium text-[var(--fl-ink)]">{c.bio}</span>
+          <span className="text-sm font-medium text-[var(--fd-ink)]">{c.bio}</span>
           {!bioDone && (
             <button
               type="button"
               onClick={() => void onBioConfirmed()}
-              className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+              className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {c.bioDone}
             </button>
@@ -435,7 +435,7 @@ function ChecklistCard({
                 key={tag}
                 type="button"
                 onClick={() => void copyLink(url, tag)}
-                className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-slate)] transition hover:border-[var(--fl-ink)] hover:text-[var(--fl-ink)]"
+                className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-slate)] transition hover:border-[var(--fd-ink)] hover:text-[var(--fd-ink)]"
               >
                 {copied === tag ? share.copied : share.variants[tag]}
               </button>
@@ -447,13 +447,13 @@ function ChecklistCard({
       <div className={itemClass}>
         <div className={rowClass}>
           <Mark done={testDone} />
-          <span className="text-sm font-medium text-[var(--fl-ink)]">{c.test}</span>
+          <span className="text-sm font-medium text-[var(--fd-ink)]">{c.test}</span>
           {!testDone && (
             <a
               href={`/${freelancer.handle}`}
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-[var(--fl-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+              className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {c.openPage}
             </a>
@@ -463,7 +463,7 @@ function ChecklistCard({
 
       <div className={rowClass}>
         <Mark done={replyDone} />
-        <span className="text-sm font-medium text-[var(--fl-ink)]">{c.reply}</span>
+        <span className="text-sm font-medium text-[var(--fd-ink)]">{c.reply}</span>
       </div>
     </section>
   );

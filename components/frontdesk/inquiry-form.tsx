@@ -22,8 +22,8 @@ function fill(template: string, params: Record<string, string>): string {
 }
 
 const inputClass =
-  "min-h-12 w-full rounded-lg border border-[var(--fl-line-control)] bg-white px-3 text-base transition focus-visible:border-[var(--fl-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fl-focus-ring)]/25 focus-visible:outline-none";
-const labelClass = "text-sm font-medium text-[var(--fl-ink)]";
+  "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base transition focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
 
 export function InquiryForm({
   handle,
@@ -77,7 +77,7 @@ export function InquiryForm({
     return (
       <p
         role="status"
-        className="rounded-2xl border border-[var(--fl-line)] bg-white p-6 text-center text-base leading-relaxed text-[var(--fl-ink)]"
+        className="rounded-2xl border border-[var(--fd-line)] bg-white p-6 text-center text-base leading-relaxed text-[var(--fd-ink)]"
       >
         {fill(t.confirmation, { name: displayName })}
       </p>
@@ -155,10 +155,10 @@ export function InquiryForm({
               type="button"
               aria-pressed={budget === value}
               onClick={() => setBudget(value)}
-              className={`min-h-12 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+              className={`min-h-12 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                 budget === value
-                  ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                  : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)]"
+                  ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                  : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)]"
               }`}
             >
               {t.budgets[key]}
@@ -194,7 +194,7 @@ export function InquiryForm({
       </div>
 
       {state === "error" && (
-        <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">
+        <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
           {t.error}
         </p>
       )}
@@ -202,7 +202,7 @@ export function InquiryForm({
       <button
         type="submit"
         disabled={state === "sending"}
-        className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white shadow-sm transition hover:bg-[var(--fl-ink-hover)] disabled:pointer-events-none disabled:opacity-50"
+        className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50"
       >
         {state === "sending" ? t.sending : t.submit}
       </button>

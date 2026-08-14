@@ -28,9 +28,9 @@ interface SamplePayload {
 }
 
 const primaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)] disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50";
 const secondaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fl-line-control)] bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]";
+  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-6 text-base font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
 
 export function RevealStep({
   locale,
@@ -102,8 +102,8 @@ export function RevealStep({
   if (state === "loading") {
     return (
       <section className="flex flex-col gap-3">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
-        <p className="text-sm text-[var(--fl-slate)]">{dict.setup.voice.extracting}</p>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <p className="text-sm text-[var(--fd-slate)]">{dict.setup.voice.extracting}</p>
       </section>
     );
   }
@@ -113,21 +113,21 @@ export function RevealStep({
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.sub}</p>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.sub}</p>
       </div>
 
       {inquiry && (
-        <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fl-line)] bg-white p-4">
-          <span className="text-sm font-semibold text-[var(--fl-ink)]">
+        <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+          <span className="text-sm font-semibold text-[var(--fd-ink)]">
             {inquiry.client_name}
           </span>
-          <span className="text-xs text-[var(--fl-slate)]">
+          <span className="text-xs text-[var(--fd-slate)]">
             {dict.public.form.types[inquiry.event_type as keyof typeof dict.public.form.types]}
             {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
           </span>
           {inquiry.message && (
-            <p className="mt-1 text-sm leading-relaxed text-[var(--fl-slate)]">
+            <p className="mt-1 text-sm leading-relaxed text-[var(--fd-slate)]">
               {inquiry.message}
             </p>
           )}
@@ -135,12 +135,12 @@ export function RevealStep({
       )}
 
       {state === "ready" && payload?.draft ? (
-        <div className="whitespace-pre-line rounded-2xl border border-[var(--fl-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fl-ink)]">
+        <div className="whitespace-pre-line rounded-2xl border border-[var(--fd-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]">
           {payload.draft.body}
         </div>
       ) : (
-        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fl-line)] p-5">
-          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.pending}</p>
+        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
+          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.pending}</p>
           <button type="button" onClick={retry} className={`${secondaryClass} w-fit`}>
             {t.retry}
           </button>

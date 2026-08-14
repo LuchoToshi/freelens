@@ -137,6 +137,20 @@
   --fl-motion-protect: 220ms;
   --fl-motion-navigate: 320ms;
   --fl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* FrontDesk brand tokens — promoted from app/page.tsx's inline FD_TOKENS */
+  --fd-paper: #FAF8F4;
+  --fd-paper-dim: #F2EEE6;
+  --fd-ink: #1A1A1A;
+  --fd-accent: #E4572E;
+  --fd-line: #E5DFD3;
+  --fd-slate: #6E675C;
+
+  /* Product-surface additions, not carried over from the landing page */
+  --fd-line-control: #8A8377;
+  --fd-focus-ring: #1A1A1A;
+  --fd-error-text: #A8391F;
+  --fd-success-text: #3F7A4A;
 }
 
 /**
