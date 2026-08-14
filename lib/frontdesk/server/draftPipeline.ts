@@ -59,8 +59,9 @@ export async function generateAndStoreDraft(
 
   const language = detectLanguage(inquiry.message, freelancer.locale === "en" ? "en" : "nl");
 
+  const startedAt = Date.now();
   try {
-    const body = await generateFrontdeskDraft({
+    const { body, attempts } = await generateFrontdeskDraft({
       kind,
       voiceProfile: freelancer.voice_profile,
       packages,
@@ -75,6 +76,7 @@ export async function generateAndStoreDraft(
       signOff: freelancer.sign_off,
       targetLanguage: language,
     });
+    const latencyMs = Date.now() - startedAt;
 
     const { error } = await db.from("drafts").insert({
       inquiry_id: inquiry.id,
@@ -85,15 +87,21 @@ export async function generateAndStoreDraft(
       prompt_version: DRAFT_PROMPT_VERSION,
     });
     if (error) {
-      console.error("frontdesk/pipeline: draft_store_failed");
+      console.error(
+        `frontdesk/pipeline: draft_store_failed latency_ms:${latencyMs} attempts:${attempts}`
+      );
       return "generation_failed";
     }
+    console.log(`frontdesk/pipeline: stored latency_ms:${latencyMs} attempts:${attempts}`);
     return "stored";
   } catch (error) {
+    const latencyMs = Date.now() - startedAt;
     if (error instanceof FrontdeskGenerationError) {
-      console.error(`frontdesk/pipeline: generation_failed attempts:${error.attempts}`);
+      console.error(
+        `frontdesk/pipeline: generation_failed latency_ms:${latencyMs} attempts:${error.attempts}`
+      );
     } else {
-      console.error("frontdesk/pipeline: generation_failed unexpected");
+      console.error(`frontdesk/pipeline: generation_failed latency_ms:${latencyMs} unexpected`);
     }
     return "generation_failed";
   }

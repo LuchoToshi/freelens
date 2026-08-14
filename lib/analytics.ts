@@ -26,7 +26,13 @@ export type AnalyticsEvent =
   | "quote_saved"
   | "quote_won"
   | "quote_lost"
-  | "quote_reopened";
+  | "quote_reopened"
+  | "voice_confirmed"
+  | "setup_completed"
+  | "draft_sent"
+  | "draft_copied"
+  | "draft_skipped"
+  | "draft_regenerated";
 
 type VercelAnalytics = (
   command: "event",

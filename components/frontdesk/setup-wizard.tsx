@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
+import { track } from "@/lib/analytics";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
@@ -395,6 +396,7 @@ export function SetupWizard({
           session={session}
           existingProfile={freelancer?.voice_profile ?? null}
           onDone={() => {
+            track("voice_confirmed");
             onFreelancerChanged();
             setRevealVisits((n) => n + 1);
             setStep(35);
@@ -409,7 +411,10 @@ export function SetupWizard({
           locale={locale}
           session={session}
           regenerate={revealVisits > 1}
-          onContinue={() => setStep(4)}
+          onContinue={() => {
+            track("setup_completed");
+            setStep(4);
+          }}
           onAdjust={() => setStep(3)}
         />
       )}

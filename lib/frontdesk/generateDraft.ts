@@ -58,7 +58,14 @@ async function callModel(system: string, user: string, maxTokens: number): Promi
   return payload.content?.find((c) => c.type === "text")?.text ?? "";
 }
 
-export async function generateFrontdeskDraft(input: DraftPromptInput): Promise<string> {
+export interface FrontdeskDraftResult {
+  body: string;
+  attempts: number;
+}
+
+export async function generateFrontdeskDraft(
+  input: DraftPromptInput
+): Promise<FrontdeskDraftResult> {
   const { system, user } = buildDraftPrompt(input);
   let lastReason = "unknown";
 
@@ -76,7 +83,7 @@ export async function generateFrontdeskDraft(input: DraftPromptInput): Promise<s
       kind: input.kind,
       packages: input.packages,
     });
-    if (verdict.ok) return text;
+    if (verdict.ok) return { body: text, attempts: attempt };
     lastReason = verdict.reason ?? "invalid";
   }
 
