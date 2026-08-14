@@ -24,15 +24,6 @@ import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
  * is bold FRAME, calm CONTENT — its text never moves after arrival. All
  * motion collapses under prefers-reduced-motion.
  */
-const FD_TOKENS = {
-  "--fd-paper": "#FAF8F4",
-  "--fd-paper-dim": "#F2EEE6",
-  "--fd-ink": "#1A1A1A",
-  "--fd-accent": "#E4572E",
-  "--fd-line": "#E5DFD3",
-  "--fd-slate": "#6E675C",
-} as React.CSSProperties;
-
 export default function Home() {
   const t = useT();
   const f = t.home.frontdesk;
@@ -40,7 +31,7 @@ export default function Home() {
   useDocumentTitle(t.meta.home.title, t.meta.home.description);
 
   return (
-    <main style={FD_TOKENS} className="min-h-screen bg-[var(--fd-paper)] text-[var(--fd-ink)]">
+    <main className="min-h-screen bg-[var(--fd-paper)] text-[var(--fd-ink)]">
       {/* 1 · The statement. */}
       <HomeHero eyebrow={f.heroEyebrow} title={f.heroTitle} sub={f.heroSub} cta={f.heroCta} />
 

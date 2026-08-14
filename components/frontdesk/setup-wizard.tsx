@@ -24,12 +24,12 @@ export interface PackageRow {
 }
 
 const inputClass =
-  "min-h-11 w-full rounded-lg border border-[var(--fl-line-control)] bg-white px-3 text-sm focus-visible:border-[var(--fl-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fl-focus-ring)]/25 focus-visible:outline-none";
-const labelClass = "text-sm font-medium text-[var(--fl-ink)]";
+  "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
 const primaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)] disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50";
 const secondaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fl-line-control)] bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]";
+  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-6 text-base font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
 
 export function SetupWizard({
   session,
@@ -172,19 +172,19 @@ export function SetupWizard({
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
       {step >= 1 && (
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fl-slate)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
           {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4)))}
         </p>
       )}
 
       {step === 0 && (
         <section className="flex flex-col gap-5">
-          <h1 className="font-serif text-3xl font-medium leading-tight text-[var(--fl-ink)]">
+          <h1 className="font-serif text-3xl font-medium leading-tight text-[var(--fd-ink)]">
             {t.welcome.heading}
           </h1>
           <div className="flex flex-col gap-3">
             {[t.welcome.line1, t.welcome.line2, t.welcome.line3].map((line, i) => (
-              <p key={i} className="text-base leading-relaxed text-[var(--fl-slate)]">
+              <p key={i} className="text-base leading-relaxed text-[var(--fd-slate)]">
                 {line}
               </p>
             ))}
@@ -198,10 +198,10 @@ export function SetupWizard({
       {step === 1 && (
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
               {t.profile.heading}
             </h1>
-            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.profile.clientsSee}</p>
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.profile.clientsSee}</p>
           </div>
 
           <fieldset className="flex flex-col gap-2">
@@ -215,8 +215,8 @@ export function SetupWizard({
                   onClick={() => setLocale(l)}
                   className={`min-h-11 rounded-lg border px-4 text-sm font-semibold transition ${
                     locale === l
-                      ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                      : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)]"
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)]"
                   }`}
                 >
                   {l === "nl" ? "Nederlands" : "English"}
@@ -234,9 +234,9 @@ export function SetupWizard({
               onChange={(e) => setHandle(e.target.value.toLowerCase().trim())}
               className={inputClass}
             />
-            <p className="text-xs text-[var(--fl-slate)]">{t.profile.handleHint}</p>
+            <p className="text-xs text-[var(--fd-slate)]">{t.profile.handleHint}</p>
             {error === "handle" && (
-              <p className="text-xs font-medium text-[var(--fl-short-text)]" role="alert">
+              <p className="text-xs font-medium text-[var(--fd-error-text)]" role="alert">
                 {t.profile.handleTaken}
               </p>
             )}
@@ -258,8 +258,8 @@ export function SetupWizard({
                   onClick={() => setCraft(c)}
                   className={`min-h-11 rounded-lg border px-4 text-sm font-medium transition ${
                     craft === c
-                      ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                      : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)]"
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)]"
                   }`}
                 >
                   {fdDict(locale).public.craft[c]}
@@ -276,7 +276,7 @@ export function SetupWizard({
           <div className="flex flex-col gap-1.5">
             <label htmlFor="su-signoff" className={labelClass}>{t.profile.signOffLabel}</label>
             <input id="su-signoff" value={signOff} maxLength={60} onChange={(e) => setSignOff(e.target.value)} className={inputClass} />
-            <p className="text-xs text-[var(--fl-slate)]">{t.profile.signOffHint}</p>
+            <p className="text-xs text-[var(--fd-slate)]">{t.profile.signOffHint}</p>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -284,7 +284,7 @@ export function SetupWizard({
             <div className="flex items-center gap-3">
               {photoUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- tiny avatar preview
-                <img src={photoUrl} alt="" className="size-14 rounded-full border border-[var(--fl-line)] object-cover" />
+                <img src={photoUrl} alt="" className="size-14 rounded-full border border-[var(--fd-line)] object-cover" />
               )}
               <input
                 type="file"
@@ -294,19 +294,19 @@ export function SetupWizard({
                   const file = e.target.files?.[0];
                   if (file) void uploadPhoto(file);
                 }}
-                className="text-sm text-[var(--fl-slate)]"
+                className="text-sm text-[var(--fd-slate)]"
               />
             </div>
-            {photoBusy && <p className="text-xs text-[var(--fl-slate)]">{t.profile.photoUploading}</p>}
+            {photoBusy && <p className="text-xs text-[var(--fd-slate)]">{t.profile.photoUploading}</p>}
             {photoError && (
-              <p className="text-xs font-medium text-[var(--fl-short-text)]" role="alert">
+              <p className="text-xs font-medium text-[var(--fd-error-text)]" role="alert">
                 {t.profile.photoError}
               </p>
             )}
           </div>
 
           {error === "generic" && (
-            <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">
+            <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
               {fdDict(locale).auth.error}
             </p>
           )}
@@ -319,14 +319,14 @@ export function SetupWizard({
       {step === 2 && (
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
               {t.packages.heading}
             </h1>
-            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.packages.hint}</p>
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.packages.hint}</p>
           </div>
 
           {packages.map((p, i) => (
-            <div key={i} className="flex flex-col gap-3 rounded-2xl border border-[var(--fl-line)] bg-white p-4">
+            <div key={i} className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
               <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor={`pk-label-${i}`} className={labelClass}>{t.packages.labelLabel}</label>
@@ -351,7 +351,7 @@ export function SetupWizard({
                 <button
                   type="button"
                   onClick={() => setPackages((prev) => prev.filter((_, j) => j !== i))}
-                  className="w-fit text-sm font-medium text-[var(--fl-slate)] underline decoration-[var(--fl-line)] underline-offset-4 hover:text-[var(--fl-ink)]"
+                  className="w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
                 >
                   {t.packages.remove}
                 </button>
@@ -368,12 +368,12 @@ export function SetupWizard({
           </button>
 
           {error === "packages" && (
-            <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">
+            <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
               {t.packages.needOne}
             </p>
           )}
           {error === "generic" && (
-            <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">
+            <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
               {fdDict(locale).auth.error}
             </p>
           )}

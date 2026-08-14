@@ -24,16 +24,16 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.hint}</p>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.hint}</p>
       </div>
 
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--fl-ink)] bg-white p-4">
-        <code className="truncate text-sm text-[var(--fl-ink)]">{base}</code>
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--fd-ink)] bg-white p-4">
+        <code className="truncate text-sm text-[var(--fd-ink)]">{base}</code>
         <button
           type="button"
           onClick={() => copy(base, "base")}
-          className="shrink-0 rounded-lg border border-[var(--fl-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+          className="shrink-0 rounded-lg border border-[var(--fd-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
         >
           {copied === "base" ? t.copied : t.copy}
         </button>
@@ -41,17 +41,17 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
 
       <div className="flex flex-col gap-2">
         {variants.map(({ tag, url }) => (
-          <div key={tag} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fl-line)] bg-white p-3">
+          <div key={tag} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fd-line)] bg-white p-3">
             <div className="flex min-w-0 flex-col">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
                 {t.variants[tag]}
               </span>
-              <code className="truncate text-xs text-[var(--fl-slate)]">{url}</code>
+              <code className="truncate text-xs text-[var(--fd-slate)]">{url}</code>
             </div>
             <button
               type="button"
               onClick={() => copy(url, tag)}
-              className="shrink-0 rounded-lg border border-[var(--fl-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]"
+              className="shrink-0 rounded-lg border border-[var(--fd-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {copied === tag ? t.copied : t.copy}
             </button>
@@ -61,7 +61,7 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
 
       <Link
         href="/inbox"
-        className="inline-flex min-h-12 w-fit items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)]"
+        className="inline-flex min-h-12 w-fit items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100"
       >
         {t.toInbox}
       </Link>

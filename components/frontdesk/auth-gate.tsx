@@ -75,7 +75,7 @@ export function AuthGate({
   if (state.stage === "loading") {
     return (
       <main className="mx-auto w-full max-w-md px-4 py-16">
-        <p className="text-sm text-[var(--fl-slate)]">{t.loading}</p>
+        <p className="text-sm text-[var(--fd-slate)]">{t.loading}</p>
       </main>
     );
   }
@@ -106,16 +106,16 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16">
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.intro}</p>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
       </div>
       {phase === "sent" ? (
-        <p role="status" className="rounded-2xl border border-[var(--fl-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fl-ink)]">
+        <p role="status" className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]">
           {t.sent}
         </p>
       ) : (
         <form onSubmit={submit} className="flex flex-col gap-3">
-          <label htmlFor="fd-auth-email" className="text-sm font-medium text-[var(--fl-ink)]">
+          <label htmlFor="fd-auth-email" className="text-sm font-medium text-[var(--fd-ink)]">
             {t.emailLabel}
           </label>
           <input
@@ -124,17 +124,17 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="min-h-12 w-full rounded-lg border border-[var(--fl-line-control)] bg-white px-3 text-base focus-visible:border-[var(--fl-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fl-focus-ring)]/25 focus-visible:outline-none"
+            className="min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
           />
           {phase === "error" && (
-            <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">
+            <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
               {t.error}
             </p>
           )}
           <button
             type="submit"
             disabled={phase === "sending"}
-            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)] disabled:opacity-50"
+            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:opacity-50"
           >
             {phase === "sending" ? t.sending : t.send}
           </button>

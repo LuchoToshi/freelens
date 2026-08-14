@@ -49,30 +49,30 @@ function AdminView({ session }: { session: Session }) {
   if (data === null) {
     return (
       <main className="mx-auto w-full max-w-4xl px-4 py-10">
-        <p className="text-sm text-[var(--fl-slate)]">One moment.</p>
+        <p className="text-sm text-[var(--fd-slate)]">One moment.</p>
       </main>
     );
   }
   if (data === "denied") {
     return (
       <main className="mx-auto w-full max-w-4xl px-4 py-10">
-        <p className="text-sm text-[var(--fl-slate)]">Not found.</p>
+        <p className="text-sm text-[var(--fd-slate)]">Not found.</p>
       </main>
     );
   }
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
-      <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">FrontDesk admin</h1>
+      <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">FrontDesk admin</h1>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
           Funnel per freelancer
         </h2>
-        <div className="overflow-x-auto rounded-2xl border border-[var(--fl-line)] bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-[var(--fd-line)] bg-white">
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
-              <tr className="border-b border-[var(--fl-line)] text-left text-xs uppercase tracking-wide text-[var(--fl-slate)]">
+              <tr className="border-b border-[var(--fd-line)] text-left text-xs uppercase tracking-wide text-[var(--fd-slate)]">
                 <th className="p-3">Freelancer</th>
                 <th className="p-3">Inquiries</th>
                 <th className="p-3">Replied</th>
@@ -85,8 +85,8 @@ function AdminView({ session }: { session: Session }) {
             </thead>
             <tbody>
               {data.funnels.map((f) => (
-                <tr key={f.handle} className="border-b border-[var(--fl-line)] last:border-0">
-                  <td className="p-3 font-medium text-[var(--fl-ink)]">{f.handle}</td>
+                <tr key={f.handle} className="border-b border-[var(--fd-line)] last:border-0">
+                  <td className="p-3 font-medium text-[var(--fd-ink)]">{f.handle}</td>
                   <td className="p-3">{f.inquiries}</td>
                   <td className="p-3">{f.replied}</td>
                   <td className="p-3">{f.booked}</td>
@@ -104,13 +104,13 @@ function AdminView({ session }: { session: Session }) {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
           Inquiries (no client data, by design)
         </h2>
-        <div className="overflow-x-auto rounded-2xl border border-[var(--fl-line)] bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-[var(--fd-line)] bg-white">
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
-              <tr className="border-b border-[var(--fl-line)] text-left text-xs uppercase tracking-wide text-[var(--fl-slate)]">
+              <tr className="border-b border-[var(--fd-line)] text-left text-xs uppercase tracking-wide text-[var(--fd-slate)]">
                 <th className="p-3">Freelancer</th>
                 <th className="p-3">Channel</th>
                 <th className="p-3">Status</th>
@@ -122,8 +122,8 @@ function AdminView({ session }: { session: Session }) {
             </thead>
             <tbody>
               {data.rows.map((r, i) => (
-                <tr key={i} className="border-b border-[var(--fl-line)] last:border-0">
-                  <td className="p-3 font-medium text-[var(--fl-ink)]">{r.handle}</td>
+                <tr key={i} className="border-b border-[var(--fd-line)] last:border-0">
+                  <td className="p-3 font-medium text-[var(--fd-ink)]">{r.handle}</td>
                   <td className="p-3">{r.srcChannel ?? "—"}</td>
                   <td className="p-3">{r.status}</td>
                   <td className="p-3">{r.draftOutcome}</td>

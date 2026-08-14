@@ -12,12 +12,12 @@ import type { VoiceProfile } from "@/lib/frontdesk/prompts";
  * and lets the freelancer correct it. Their edits overwrite the profile.
  */
 const inputClass =
-  "min-h-11 w-full rounded-lg border border-[var(--fl-line-control)] bg-white px-3 text-sm focus-visible:border-[var(--fl-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fl-focus-ring)]/25 focus-visible:outline-none";
-const labelClass = "text-sm font-medium text-[var(--fl-ink)]";
+  "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
 const primaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-ink)] px-6 text-base font-medium text-white transition hover:bg-[var(--fl-ink-hover)] disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50";
 const secondaryClass =
-  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fl-line-control)] bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:border-[var(--fl-ink)]";
+  "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-6 text-base font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
 
 export function VoiceStep({
   locale,
@@ -83,10 +83,10 @@ export function VoiceStep({
     return (
       <section className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
-          <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">
+          <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
             {t.mirrorHeading}
           </h1>
-          <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.mirrorHint}</p>
+          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.mirrorHint}</p>
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -168,8 +168,8 @@ export function VoiceStep({
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fl-ink)]">{t.heading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fl-slate)]">{t.hint}</p>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.hint}</p>
       </div>
       <textarea
         aria-label={t.heading}
@@ -180,7 +180,7 @@ export function VoiceStep({
         className={`${inputClass} min-h-56 py-2 leading-relaxed`}
       />
       {phase === "error" && (
-        <p className="text-sm font-medium text-[var(--fl-short-text)]" role="alert">{t.error}</p>
+        <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">{t.error}</p>
       )}
       <div className="flex items-center gap-3">
         <button type="button" onClick={onBack} className={secondaryClass}>

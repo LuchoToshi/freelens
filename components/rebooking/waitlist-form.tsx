@@ -7,7 +7,7 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { primaryButtonClass } from "@/components/app/styles";
+import { primaryButtonClass } from "@/components/frontdesk/styles";
 import { CRAFTS, type Craft } from "@/lib/server/waitlist";
 import { track } from "@/lib/analytics";
 import { useLocale, useT } from "@/components/i18n/locale-provider";
@@ -55,8 +55,8 @@ export function WaitlistForm() {
 
   if (state === "done") {
     return (
-      <p className="flex max-w-xl items-start gap-2 text-base font-medium leading-relaxed text-[var(--fl-ink)]">
-        <Check className="mt-1 size-4 shrink-0 text-[var(--fl-payout-text)]" aria-hidden="true" />
+      <p className="flex max-w-xl items-start gap-2 text-base font-medium leading-relaxed text-[var(--fd-ink)]">
+        <Check className="mt-1 size-4 shrink-0 text-[var(--fd-success-text)]" aria-hidden="true" />
         {w.done}
       </p>
     );
@@ -66,7 +66,7 @@ export function WaitlistForm() {
     <form onSubmit={submit} className="flex w-full max-w-xl flex-col gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="wl-name" className="text-sm font-medium text-[var(--fl-ink)]">
+          <Label htmlFor="wl-name" className="text-sm font-medium text-[var(--fd-ink)]">
             {w.nameLabel}
           </Label>
           <Input
@@ -78,11 +78,11 @@ export function WaitlistForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={w.namePlaceholder}
-            className="rounded-lg border border-[var(--fl-line-control)] bg-white"
+            className="rounded-lg border border-[var(--fd-line-control)] bg-white"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="wl-email" className="text-sm font-medium text-[var(--fl-ink)]">
+          <Label htmlFor="wl-email" className="text-sm font-medium text-[var(--fd-ink)]">
             {w.emailLabel}
           </Label>
           <Input
@@ -93,13 +93,13 @@ export function WaitlistForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={w.emailPlaceholder}
-            className="rounded-lg border border-[var(--fl-line-control)] bg-white"
+            className="rounded-lg border border-[var(--fd-line-control)] bg-white"
           />
         </div>
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-[var(--fl-ink)]">{w.craftLabel}</legend>
+        <legend className="text-sm font-medium text-[var(--fd-ink)]">{w.craftLabel}</legend>
         <div className="flex flex-wrap gap-2">
           {CRAFTS.map((c) => (
             <button
@@ -107,10 +107,10 @@ export function WaitlistForm() {
               type="button"
               aria-pressed={craft === c}
               onClick={() => setCraft(c)}
-              className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+              className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                 craft === c
-                  ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                  : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+                  ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                  : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)] hover:border-[var(--fd-ink)]"
               }`}
             >
               {w.crafts[c]}
@@ -140,19 +140,19 @@ export function WaitlistForm() {
         {state === "sending" ? w.sending : w.submit}
       </button>
 
-      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">{fill(w.noCommit, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}</p>
+      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{fill(w.noCommit, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}</p>
 
       {state === "error" && (
-        <p role="alert" className="text-sm text-[var(--fl-short-text)]">
+        <p role="alert" className="text-sm text-[var(--fd-error-text)]">
           {w.error}
         </p>
       )}
 
-      <p className="text-xs leading-relaxed text-[var(--fl-slate)]">
+      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
         {w.privacyNote}{" "}
         <Link
           href="/privacy"
-          className="font-medium text-[var(--fl-ink)] underline decoration-[var(--fl-line)] underline-offset-4 hover:decoration-[var(--fl-ink)]"
+          className="font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
         >
           {t.common.nav.privacy}
         </Link>

@@ -19,7 +19,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
   errorClass,
-} from "@/components/app/styles";
+} from "@/components/frontdesk/styles";
 
 /**
  * The anonymous trial: one week of the product, no account, no storage.
@@ -237,17 +237,17 @@ export function TryApp() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 sm:px-6">
       <header className="flex flex-col gap-3">
-        <p className="text-sm font-medium uppercase tracking-wide text-[var(--fl-slate)]">
+        <p className="text-sm font-medium uppercase tracking-wide text-[var(--fd-slate)]">
           {p.eyebrow}
         </p>
         <h1
           ref={headingRef}
           tabIndex={-1}
-          className="font-serif text-3xl font-medium text-[var(--fl-ink)] focus-visible:outline-none"
+          className="font-serif text-3xl font-medium text-[var(--fd-ink)] focus-visible:outline-none"
         >
           {p.heading}
         </h1>
-        <p className="max-w-xl text-base leading-relaxed text-[var(--fl-slate)]">
+        <p className="max-w-xl text-base leading-relaxed text-[var(--fd-slate)]">
           {p.intro}
         </p>
       </header>
@@ -255,7 +255,7 @@ export function TryApp() {
       {stage === "clients" && (
         <section className={`${cardClass} flex flex-col gap-5 p-6`}>
           <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            <h2 className="font-serif text-xl font-medium text-[var(--fd-ink)]">
               {p.clients.heading}
             </h2>
             <p className={hintClass}>{p.clients.hint}</p>
@@ -323,7 +323,7 @@ export function TryApp() {
                   <div
                     role="group"
                     aria-label={`${p.clients.typeLabel} ${i + 1}`}
-                    className="inline-flex items-center rounded-lg border border-[var(--fl-line-control)] bg-white p-0.5"
+                    className="inline-flex items-center rounded-lg border border-[var(--fd-line-control)] bg-white p-0.5"
                   >
                     {(["business", "private"] as const).map((ct) => (
                       <button
@@ -331,10 +331,10 @@ export function TryApp() {
                         type="button"
                         aria-pressed={row.clientType === ct}
                         onClick={() => setRow(i, { clientType: ct })}
-                        className={`min-h-9 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+                        className={`min-h-9 rounded-md px-2.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                           row.clientType === ct
-                            ? "bg-[var(--fl-ink)] text-white"
-                            : "text-[var(--fl-slate)] hover:text-[var(--fl-ink)]"
+                            ? "bg-[var(--fd-ink)] text-white"
+                            : "text-[var(--fd-slate)] hover:text-[var(--fd-ink)]"
                         }`}
                       >
                         {ct === "business" ? p.clients.typeBusiness : p.clients.typePrivate}
@@ -368,7 +368,7 @@ export function TryApp() {
       {stage === "voice" && (
         <section className={`${cardClass} flex flex-col gap-5 p-6`}>
           <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            <h2 className="font-serif text-xl font-medium text-[var(--fd-ink)]">
               {p.voice.heading}
             </h2>
             <p className={hintClass}>{p.voice.hint}</p>
@@ -382,10 +382,10 @@ export function TryApp() {
                   type="button"
                   aria-pressed={craft === id}
                   onClick={() => setCraft(id)}
-                  className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+                  className={`min-h-11 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                     craft === id
-                      ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                      : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)] hover:border-[var(--fd-ink)]"
                   }`}
                 >
                   {t.home.rebooking.waitlist.crafts[id]}
@@ -402,10 +402,10 @@ export function TryApp() {
                   type="button"
                   aria-pressed={formality === f}
                   onClick={() => setFormality(f)}
-                  className={`min-h-11 rounded-lg border px-4 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fl-focus-ring)] ${
+                  className={`min-h-11 rounded-lg border px-4 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                     formality === f
-                      ? "border-[var(--fl-ink)] bg-[var(--fl-ink)] text-white"
-                      : "border-[var(--fl-line-control)] bg-white text-[var(--fl-ink)] hover:border-[var(--fl-ink)]"
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)] hover:border-[var(--fd-ink)]"
                   }`}
                 >
                   {f === "je" ? p.voice.toneInformal : p.voice.toneFormal}
@@ -463,7 +463,7 @@ export function TryApp() {
       {stage === "queue" && (
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            <h2 className="font-serif text-xl font-medium text-[var(--fd-ink)]">
               {p.queue.heading}
             </h2>
             <p className={hintClass}>{p.queue.hint}</p>
@@ -471,10 +471,10 @@ export function TryApp() {
 
           {ranked.length === 0 && (
             <div className={`${cardClass} flex flex-col gap-3 p-6`}>
-              <h3 className="font-serif text-lg font-medium text-[var(--fl-ink)]">
+              <h3 className="font-serif text-lg font-medium text-[var(--fd-ink)]">
                 {p.queue.empty.title}
               </h3>
-              <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+              <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
                 {p.queue.empty.body}
               </p>
               <button
@@ -493,7 +493,7 @@ export function TryApp() {
             return (
               <article key={s.relationshipId} className={`${cardClass} flex flex-col gap-3 p-6`}>
                 <div className="flex flex-col gap-0.5">
-                  <h3 className="text-base font-semibold text-[var(--fl-ink)]">
+                  <h3 className="text-base font-semibold text-[var(--fd-ink)]">
                     {rel.clientName}
                   </h3>
                   {rel.lastProjectTitle && (
@@ -502,7 +502,7 @@ export function TryApp() {
                     </p>
                   )}
                 </div>
-                <p className="text-sm leading-relaxed text-[var(--fl-ink)]">
+                <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
                   {reasonTextFor(s, rel, locale)}
                 </p>
 
@@ -533,12 +533,12 @@ export function TryApp() {
                   </div>
                 )}
                 {mine && draft.kind === "limit" && (
-                  <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                  <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
                     {p.draft.limit}
                   </p>
                 )}
                 {mine && draft.kind === "done" && (
-                  <div className="flex flex-col gap-3 rounded-xl border border-[var(--fl-line)] bg-[var(--fl-paper,#faf9f7)] p-4">
+                  <div className="flex flex-col gap-3 rounded-xl border border-[var(--fd-line)] bg-[var(--fd-paper-dim)] p-4">
                     <h4 className={labelClass}>{p.draft.heading}</h4>
                     <input
                       aria-label={p.draft.heading}
@@ -586,7 +586,7 @@ export function TryApp() {
                           </div>
                           {!hasEmail && <p className={hintClass}>{p.draft.mailHint}</p>}
                           {handedOff && (
-                            <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
                               {p.draft.loopTeaser}
                             </p>
                           )}
@@ -601,7 +601,7 @@ export function TryApp() {
 
           {freshClients.length > 0 && (
             <div className="flex flex-col gap-3">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--fl-slate)]">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
                 {p.queue.fresh.heading}
               </h3>
               {freshClients.map((rel) => {
@@ -610,12 +610,12 @@ export function TryApp() {
                 return (
                   <article
                     key={rel.id}
-                    className="flex flex-col gap-1.5 rounded-2xl border border-dashed border-[var(--fl-line)] bg-transparent p-5 opacity-80"
+                    className="flex flex-col gap-1.5 rounded-2xl border border-dashed border-[var(--fd-line)] bg-transparent p-5 opacity-80"
                   >
-                    <h4 className="text-sm font-medium text-[var(--fl-slate)]">
+                    <h4 className="text-sm font-medium text-[var(--fd-slate)]">
                       {rel.clientName}
                     </h4>
-                    <p className="text-sm leading-relaxed text-[var(--fl-slate)]">
+                    <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
                       {fill(p.queue.fresh.body, {
                         project: rel.lastProjectTitle ?? rel.clientName,
                         month: monthLabel(date),
@@ -637,11 +637,11 @@ export function TryApp() {
           )}
 
           {(draft.kind === "done" || draft.kind === "limit") && (
-            <div className={`${cardClass} flex flex-col gap-3 border-[var(--fl-ink)] p-6`}>
-              <h3 className="font-serif text-xl font-medium text-[var(--fl-ink)]">
+            <div className={`${cardClass} flex flex-col gap-3 border-[var(--fd-ink)] p-6`}>
+              <h3 className="font-serif text-xl font-medium text-[var(--fd-ink)]">
                 {p.gate.heading}
               </h3>
-              <p className="max-w-xl text-sm leading-relaxed text-[var(--fl-slate)]">
+              <p className="max-w-xl text-sm leading-relaxed text-[var(--fd-slate)]">
                 {fill(p.gate.body, { spots: OFFER.spots, founding: OFFER.founding, yearly: OFFER.standardYear, monthly: OFFER.standardMonth })}
               </p>
               <div className="flex flex-wrap items-center gap-4">
