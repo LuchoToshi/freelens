@@ -570,15 +570,6 @@ export const en = {
       h: "Where the line is",
       p1: "Client records hold a name, a project, a date and a rough value. No addresses, no phone numbers, no registration numbers. Everything can be exported and deleted from day one, and your client data is used for nothing else.",
     },
-    trust: {
-      h: "Why you would trust us with your clients",
-      p1: "The tax engine behind our free calculators works with the real Dutch brackets, deductions and credits for 2026 \u2014 every figure checked against belastingdienst.nl, every result with an explanation you can verify. We even have a page showing where the popular 30% rule of thumb misses by up to \u20ac 16,720.",
-      p2: "The same standard applies to the agent: every reason comes from your own records, every email is bound to what actually happened, and nothing is invented. If a date is off, you correct it and Freelens remembers.",
-    },
-    tools: {
-      h: "The free calculators stay free",
-      p1: "What to charge before the job, and what is genuinely yours after the payment \u2014 the same calculation, both directions. No account, and your figures stay in your browser. That stays true.",
-    },
     going: {
       h: "Where this is going",
       p1: "Freelens Rebooking is in private beta. We are onboarding the first 25 freelancers, and we would rather say out loud that nothing is live yet than pretend otherwise. If you are a photographer, videographer, designer or illustrator and you want your best clients not to forget you: get on the list.",
@@ -590,10 +581,6 @@ export const en = {
     eyebrow: "Privacy",
     heading: "What we know, and what we never will.",
     updated: "Version of {date}.",
-    calc: {
-      title: "The calculators",
-      body: "Everything you type into the calculators stays in your browser. It is saved on your device only when you choose to save, you can clear it at any time, and it is never uploaded to Freelens.",
-    },
     analytics: {
       title: "Page views",
       body: "Freelens counts anonymous page views through Vercel Web Analytics: no cookies, no profile, nothing that identifies you. Custom events carry a name only, never an amount, a client, or an email address.",

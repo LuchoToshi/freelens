@@ -7,7 +7,7 @@ import { container } from "@/components/container";
 import { primaryButtonClass } from "@/components/app/styles";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
-const SECTIONS = ["what", "boundary", "trust", "tools", "going"] as const;
+const SECTIONS = ["what", "boundary", "going"] as const;
 
 /** The rebooking-first story, honest about the two data zones. */
 export function AboutPageBody() {

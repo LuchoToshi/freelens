@@ -566,15 +566,6 @@ export const nl: DeepPartial<typeof en> = {
       h: "Waar de grens ligt",
       p1: "Klantrecords bevatten een naam, een project, een datum en ongeveer een bedrag. Geen adressen, geen telefoonnummers, geen registratienummers. Alles is vanaf dag \u00e9\u00e9n te exporteren en te verwijderen, en je klantgegevens worden nergens anders voor gebruikt.",
     },
-    trust: {
-      h: "Waarom je ons met je klanten zou vertrouwen",
-      p1: "De belastingmotor achter onze gratis rekentools rekent met de echte Nederlandse schijven, aftrekposten en heffingskortingen van 2026 \u2014 elk cijfer gecontroleerd bij belastingdienst.nl, elke uitkomst met een uitleg die je kunt nalopen. We hebben zelfs een pagina die voorrekent waar de populaire 30%-vuistregel er tot \u20ac 16.720 naast zit.",
-      p2: "Diezelfde standaard geldt voor de agent: elke reden komt uit jouw eigen gegevens, elke mail is gebonden aan wat er echt gebeurd is, en niets wordt verzonnen. Klopt een datum niet, dan pas je hem aan en onthoudt Freelens dat.",
-    },
-    tools: {
-      h: "De gratis rekentools blijven gratis",
-      p1: "Wat moet je vragen v\u00f3\u00f3r de klus, en wat is er echt van jou na de betaling \u2014 dezelfde berekening, beide kanten op. Zonder account, en je cijfers blijven in je browser. Dat blijft zo.",
-    },
     going: {
       h: "Waar dit heen gaat",
       p1: "Freelens Rebooking is in besloten b\u00e8ta. We onboarden de eerste 25 freelancers en zeggen liever hardop dat er nog niets live is dan dat we doen alsof. Als je fotograaf, videograaf, ontwerper of illustrator bent en je wilt dat je beste klanten je niet vergeten: zet je op de lijst.",
@@ -586,10 +577,6 @@ export const nl: DeepPartial<typeof en> = {
     eyebrow: "Privacy",
     heading: "Wat we weten, en wat we nooit zullen weten.",
     updated: "Versie van {date}.",
-    calc: {
-      title: "De rekentools",
-      body: "Alles wat je in de rekentools invult blijft in je browser. Het wordt alleen op je apparaat bewaard als je zelf kiest voor opslaan, je kunt het altijd wissen, en het wordt nooit naar Freelens geüpload.",
-    },
     analytics: {
       title: "Paginaweergaven",
       body: "Freelens telt anonieme paginaweergaven via Vercel Web Analytics: geen cookies, geen profiel, niets dat jou identificeert. Eigen events bevatten alleen een naam, nooit een bedrag, een klant of een e-mailadres.",
