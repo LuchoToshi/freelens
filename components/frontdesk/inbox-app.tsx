@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
+import { track } from "@/lib/analytics";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import { shareLinks } from "@/lib/frontdesk/shareLinks";
@@ -120,6 +121,7 @@ export function InboxApp({
 
   async function recordOutcome(kind: "send" | "skip") {
     if (!open || !openDraft) return;
+    track(kind === "skip" ? "draft_skipped" : "draft_sent");
     if (kind === "skip") {
       await sb
         .from("drafts")
@@ -151,6 +153,7 @@ export function InboxApp({
 
   async function copyReply() {
     await navigator.clipboard.writeText(editedBody);
+    track("draft_copied");
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
     await recordOutcome("send");
@@ -167,6 +170,7 @@ export function InboxApp({
       },
       body: JSON.stringify({ inquiryId: open.id }),
     }).catch(() => null);
+    track("draft_regenerated");
     setRegenerating(false);
     await load();
     setEditedBody("");
