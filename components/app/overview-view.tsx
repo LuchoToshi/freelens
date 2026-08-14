@@ -48,7 +48,7 @@ export function OverviewView({
     : null;
   const stale = weekly ? isStale(weekly.timestampIso) : false;
 
-  const nextAction = pickNextAction(t, state, weekly?.result.status, stale);
+  const nextAction = pickNextAction(t, state);
 
   if (!state.setup && !weekly && !state.lastAllocation) {
     return (
@@ -237,9 +237,7 @@ function ExampleOverview() {
 
 function pickNextAction(
   t: Dictionary,
-  state: AppState,
-  status: string | undefined,
-  stale: boolean
+  state: AppState
 ): { title: string; cta: string; view: AppView } {
   const a = t.app.overview.actions;
   if (!state.setup) return { ...a.finishSetup, view: "setup" };

@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     // thousands of problems in bundled vendor code that we do not author.
     ".vercel/**",
     "coverage/**",
+    // Agent tooling scripts (plain-Node .cjs), not shipped app code.
+    ".claude/**",
   ]),
 ]);
 

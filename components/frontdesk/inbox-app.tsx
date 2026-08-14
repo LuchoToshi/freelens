@@ -101,6 +101,7 @@ export function InboxApp({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch; load() only calls setState after awaited network responses, never synchronously in the effect body
     void load();
   }, [load]);
 
@@ -352,6 +353,21 @@ export function InboxApp({
  * inquiry arriving with a ?src= tag proves the link works and completes it
  * without them.
  */
+function Mark({ done }: { done: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold ${
+        done
+          ? "border-[#22c55e] bg-[#22c55e] text-white"
+          : "border-[var(--fl-line-control)] text-transparent"
+      }`}
+    >
+      ✓
+    </span>
+  );
+}
+
 function ChecklistCard({
   freelancer,
   inquiries,
@@ -391,21 +407,6 @@ function ChecklistCard({
 
   const itemClass = "flex flex-col gap-2";
   const rowClass = "flex flex-wrap items-center gap-2";
-
-  function Mark({ done }: { done: boolean }) {
-    return (
-      <span
-        aria-hidden="true"
-        className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold ${
-          done
-            ? "border-[#22c55e] bg-[#22c55e] text-white"
-            : "border-[var(--fl-line-control)] text-transparent"
-        }`}
-      >
-        ✓
-      </span>
-    );
-  }
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-[var(--fl-ink)] bg-white p-5">
