@@ -33,7 +33,14 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--fd-paper)] text-[var(--fd-ink)]">
       {/* 1 · The statement. */}
-      <HomeHero eyebrow={f.heroEyebrow} title={f.heroTitle} sub={f.heroSub} cta={f.heroCta} />
+      <HomeHero
+        eyebrow={f.heroEyebrow}
+        title={f.heroTitle}
+        sub={f.heroSub}
+        cta={f.heroCta}
+        ctaTry={f.heroCtaTry}
+        ctaTryCaption={f.heroCtaTryCaption}
+      />
 
       {/* 2 · The worked example: an ink gallery wall around a calm, readable draft. */}
       <section aria-label={f.example.label} className="bg-[var(--fd-ink)] text-white">

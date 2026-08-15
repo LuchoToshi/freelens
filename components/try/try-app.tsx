@@ -10,6 +10,7 @@ import type { Craft, Relationship } from "@/lib/rebooking/types";
 import { fill } from "@/lib/i18n";
 import { OFFER } from "@/lib/offer";
 import { salutationFor } from "@/lib/rebooking/salutation";
+import { MonthYearPicker } from "@/components/try/month-year-picker";
 import {
   cardClass,
   hintClass,
@@ -292,13 +293,16 @@ export function TryApp() {
                   <label htmlFor={`try-month-${i}`} className={labelClass}>
                     {p.clients.monthLabel}
                   </label>
-                  <input
+                  <MonthYearPicker
                     id={`try-month-${i}`}
-                    type="month"
                     value={row.month}
+                    onChange={(month) => setRow(i, { month })}
                     max={thisMonth}
-                    onChange={(e) => setRow(i, { month: e.target.value })}
-                    className={`${inputClass} min-h-11 px-3 text-sm`}
+                    locale={locale}
+                    placeholder={p.clients.monthPlaceholder}
+                    dialogLabel={p.clients.monthDialogLabel}
+                    prevYearLabel={p.clients.monthPrevYear}
+                    nextYearLabel={p.clients.monthNextYear}
                   />
                 </div>
                 </div>

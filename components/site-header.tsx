@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { container } from "@/components/container";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useT } from "@/components/i18n/locale-provider";
+import { track } from "@/lib/analytics";
 
 /**
  * One nav link, with a real current state.
@@ -18,11 +19,13 @@ function NavLink({
   href,
   pathname,
   onNavigate,
+  onLinkClick,
   children,
 }: {
   href: string;
   pathname: string | null;
   onNavigate?: () => void;
+  onLinkClick?: () => void;
   children: React.ReactNode;
 }) {
   const current = pathname === href;
@@ -30,7 +33,10 @@ function NavLink({
     <Link
       href={href}
       aria-current={current ? "page" : undefined}
-      onClick={onNavigate}
+      onClick={() => {
+        onLinkClick?.();
+        onNavigate?.();
+      }}
       className={`inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
         current
           ? "text-[var(--fd-ink)] underline decoration-[var(--fd-ink)] decoration-2"
@@ -44,8 +50,12 @@ function NavLink({
 
 // The homepage sells one product (FrontDesk), so the primary nav carries no
 // second-product entries: the wordmark is the way home, the calculators and
-// rebooking surfaces keep their routes and their quiet footer links.
-const LINKS = [{ href: "/about", key: "about" }] as const;
+// rebooking surfaces keep their routes and their quiet footer links. The demo
+// link is the one exception — it is the product, not a second product.
+const LINKS = [
+  { href: "/try", key: "tryDemo", onLinkClick: () => track("try_demo_clicked_nav") },
+  { href: "/about", key: "about", onLinkClick: undefined },
+] as const;
 
 /**
  * Sticky from 420px up; below that it scrolls with the page and the links
@@ -79,8 +89,8 @@ export function SiteHeader() {
           aria-label={t.common.nav.ariaLabel}
           className="hidden items-center gap-x-4 min-[420px]:flex sm:gap-x-5"
         >
-          {LINKS.map(({ href, key }) => (
-            <NavLink key={href} href={href} pathname={pathname}>
+          {LINKS.map(({ href, key, onLinkClick }) => (
+            <NavLink key={href} href={href} pathname={pathname} onLinkClick={onLinkClick}>
               {t.common.nav[key]}
             </NavLink>
           ))}
@@ -110,12 +120,13 @@ export function SiteHeader() {
           aria-label={t.common.nav.ariaLabel}
           className={`${container} flex flex-col gap-1 border-t border-[var(--fd-line)] pb-3 pt-2 min-[420px]:hidden`}
         >
-          {LINKS.map(({ href, key }) => (
+          {LINKS.map(({ href, key, onLinkClick }) => (
             <NavLink
               key={href}
               href={href}
               pathname={pathname}
               onNavigate={() => setOpen(false)}
+              onLinkClick={onLinkClick}
             >
               {t.common.nav[key]}
             </NavLink>
