@@ -32,7 +32,9 @@ export type AnalyticsEvent =
   | "draft_sent"
   | "draft_copied"
   | "draft_skipped"
-  | "draft_regenerated";
+  | "draft_regenerated"
+  | "try_demo_clicked_hero"
+  | "try_demo_clicked_nav";
 
 type VercelAnalytics = (
   command: "event",

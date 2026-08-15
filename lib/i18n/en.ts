@@ -15,6 +15,7 @@ export const en = {
     brand: "Freelens",
     nav: {
       ariaLabel: "Main navigation",
+      tryDemo: "Try the demo",
       about: "About",
       beforeJob: "Before the job",
       afterPayment: "After payment",
@@ -66,13 +67,17 @@ export const en = {
     eyebrow: "Try Freelens",
     heading: "One week of Freelens, in three minutes.",
     intro:
-      "Enter three past clients. Freelens ranks who is worth a message right now, says why, and writes one draft in your tone. What you type stays in your browser.",
+      "Enter three clients — a new inquiry or someone you haven't heard from in a while. Freelens ranks who's worth a message right now, says why, and writes one draft in your tone. What you type stays in your browser.",
     clients: {
-      heading: "Step 1 — three past clients",
+      heading: "Step 1 — three clients",
       hint: "Real clients work best. A first name makes the greeting personal; an email address enables the send button. Both optional.",
       nameLabel: "Client name",
       projectLabel: "Last project",
       monthLabel: "When was that?",
+      monthPlaceholder: "Select a month",
+      monthDialogLabel: "Choose month",
+      monthPrevYear: "Previous year",
+      monthNextYear: "Next year",
       contactLabel: "Contact first name",
       contactPlaceholder: "For the greeting",
       emailLabel: "Email address",
@@ -360,6 +365,8 @@ export const en = {
       heroSub:
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
+      heroCtaTry: "Try it live",
+      heroCtaTryCaption: "No signup — see a real draft in under a minute.",
       example: {
         label: "This is what one inquiry looks like.",
         inquiryLabel: "Inquiry",

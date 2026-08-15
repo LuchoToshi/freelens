@@ -20,6 +20,7 @@ export const nl: DeepPartial<typeof en> = {
     brand: "Freelens",
     nav: {
       ariaLabel: "Hoofdnavigatie",
+      tryDemo: "Probeer de demo",
       about: "Over ons",
       beforeJob: "Voor de klus",
       afterPayment: "Na betaling",
@@ -69,13 +70,17 @@ export const nl: DeepPartial<typeof en> = {
     eyebrow: "Probeer Freelens",
     heading: "E\u00e9n week Freelens, in drie minuten.",
     intro:
-      "Vul drie oude klanten in. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon. Wat je invult blijft in je browser.",
+      "Vul drie klanten in \u2014 een nieuwe aanvraag, of iemand die al een tijdje niets van zich heeft laten horen. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon. Wat je invult blijft in je browser.",
     clients: {
-      heading: "Stap 1 \u2014 drie oude klanten",
+      heading: "Stap 1 \u2014 drie klanten",
       hint: "Echte klanten werken het best. Een voornaam maakt de aanhef persoonlijk; een e-mailadres maakt de verzendknop mogelijk. Allebei optioneel.",
       nameLabel: "Naam klant",
       projectLabel: "Laatste klus",
       monthLabel: "Wanneer was dat?",
+      monthPlaceholder: "Kies een maand",
+      monthDialogLabel: "Kies maand",
+      monthPrevYear: "Vorig jaar",
+      monthNextYear: "Volgend jaar",
       contactLabel: "Voornaam contactpersoon",
       contactPlaceholder: "Voor de aanhef",
       emailLabel: "E-mailadres",
@@ -354,6 +359,8 @@ export const nl: DeepPartial<typeof en> = {
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
+      heroCtaTry: "Probeer het live",
+      heroCtaTryCaption: "Geen account nodig — bekijk een echt concept in minder dan een minuut.",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",
