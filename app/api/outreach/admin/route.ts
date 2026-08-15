@@ -92,11 +92,21 @@ export async function POST(request: Request) {
   const contact = message.contact;
   if (!contact) return Response.json({ ok: false, error: "message has no contact" }, { status: 500 });
 
-  const sent = await sendOutreachMessage({
-    to: contact.email,
-    subject: message.subject,
-    body: message.body,
-  });
+  // Left in `draft` on failure — an unset Gmail credential must never look
+  // like a successful send. The caller gets back why, not a bare 500.
+  let sent: Awaited<ReturnType<typeof sendOutreachMessage>>;
+  try {
+    sent = await sendOutreachMessage({
+      to: contact.email,
+      subject: message.subject,
+      body: message.body,
+    });
+  } catch (error) {
+    return Response.json(
+      { ok: false, error: error instanceof Error ? error.message : "send failed" },
+      { status: 502 }
+    );
+  }
   await markApprovedAndSent(id, approver, sent);
   return Response.json({ ok: true, status: "sent" });
 }
