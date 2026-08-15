@@ -7,6 +7,7 @@ import {
 } from "@/lib/server/outreach/db";
 import { sendOutreachMessage } from "@/lib/server/outreach/gmail";
 import { syncWaitlistCandidates } from "@/lib/server/outreach/waitlistSource";
+import { syncPendingReplies } from "@/lib/server/outreach/sync";
 
 const APPROVERS = ["product-manager", "researcher"] as const;
 type Approver = (typeof APPROVERS)[number];
@@ -46,6 +47,7 @@ function asApprover(value: unknown): Approver | null {
 
 export async function GET(request: Request) {
   if (!requireSecret(request)) return Response.json({ ok: false }, { status: 404 });
+  await syncPendingReplies();
   const drafts = await listDrafts();
   return Response.json({ ok: true, messages: drafts });
 }
