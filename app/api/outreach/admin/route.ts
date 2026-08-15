@@ -21,6 +21,13 @@ type Approver = (typeof APPROVERS)[number];
  * this trust level: both agents already have direct write access to this
  * repo and its production data.
  *
+ * Scoped approval, per Shrf: this trust model holds for *this* tool at *this*
+ * volume — a handful of recruiting emails from a Freelens-owned account, no
+ * customer data, no money. If this ever sends to customers, at higher
+ * volume, or touches anything sensitive, self-declared identity stops being
+ * good enough and this needs real per-approver auth. Don't let it drift into
+ * the permanent pattern by default.
+ *
  * GET lists every draft/sent/replied message. POST approves (sends via Gmail)
  * or rejects one. There is no bulk-send path on purpose — every message goes
  * out one at a time, one explicit call.
