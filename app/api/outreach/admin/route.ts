@@ -3,11 +3,11 @@ import {
   getMessage,
   markApprovedAndSent,
   markRejected,
+  markReplied,
   createDraft,
 } from "@/lib/server/outreach/db";
 import { sendOutreachMessage } from "@/lib/server/outreach/gmail";
 import { syncWaitlistCandidates } from "@/lib/server/outreach/waitlistSource";
-import { syncPendingReplies } from "@/lib/server/outreach/sync";
 
 const APPROVERS = ["product-manager", "researcher"] as const;
 type Approver = (typeof APPROVERS)[number];
@@ -32,6 +32,11 @@ type Approver = (typeof APPROVERS)[number];
  * GET lists every draft/sent/replied message. POST approves (sends via Gmail)
  * or rejects one. There is no bulk-send path on purpose — every message goes
  * out one at a time, one explicit call.
+ *
+ * Reply tracking is a manual "mark-replied" toggle, not an automated inbox
+ * read: gmail.readonly is a Restricted scope requiring a CASA security
+ * review, the wrong tool entirely for an 8-message probe. Whoever's
+ * reviewing glances at the inbox and flags it themselves.
  */
 function requireSecret(request: Request): boolean {
   const secret = process.env.OUTREACH_ADMIN_SECRET;
@@ -47,7 +52,6 @@ function asApprover(value: unknown): Approver | null {
 
 export async function GET(request: Request) {
   if (!requireSecret(request)) return Response.json({ ok: false }, { status: 404 });
-  await syncPendingReplies();
   const drafts = await listDrafts();
   return Response.json({ ok: true, messages: drafts });
 }
@@ -72,6 +76,18 @@ export async function POST(request: Request) {
     }
     await createDraft({ contactId, subject, body: draftBody });
     return Response.json({ ok: true });
+  }
+
+  if (action === "mark-replied") {
+    const id = typeof body?.id === "string" ? body.id : null;
+    if (!id) return Response.json({ ok: false, error: "invalid request" }, { status: 400 });
+    const message = await getMessage(id);
+    if (!message) return Response.json({ ok: false, error: "not found" }, { status: 404 });
+    if (message.status !== "sent") {
+      return Response.json({ ok: false, error: `message is ${message.status}, not sent` }, { status: 409 });
+    }
+    await markReplied(id);
+    return Response.json({ ok: true, status: "replied" });
   }
 
   const id = typeof body?.id === "string" ? body.id : null;

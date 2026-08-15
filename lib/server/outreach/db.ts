@@ -1,7 +1,6 @@
 /**
  * Data access for the outreach tool. Service-role only — there is no user
- * JWT in this flow, only the ADMIN_EMAILS-gated founder/agent session and
- * the sync cron.
+ * JWT in this flow, only the shared-secret-gated admin route.
  */
 import { serviceClient } from "@/lib/frontdesk/server/clients";
 
@@ -75,31 +74,12 @@ export async function markRejected(id: string, approvedBy: string): Promise<void
   if (error) throw error;
 }
 
-export async function listSentAwaitingReply(): Promise<OutreachMessage[]> {
-  const db = serviceClient();
-  const { data, error } = await db
-    .from("outreach_messages")
-    .select("*")
-    .eq("status", "sent")
-    .not("gmail_thread_id", "is", null);
-  if (error) throw error;
-  return (data ?? []) as OutreachMessage[];
-}
-
+/** Human-set, not read-detected — see the admin route's mark-replied action. */
 export async function markReplied(id: string): Promise<void> {
   const db = serviceClient();
   const { error } = await db
     .from("outreach_messages")
-    .update({ status: "replied", last_synced_at: new Date().toISOString() })
-    .eq("id", id);
-  if (error) throw error;
-}
-
-export async function touchSynced(id: string): Promise<void> {
-  const db = serviceClient();
-  const { error } = await db
-    .from("outreach_messages")
-    .update({ last_synced_at: new Date().toISOString() })
+    .update({ status: "replied" })
     .eq("id", id);
   if (error) throw error;
 }

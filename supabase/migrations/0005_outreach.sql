@@ -30,16 +30,12 @@ create table public.outreach_messages (
   gmail_thread_id text,
   gmail_message_id text,
   created_at timestamptz not null default now(),
-  sent_at timestamptz,
-  last_synced_at timestamptz
+  sent_at timestamptz
 );
 
 create unique index outreach_contacts_email_idx on public.outreach_contacts (email);
 create index outreach_messages_contact_idx on public.outreach_messages (contact_id, created_at desc);
 create index outreach_messages_status_idx on public.outreach_messages (status);
--- Reply-sync cron scans threads on messages it has sent but not yet resolved.
-create index outreach_messages_thread_idx on public.outreach_messages (gmail_thread_id)
-  where gmail_thread_id is not null;
 
 alter table public.outreach_contacts enable row level security;
 alter table public.outreach_messages enable row level security;

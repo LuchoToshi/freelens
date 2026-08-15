@@ -1,9 +1,9 @@
 /**
- * Thin wrapper around the dedicated outreach Gmail account. Scopes are
- * gmail.send + gmail.readonly, both bound to that one account — this reads
- * mail Freelens owns to detect replies, never a prospect's inbox. That's the
- * line the paused customer-facing opportunity-agent would have crossed;
- * this tool doesn't.
+ * Thin wrapper around the dedicated outreach Gmail account. Scope is
+ * gmail.send only — gmail.readonly turned out to be a Restricted scope
+ * requiring a CASA security review, wildly disproportionate for an
+ * 8-message probe, so reply detection is a manual toggle in the admin
+ * route instead of an automated inbox read. See waitlistSource/db for that.
  *
  * Credentials are absent until Ops provisions the account. Every export
  * throws a clear error rather than silently no-op-ing, so a misconfigured
@@ -55,15 +55,4 @@ export async function sendOutreachMessage(input: {
     throw new Error("outreach/gmail: send returned no message/thread id");
   }
   return { gmailMessageId, gmailThreadId };
-}
-
-/** True if the thread has any message after the one we sent — i.e. a reply. */
-export async function threadHasReply(
-  gmailThreadId: string,
-  sentMessageId: string
-): Promise<boolean> {
-  const gmail = client();
-  const res = await gmail.users.threads.get({ userId: "me", id: gmailThreadId, format: "minimal" });
-  const messageIds = (res.data.messages ?? []).map((m) => m.id).filter(Boolean);
-  return messageIds.some((id) => id !== sentMessageId);
 }
