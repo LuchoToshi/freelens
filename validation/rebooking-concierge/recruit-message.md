@@ -17,7 +17,7 @@ the software; naming software changes what they think they're judging.
 | Tier | Who | Variant | Notes |
 |---|---|---|---|
 | 1–3 | Shrf's personal network (warm) | A (Dutch) | Adjust the opening line to the real relationship if you want, reference something true and specific, just not an "earlier conversation" that didn't happen. |
-| 4–6 | FrontDesk waitlist (opted-in strangers) | B (English), **[Waitlist opening]** | Honest to reference their signup, they did opt in. |
+| 4–6 | Site waitlist (opted-in strangers) | B (English), **[Waitlist opening]** | Honest to reference their signup, but don't say "FrontDesk", the one confirmed record (2026-08-06) predates FrontDesk and has no `product` field, so it opted into something else, probably the old calculator. Say "the site," not the product name. |
 | 7–8 | Referrals from slots 1–6 | A or B, matched to the referred person's language | Comes with a warm intro from whoever referred them, use that real intro as the opening line, not either bracketed default. |
 | 9 | Cold: Dutch ZZP Facebook groups | A (Dutch), generic opening exactly as written | **Do not add any relationship claim.** 15-minute trust call before the intake ask. See README.md. |
 | 10 | Cold: LinkedIn + International Freelancers in Nederland | B (English), **[Cold/warm opening]** bracket | Do not use the waitlist bracket, they didn't sign up for anything. 15-minute trust call before the intake ask. See README.md. |
@@ -71,9 +71,9 @@ the product" rule for the waitlist case specifically, flagged at sign-off.
 
 Hi {name},
 
-[Waitlist opening, tier 4–6 only: You signed up for the FrontDesk waitlist
-a while back, before anything launches, I'm running the whole thing by
-hand for five people, free, as an experiment. Can I do it for you?]
+[Waitlist opening, tier 4–6 only: You signed up on the site a while back,
+before anything launches, I'm running the whole thing by hand for five
+people, free, as an experiment. Can I do it for you?]
 [Cold/warm opening, tiers 7–8, 10: Can I do something for you, free, for
 two weeks, as an experiment?]
 
