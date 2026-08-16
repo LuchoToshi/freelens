@@ -29,6 +29,10 @@ export type AnalyticsEvent =
   | "quote_reopened"
   | "voice_confirmed"
   | "setup_completed"
+  /** Fires on click of the mailto link or the copy button — intent to send,
+   *  not a confirmed send. Nothing in the product can observe whether the
+   *  freelancer's mail client actually dispatched the message. Any funnel
+   *  built on this event measures "marked as replied," not "replied." */
   | "draft_sent"
   | "draft_copied"
   | "draft_skipped"
