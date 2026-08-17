@@ -77,7 +77,7 @@ export function OutcomesAndNumbers({ refreshKey }: { refreshKey: number }) {
       relationships: rel.count ?? 0,
       sent: sent.length,
       outcomes: all.length,
-      replies: all.filter((o) => o.result.startsWith("reply_") || o.result === "booked").length,
+      replies: all.filter((o) => o.result.startsWith("reply_")).length,
       bookedCents: all
         .filter((o) => o.result === "booked" && o.recorded_at >= quarterStart)
         .reduce((sum, o) => sum + (o.booked_value_cents ?? 0), 0),
