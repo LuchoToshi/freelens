@@ -67,9 +67,9 @@ export const en = {
     eyebrow: "Try Freelens",
     heading: "One week of Freelens, in three minutes.",
     intro:
-      "Enter three clients — a new inquiry or someone you haven't heard from in a while. Freelens ranks who's worth a message right now, says why, and writes one draft in your tone. What you type stays in your browser.",
+      "Enter three clients, a new inquiry or someone you haven't heard from in a while. Freelens ranks who's worth a message right now, says why, and writes one draft in your tone.",
     clients: {
-      heading: "Step 1 — three clients",
+      heading: "Step 1: three clients",
       hint: "Real clients work best. A first name makes the greeting personal; an email address enables the send button. Both optional.",
       nameLabel: "Client name",
       projectLabel: "Last project",
@@ -89,7 +89,7 @@ export const en = {
       next: "Next: how you write",
     },
     voice: {
-      heading: "Step 2 — how you write",
+      heading: "Step 2: how you write",
       hint: "Three choices, so the draft sounds like you instead of like software.",
       craftLabel: "Your craft",
       toneLabel: "Tone",
@@ -104,10 +104,10 @@ export const en = {
     },
     queue: {
       heading: "Who is worth a message this week",
-      hint: "Ranked by the same rules as the real product: anniversaries first, then season, then silence. No AI in the ranking — every reason is checkable.",
+      hint: "Ranked by the same rules as the real product: anniversaries first, then season, then silence. No AI in the ranking, every reason is checkable.",
       empty: {
         title: "Honest answer: nobody, this week.",
-        body: "None of these three hit an anniversary, a season window, or six months of silence. That is the product working — quiet weeks stay quiet. Try a client from last year, or load the sample data.",
+        body: "None of these three hit an anniversary, a season window, or six months of silence. That is the product working: quiet weeks stay quiet. Try a client from last year, or load the sample data.",
         edit: "Edit clients",
       },
       draftCta: "Write the draft",
@@ -115,7 +115,7 @@ export const en = {
       notThisWeek: "No reason this week:",
       fresh: {
         heading: "Too recent for a note",
-        body: "{project} was in {month} — that is {n} months ago. Next natural moment: {next}, a year after the job.",
+        body: "{project} was in {month}, that is {n} months ago. Next natural moment: {next}, a year after the job.",
         privateExtra: "Until then: a short thank-you with a request for a referral is always fine.",
       },
     },
@@ -125,19 +125,19 @@ export const en = {
       copied: "Copied",
       openMail: "Open in your mail app",
       mailHint: "Tip: with an email address this opens straight in your mail app.",
-      loopTeaser: "In the real Freelens the agent remembers you sent this — and your Monday email sees who has not replied yet.",
-      locked: "Fill in the [fill in:] parts first — Freelens does not invent facts.",
+      loopTeaser: "In the real Freelens the agent remembers you sent this, and your Monday email sees who has not replied yet.",
+      locked: "Fill in the [fill in:] parts first. Freelens does not invent facts.",
       error: "The draft did not pass our checks. Try once more.",
-      limit: "That was today's free draft. The queue and the reasons stay open — for more drafts, get on the list below.",
+      limit: "That was today's free draft. The queue and the reasons stay open. For more drafts, get on the list below.",
     },
     gate: {
-      heading: "Nothing was saved. That is the point — and the limit.",
+      heading: "Nothing was saved. That is the point, and the limit.",
       body: "This trial ran in your browser. The real Freelens keeps your client list, redoes this every Monday, and mails you the queue. It is in private beta: {spots} founding spots, {founding} for the first year. After that the standard price is {yearly} a year or {monthly} a month.",
       cta: "Get on the list",
       again: "Run it again with different clients",
     },
     privacyNote:
-      "What you type never leaves your browser, except the one client you draft for: name, contact person, project and date are sent once to write the email and are not stored. Email addresses never leave your browser.",
+      "Only the one client you draft for is sent anywhere: name, contact person, project and date, used once to write the email and not stored. Your email address is used only to open your mail app, it is not sent.",
   },
 
   meta: {
@@ -366,7 +366,7 @@ export const en = {
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
       heroCtaTry: "Try it live",
-      heroCtaTryCaption: "No signup — see a real draft in under a minute.",
+      heroCtaTryCaption: "No signup, see a real draft in under a minute.",
       example: {
         label: "This is what one inquiry looks like.",
         inquiryLabel: "Inquiry",
@@ -376,7 +376,7 @@ export const en = {
         budget: "€1,000–2,500",
         draftLabel: "The reply",
         draft:
-          "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
+          "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week?\n\nEmma",
         caption: "Ready in ~20 seconds. Sent from your own inbox.",
       },
       demo: {
@@ -387,7 +387,7 @@ export const en = {
             eventDate: "June 14, 2026",
             budget: "€1,000–2,500",
             draft:
-              "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week? — Emma",
+              "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week?\n\nEmma",
           },
           party: {
             label: "Party",
@@ -395,7 +395,7 @@ export const en = {
             eventDate: "March 21, 2026",
             budget: "€500–1,000",
             draft:
-              "Hi Sophie! A party is my favourite kind of shoot: real moments, no posing. Tell me a little more about what you're celebrating and how many people are coming, and I'll think along with you on the approach. For parties I usually put a package together to fit, depending on the hours and what you want to do with the photos. I'd love to check the date. Shall we hop on a quick call this week? — Emma",
+              "Hi Sophie! A party is my favourite kind of shoot: real moments, no posing. Tell me a little more about what you're celebrating and how many people are coming, and I'll think along with you on the approach. For parties I usually put a package together to fit, depending on the hours and what you want to do with the photos. I'd love to check the date. Shall we hop on a quick call this week?\n\nEmma",
           },
           business: {
             label: "Business",
@@ -403,7 +403,7 @@ export const en = {
             eventDate: "April 9, 2026",
             budget: "€1,000–2,500",
             draft:
-              "Hi James! Great to hear from you. I shoot business work regularly, from team portraits to imagery for your website, and I'd love to hear what you're after. Tell me a bit about your brand and where the photos will live, and I'll put together a proposal that fits your goal and budget. I'd be happy to check the date. Shall I give you a call this week to talk it through? — Emma",
+              "Hi James! Great to hear from you. I shoot business work regularly, from team portraits to imagery for your website, and I'd love to hear what you're after. Tell me a bit about your brand and where the photos will live, and I'll put together a proposal that fits your goal and budget. I'd be happy to check the date. Shall I give you a call this week to talk it through?\n\nEmma",
           },
           portrait: {
             label: "Portrait",
@@ -411,7 +411,7 @@ export const en = {
             eventDate: "May 2, 2026",
             budget: "€250–500",
             draft:
-              "Hi Amber! Lovely that you want to plan a portrait session. A good portrait session feels more like a good conversation than a photo shoot, and you can see that in the images. For portraits I work with a package from €350, editing of the best photos included. Tell me a little about what the portraits are for and I'll shape the session around it. I'd love to check the date. When works for you? — Emma",
+              "Hi Amber! Lovely that you want to plan a portrait session. A good portrait session feels more like a good conversation than a photo shoot, and you can see that in the images. For portraits I work with a package from €350, editing of the best photos included. Tell me a little about what the portraits are for and I'll shape the session around it. I'd love to check the date. When works for you?\n\nEmma",
           },
         },
         caption: "Ready in about 20 seconds. Sent from your own inbox.",
@@ -471,9 +471,9 @@ export const en = {
       heroEyebrow: "For creative freelancers",
       betaPill: "Private beta \u00b7 onboarding the first 25",
       heroQuestion: "When did you last talk to your best client from last year?",
-      heroSub: "Your easiest next job is a client you already know. Freelens remembers who, knows when, and writes the first email \u2014 in your voice. You press send.",
+      heroSub: "Your easiest next job is a client you already know. Freelens remembers who, knows when, and writes the first email, in your voice. You press send.",
       heroCta: "Join the waitlist",
-      heroCtaTry: "Try it with 3 clients — no account",
+      heroCtaTry: "Try it with 3 clients, no account",
       how: {
         eyebrow: "How it will work",
         heading: "Three steps, one of them yours.",
@@ -484,7 +484,7 @@ export const en = {
           },
           {
             title: "Each week: two to four people worth a message",
-            body: "Chosen for a real reason \u2014 a year since the last shoot, briefing season in their world \u2014 never \u201cjust checking in\u201d.",
+            body: "Chosen for a real reason: a year since the last shoot, briefing season in their world, never \u201cjust checking in\u201d.",
           },
           {
             title: "It drafts, you send",
@@ -502,8 +502,8 @@ export const en = {
         reasonText: "Last year, the briefing for the autumn campaign happened in August.\nIf De Groene Kamer shoots again this year, it's being planned now.",
         draftLabel: "The email, in your voice",
         draftSubject: "Subject: Autumn campaign De Groene Kamer?",
-        draftBody: "Hi Marloes,\n\nLast October I shot the autumn campaign for De Groene Kamer \u2014 one of the best jobs of that season.\n\nI'm planning my autumn now and thought of you: is there another campaign on the calendar this year? If so, I'd love to hold some space.\n\nBest,\nSam",
-        micro: "An example. Every reason comes from your own records \u2014 if a date is off, you correct it. You send the email yourself, from your own inbox.",
+        draftBody: "Hi Marloes,\n\nLast October I shot the autumn campaign for De Groene Kamer, one of the best jobs of that season.\n\nI'm planning my autumn now and thought of you: is there another campaign on the calendar this year? If so, I'd love to hold some space.\n\nBest,\nSam",
+        micro: "An example. Every reason comes from your own records: if a date is off, you correct it. You send the email yourself, from your own inbox.",
       },
       offer: {
         eyebrow: "Founding offer",
@@ -514,7 +514,7 @@ export const en = {
       },
       waitlist: {
         heading: "Get on the list for one of the 25 spots",
-        noCommit: "Signing up is free and commits you to nothing. When the beta opens, we offer the {spots} founding spots ({founding} for the first year) in order of signup \u2014 you decide then.",
+        noCommit: "Signing up is free and commits you to nothing. When the beta opens, we offer the {spots} founding spots ({founding} for the first year) in order of signup, you decide then.",
         nameLabel: "Your name",
         namePlaceholder: "First name is fine",
         emailLabel: "Your email",
@@ -529,7 +529,7 @@ export const en = {
         },
         submit: "Put me on the waitlist",
         sending: "One moment",
-        done: "Almost there: open your inbox and click the confirmation link. No confirmation, no spot \u2014 that is how we know the address is yours.",
+        done: "Almost there: open your inbox and click the confirmation link. No confirmation, no spot, that is how we know the address is yours.",
         error: "That did not go through. Check the fields and try again.",
         privacyNote: "Used only to tell you about the beta. Confirmed by you, deleted on request, never shared.",
       },
@@ -539,7 +539,7 @@ export const en = {
         body: "You always send it yourself, from your own mail. Your client data is used for nothing else and can always be exported and deleted.",
         points: [
           "Every email leaves from your own inbox, pressed by you",
-          "Client records hold a name, a project, a date \u2014 never addresses, phone numbers or registration numbers",
+          "Client records hold a name, a project, a date, never addresses, phone numbers or registration numbers",
           "Export everything or delete everything, from day one",
         ],
       },
@@ -614,10 +614,10 @@ export const en = {
   aboutPage: {
     eyebrow: "Why Freelens exists",
     heading: "Your past clients are your next booking.",
-    intro: "A creative freelancer's quietest months are rarely a quality problem. The work was good. The client was happy. There is just nobody who remembers when the natural moment is to get back in touch \u2014 so it doesn't happen, or it happens as \u201cjust checking in\u201d, and that feels awkward for everyone.",
+    intro: "A creative freelancer's quietest months are rarely a quality problem. The work was good. The client was happy. There is just nobody who remembers when the natural moment is to get back in touch, so it doesn't happen, or it happens as \u201cjust checking in\u201d, and that feels awkward for everyone.",
     what: {
       h: "What Freelens does",
-      p1: "Freelens remembers who your clients are, knows when a message makes sense, and writes the first email \u2014 in your voice. Each week: two to four people worth a message, each with a real reason. A year since the last shoot. Briefing season in their world. Never \u201cjust checking in\u201d.",
+      p1: "Freelens remembers who your clients are, knows when a message makes sense, and writes the first email, in your voice. Each week: two to four people worth a message, each with a real reason. A year since the last shoot. Briefing season in their world. Never \u201cjust checking in\u201d.",
       p2: "You edit what you want and send it yourself, from your own inbox. Freelens never sends anything, to anyone.",
     },
     boundary: {
@@ -626,12 +626,12 @@ export const en = {
     },
     trust: {
       h: "Why you would trust us with your clients",
-      p1: "The tax engine behind our free calculators works with the real Dutch brackets, deductions and credits for 2026 \u2014 every figure checked against belastingdienst.nl, every result with an explanation you can verify. We even have a page showing where the popular 30% rule of thumb misses by up to \u20ac 16,720.",
+      p1: "The tax engine behind our free calculators works with the real Dutch brackets, deductions and credits for 2026: every figure checked against belastingdienst.nl, every result with an explanation you can verify. We even have a page showing where the popular 30% rule of thumb misses by up to \u20ac 16,720.",
       p2: "The same standard applies to the agent: every reason comes from your own records, every email is bound to what actually happened, and nothing is invented. If a date is off, you correct it and Freelens remembers.",
     },
     tools: {
       h: "The free calculators stay free",
-      p1: "What to charge before the job, and what is genuinely yours after the payment \u2014 the same calculation, both directions. No account, and your figures stay in your browser. That stays true.",
+      p1: "What to charge before the job, and what is genuinely yours after the payment: the same calculation, both directions. No account, and your figures stay in your browser. That stays true.",
     },
     going: {
       h: "Where this is going",
@@ -886,7 +886,7 @@ export const en = {
     },
     app: {
       title: "The Rebooking app (private beta)",
-      body: "If you use the app at /app: your account is an email address with a magic link, no password. Client records you enter (name, project, date, value, notes \u2014 never addresses, phone or registration numbers) are stored with Supabase in the EU, readable only by you. Draft emails are written by Anthropic's Claude API, configured without training on your data; the model sees only the record you entered. The weekly email goes through Resend, only when there is something to say, with a one-click stop. Export everything or delete your account, immediately and permanently, from inside the app.",
+      body: "If you use the app at /app: your account is an email address with a magic link, no password. Client records you enter (name, project, date, value, notes, never addresses, phone or registration numbers) are stored with Supabase in the EU, readable only by you. Draft emails are written by Anthropic's Claude API, configured without training on your data; the model sees only the record you entered. The weekly email goes through Resend, only when there is something to say, with a one-click stop. Export everything or delete your account, immediately and permanently, from inside the app.",
     },
     never: {
       title: "What we never collect",
@@ -974,7 +974,7 @@ export const en = {
       replyRate: "Reply rate",
       booked: "Booked this quarter",
       taxNote: "\u2248 {net} for you after btw and reserve, on your saved tax profile.",
-      noData: "\u2014",
+      noData: "-",
     },
     account: {
       heading: "Your data",
@@ -1186,10 +1186,10 @@ export const en = {
       estimateResult: {
         perDay: "per billable day",
         eyebrow: "Your baseline rate \u00b7 estimate",
-        summary: "At {days} billable days a year, the work needs {revenue} in revenue for {take} to be yours \u2014 using your {pct}% tax estimate.",
+        summary: "At {days} billable days a year, the work needs {revenue} in revenue for {take} to be yours, using your {pct}% tax estimate.",
         taxRateLabel: "Effective tax rate on profit",
         taxRateHint: "Your estimate of income tax plus contributions where you work. Adjust it and the rate follows.",
-        provenance: "The tax line here is your estimate, not verified rules \u2014 we only claim verified numbers for the Netherlands. Everything else on this page is plain arithmetic on what you entered.",
+        provenance: "The tax line here is your estimate, not verified rules: we only claim verified numbers for the Netherlands. Everything else on this page is plain arithmetic on what you entered.",
         switchNl: "Work in the Netherlands? Use the verified calculation",
         lines: {
           revenue: "Revenue the year needs",
@@ -1212,11 +1212,11 @@ export const en = {
           question: "Where do you work?",
           helper: "Tax rules are national. We only show verified numbers where we actually have them.",
           nl: "The Netherlands",
-          nlNote: "Verified rules \u2014 checked against belastingdienst.nl",
+          nlNote: "Verified rules, checked against belastingdienst.nl",
           other: "Somewhere else",
-          otherNote: "Estimate mode \u2014 you set the tax rate, we do the arithmetic",
+          otherNote: "Estimate mode: you set the tax rate, we do the arithmetic",
           currencyLabel: "Your currency",
-          why: "The Dutch calculation runs on rules we verified at the source, line by line. We have not done that work for other countries yet, and we will not pretend otherwise. Outside the Netherlands the tax share is an estimate you control \u2014 everything else is arithmetic that holds anywhere.",
+          why: "The Dutch calculation runs on rules we verified at the source, line by line. We have not done that work for other countries yet, and we will not pretend otherwise. Outside the Netherlands the tax share is an estimate you control, everything else is arithmetic that holds anywhere.",
         },
 
         target: {

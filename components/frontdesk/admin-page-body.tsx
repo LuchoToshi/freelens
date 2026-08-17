@@ -94,7 +94,7 @@ function AdminView({ session }: { session: Session }) {
                   <td className="p-3">{f.outcomes.edited}</td>
                   <td className="p-3">{f.outcomes.skipped}</td>
                   <td className="p-3">
-                    {f.medianReplyMinutes === null ? "—" : `${f.medianReplyMinutes} min`}
+                    {f.medianReplyMinutes === null ? "-" : `${f.medianReplyMinutes} min`}
                   </td>
                 </tr>
               ))}
@@ -124,12 +124,12 @@ function AdminView({ session }: { session: Session }) {
               {data.rows.map((r, i) => (
                 <tr key={i} className="border-b border-[var(--fd-line)] last:border-0">
                   <td className="p-3 font-medium text-[var(--fd-ink)]">{r.handle}</td>
-                  <td className="p-3">{r.srcChannel ?? "—"}</td>
+                  <td className="p-3">{r.srcChannel ?? "-"}</td>
                   <td className="p-3">{r.status}</td>
                   <td className="p-3">{r.draftOutcome}</td>
                   <td className="p-3">{r.nudges}</td>
                   <td className="p-3">{r.createdAt.slice(0, 16).replace("T", " ")}</td>
-                  <td className="p-3">{r.repliedAt ? r.repliedAt.slice(0, 16).replace("T", " ") : "—"}</td>
+                  <td className="p-3">{r.repliedAt ? r.repliedAt.slice(0, 16).replace("T", " ") : "-"}</td>
                 </tr>
               ))}
             </tbody>

@@ -18,7 +18,7 @@ const VOICE = {
   emoji: "rare" as const,
   greeting_style: "Hoi {first name}!",
   closing_habit: "suggests a call",
-  sign_off: "— Emma",
+  sign_off: "Groetjes, Emma",
   language_notes: "Dutch, informal je",
   quirks: [],
 };
@@ -36,7 +36,7 @@ function input(overrides: Partial<DraftPromptInput> = {}): DraftPromptInput {
       message: "Wij trouwen in juni en zoeken een fotograaf.",
     },
     displayName: "Emma van Dijk",
-    signOff: "— Emma",
+    signOff: "Groetjes, Emma",
     targetLanguage: "nl",
     ...overrides,
   };
@@ -101,8 +101,17 @@ describe("availability guard", () => {
   });
 
   it("allows enthusiasm and checking language", () => {
-    const body = `${REPLY_PAD}Wat een mooie datum — ik duik graag even in mijn agenda en kom er vrijblijvend op terug. Zullen we bellen?`;
+    const body = `${REPLY_PAD}Wat een mooie datum, ik duik graag even in mijn agenda en kom er vrijblijvend op terug. Zullen we bellen?`;
     expect(validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES }).ok).toBe(true);
+  });
+});
+
+describe("style guard", () => {
+  it("rejects an em dash anywhere in the draft", () => {
+    const body = `${REPLY_PAD}Wat een mooie datum — ik duik er graag in. Zullen we bellen?`;
+    const verdict = validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES });
+    expect(verdict.ok).toBe(false);
+    expect(verdict.reason).toBe("em-dash");
   });
 });
 

@@ -70,9 +70,9 @@ export const nl: DeepPartial<typeof en> = {
     eyebrow: "Probeer Freelens",
     heading: "E\u00e9n week Freelens, in drie minuten.",
     intro:
-      "Vul drie klanten in \u2014 een nieuwe aanvraag, of iemand die al een tijdje niets van zich heeft laten horen. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon. Wat je invult blijft in je browser.",
+      "Vul drie klanten in, een nieuwe aanvraag, of iemand die al een tijdje niets van zich heeft laten horen. Freelens rangschikt wie nu een bericht waard is, zegt waarom, en schrijft \u00e9\u00e9n concept in jouw toon.",
     clients: {
-      heading: "Stap 1 \u2014 drie klanten",
+      heading: "Stap 1: drie klanten",
       hint: "Echte klanten werken het best. Een voornaam maakt de aanhef persoonlijk; een e-mailadres maakt de verzendknop mogelijk. Allebei optioneel.",
       nameLabel: "Naam klant",
       projectLabel: "Laatste klus",
@@ -92,7 +92,7 @@ export const nl: DeepPartial<typeof en> = {
       next: "Verder: hoe jij schrijft",
     },
     voice: {
-      heading: "Stap 2 \u2014 hoe jij schrijft",
+      heading: "Stap 2: hoe jij schrijft",
       hint: "Drie keuzes, zodat het concept klinkt als jij en niet als software.",
       craftLabel: "Jouw vak",
       toneLabel: "Toon",
@@ -107,17 +107,17 @@ export const nl: DeepPartial<typeof en> = {
     },
     queue: {
       heading: "Wie is deze week een bericht waard",
-      hint: "Gerangschikt volgens dezelfde regels als het echte product: eerst verjaardagen, dan seizoen, dan stilte. Geen AI in de rangschikking \u2014 elke reden is controleerbaar.",
+      hint: "Gerangschikt volgens dezelfde regels als het echte product: eerst verjaardagen, dan seizoen, dan stilte. Geen AI in de rangschikking, elke reden is controleerbaar.",
       empty: {
         title: "Eerlijk antwoord: niemand, deze week.",
-        body: "Geen van deze drie zit op een verjaardag, een seizoensvenster of een half jaar stilte. Zo hoort het te werken \u2014 rustige weken blijven rustig. Probeer een klant van vorig jaar, of laad de voorbeelddata.",
+        body: "Geen van deze drie zit op een verjaardag, een seizoensvenster of een half jaar stilte. Zo hoort het te werken: rustige weken blijven rustig. Probeer een klant van vorig jaar, of laad de voorbeelddata.",
         edit: "Klanten aanpassen",
       },
       draftCta: "Schrijf het concept",
       notThisWeek: "Geen reden deze week:",
       fresh: {
         heading: "Nog te vers voor een berichtje",
-        body: "{project} was in {month} \u2014 dat is {n} maanden geleden. Eerstvolgend logisch moment: {next}, een jaar na de klus.",
+        body: "{project} was in {month}, dat is {n} maanden geleden. Eerstvolgend logisch moment: {next}, een jaar na de klus.",
         privateExtra: "Tot die tijd: een korte bedankmail met de vraag om een aanbeveling kan altijd.",
       },
       drafting: "Aan het schrijven in jouw toon\u2026",
@@ -128,19 +128,19 @@ export const nl: DeepPartial<typeof en> = {
       copied: "Gekopieerd",
       openMail: "Open in je mail",
       mailHint: "Tip: met een e-mailadres opent dit direct in je mailprogramma.",
-      loopTeaser: "In het echte Freelens onthoudt de agent dat je dit verstuurde \u2014 en ziet je maandagmail wie nog niet antwoordde.",
-      locked: "Vul eerst de [vul in:]-delen in \u2014 Freelens verzint geen feiten.",
+      loopTeaser: "In het echte Freelens onthoudt de agent dat je dit verstuurde, en ziet je maandagmail wie nog niet antwoordde.",
+      locked: "Vul eerst de [vul in:]-delen in. Freelens verzint geen feiten.",
       error: "Het concept kwam niet door onze controles. Probeer het nog een keer.",
-      limit: "Dat was het gratis concept voor vandaag. De lijst en de redenen blijven open \u2014 voor meer concepten: zet je op de lijst hieronder.",
+      limit: "Dat was het gratis concept voor vandaag. De lijst en de redenen blijven open. Voor meer concepten: zet je op de lijst hieronder.",
     },
     gate: {
-      heading: "Er is niets opgeslagen. Dat is het idee \u2014 en de grens.",
+      heading: "Er is niets opgeslagen. Dat is het idee, en de grens.",
       body: "Deze proef draaide in je browser. Het echte Freelens bewaart je klantenlijst, doet dit elke maandag opnieuw en mailt je de lijst. Het zit in besloten b\u00e8ta: {spots} founding-plekken, {founding} voor het eerste jaar. Daarna is de standaardprijs {yearly} per jaar of {monthly} per maand.",
       cta: "Zet me op de lijst",
       again: "Nog een keer met andere klanten",
     },
     privacyNote:
-      "Wat je invult verlaat je browser niet, behalve de ene klant voor wie je een concept maakt: naam, contactpersoon, klus en datum gaan \u00e9\u00e9n keer mee om de e-mail te schrijven en worden niet opgeslagen. E-mailadressen gaan nooit mee.",
+      "Alleen de ene klant voor wie je een concept maakt wordt ergens naartoe gestuurd: naam, contactpersoon, klus en datum, eenmalig gebruikt om de e-mail te schrijven en niet opgeslagen. Je e-mailadres wordt alleen gebruikt om je mailprogramma te openen, dat wordt niet verstuurd.",
   },
 
   meta: {
@@ -360,7 +360,7 @@ export const nl: DeepPartial<typeof en> = {
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
       heroCtaTry: "Probeer het live",
-      heroCtaTryCaption: "Geen account nodig — bekijk een echt concept in minder dan een minuut.",
+      heroCtaTryCaption: "Geen account nodig, bekijk een echt concept in minder dan een minuut.",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",
@@ -370,7 +370,7 @@ export const nl: DeepPartial<typeof en> = {
         budget: "€1.000–2.500",
         draftLabel: "Het antwoord",
         draft:
-          "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
+          "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen?\n\nEmma",
         caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
       },
       demo: {
@@ -381,7 +381,7 @@ export const nl: DeepPartial<typeof en> = {
             eventDate: "14 juni 2026",
             budget: "€1.000–2.500",
             draft:
-              "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen? — Emma",
+              "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen?\n\nEmma",
           },
           party: {
             label: "Feest",
@@ -389,7 +389,7 @@ export const nl: DeepPartial<typeof en> = {
             eventDate: "21 maart 2026",
             budget: "€500–1.000",
             draft:
-              "Hoi Sanne! Wat leuk, een feest vastleggen is altijd goud: echte momenten, geen poses. Vertel me iets meer over wat jullie vieren en hoe groot het gezelschap is, dan denk ik met je mee over de aanpak. Voor feesten stel ik het pakket meestal op maat samen, afhankelijk van het aantal uren en wat je met de foto's wilt. Ik check de datum graag even. Zullen we deze week kort bellen of mailen? — Emma",
+              "Hoi Sanne! Wat leuk, een feest vastleggen is altijd goud: echte momenten, geen poses. Vertel me iets meer over wat jullie vieren en hoe groot het gezelschap is, dan denk ik met je mee over de aanpak. Voor feesten stel ik het pakket meestal op maat samen, afhankelijk van het aantal uren en wat je met de foto's wilt. Ik check de datum graag even. Zullen we deze week kort bellen of mailen?\n\nEmma",
           },
           business: {
             label: "Zakelijk",
@@ -397,7 +397,7 @@ export const nl: DeepPartial<typeof en> = {
             eventDate: "9 april 2026",
             budget: "€1.000–2.500",
             draft:
-              "Hoi Mark! Goed om van je te horen. Zakelijke shoots doe ik regelmatig, van teamportretten tot beeld voor je website, en ik hoor graag wat jullie precies zoeken. Vertel me iets over jullie merk en waar de foto's voor bedoeld zijn, dan maak ik een voorstel op maat dat past bij jullie doel en budget. De datum check ik graag even. Zal ik je deze week bellen om het door te nemen? — Emma",
+              "Hoi Mark! Goed om van je te horen. Zakelijke shoots doe ik regelmatig, van teamportretten tot beeld voor je website, en ik hoor graag wat jullie precies zoeken. Vertel me iets over jullie merk en waar de foto's voor bedoeld zijn, dan maak ik een voorstel op maat dat past bij jullie doel en budget. De datum check ik graag even. Zal ik je deze week bellen om het door te nemen?\n\nEmma",
           },
           portrait: {
             label: "Portret",
@@ -405,7 +405,7 @@ export const nl: DeepPartial<typeof en> = {
             eventDate: "2 mei 2026",
             budget: "€250–500",
             draft:
-              "Hoi Nadia! Leuk dat je een portretshoot wilt plannen. Een goede portretsessie voelt meer als een goed gesprek dan als een fotoshoot, en dat zie je terug in de beelden. Voor een portretsessie werk ik met een pakket vanaf €350, inclusief nabewerking van de beste foto's. Vertel me iets over waar de portretten voor zijn, dan stem ik de aanpak daarop af. Ik check de datum graag even. Wanneer schikt het jou? — Emma",
+              "Hoi Nadia! Leuk dat je een portretshoot wilt plannen. Een goede portretsessie voelt meer als een goed gesprek dan als een fotoshoot, en dat zie je terug in de beelden. Voor een portretsessie werk ik met een pakket vanaf €350, inclusief nabewerking van de beste foto's. Vertel me iets over waar de portretten voor zijn, dan stem ik de aanpak daarop af. Ik check de datum graag even. Wanneer schikt het jou?\n\nEmma",
           },
         },
         caption: "Klaar in ongeveer 20 seconden. Verstuurd vanuit je eigen inbox.",
@@ -465,9 +465,9 @@ export const nl: DeepPartial<typeof en> = {
       heroEyebrow: "Voor creatieve freelancers",
       betaPill: "Besloten b\u00e8ta \u00b7 we onboarden de eerste 25",
       heroQuestion: "Wanneer sprak je je beste klant van vorig jaar voor het laatst?",
-      heroSub: "Je makkelijkste volgende klus is een klant die je al kent. Freelens onthoudt wie, weet wanneer, en schrijft de eerste mail \u2014 in jouw toon. Jij drukt op verzenden.",
+      heroSub: "Je makkelijkste volgende klus is een klant die je al kent. Freelens onthoudt wie, weet wanneer, en schrijft de eerste mail, in jouw toon. Jij drukt op verzenden.",
       heroCta: "Zet me op de wachtlijst",
-      heroCtaTry: "Probeer het met 3 klanten \u2014 zonder account",
+      heroCtaTry: "Probeer het met 3 klanten, zonder account",
       how: {
         eyebrow: "Zo gaat het werken",
         heading: "Drie stappen, waarvan \u00e9\u00e9n van jou.",
@@ -478,7 +478,7 @@ export const nl: DeepPartial<typeof en> = {
           },
           {
             title: "Elke week: twee tot vier mensen die een berichtje waard zijn",
-            body: "Gekozen met een echte reden \u2014 een jaar na de vorige shoot, briefingseizoen in hun wereld \u2014 nooit \u201ceven checken\u201d.",
+            body: "Gekozen met een echte reden: een jaar na de vorige shoot, briefingseizoen in hun wereld, nooit \u201ceven checken\u201d.",
           },
           {
             title: "Het schrijft, jij verstuurt",
@@ -496,8 +496,8 @@ export const nl: DeepPartial<typeof en> = {
         reasonText: "Vorig jaar viel de briefing voor de najaarscampagne in augustus.\nAls De Groene Kamer dit jaar weer schiet, wordt die nu gepland.",
         draftLabel: "De mail, in jouw toon",
         draftSubject: "Onderwerp: Najaarscampagne De Groene Kamer?",
-        draftBody: "Hoi Marloes,\n\nVorig jaar oktober schoot ik de najaarscampagne voor De Groene Kamer \u2014 een van de leukste klussen van dat seizoen.\n\nIk zit mijn najaar nu in te plannen en moest aan jullie denken: staat er dit jaar weer een campagne op de planning? Dan hou ik graag alvast ruimte vrij.\n\nGroet,\nSam",
-        micro: "Een voorbeeld. Elke reden komt uit jouw eigen gegevens \u2014 klopt een datum niet, dan pas je hem aan. De mail verstuur jij zelf, uit je eigen inbox.",
+        draftBody: "Hoi Marloes,\n\nVorig jaar oktober schoot ik de najaarscampagne voor De Groene Kamer, een van de leukste klussen van dat seizoen.\n\nIk zit mijn najaar nu in te plannen en moest aan jullie denken: staat er dit jaar weer een campagne op de planning? Dan hou ik graag alvast ruimte vrij.\n\nGroet,\nSam",
+        micro: "Een voorbeeld. Elke reden komt uit jouw eigen gegevens: klopt een datum niet, dan pas je hem aan. De mail verstuur jij zelf, uit je eigen inbox.",
       },
       offer: {
         eyebrow: "Founding-aanbod",
@@ -508,7 +508,7 @@ export const nl: DeepPartial<typeof en> = {
       },
       waitlist: {
         heading: "Zet je op de lijst voor een van de 25 plekken",
-        noCommit: "Aanmelden is gratis en verplicht je tot niets. Zodra de b\u00e8ta opent, bieden we de {spots} founding-plekken ({founding} voor het eerste jaar) aan in volgorde van aanmelding \u2014 je beslist dan pas.",
+        noCommit: "Aanmelden is gratis en verplicht je tot niets. Zodra de b\u00e8ta opent, bieden we de {spots} founding-plekken ({founding} voor het eerste jaar) aan in volgorde van aanmelding, je beslist dan pas.",
         nameLabel: "Je naam",
         namePlaceholder: "Voornaam is genoeg",
         emailLabel: "Je e-mailadres",
@@ -523,7 +523,7 @@ export const nl: DeepPartial<typeof en> = {
         },
         submit: "Zet me op de wachtlijst",
         sending: "Momentje",
-        done: "Bijna: open je inbox en klik op de bevestigingslink. Geen bevestiging, geen plek \u2014 zo weten we dat het adres van jou is.",
+        done: "Bijna: open je inbox en klik op de bevestigingslink. Geen bevestiging, geen plek, zo weten we dat het adres van jou is.",
         error: "Dat ging niet door. Controleer de velden en probeer het opnieuw.",
         privacyNote: "Alleen gebruikt om je over de b\u00e8ta te vertellen. Door jou bevestigd, op verzoek verwijderd, nooit gedeeld.",
       },
@@ -533,7 +533,7 @@ export const nl: DeepPartial<typeof en> = {
         body: "Jij verstuurt altijd zelf, vanuit je eigen mail. Je klantgegevens worden nergens anders voor gebruikt en zijn altijd te exporteren en te verwijderen.",
         points: [
           "Elke mail vertrekt uit je eigen inbox, verstuurd door jou",
-          "Klantrecords bevatten een naam, een project, een datum \u2014 nooit adressen, telefoonnummers of registratienummers",
+          "Klantrecords bevatten een naam, een project, een datum, nooit adressen, telefoonnummers of registratienummers",
           "Alles exporteren of alles verwijderen, vanaf dag \u00e9\u00e9n",
         ],
       },
@@ -608,10 +608,10 @@ export const nl: DeepPartial<typeof en> = {
   aboutPage: {
     eyebrow: "Waarom Freelens bestaat",
     heading: "Je oude klanten zijn je volgende boeking.",
-    intro: "De stilste maanden van een creatieve freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die onthoudt wanneer het logische moment is om weer contact te leggen \u2014 en dus gebeurt het niet, of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",
+    intro: "De stilste maanden van een creatieve freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die onthoudt wanneer het logische moment is om weer contact te leggen, en dus gebeurt het niet, of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",
     what: {
       h: "Wat Freelens doet",
-      p1: "Freelens onthoudt wie je klanten zijn, weet wanneer een berichtje ergens op slaat, en schrijft de eerste mail \u2014 in jouw toon. Elke week: twee tot vier mensen die een bericht waard zijn, elk met een echte reden. Een jaar na de vorige shoot. Briefingseizoen in hun wereld. Nooit \u201ceven checken\u201d.",
+      p1: "Freelens onthoudt wie je klanten zijn, weet wanneer een berichtje ergens op slaat, en schrijft de eerste mail, in jouw toon. Elke week: twee tot vier mensen die een bericht waard zijn, elk met een echte reden. Een jaar na de vorige shoot. Briefingseizoen in hun wereld. Nooit \u201ceven checken\u201d.",
       p2: "Jij past aan wat je wilt en verstuurt zelf, vanuit je eigen inbox. Freelens verstuurt nooit iets, naar niemand.",
     },
     boundary: {
@@ -620,12 +620,12 @@ export const nl: DeepPartial<typeof en> = {
     },
     trust: {
       h: "Waarom je ons met je klanten zou vertrouwen",
-      p1: "De belastingmotor achter onze gratis rekentools rekent met de echte Nederlandse schijven, aftrekposten en heffingskortingen van 2026 \u2014 elk cijfer gecontroleerd bij belastingdienst.nl, elke uitkomst met een uitleg die je kunt nalopen. We hebben zelfs een pagina die voorrekent waar de populaire 30%-vuistregel er tot \u20ac 16.720 naast zit.",
+      p1: "De belastingmotor achter onze gratis rekentools rekent met de echte Nederlandse schijven, aftrekposten en heffingskortingen van 2026: elk cijfer gecontroleerd bij belastingdienst.nl, elke uitkomst met een uitleg die je kunt nalopen. We hebben zelfs een pagina die voorrekent waar de populaire 30%-vuistregel er tot \u20ac 16.720 naast zit.",
       p2: "Diezelfde standaard geldt voor de agent: elke reden komt uit jouw eigen gegevens, elke mail is gebonden aan wat er echt gebeurd is, en niets wordt verzonnen. Klopt een datum niet, dan pas je hem aan en onthoudt Freelens dat.",
     },
     tools: {
       h: "De gratis rekentools blijven gratis",
-      p1: "Wat moet je vragen v\u00f3\u00f3r de klus, en wat is er echt van jou na de betaling \u2014 dezelfde berekening, beide kanten op. Zonder account, en je cijfers blijven in je browser. Dat blijft zo.",
+      p1: "Wat moet je vragen v\u00f3\u00f3r de klus, en wat is er echt van jou na de betaling: dezelfde berekening, beide kanten op. Zonder account, en je cijfers blijven in je browser. Dat blijft zo.",
     },
     going: {
       h: "Waar dit heen gaat",
@@ -880,7 +880,7 @@ export const nl: DeepPartial<typeof en> = {
     },
     app: {
       title: "De Rebooking-app (besloten b\u00e8ta)",
-      body: "Gebruik je de app op /app: je account is een e-mailadres met een magic link, zonder wachtwoord. Klantrecords die je invoert (naam, klus, datum, bedrag, notities \u2014 nooit adressen, telefoonnummers of registratienummers) staan bij Supabase in de EU en zijn alleen door jou leesbaar. Conceptmails schrijft de Claude-API van Anthropic, ingesteld zonder training op jouw gegevens; het model ziet alleen het record dat jij invoerde. De wekelijkse mail loopt via Resend, alleen als er iets te melden is, met \u00e9\u00e9n klik om te stoppen. Alles exporteren of je account verwijderen, direct en definitief, kan in de app zelf.",
+      body: "Gebruik je de app op /app: je account is een e-mailadres met een magic link, zonder wachtwoord. Klantrecords die je invoert (naam, klus, datum, bedrag, notities, nooit adressen, telefoonnummers of registratienummers) staan bij Supabase in de EU en zijn alleen door jou leesbaar. Conceptmails schrijft de Claude-API van Anthropic, ingesteld zonder training op jouw gegevens; het model ziet alleen het record dat jij invoerde. De wekelijkse mail loopt via Resend, alleen als er iets te melden is, met \u00e9\u00e9n klik om te stoppen. Alles exporteren of je account verwijderen, direct en definitief, kan in de app zelf.",
     },
     never: {
       title: "Wat we nooit verzamelen",
@@ -968,7 +968,7 @@ export const nl: DeepPartial<typeof en> = {
       replyRate: "Antwoordpercentage",
       booked: "Geboekt dit kwartaal",
       taxNote: "\u2248 {net} voor jou na btw en reservering, op je opgeslagen belastingprofiel.",
-      noData: "\u2014",
+      noData: "-",
     },
     account: {
       heading: "Je gegevens",
@@ -1164,10 +1164,10 @@ export const nl: DeepPartial<typeof en> = {
       estimateResult: {
         perDay: "per declarabele dag",
         eyebrow: "Je basistarief \u00b7 schatting",
-        summary: "Bij {days} declarabele dagen per jaar moet het werk {revenue} aan omzet opleveren om {take} voor jou over te houden \u2014 met jouw schatting van {pct}% belasting.",
+        summary: "Bij {days} declarabele dagen per jaar moet het werk {revenue} aan omzet opleveren om {take} voor jou over te houden, met jouw schatting van {pct}% belasting.",
         taxRateLabel: "Effectief belastingpercentage op winst",
         taxRateHint: "Jouw schatting van inkomstenbelasting plus premies waar jij werkt. Pas het aan en het tarief beweegt mee.",
-        provenance: "Het belastingdeel hier is jouw schatting, geen geverifieerde regels \u2014 alleen voor Nederland claimen we geverifieerde cijfers. De rest op deze pagina is puur rekenwerk met wat je invulde.",
+        provenance: "Het belastingdeel hier is jouw schatting, geen geverifieerde regels: alleen voor Nederland claimen we geverifieerde cijfers. De rest op deze pagina is puur rekenwerk met wat je invulde.",
         switchNl: "Werk je in Nederland? Gebruik de geverifieerde berekening",
         lines: {
           revenue: "Omzet die het jaar nodig heeft",
@@ -1190,11 +1190,11 @@ export const nl: DeepPartial<typeof en> = {
           question: "Waar werk je?",
           helper: "Belastingregels zijn nationaal. We tonen alleen geverifieerde cijfers waar we ze echt hebben.",
           nl: "Nederland",
-          nlNote: "Geverifieerde regels \u2014 gecontroleerd bij belastingdienst.nl",
+          nlNote: "Geverifieerde regels, gecontroleerd bij belastingdienst.nl",
           other: "Ergens anders",
-          otherNote: "Schattingsmodus \u2014 jij bepaalt het belastingpercentage, wij doen het rekenwerk",
+          otherNote: "Schattingsmodus: jij bepaalt het belastingpercentage, wij doen het rekenwerk",
           currencyLabel: "Jouw valuta",
-          why: "De Nederlandse berekening draait op regels die we regel voor regel bij de bron hebben gecontroleerd. Dat werk hebben we voor andere landen nog niet gedaan, en we doen niet alsof. Buiten Nederland is het belastingdeel een schatting die jij instelt \u2014 de rest is rekenwerk dat overal klopt.",
+          why: "De Nederlandse berekening draait op regels die we regel voor regel bij de bron hebben gecontroleerd. Dat werk hebben we voor andere landen nog niet gedaan, en we doen niet alsof. Buiten Nederland is het belastingdeel een schatting die jij instelt, de rest is rekenwerk dat overal klopt.",
         },
 
         target: {

@@ -87,7 +87,7 @@ export async function GET(request: Request) {
       const items = queue
         .map((s) => {
           const r = relationships.find((x) => x.id === s.relationshipId)!;
-          return `<li><strong>${escapeHtml(r.clientName)}</strong> — ${escapeHtml(
+          return `<li><strong>${escapeHtml(r.clientName)}</strong>: ${escapeHtml(
             reasonTextFor(s, r, "nl")
           )}</li>`;
         })
