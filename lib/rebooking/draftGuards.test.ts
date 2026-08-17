@@ -161,5 +161,10 @@ describe("the new validators", () => {
     const longSubject = { ...ok, subject: "Een hele erg veel te lange onderwerpregel" };
     expect(validateDraft(longSubject).reason).toBe("subject-over-6-words");
   });
+
+  it("rejects an em dash anywhere in subject or body", () => {
+    const draft = { ...ok, body: ok.body.replace("Zal ik", "Zal ik — heel graag —") };
+    expect(validateDraft(draft).reason).toBe("em-dash");
+  });
 });
 

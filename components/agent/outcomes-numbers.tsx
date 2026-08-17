@@ -68,7 +68,7 @@ export function OutcomesAndNumbers({ refreshKey }: { refreshKey: number }) {
     setPending(
       needOutcome.map((x) => ({
         id: x.id,
-        clientName: nameById.get(x.relationship_id) ?? "—",
+        clientName: nameById.get(x.relationship_id) ?? "-",
         statusAt: x.status_at,
       }))
     );

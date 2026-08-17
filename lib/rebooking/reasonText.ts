@@ -62,15 +62,15 @@ export function reasonTextFor(
       // the months of silence are this client's own number.
       const months = suggestion.monthsSince ?? 6;
       return locale === "nl"
-        ? `${line} En het is al ${months} maanden stil sinds ${project ?? "de laatste klus"} — ${name} hoort nu van je, niet als het al vergeven is.`
-        : `${line} And it has been ${months} months of quiet since ${project ?? "the last job"} — ${name} should hear from you now, not after it is all assigned.`;
+        ? `${line} En het is al ${months} maanden stil sinds ${project ?? "de laatste klus"}, ${name} hoort nu van je, niet als het al vergeven is.`
+        : `${line} And it has been ${months} months of quiet since ${project ?? "the last job"}, ${name} should hear from you now, not after it is all assigned.`;
     }
     case "gap": {
       const months = suggestion.monthsSince ?? 6;
       const about = project ?? (locale === "nl" ? "de laatste klus" : "the last job");
       return locale === "nl"
-        ? `Al ${months} maanden stil sinds ${about}. Een kort berichtje houdt de relatie warm — met een concrete aanleiding, geen "even checken".`
-        : `Quiet for ${months} months since ${about}. A short note keeps the relationship warm — with a concrete reason, not a "just checking in".`;
+        ? `Al ${months} maanden stil sinds ${about}. Een kort berichtje houdt de relatie warm, met een concrete aanleiding, geen "even checken".`
+        : `Quiet for ${months} months since ${about}. A short note keeps the relationship warm, with a concrete reason, not a "just checking in".`;
     }
     case "referral": {
       const months = suggestion.monthsSince ?? 6;

@@ -4,10 +4,11 @@
  * enforces them, and a draft that breaks one is rejected with a named reason
  * the retry loop feeds back.
  *
- * Two hard product rules live here:
+ * Three hard product rules live here:
  *   - never an invented price: any euro amount in a draft must literally be a
  *     configured package price
  *   - never an availability claim
+ *   - never an em dash
  * Plus the reply-language rule: Dutch inquiry → Dutch draft, detected
  * deterministically so it is unit-testable.
  */
@@ -80,6 +81,15 @@ export function findPriceLikeAmounts(text: string): string[] {
   return found;
 }
 
+// ---------------------------------------------------------------- style guard
+
+const EM_DASH = "—";
+
+/** The product's punctuation rule: commas, periods, parentheses, colons only. */
+export function containsEmDash(text: string): boolean {
+  return text.includes(EM_DASH);
+}
+
 // ------------------------------------------------------- availability guard
 
 /**
@@ -126,6 +136,10 @@ export function validateFrontdeskDraft(
     if (pattern.test(text)) {
       return { ok: false, reason: `availability-claim:${pattern.source}` };
     }
+  }
+
+  if (containsEmDash(text)) {
+    return { ok: false, reason: "em-dash" };
   }
 
   const allowed = packagePriceDigits(ctx.packages);

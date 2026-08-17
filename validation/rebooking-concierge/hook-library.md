@@ -1,4 +1,4 @@
-# Hook library — the reason is the product
+# Hook library: the reason is the product
 
 Every note names a concrete reason why *now*. This file is the concierge
 version of what the agent's deterministic timing layer would become, so every
@@ -17,24 +17,24 @@ hook that gets a reply is also product research.
 
 ## Cycle hooks (from the intake dates)
 
-- **Verjaardag van de klus** — 11–13 maanden na een jaarlijks-achtige opdracht:
+- **Verjaardag van de klus**: 11–13 maanden na een jaarlijks-achtige opdracht:
   "vorig jaar rond deze tijd deden we X" is de sterkste enkele hook die er is.
-- **Team- en groeisignalen** — headshots verouderen met elke hire; een klant
+- **Team- en groeisignalen**: headshots verouderen met elke hire; een klant
   die toen 8 mensen had, heeft er nu misschien 14.
-- **Gebruiksrechten die aflopen** — als licentieduur ooit besproken is: einde
+- **Gebruiksrechten die aflopen**: als licentieduur ooit besproken is: einde
   looptijd is een volledig zakelijke, volledig natuurlijke reden om te mailen.
-- **Seizoensvenster van de klant zelf** — horeca voor de zomer, retail voor
+- **Seizoensvenster van de klant zelf**: horeca voor de zomer, retail voor
   Q4, onderwijs voor september.
 
 ## Personal hooks (from the intake's last column, and 5 minutes of looking)
 
 Nieuw pand, nieuwe huisstijl, award, product launch, vacature online, iets in
 het nieuws. One only per note. If it took more than five minutes to find, it
-reads as surveillance instead of attention — skip it.
+reads as surveillance instead of attention, skip it.
 
 ## The rule, stated once
 
 **No hook, no note.** A reasonless note is "even checken", and "even checken"
 is what the freelancer already doesn't send. If the top-3 client has no
 honest hook, write for #4 instead. The experiment tests whether removing the
-writing removes the block — not whether people will send filler.
+writing removes the block, not whether people will send filler.

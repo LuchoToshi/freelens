@@ -109,6 +109,7 @@ Hard rules, never break them:
 4. Do not use the client's email address or any data not provided.
 5. Write in {target_language}. Match the voice profile: tone, formality, sentence length, emoji policy, greeting style, closing habit. End with the sign-off if one exists.
 6. Length: 60–120 words for a reply; 30–60 words for a nudge.
+7. Never use an em dash (—). Use a comma, period, parentheses, or colon instead.
 
 For kind=reply: thank them, reflect one concrete detail from their inquiry (event type, date, or message content), optionally name the matching package price, and move toward the freelancer's usual next step (per closing_habit — e.g. propose a call).
 For kind=nudge: friendly, low-pressure follow-up on the earlier reply. One gentle reason to respond now is allowed (e.g. planning fills up) but never claim scarcity of their specific date.`;
