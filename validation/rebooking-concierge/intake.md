@@ -26,11 +26,30 @@ and businesslike, one warmer. What you are extracting:
 
 ## Ranking the ten (you do this, before writing)
 
-Score each client on three things; write the three notes for the top three
-that also have an honest hook available:
+This follows the agent's actual eligibility rule (`lib/rebooking/ranking.ts`,
+see `PLANS/FREELENS_JUDGMENT_POLICY.md`), not a rough band, the point of the
+test is to evaluate the policy the agent will really run.
 
-1. **Repeat-cycle fit**: does this client's world naturally rebuy (annual
-   campaigns, seasonal content, team growth → headshots)?
-2. **Time since contact**: the 9–18 month band is prime: long enough that a
-   note is an event, short enough that the relationship is warm.
-3. **Hook available now**: check `hook-library.md`. No honest hook, no note.
+**First, drop anyone who fails the floor:**
+
+- **Under 6 months since the last project.** Too recent, silence is the
+  honest advice, not a note.
+- **Over 24 months.** The relationship reads as cold, not cooling; the honest
+  angle there is a fresh pitch, not a rebooking note.
+- **No honest hook available**: check `hook-library.md`. No hook, no note,
+  no exception.
+
+**Then rank whoever is left:**
+
+1. **Anniversary, 10–14 months since the last project**, strongest. The one
+   moment a note is an event rather than an interruption.
+2. **Season fit**: does this client's world have a briefing window right now
+   (annual campaigns, seasonal content)? Outranks a bare gap, not an
+   anniversary.
+3. **Gap alone**: 6 to 24 months of silence with no better reason. Weakest,
+   but still real.
+
+Write notes for whoever clears the floor **and** has a hook, up to four.
+Expect 2–4 most of the time; 0 or 1 is a valid outcome if this client list
+happens to be recent or already cold, don't force a note where the policy
+would refuse one.
