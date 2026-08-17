@@ -888,6 +888,10 @@ export const en = {
       title: "The Rebooking app (private beta)",
       body: "If you use the app at /app: your account is an email address with a magic link, no password. Client records you enter (name, project, date, value, notes, never addresses, phone or registration numbers) are stored with Supabase in the EU, readable only by you. Draft emails are written by Anthropic's Claude API, configured without training on your data; the model sees only the record you entered. The weekly email goes through Resend, only when there is something to say, with a one-click stop. Export everything or delete your account, immediately and permanently, from inside the app.",
     },
+    gmail: {
+      title: "Your Gmail inbox, if you connect it",
+      body: "Connecting Gmail is optional and off by default, and not something you can do yet. If and when it ships: we ask for read-only access to the inbox, labels, and date range you choose, plus a separate permission to send only after you approve each draft yourself. Each message is read once to pull out what's useful, then let go. The email itself is never stored. What we keep is a short summary of each conversation (contact, project type, dates, budget signals), the opportunities we surface from it, and the drafts and approvals you act on, stored with Supabase, the same place your other Freelens data lives, readable only by you. That data stays for as long as your connection is active. Revoke access and it's kept 30 more days in case you change your mind, then deleted automatically; a connection that sits idle is deleted after 12 months regardless. Disconnect anytime from Settings, one click, sync stops immediately. Your email content is never used to train any shared AI model. Drafts are written by Anthropic's Claude API. Freelens's use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.",
+    },
     never: {
       title: "What we never collect",
       body: "No bank connection, no client addresses or phone numbers, no KvK or VAT numbers, no uploaded documents.",
