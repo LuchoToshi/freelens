@@ -966,7 +966,7 @@ export const nl: DeepPartial<typeof en> = {
       relationships: "Relaties gevolgd",
       sent: "Berichten verstuurd",
       replyRate: "Vastgelegd antwoordpercentage",
-      booked: "Geboekt dit kwartaal",
+      booked: "Zelf opgegeven bedrag dit kwartaal",
       taxNote: "\u2248 {net} voor jou na btw en reservering, op je opgeslagen belastingprofiel.",
       noData: "-",
     },

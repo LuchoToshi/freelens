@@ -972,7 +972,7 @@ export const en = {
       relationships: "Relationships tracked",
       sent: "Touches sent",
       replyRate: "Recorded reply rate",
-      booked: "Booked this quarter",
+      booked: "Self-reported value this quarter",
       taxNote: "\u2248 {net} for you after btw and reserve, on your saved tax profile.",
       noData: "-",
     },
