@@ -971,7 +971,7 @@ export const en = {
       heading: "The numbers",
       relationships: "Relationships tracked",
       sent: "Touches sent",
-      replyRate: "Reply rate",
+      replyRate: "Recorded reply rate",
       booked: "Booked this quarter",
       taxNote: "\u2248 {net} for you after btw and reserve, on your saved tax profile.",
       noData: "-",
