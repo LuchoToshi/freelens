@@ -6,16 +6,36 @@ can: **when the note is already written, do freelancers press send?**
 
 ## The bars (write them down before you start: a gate you can renegotiate is not a gate)
 
+Volume per participant is **not fixed at three.** It follows the agent's
+judgment policy (`PLANS/FREELENS_JUDGMENT_POLICY.md`, sourced from
+`lib/rebooking/ranking.ts`): 2–4 qualifying clients per person, and zero is a
+valid, loggable outcome if nobody clears the floor. Testing a fixed-three
+rule would validate a policy the agent will never run.
+
+| Notes prepared for a participant | Minimum sent to pass the discomfort test |
+|---|---|
+| 1 | 1 |
+| 2 | 2 |
+| 3 | 2 |
+| 4 | 3 |
+
 | Measure | Bar |
 |---|---|
-| Participants who send ≥ 2 of their 3 notes | **4 / 5**, the discomfort test |
+| Participants who hit their minimum-sent row above | **4 / 5**, the discomfort test |
 | Reply rate on sent notes | ≥ 30% |
 | Meetings or bookings across the pool | ≥ 2 |
 | Verbal yes to "would you pay €19/month for this weekly?" | ≥ 3 / 5 |
 
-**Stop condition:** fewer than 3 of 5 send. Then the discomfort is stronger
-than the product, no interface fixes it, and the direction dies for the price
-of two weeks of writing.
+A participant with **zero** qualifying clients is excluded from the
+discomfort-test denominator (nothing to send is not nerve failing), but is
+still logged in full. If more than 1 of 5 lands at zero, that is a signal
+about client-list composition or recruiting, not about the product, flag it
+before it's read as a failed test.
+
+**Stop condition:** fewer than 3 of 5 (of those with at least one qualifying
+client) hit their minimum-sent row. Then the discomfort is stronger than the
+product, no interface fixes it, and the direction dies for the price of two
+weeks of writing.
 
 ## Day by day
 
@@ -23,7 +43,7 @@ of two weeks of writing.
 |---|---|
 | 1–2 | Recruit five from the interview pool, photographer/videographer-weighted. Message in `recruit-message.md`. |
 | 2–4 | Each sends you their intake (`intake.md`): ten past clients + two old sent emails for voice. |
-| 4–7 | You write three notes per person. Use `hook-library.md` for the reason, `draft-templates.md` for the skeleton, their own emails for the voice. Deliver as a doc per person. |
+| 4–7 | You write notes for whichever of their clients qualify: 2 to 4, occasionally 0 or 1. Use `hook-library.md` for the reason, `draft-templates.md` for the skeleton, their own emails for the voice. Deliver as a doc per person. |
 | 7–14 | They send from their own mail, on their own account, and report every reply to you. You log everything in `tracking.csv`. |
 | 14 | Score against the bars. Ask the €19 question **after** they have seen replies, never before. |
 

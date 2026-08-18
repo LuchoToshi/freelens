@@ -13,13 +13,19 @@ Do not add a Freelens logo, footer, or any software framing. Per
 demo. This doc should read like it was typed by a person who knows them,
 not exported from anything.
 
-Keep the cover note to 2–3 sentences. Its only job is to stop the three
-mails below from reading like they arrived out of nowhere.
+Keep the cover note to 2–3 sentences. Its only job is to stop the mails
+below from reading like they arrived out of nowhere.
+
+**Count varies per person, 2 to 4, per the intake ranking, not always
+three.** Delete the block(s) you don't need (a 4th block is included below
+for when four clients qualify); never pad with a reasonless client to hit
+three. If zero clients qualify for someone, don't send this doc at all,
+tell them directly and log it (see `README.md`).
 
 Note: `draft-templates.md` and `hook-library.md` (the {mail N} source) are
-Dutch-only today. For an English participant, write the three notes
-directly in English using the same shape (their world first, the reason
-now, one small ask) rather than translating the Dutch skeletons literally.
+Dutch-only today. For an English participant, write the notes directly in
+English using the same shape (their world first, the reason now, one small
+ask) rather than translating the Dutch skeletons literally.
 
 ---
 
@@ -27,7 +33,7 @@ now, one small ask) rather than translating the Dutch skeletons literally.
 
 Hoi {naam},
 
-Hier zijn de drie. Ik heb ze geschreven met jouw lijstje en jouw mails
+Hier zijn er {n}. Ik heb ze geschreven met jouw lijstje en jouw mails
 ernaast, dus als iets niet klinkt zoals jij het zou zeggen, verander het
 gewoon. Ze zijn van jou zodra je ze aanpast.
 
@@ -58,6 +64,13 @@ ik niet te weten.
 
 ---
 
+**Voor {klant 4 naam}, alleen als er een vierde kwalificeert**
+*Aanleiding: {hook, één regel}*
+
+{mail 4}
+
+---
+
 Succes ermee, en bedankt, ik weet dat "oude klanten mailen" niemands
 lievelingsklusje is.
 
@@ -69,9 +82,9 @@ lievelingsklusje is.
 
 Hi {name},
 
-Here are the three. I wrote them with your client list and your own emails
-next to me, so if anything doesn't sound like you, change it. They're
-yours the moment you edit them.
+Here are {n}. I wrote them with your client list and your own emails next to
+me, so if anything doesn't sound like you, change it. They're yours the
+moment you edit them.
 
 **Send from your own inbox, whenever suits you.** No order, no pressure.
 Let me know what you send and what comes back, that's all I need.
@@ -96,6 +109,13 @@ Let me know what you send and what comes back, that's all I need.
 *Reason: {hook, one line}*
 
 {note 3}
+
+---
+
+**For {client 4 name}, only if a fourth client qualifies**
+*Reason: {hook, one line}*
+
+{note 4}
 
 ---
 
