@@ -9,7 +9,7 @@ import { encryptRefreshToken, verifyState } from "@/lib/gmail/server/tokens";
  * migration 0006's RLS note.
  *
  * No retry/backoff here: a failed exchange sends the freelancer back to
- * /app to try connecting again, same as any other broken OAuth redirect.
+ * /inbox to try connecting again, same as any other broken OAuth redirect.
  */
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -18,12 +18,12 @@ export async function GET(request: Request) {
   const appUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://freelens-mvp.vercel.app";
 
   if (!code || !state) {
-    return Response.redirect(`${appUrl}/app?gmail=error`, 302);
+    return Response.redirect(`${appUrl}/inbox?gmail=error`, 302);
   }
 
   const freelancerId = verifyState(state);
   if (!freelancerId) {
-    return Response.redirect(`${appUrl}/app?gmail=error`, 302);
+    return Response.redirect(`${appUrl}/inbox?gmail=error`, 302);
   }
 
   let tokens;
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     tokens = await exchangeCodeForTokens(code);
   } catch (error) {
     console.error("auth/google/callback: exchange_failed", error instanceof OAuthExchangeError ? error.message : "unexpected");
-    return Response.redirect(`${appUrl}/app?gmail=error`, 302);
+    return Response.redirect(`${appUrl}/inbox?gmail=error`, 302);
   }
 
   if (!tokens.refresh_token) {
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     // prompt=consent, so this means Google withheld it - treat as failure
     // rather than storing a connection with nothing to sync from.
     console.error("auth/google/callback: no_refresh_token");
-    return Response.redirect(`${appUrl}/app?gmail=error`, 302);
+    return Response.redirect(`${appUrl}/inbox?gmail=error`, 302);
   }
 
   const supabase = serviceClient();
@@ -56,8 +56,8 @@ export async function GET(request: Request) {
   );
   if (error) {
     console.error("auth/google/callback: store_failed");
-    return Response.redirect(`${appUrl}/app?gmail=error`, 302);
+    return Response.redirect(`${appUrl}/inbox?gmail=error`, 302);
   }
 
-  return Response.redirect(`${appUrl}/app?gmail=connected`, 302);
+  return Response.redirect(`${appUrl}/inbox?gmail=connected`, 302);
 }
