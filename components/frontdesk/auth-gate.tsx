@@ -91,17 +91,18 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
   const t = fdDict(locale).auth;
   const [email, setEmail] = useState("");
   const [phase, setPhase] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [linkExpired, setLinkExpired] = useState(false);
+  const [redirectError, setRedirectError] = useState<"expired" | "generic" | null>(null);
 
   useEffect(() => {
     const url = new URL(window.location.href);
+    const errorCode = url.searchParams.get("error_code");
     if (!url.searchParams.get("error")) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the auth callback's error redirect, not derivable from render since window.location isn't available server-side
-    setLinkExpired(true);
+    setRedirectError(errorCode === "otp_expired" ? "expired" : "generic");
     // Supabase's own error code/description, never shown to the user directly.
     console.error(
       "Sign-in redirect error:",
-      url.searchParams.get("error_code"),
+      errorCode,
       url.searchParams.get("error_description")
     );
     url.searchParams.delete("error");
@@ -127,13 +128,15 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
         <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
       </div>
-      {linkExpired && (
+      {redirectError && (
         <div role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm leading-relaxed text-[var(--fd-ink)]">
-          <p className="font-medium">{t.expiredHeading}</p>
-          <p className="mt-1">{t.expiredBody}</p>
+          <p className="font-medium">
+            {redirectError === "expired" ? t.expiredHeading : t.redirectErrorHeading}
+          </p>
+          <p className="mt-1">{redirectError === "expired" ? t.expiredBody : t.redirectErrorBody}</p>
           <button
             type="button"
-            onClick={() => setLinkExpired(false)}
+            onClick={() => setRedirectError(null)}
             className="mt-2 text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
           >
             {t.backToSignIn}
