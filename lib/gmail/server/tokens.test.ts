@@ -1,8 +1,12 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { decryptRefreshToken, encryptRefreshToken, signState, verifyState } from "@/lib/gmail/server/tokens";
 
 beforeEach(() => {
   process.env.GMAIL_TOKEN_ENCRYPTION_KEY = "test-key-not-for-production-use";
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("state signing", () => {
@@ -20,6 +24,17 @@ describe("state signing", () => {
   it("rejects garbage input", () => {
     expect(verifyState("not-a-real-state")).toBeNull();
     expect(verifyState("")).toBeNull();
+  });
+
+  it("accepts a state just under the 10min TTL and rejects one just over it", () => {
+    vi.useFakeTimers({ now: new Date("2026-01-01T00:00:00Z") });
+    const state = signState("11111111-1111-1111-1111-111111111111");
+
+    vi.setSystemTime(new Date("2026-01-01T00:09:59Z"));
+    expect(verifyState(state)).toBe("11111111-1111-1111-1111-111111111111");
+
+    vi.setSystemTime(new Date("2026-01-01T00:10:01Z"));
+    expect(verifyState(state)).toBeNull();
   });
 });
 
