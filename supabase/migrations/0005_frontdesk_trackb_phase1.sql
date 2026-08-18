@@ -39,6 +39,23 @@
 -- "denormalized so the policy is one hop" reasoning as 0003's drafts table.
 -- Downstream entities (evidence, opportunities, actions, drafts, approvals,
 -- outcomes, corrections) scope through their parent instead.
+--
+-- sync_batch_id on evidence/opportunities/drafts is `on delete cascade`, not
+-- `set null`: the published revoke commitment is that nothing derived from a
+-- discarded batch persists, so a removed batch row must take its derived
+-- rows with it, not orphan them into unattributable, no-longer-discardable
+-- data.
+--
+-- status/validation_status enums are deliberately narrow, scoped to values
+-- actually named in the source docs (agent_conversations.status from the
+-- Judgment Policy's "active thread gone quiet"; agent_opportunities.status
+-- from Section 1's "pending or recently sent opportunity" plus the "Detect
+-- Reply" pipeline stage; agent_drafts.validation_status from the tracking
+-- plan's own `validation_status` (`passed`/`rejected`) metric field, so the
+-- approval-rate denominator this doc already promises can't silently drift
+-- on a typo). Expect these lists to grow as Epic 1's sync and reply-detection
+-- logic lands; extending a CHECK is a small migration, an unconstrained
+-- column staying unconstrained is a silent one.
 
 create table public.agent_contacts (
   id uuid primary key default gen_random_uuid(),
@@ -73,7 +90,7 @@ create table public.agent_conversations (
   -- Null for email (no messaging window). Set for Instagram/WhatsApp once
   -- those channels exist.
   channel_window_open_until timestamptz,
-  status text not null default 'active',
+  status text not null default 'active' check (status in ('active', 'quiet')),
   last_message_at timestamptz not null default now(),
   unique (freelancer_id, thread_id)
 );
@@ -82,7 +99,7 @@ create table public.agent_project_evidence (
   id uuid primary key default gen_random_uuid(),
   -- Which sync run produced this row, so a mid-sync revoke can discard
   -- everything an in-flight batch derived (execution package Section 1).
-  sync_batch_id uuid references public.agent_sync_batches (id) on delete set null,
+  sync_batch_id uuid references public.agent_sync_batches (id) on delete cascade,
   conversation_id uuid not null references public.agent_conversations (id) on delete cascade,
   extracted_field text not null check (char_length(extracted_field) <= 80),
   -- Nullable: "nothing invented, unextractable fields are null, never
@@ -95,7 +112,7 @@ create table public.agent_project_evidence (
 
 create table public.agent_opportunities (
   id uuid primary key default gen_random_uuid(),
-  sync_batch_id uuid references public.agent_sync_batches (id) on delete set null,
+  sync_batch_id uuid references public.agent_sync_batches (id) on delete cascade,
   conversation_id uuid not null references public.agent_conversations (id) on delete cascade,
   -- The three trigger types from the Judgment Policy Doc (execution package
   -- Section 3): new inquiry with no reply, a quiet active thread, a dormant
@@ -103,7 +120,10 @@ create table public.agent_opportunities (
   type text not null check (type in ('new_inquiry', 'quiet_thread', 'dormant_reactivation')),
   score numeric not null,
   reason_code text not null check (char_length(reason_code) <= 80),
-  status text not null default 'pending',
+  -- 'pending'/'sent' from Section 1's "pending or recently sent
+  -- opportunity"; 'replied' from the same section's "Detect Reply" stage,
+  -- which "flips status automatically" on the sync loop's watch.
+  status text not null default 'pending' check (status in ('pending', 'sent', 'replied')),
   -- Derived from channel + window state; null when the opportunity exists
   -- but the channel can't act on it yet (Today-queue's channel-ineligible
   -- state, execution package Section 5).
@@ -121,10 +141,13 @@ create table public.agent_recommended_actions (
 
 create table public.agent_drafts (
   id uuid primary key default gen_random_uuid(),
-  sync_batch_id uuid references public.agent_sync_batches (id) on delete set null,
+  sync_batch_id uuid references public.agent_sync_batches (id) on delete cascade,
   action_id uuid not null references public.agent_recommended_actions (id) on delete cascade,
   content text not null check (char_length(content) <= 5000),
-  validation_status text not null default 'pending',
+  -- 'passed'/'rejected' match OUTBOX/FRONTDESK_TRACKB_TRACKING_PLAN_v1.md's
+  -- `draft_generated{validation_status=passed}` denominator exactly; a typo
+  -- here would silently corrupt that metric.
+  validation_status text not null default 'pending' check (validation_status in ('pending', 'passed', 'rejected')),
   validation_rejections text[] not null default '{}',
   created_at timestamptz not null default now()
 );
