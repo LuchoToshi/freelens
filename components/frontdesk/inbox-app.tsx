@@ -79,8 +79,38 @@ export function InboxApp({
   const [editedBody, setEditedBody] = useState("");
   const [copied, setCopied] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [gmailStatus, setGmailStatus] = useState<"connected" | "error" | null>(null);
+  const [connectingGmail, setConnectingGmail] = useState(false);
 
   const sb = supabaseBrowser();
+
+  useEffect(() => {
+    const params = new URL(window.location.href).searchParams;
+    const status = params.get("gmail");
+    if (status !== "connected" && status !== "error") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the OAuth callback's redirect param, not derivable from render since window.location isn't available server-side
+    setGmailStatus(status);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("gmail");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
+
+  async function connectGmail() {
+    setConnectingGmail(true);
+    try {
+      const res = await fetch("/api/auth/google/connect", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const json = await res.json();
+      if (json.ok && json.url) {
+        window.location.href = json.url;
+        return;
+      }
+    } catch {
+      // fall through, reset below
+    }
+    setConnectingGmail(false);
+  }
 
   const load = useCallback(async () => {
     const { data: rows } = await sb
@@ -285,6 +315,20 @@ export function InboxApp({
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
       <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+
+      {gmailStatus === "connected" && (
+        <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
+          {t.gmail.connected}
+        </p>
+      )}
+      {gmailStatus === "error" && (
+        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
+          {t.gmail.error}
+        </p>
+      )}
+      <button type="button" disabled={connectingGmail} onClick={connectGmail} className={`${secondaryClass} w-fit`}>
+        {connectingGmail ? t.gmail.connecting : t.gmail.connect}
+      </button>
 
       <ChecklistCard
         freelancer={freelancer}

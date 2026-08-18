@@ -85,6 +85,12 @@ const en = {
       markBooked: "Mark as booked",
       markLost: "Mark as lost",
     },
+    gmail: {
+      connect: "Connect Gmail",
+      connecting: "Connecting…",
+      connected: "Gmail connected.",
+      error: "Something went wrong connecting Gmail. Please try again.",
+    },
   },
   sample: {
     clientName: "Lisa (example)",
@@ -259,6 +265,12 @@ const nl: typeof en = {
       skip: "Dit concept overslaan",
       markBooked: "Markeer als geboekt",
       markLost: "Markeer als vervallen",
+    },
+    gmail: {
+      connect: "Gmail koppelen",
+      connecting: "Koppelen…",
+      connected: "Gmail gekoppeld.",
+      error: "Er ging iets mis bij het koppelen van Gmail. Probeer het nog een keer.",
     },
   },
   sample: {
