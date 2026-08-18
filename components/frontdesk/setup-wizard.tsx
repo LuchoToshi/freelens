@@ -173,9 +173,11 @@ export function SetupWizard({
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
-        {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4) || 1))}
-      </p>
+      {step >= 1 && (
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
+          {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4)))}
+        </p>
+      )}
 
       {step === 0 && (
         <section className="flex flex-col gap-5">
