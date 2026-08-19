@@ -1,4 +1,5 @@
 import { asUserClient, serviceClient } from "@/lib/frontdesk/server/clients";
+import { tallyFirstDraftBuckets, type FunnelDraftRow } from "@/lib/frontdesk/server/adminFunnel";
 
 /**
  * The founder's learning instrument, read-only. The gate is this route, not
@@ -38,16 +39,17 @@ export async function GET(request: Request) {
 
   type Row = NonNullable<typeof inquiries>[number];
   const rows = (inquiries ?? []).map((i: Row) => {
-    const drafts = (i.drafts ?? []) as { kind: string; outcome: string | null; created_at: string }[];
+    const drafts = (i.drafts ?? []) as FunnelDraftRow[];
     const latest = [...drafts].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
     return {
       handle: (i.freelancers as unknown as { handle: string } | null)?.handle ?? "?",
       srcChannel: i.src_channel,
       status: i.status,
       draftOutcome: latest?.outcome ?? (latest ? "pending" : "none"),
-      // The funnel counts every draft's recorded outcome, not just the
-      // latest: an edited reply is not erased by a later pending nudge.
-      allOutcomes: drafts.map((d) => d.outcome).filter((o): o is string => o !== null),
+      // Kept per-inquiry (not flattened) so the funnel tally below can apply
+      // the first-draft, reply-only definition from issue #32/#33 rather
+      // than counting every draft's outcome regardless of kind or order.
+      drafts,
       nudges: drafts.filter((d) => d.kind === "nudge").length,
       createdAt: i.created_at,
       repliedAt: i.replied_at,
@@ -64,12 +66,7 @@ export async function GET(request: Request) {
   const funnels = [...byHandle.entries()].map(([handle, list]) => {
     const replied = list.filter((r) => r.repliedAt).length;
     const booked = list.filter((r) => r.status === "booked").length;
-    const outcomes = { sent_as_is: 0, edited: 0, skipped: 0 };
-    for (const r of list) {
-      for (const o of r.allOutcomes) {
-        if (o in outcomes) outcomes[o as keyof typeof outcomes]++;
-      }
-    }
+    const outcomes = tallyFirstDraftBuckets(list.map((r) => r.drafts));
     const replyMinutes = list
       .filter((r) => r.repliedAt)
       .map((r) =>
