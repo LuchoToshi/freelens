@@ -61,6 +61,41 @@ describe("rankQueue", () => {
     expect(second?.reasonCode).toBe("season");
   });
 
+  it("suppresses the season reason for a freelancer outside the config's country", () => {
+    // 19 months, August: matches the "anniversary outranks season outranks
+    // gap" fixture above, where the same relationship gets "season" when the
+    // freelancer's country is unknown or matches. Confirmed NL_V1 is a
+    // Netherlands config, so a confirmed non-NL freelancer must not get a
+    // Dutch campaign-season reason: falls through to gap instead, the same
+    // way an out-of-window month already does.
+    const inNL = rankQueue({
+      relationships: [rel({ id: "gap", lastProjectDate: "2025-01-06" })],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+      freelancerCountry: "NL",
+    });
+    expect(inNL[0].reasonCode).toBe("season");
+
+    const unknownCountry = rankQueue({
+      relationships: [rel({ id: "gap", lastProjectDate: "2025-01-06" })],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+    });
+    expect(unknownCountry[0].reasonCode).toBe("season");
+
+    const outsideNL = rankQueue({
+      relationships: [rel({ id: "gap", lastProjectDate: "2025-01-06" })],
+      craft: "photographer",
+      config: SEASONALITY_NL_V1,
+      today: TODAY,
+      freelancerCountry: "AR",
+    });
+    expect(outsideNL[0].reasonCode).toBe("gap");
+    expect(outsideNL[0].seasonReason).toBeUndefined();
+  });
+
   it("a snoozed relationship never surfaces, and wakes after the date", () => {
     const snoozed = rel({ id: "s", lastProjectDate: "2025-08-01", snoozedUntil: "2026-12-01" });
     expect(isSnoozed(snoozed, TODAY)).toBe(true);
