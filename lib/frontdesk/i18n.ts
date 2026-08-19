@@ -313,7 +313,7 @@ const nl: typeof en = {
     welcome: {
       heading: "Je front desk voor nieuwe aanvragen",
       line1: "E\u00e9n link voor al je bio's. Klanten vragen aan via een korte pagina met jouw naam erop, geen productnaam, geen gedoe.",
-      line2: "Instellen gaat over je pagina, je pakketten, en hoe jij schrijft.",
+      line2: "Bij het instellen regel je je pagina, je pakketten, en hoe jij schrijft.",
       line3: "Daarna ligt er bij elke aanvraag een antwoord klaar in jouw stijl, met jouw echte prijzen. Versturen doe jij.",
       cta: "Aan de slag",
     },
