@@ -106,6 +106,11 @@ const en = {
     error: "That did not work. Check the address and try again.",
     signOut: "Sign out",
     loading: "One moment.",
+    expiredHeading: "That link expired",
+    expiredBody: "Your account and data are safe. Enter your email below to get a new one.",
+    redirectErrorHeading: "That sign-in link didn't work",
+    redirectErrorBody: "Your account and data are safe. Enter your email below to get a new one.",
+    backToSignIn: "Back to sign in",
   },
   setup: {
     welcome: {
@@ -287,6 +292,11 @@ const nl: typeof en = {
     error: "Dat lukte niet. Controleer het adres en probeer opnieuw.",
     signOut: "Uitloggen",
     loading: "Momentje.",
+    expiredHeading: "Die link is verlopen",
+    expiredBody: "Je account en gegevens zijn veilig. Vul hieronder je e-mailadres in voor een nieuwe link.",
+    redirectErrorHeading: "Die inloglink werkte niet",
+    redirectErrorBody: "Je account en gegevens zijn veilig. Vul hieronder je e-mailadres in voor een nieuwe link.",
+    backToSignIn: "Terug naar inloggen",
   },
   setup: {
     welcome: {

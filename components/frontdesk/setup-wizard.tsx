@@ -161,6 +161,7 @@ export function SetupWizard({
       .from("frontdesk-avatars")
       .upload(path, file, { upsert: true, contentType: file.type });
     if (uploadError) {
+      console.error("Avatar upload failed:", uploadError.message);
       setPhotoBusy(false);
       setPhotoError(true);
       return;
