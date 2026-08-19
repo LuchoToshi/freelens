@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Combobox } from "@base-ui/react/combobox";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 
@@ -37,6 +38,9 @@ const popupClass =
 const itemClass =
   "cursor-pointer px-3 py-2 text-sm data-[highlighted]:bg-[var(--fd-line-control)]/30 data-[selected]:font-medium";
 const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
+const srOnlyClass = "sr-only";
+
+const INPUT_ID = "profession-picker-input";
 
 export function ProfessionPicker({
   locale,
@@ -50,20 +54,50 @@ export function ProfessionPicker({
   const dict = fdDict(locale);
   const t = dict.setup.profile;
   const craftLabels = dict.public.craft;
+  const [announcement, setAnnouncement] = useState("");
+
+  function handleValueChange(next: Profession[]) {
+    const added = next.find((profession) => !value.includes(profession));
+    const removed = value.find((profession) => !next.includes(profession));
+    if (added) {
+      setAnnouncement(
+        t.professionAdded
+          .replace("{profession}", craftLabels[added])
+          .replace("{n}", String(next.length))
+      );
+    } else if (removed) {
+      setAnnouncement(
+        t.professionRemoved
+          .replace("{profession}", craftLabels[removed])
+          .replace("{n}", String(next.length))
+      );
+    }
+    onChange(next);
+  }
 
   return (
     <div className="flex flex-col gap-1.5">
+      <label htmlFor={INPUT_ID} className={labelClass}>
+        {t.professionsLabel}
+      </label>
+      <p id="profession-picker-hint" className="text-xs text-[var(--fd-ink)]/60">
+        {t.professionsHint}
+      </p>
+      <div role="status" aria-live="polite" className={srOnlyClass}>
+        {announcement}
+      </div>
       <Combobox.Root
         items={PROFESSION_VALUES}
         multiple
         value={value}
-        onValueChange={(next) => onChange(next as Profession[])}
+        onValueChange={(next) => handleValueChange(next as Profession[])}
+        onOpenChange={(nextOpen, eventDetails) => {
+          if (!nextOpen && eventDetails.reason === "item-press") {
+            eventDetails.cancel();
+          }
+        }}
         itemToStringLabel={(profession) => craftLabels[profession]}
       >
-        <Combobox.Label className={labelClass}>{t.professionsLabel}</Combobox.Label>
-        <p id="profession-picker-hint" className="text-xs text-[var(--fd-ink)]/60">
-          {t.professionsHint}
-        </p>
         <Combobox.Chips className={chipsClass}>
           {value.map((profession) => (
             <Combobox.Chip key={profession} className={chipClass}>
@@ -76,7 +110,11 @@ export function ProfessionPicker({
               </Combobox.ChipRemove>
             </Combobox.Chip>
           ))}
-          <Combobox.Input aria-describedby="profession-picker-hint" className={inputClass} />
+          <Combobox.Input
+            id={INPUT_ID}
+            aria-describedby="profession-picker-hint"
+            className={inputClass}
+          />
         </Combobox.Chips>
         <Combobox.Portal>
           <Combobox.Positioner sideOffset={4}>
