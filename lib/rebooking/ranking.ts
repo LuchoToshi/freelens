@@ -44,6 +44,16 @@ export interface RankInput {
   today: string;
   /** Relationship ids touched recently enough that this week skips them. */
   recentlyTouchedIds?: readonly string[];
+  /**
+   * The freelancer's own country, if known. `config`'s windows are shaped
+   * for `config.country` alone; shipping them to a freelancer confirmed to be
+   * elsewhere would be a confidently wrong reason, exactly what the guards
+   * exist to prevent. Unset (today, every caller) trusts the config, since
+   * every real user right now is in fact `config.country`; once a real
+   * per-freelancer signal exists, passing a mismatched country here
+   * suppresses the season reason instead of fabricating one.
+   */
+  freelancerCountry?: string;
 }
 
 /** Under this many whole months since the last project, silence is the advice. */
@@ -58,10 +68,13 @@ const SCORE_FLOOR = 30;
 export function rankQueue(input: RankInput): RankedTouchSuggestion[] {
   const touched = new Set(input.recentlyTouchedIds ?? []);
   const month = monthOf(input.today);
+  const countryValidated =
+    input.freelancerCountry === undefined ||
+    input.freelancerCountry.toUpperCase() === input.config.country.toUpperCase();
 
   const scored = input.relationships
     .filter((r) => !isSnoozed(r, input.today) && !touched.has(r.id))
-    .map((r) => scoreOne(r, input.craft, input.config, input.today, month))
+    .map((r) => scoreOne(r, input.craft, input.config, input.today, month, countryValidated))
     .filter((s): s is RankedTouchSuggestion => s !== null && s.score >= SCORE_FLOOR)
     .sort(byScoreThenStableId);
 
@@ -73,7 +86,8 @@ function scoreOne(
   craft: Craft,
   config: SeasonalityConfig,
   today: string,
-  month: number
+  month: number,
+  countryValidated: boolean
 ): RankedTouchSuggestion | null {
   const monthsSince = r.lastProjectDate
     ? wholeMonthsBetween(r.lastProjectDate, today)
@@ -89,7 +103,7 @@ function scoreOne(
   if (monthsSince === undefined || monthsSince < RECENCY_FLOOR_MONTHS) return null;
 
   const isPrivate = r.clientType === "private";
-  const window = seasonWindowFor(config, craft, month);
+  const window = countryValidated ? seasonWindowFor(config, craft, month) : null;
 
   let reasonCode: RankedTouchSuggestion["reasonCode"] | null = null;
   let base = 0;
