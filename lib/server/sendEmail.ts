@@ -14,7 +14,7 @@ export async function sendEmail(input: {
 }): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    console.error("sendEmail: RESEND_API_KEY not set — mail not sent");
+    console.error("sendEmail: RESEND_API_KEY not set, mail not sent");
     return false;
   }
   const from = process.env.RESEND_FROM ?? "Freelens <onboarding@resend.dev>";
@@ -28,7 +28,11 @@ export async function sendEmail(input: {
       body: JSON.stringify({ from, to: input.to, subject: input.subject, html: input.html }),
     });
     if (!response.ok) {
-      console.error("sendEmail: provider returned", response.status);
+      // Body, not just status: a 403 sandbox-sender rejection and a
+      // transient 5xx both log as "provider returned 403"/"500" otherwise,
+      // and those require opposite responses (fix the sender vs. retry).
+      const body = await response.text().catch(() => "");
+      console.error("sendEmail: provider returned", response.status, body);
       return false;
     }
     return true;
