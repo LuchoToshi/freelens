@@ -83,6 +83,7 @@ export function findPriceLikeAmounts(text: string): string[] {
 
 // ---------------------------------------------------------------- style guard
 
+// eslint-disable-next-line no-restricted-syntax -- this is the detector, not content
 const EM_DASH = "—";
 
 /** The product's punctuation rule: commas, periods, parentheses, colons only. */

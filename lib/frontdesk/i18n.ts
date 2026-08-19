@@ -161,7 +161,9 @@ const en = {
       signOffHint: "How you close an email, e.g. Emma",
       photoLabel: "Profile photo (optional)",
       photoUploading: "Uploading\u2026",
-      photoError: "Upload failed. JPG, PNG or WebP up to 2MB.",
+      photoErrorType: "That file type isn't supported. Use JPG, PNG or WebP.",
+      photoErrorSize: "That file is too large. Up to 2MB.",
+      photoError: "Upload failed. Try again.",
     },
     voice: {
       heading: "How you sound",
@@ -362,7 +364,9 @@ const nl: typeof en = {
       signOffHint: "Hoe je een mail afsluit, bijv. Emma",
       photoLabel: "Profielfoto (optioneel)",
       photoUploading: "Uploaden\u2026",
-      photoError: "Upload mislukt. JPG, PNG of WebP tot 2MB.",
+      photoErrorType: "Dat bestandstype wordt niet ondersteund. Gebruik JPG, PNG of WebP.",
+      photoErrorSize: "Dat bestand is te groot. Tot 2MB.",
+      photoError: "Uploaden mislukt. Probeer het opnieuw.",
     },
     voice: {
       heading: "Hoe jij klinkt",

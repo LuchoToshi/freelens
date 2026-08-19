@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import { resolveInitialLocale } from "@/components/i18n/locale-provider";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import { VoiceStep } from "@/components/frontdesk/voice-step";
@@ -33,6 +34,10 @@ const primaryClass =
 const secondaryClass =
   "inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-6 text-base font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
 
+// Matches the input's `accept` attribute and the "up to 2MB" copy below.
+const PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+
 export function SetupWizard({
   session,
   freelancer,
@@ -43,6 +48,10 @@ export function SetupWizard({
   onFreelancerChanged: () => void;
 }) {
   const [step, setStep] = useState(freelancer ? 1 : 0);
+  // A returning freelancer's stored locale is authoritative. A brand-new
+  // signup has none yet: default to English for the SSR-safe first render,
+  // then detect the browser's language once mounted, same rule the site-wide
+  // provider uses. A global product that greets a stranger in Dutch is a bug.
   const [locale, setLocale] = useState<FrontdeskLocale>(freelancer?.locale ?? "en");
   const [handle, setHandle] = useState(freelancer?.handle ?? "");
   const [displayName, setDisplayName] = useState(freelancer?.display_name ?? "");
@@ -57,7 +66,7 @@ export function SetupWizard({
   const [signOff, setSignOff] = useState(freelancer?.sign_off ?? "");
   const [photoUrl, setPhotoUrl] = useState(freelancer?.photo_url ?? "");
   const [photoBusy, setPhotoBusy] = useState(false);
-  const [photoError, setPhotoError] = useState(false);
+  const [photoError, setPhotoError] = useState<"" | "type" | "size" | "generic">("");
   const [freelancerId, setFreelancerId] = useState(freelancer?.id ?? null);
   const [packages, setPackages] = useState<PackageRow[]>([
     { label: "", price: "", unit: "", notes: "" },
@@ -70,6 +79,14 @@ export function SetupWizard({
 
   const t = fdDict(locale).setup;
   const sb = supabaseBrowser();
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (freelancer?.locale) return; // stored preference wins, nothing to detect
+    setLocale(resolveInitialLocale(null, window.navigator?.language ?? ""));
+    /* eslint-enable react-hooks/set-state-in-effect */
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on mount, for a first-time signup only
+  }, []);
 
   useEffect(() => {
     if (!freelancerId) return;
@@ -169,8 +186,19 @@ export function SetupWizard({
   }
 
   async function uploadPhoto(file: File) {
+    setPhotoError("");
+    // Checked here, not just left to the storage policy, so the freelancer
+    // hears the real cause: "wrong type" and "too large" are both silently
+    // identical to a network drop once they only reach the server.
+    if (!PHOTO_ALLOWED_TYPES.includes(file.type)) {
+      setPhotoError("type");
+      return;
+    }
+    if (file.size > PHOTO_MAX_BYTES) {
+      setPhotoError("size");
+      return;
+    }
     setPhotoBusy(true);
-    setPhotoError(false);
     const path = `${session.user.id}/avatar`;
     const { error: uploadError } = await sb.storage
       .from("frontdesk-avatars")
@@ -178,7 +206,7 @@ export function SetupWizard({
     if (uploadError) {
       console.error("Avatar upload failed:", uploadError.message);
       setPhotoBusy(false);
-      setPhotoError(true);
+      setPhotoError("generic");
       return;
     }
     const { data } = sb.storage.from("frontdesk-avatars").getPublicUrl(path);
@@ -298,7 +326,11 @@ export function SetupWizard({
             {photoBusy && <p className="text-xs text-[var(--fd-slate)]">{t.profile.photoUploading}</p>}
             {photoError && (
               <p className="text-xs font-medium text-[var(--fd-error-text)]" role="alert">
-                {t.profile.photoError}
+                {photoError === "type"
+                  ? t.profile.photoErrorType
+                  : photoError === "size"
+                    ? t.profile.photoErrorSize
+                    : t.profile.photoError}
               </p>
             )}
           </div>

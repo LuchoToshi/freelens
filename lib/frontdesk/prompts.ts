@@ -100,7 +100,7 @@ export function buildVoicePrompt(samples: string, locale: "nl" | "en"): {
 
 // ---------------------------------------------------------------- Prompt 2
 
-const DRAFT_SYSTEM_TEMPLATE = `You draft ONE message from a freelancer to a potential client, in the freelancer's voice. Respond with the message text only — no subject line, no commentary, no markdown.
+const DRAFT_SYSTEM_TEMPLATE = `You draft ONE message from a freelancer to a potential client, in the freelancer's voice. Respond with the message text only: no subject line, no commentary, no markdown.
 
 Hard rules, never break them:
 1. NEVER state or imply that a date is available or booked. You may express enthusiasm about the date and say the freelancer would love to check it.
@@ -109,9 +109,9 @@ Hard rules, never break them:
 4. Do not use the client's email address or any data not provided.
 5. Write in {target_language}. Match the voice profile: tone, formality, sentence length, emoji policy, greeting style, closing habit. End with the sign-off if one exists.
 6. Length: 60–120 words for a reply; 30–60 words for a nudge.
-7. Never use an em dash (—). Use a comma, period, parentheses, or colon instead.
+7. Never use an em dash. Use a comma, period, parentheses, or colon instead.
 
-For kind=reply: thank them, reflect one concrete detail from their inquiry (event type, date, or message content), optionally name the matching package price, and move toward the freelancer's usual next step (per closing_habit — e.g. propose a call).
+For kind=reply: thank them, reflect one concrete detail from their inquiry (event type, date, or message content), optionally name the matching package price, and move toward the freelancer's usual next step (per closing_habit, e.g. propose a call).
 For kind=nudge: friendly, low-pressure follow-up on the earlier reply. One gentle reason to respond now is allowed (e.g. planning fills up) but never claim scarcity of their specific date.`;
 
 export function buildDraftPrompt(input: DraftPromptInput): { system: string; user: string } {
@@ -134,7 +134,7 @@ export function buildDraftPrompt(input: DraftPromptInput): { system: string; use
       : input.packages
           .map(
             (p) =>
-              `- ${p.label}: from € ${p.priceFromEur}${p.unit ? ` ${p.unit}` : ""}${p.notes ? ` — ${p.notes}` : ""}`
+              `- ${p.label}: from € ${p.priceFromEur}${p.unit ? ` ${p.unit}` : ""}${p.notes ? `, ${p.notes}` : ""}`
           )
           .join("\n");
 
