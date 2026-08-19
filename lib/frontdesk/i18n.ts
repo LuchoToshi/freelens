@@ -119,7 +119,7 @@ const en = {
     welcome: {
       heading: "Your front desk for new inquiries",
       line1: "One link for every bio. Clients inquire through a short page with your name on it, no product name, no fuss.",
-      line2: "Setup takes about ten minutes: your page, your packages, and how you write.",
+      line2: "Setup covers your page, your packages, and how you write.",
       line3: "After that, every inquiry arrives with a reply ready in your style, using your real prices. Sending stays yours.",
       cta: "Get started",
     },
@@ -313,7 +313,7 @@ const nl: typeof en = {
     welcome: {
       heading: "Je front desk voor nieuwe aanvragen",
       line1: "E\u00e9n link voor al je bio's. Klanten vragen aan via een korte pagina met jouw naam erop, geen productnaam, geen gedoe.",
-      line2: "Instellen kost een minuut of tien: je pagina, je pakketten, en hoe jij schrijft.",
+      line2: "Instellen gaat over je pagina, je pakketten, en hoe jij schrijft.",
       line3: "Daarna ligt er bij elke aanvraag een antwoord klaar in jouw stijl, met jouw echte prijzen. Versturen doe jij.",
       cta: "Aan de slag",
     },
