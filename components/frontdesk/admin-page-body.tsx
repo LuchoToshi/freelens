@@ -25,7 +25,7 @@ interface AdminData {
     inquiries: number;
     replied: number;
     booked: number;
-    outcomes: { sent_as_is: number; edited: number; skipped: number };
+    outcomes: { sent_as_is: number; edited: number; skipped: number; regenerated: number };
     medianReplyMinutes: number | null;
   }[];
 }
@@ -80,6 +80,7 @@ function AdminView({ session }: { session: Session }) {
                 <th className="p-3">Sent as-is</th>
                 <th className="p-3">Edited</th>
                 <th className="p-3">Skipped</th>
+                <th className="p-3">Regenerated</th>
                 <th className="p-3">Median reply</th>
               </tr>
             </thead>
@@ -93,6 +94,7 @@ function AdminView({ session }: { session: Session }) {
                   <td className="p-3">{f.outcomes.sent_as_is}</td>
                   <td className="p-3">{f.outcomes.edited}</td>
                   <td className="p-3">{f.outcomes.skipped}</td>
+                  <td className="p-3">{f.outcomes.regenerated}</td>
                   <td className="p-3">
                     {f.medianReplyMinutes === null ? "-" : `${f.medianReplyMinutes} min`}
                   </td>
