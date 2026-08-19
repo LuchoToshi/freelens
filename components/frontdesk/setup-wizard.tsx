@@ -10,6 +10,7 @@ import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import { VoiceStep } from "@/components/frontdesk/voice-step";
 import { RevealStep } from "@/components/frontdesk/reveal-step";
 import { ShareStep } from "@/components/frontdesk/share-step";
+import { ProfessionPicker, type Profession } from "@/components/frontdesk/profession-picker";
 
 /**
  * Onboarding, four steps, nothing external. The locale question comes first
@@ -45,10 +46,14 @@ export function SetupWizard({
   const [locale, setLocale] = useState<FrontdeskLocale>(freelancer?.locale ?? "nl");
   const [handle, setHandle] = useState(freelancer?.handle ?? "");
   const [displayName, setDisplayName] = useState(freelancer?.display_name ?? "");
-  const [craft, setCraft] = useState<"photographer" | "videographer">(
-    freelancer?.craft ?? "photographer"
+  const [professions, setProfessions] = useState<Profession[]>(
+    (freelancer?.professions as Profession[] | null | undefined)?.length
+      ? (freelancer!.professions as Profession[])
+      : freelancer?.craft
+        ? [freelancer.craft]
+        : []
   );
-  const [city, setCity] = useState(freelancer?.city ?? "");
+  const [city, setCity] = useState(freelancer?.location ?? freelancer?.city ?? "");
   const [signOff, setSignOff] = useState(freelancer?.sign_off ?? "");
   const [photoUrl, setPhotoUrl] = useState(freelancer?.photo_url ?? "");
   const [photoBusy, setPhotoBusy] = useState(false);
@@ -97,8 +102,13 @@ export function SetupWizard({
       setError("generic");
       return;
     }
+    if (professions.length === 0) {
+      setError("generic");
+      return;
+    }
     setSaving(true);
     setError("");
+    const location = city.trim() || null;
     const { data, error: upsertError } = await sb
       .from("freelancers")
       .upsert(
@@ -106,8 +116,13 @@ export function SetupWizard({
           auth_user_id: session.user.id,
           handle,
           display_name: displayName.trim(),
-          craft,
-          city: city.trim() || null,
+          // craft/city are kept in sync for consumers that have not moved to
+          // professions/location yet (WP4, phase 1 - see 0008 migration).
+          craft: professions[0],
+          city: location,
+          primary_profession: professions[0],
+          professions,
+          location,
           locale,
           sign_off: signOff.trim() || null,
           photo_url: photoUrl || null,
@@ -249,26 +264,7 @@ export function SetupWizard({
             <input id="su-name" value={displayName} maxLength={80} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
           </div>
 
-          <fieldset className="flex flex-col gap-2">
-            <legend className={labelClass}>{t.profile.craftLabel}</legend>
-            <div className="flex gap-2">
-              {(["photographer", "videographer"] as const).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-pressed={craft === c}
-                  onClick={() => setCraft(c)}
-                  className={`min-h-11 rounded-lg border px-4 text-sm font-medium transition ${
-                    craft === c
-                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
-                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)]"
-                  }`}
-                >
-                  {fdDict(locale).public.craft[c]}
-                </button>
-              ))}
-            </div>
-          </fieldset>
+          <ProfessionPicker locale={locale} value={professions} onChange={setProfessions} />
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="su-city" className={labelClass}>{t.profile.cityLabel}</label>
