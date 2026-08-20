@@ -366,7 +366,6 @@ export const en = {
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
       heroCtaTry: "Try it live",
-      heroCtaTryCaption: "No signup, see a real draft in under a minute.",
       example: {
         label: "This is what one inquiry looks like.",
         inquiryLabel: "Inquiry",

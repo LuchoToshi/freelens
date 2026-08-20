@@ -360,7 +360,6 @@ export const nl: DeepPartial<typeof en> = {
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
       heroCtaTry: "Probeer het live",
-      heroCtaTryCaption: "Geen account nodig, bekijk een echt concept in minder dan een minuut.",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",

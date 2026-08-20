@@ -24,14 +24,12 @@ export function HomeHero({
   sub,
   cta,
   ctaTry,
-  ctaTryCaption,
 }: {
   eyebrow: string;
   title: string;
   sub: string;
   cta: string;
   ctaTry: string;
-  ctaTryCaption: string;
 }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
@@ -120,7 +118,7 @@ export function HomeHero({
             className="flex flex-wrap items-center gap-4"
           >
             <Link
-              href="/try"
+              href="/setup"
               onClick={() => track("try_demo_clicked_hero")}
               className="group inline-flex min-h-14 items-center gap-3 bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
             >
@@ -137,15 +135,6 @@ export function HomeHero({
               {cta}
             </a>
           </motion.div>
-
-          <motion.p
-            variants={riseIn(reduce)}
-            initial="hidden"
-            animate="visible"
-            className="text-sm text-[var(--fd-slate)]"
-          >
-            {ctaTryCaption}
-          </motion.p>
         </div>
       </div>
     </section>

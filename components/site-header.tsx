@@ -53,7 +53,7 @@ function NavLink({
 // rebooking surfaces keep their routes and their quiet footer links. The demo
 // link is the one exception — it is the product, not a second product.
 const LINKS = [
-  { href: "/try", key: "tryDemo", onLinkClick: () => track("try_demo_clicked_nav") },
+  { href: "/setup", key: "tryDemo", onLinkClick: () => track("try_demo_clicked_nav") },
   { href: "/about", key: "about", onLinkClick: undefined },
 ] as const;
 

@@ -39,7 +39,6 @@ export default function Home() {
         sub={f.heroSub}
         cta={f.heroCta}
         ctaTry={f.heroCtaTry}
-        ctaTryCaption={f.heroCtaTryCaption}
       />
 
       {/* 2 · The worked example: an ink gallery wall around a calm, readable draft. */}
