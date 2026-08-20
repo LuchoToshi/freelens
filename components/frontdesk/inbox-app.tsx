@@ -60,6 +60,10 @@ const secondaryClass =
 const linkClass =
   "w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]";
 
+// Track B (Gmail) is off the handover path pending Google CASA verification.
+// Flip back once that clears — see issue #34 / FS 2026-08-20.
+const GMAIL_CONNECT_ENABLED = false;
+
 export function InboxApp({
   session,
   freelancer,
@@ -316,19 +320,21 @@ export function InboxApp({
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
       <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
 
-      {gmailStatus === "connected" && (
+      {GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
         <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
           {t.gmail.connected}
         </p>
       )}
-      {gmailStatus === "error" && (
+      {GMAIL_CONNECT_ENABLED && gmailStatus === "error" && (
         <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
           {t.gmail.error}
         </p>
       )}
-      <button type="button" disabled={connectingGmail} onClick={connectGmail} className={`${secondaryClass} w-fit`}>
-        {connectingGmail ? t.gmail.connecting : t.gmail.connect}
-      </button>
+      {GMAIL_CONNECT_ENABLED && (
+        <button type="button" disabled={connectingGmail} onClick={connectGmail} className={`${secondaryClass} w-fit`}>
+          {connectingGmail ? t.gmail.connecting : t.gmail.connect}
+        </button>
+      )}
 
       <ChecklistCard
         freelancer={freelancer}
