@@ -6,6 +6,15 @@ import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 
 /**
+ * Supabase puts auth-callback errors (e.g. an expired magic link) in the URL
+ * hash, not the query string. Its own client strips that hash as soon as it
+ * initializes (detectSessionInUrl), which races the login form's own effect.
+ * Captured here at module-evaluation time — before any component mounts and
+ * before `supabaseBrowser()` is ever called — so the value can't be clobbered.
+ */
+const capturedAuthHash = typeof window !== "undefined" ? window.location.hash : "";
+
+/**
  * FrontDesk's magic-link gate, copied from the /app pattern (agent-app.tsx),
  * not imported — the original stays untouched.
  *
@@ -99,19 +108,22 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const errorCode = url.searchParams.get("error_code");
-    if (!url.searchParams.get("error")) return;
+    const hashParams = new URLSearchParams(capturedAuthHash.replace(/^#/, ""));
+    const error = url.searchParams.get("error") ?? hashParams.get("error");
+    if (!error) return;
+    const errorCode = url.searchParams.get("error_code") ?? hashParams.get("error_code");
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the auth callback's error redirect, not derivable from render since window.location isn't available server-side
     setRedirectError(errorCode === "otp_expired" ? "expired" : "generic");
     // Supabase's own error code/description, never shown to the user directly.
     console.error(
       "Sign-in redirect error:",
       errorCode,
-      url.searchParams.get("error_description")
+      url.searchParams.get("error_description") ?? hashParams.get("error_description")
     );
     url.searchParams.delete("error");
     url.searchParams.delete("error_code");
     url.searchParams.delete("error_description");
+    url.hash = "";
     window.history.replaceState({}, "", url.toString());
   }, []);
 
