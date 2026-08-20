@@ -402,5 +402,5 @@ export type FrontdeskDict = typeof en;
 const DICTS: Record<FrontdeskLocale, FrontdeskDict> = { en, nl };
 
 export function fdDict(locale: string | null | undefined): FrontdeskDict {
-  return DICTS[locale === "en" ? "en" : "nl"];
+  return DICTS[locale === "nl" ? "nl" : "en"];
 }

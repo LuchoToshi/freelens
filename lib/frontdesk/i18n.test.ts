@@ -53,8 +53,8 @@ describe("frontdesk dictionary parity", () => {
     }
   });
 
-  it("unknown locales fall back to Dutch", () => {
-    expect(fdDict("de")).toBe(fdDict("nl"));
-    expect(fdDict(null)).toBe(fdDict("nl"));
+  it("unknown locales fall back to English", () => {
+    expect(fdDict("de")).toBe(fdDict("en"));
+    expect(fdDict(null)).toBe(fdDict("en"));
   });
 });
