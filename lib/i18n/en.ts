@@ -15,7 +15,7 @@ export const en = {
     brand: "Freelens",
     nav: {
       ariaLabel: "Main navigation",
-      tryDemo: "Try the demo",
+      tryDemo: "Sign in",
       about: "About",
       beforeJob: "Before the job",
       afterPayment: "After payment",
@@ -365,8 +365,7 @@ export const en = {
       heroSub:
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
-      heroCtaTry: "Try it live",
-      heroCtaTryCaption: "No signup, see a real draft in under a minute.",
+      heroCtaTry: "Sign in",
       example: {
         label: "This is what one inquiry looks like.",
         inquiryLabel: "Inquiry",
