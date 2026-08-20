@@ -43,7 +43,7 @@ export function SetupWizard({
   onFreelancerChanged: () => void;
 }) {
   const [step, setStep] = useState(freelancer ? 1 : 0);
-  const [locale, setLocale] = useState<FrontdeskLocale>(freelancer?.locale ?? "nl");
+  const [locale, setLocale] = useState<FrontdeskLocale>(freelancer?.locale ?? "en");
   const [handle, setHandle] = useState(freelancer?.handle ?? "");
   const [displayName, setDisplayName] = useState(freelancer?.display_name ?? "");
   const [professions, setProfessions] = useState<Profession[]>(

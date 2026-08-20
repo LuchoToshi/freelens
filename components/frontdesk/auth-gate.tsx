@@ -36,7 +36,7 @@ type GateState =
   | { stage: "ready"; session: Session; freelancer: FreelancerRow | null };
 
 export function AuthGate({
-  locale = "nl",
+  locale = "en",
   children,
 }: {
   locale?: FrontdeskLocale;
