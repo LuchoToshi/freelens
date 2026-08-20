@@ -117,23 +117,26 @@ export function HomeHero({
             animate="visible"
             className="flex flex-wrap items-center gap-4"
           >
-            <Link
-              href="/setup"
-              onClick={() => track("try_demo_clicked_hero")}
+            {/* Primary: joining the list is the action a cold visitor can
+                actually complete. Sign-in is for the invited testers who
+                already have a handle, so it stays secondary. */}
+            <a
+              href="#early-access"
               className="group inline-flex min-h-14 items-center gap-3 bg-[var(--fd-accent)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
             >
-              {ctaTry}
+              {cta}
               <ArrowRight
                 className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
                 aria-hidden="true"
               />
-            </Link>
-            <a
-              href="#early-access"
+            </a>
+            <Link
+              href="/setup"
+              onClick={() => track("try_demo_clicked_hero")}
               className="inline-flex min-h-14 items-center border border-[var(--fd-ink)] px-8 text-base font-semibold text-[var(--fd-ink)] transition-colors hover:bg-[var(--fd-ink)] hover:text-[var(--fd-paper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--fd-ink)]"
             >
-              {cta}
-            </a>
+              {ctaTry}
+            </Link>
           </motion.div>
         </div>
       </div>

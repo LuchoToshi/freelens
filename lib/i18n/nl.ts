@@ -20,7 +20,7 @@ export const nl: DeepPartial<typeof en> = {
     brand: "Freelens",
     nav: {
       ariaLabel: "Hoofdnavigatie",
-      tryDemo: "Probeer de demo",
+      tryDemo: "Inloggen",
       about: "Over ons",
       beforeJob: "Voor de klus",
       afterPayment: "Na betaling",
@@ -359,7 +359,7 @@ export const nl: DeepPartial<typeof en> = {
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
-      heroCtaTry: "Probeer het live",
+      heroCtaTry: "Inloggen",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",
