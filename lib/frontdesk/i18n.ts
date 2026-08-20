@@ -105,7 +105,7 @@ const en = {
     emailLabel: "Email address",
     send: "Send me the link",
     sending: "One moment",
-    sent: "Almost there: open your inbox and tap the link.",
+    sent: "We sent you a code. Enter it below to sign in.",
     error: "That did not work. Check the address and try again.",
     signOut: "Sign out",
     loading: "One moment.",
@@ -114,6 +114,11 @@ const en = {
     redirectErrorHeading: "That sign-in link didn't work",
     redirectErrorBody: "Your account and data are safe. Enter your email below to get a new one.",
     backToSignIn: "Back to sign in",
+    codeLabel: "6-digit code",
+    codeSubmit: "Sign in",
+    codeError: "That code didn't work. Check it and try again.",
+    openInboxHint: "Prefer to click the link instead?",
+    openProvider: "Open {provider}",
   },
   setup: {
     welcome: {
@@ -299,7 +304,7 @@ const nl: typeof en = {
     emailLabel: "E-mailadres",
     send: "Stuur mij de link",
     sending: "Momentje",
-    sent: "Bijna: open je inbox en tik op de link.",
+    sent: "We hebben je een code gestuurd. Vul hem hieronder in om in te loggen.",
     error: "Dat lukte niet. Controleer het adres en probeer opnieuw.",
     signOut: "Uitloggen",
     loading: "Momentje.",
@@ -308,6 +313,11 @@ const nl: typeof en = {
     redirectErrorHeading: "Die inloglink werkte niet",
     redirectErrorBody: "Je account en gegevens zijn veilig. Vul hieronder je e-mailadres in voor een nieuwe link.",
     backToSignIn: "Terug naar inloggen",
+    codeLabel: "6-cijferige code",
+    codeSubmit: "Inloggen",
+    codeError: "Die code werkte niet. Controleer hem en probeer opnieuw.",
+    openInboxHint: "Liever op de link klikken?",
+    openProvider: "Open {provider}",
   },
   setup: {
     welcome: {
