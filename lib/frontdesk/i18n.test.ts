@@ -8,6 +8,8 @@ const SAME_BY_DESIGN = new Set([
   "inbox.detail.budget",
   // "Illustrator" has no distinct Dutch spelling — same loanword both ways.
   "public.craft.illustrator",
+  // "Open" is a valid Dutch imperative too; provider names (Gmail, Outlook.com...) don't translate.
+  "auth.openProvider",
 ]);
 
 type Node = string | { [key: string]: Node };
