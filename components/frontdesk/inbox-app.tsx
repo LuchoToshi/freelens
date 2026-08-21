@@ -74,6 +74,7 @@ export function InboxApp({
   const dict = fdDict(freelancer.locale);
   const t = dict.inbox;
   const [inquiries, setInquiries] = useState<InquiryRow[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, DraftRow>>({});
   const [allDrafts, setAllDrafts] = useState<DraftRow[]>([]);
   const [bioConfirmedAt, setBioConfirmedAt] = useState<string | null>(
@@ -117,15 +118,24 @@ export function InboxApp({
   }
 
   const load = useCallback(async () => {
-    const { data: rows } = await sb
+    const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
       .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at")
       .order("created_at", { ascending: false });
+    if (inquiriesError) {
+      setLoadError(true);
+      return;
+    }
     setInquiries((rows as InquiryRow[] | null) ?? []);
-    const { data: draftRows } = await sb
+    const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
       .select("id, inquiry_id, kind, body, outcome")
       .order("created_at", { ascending: false });
+    if (draftsError) {
+      setLoadError(true);
+      return;
+    }
+    setLoadError(false);
     const latest: Record<string, DraftRow> = {};
     for (const d of (draftRows as DraftRow[] | null) ?? []) {
       if (!latest[d.inquiry_id]) latest[d.inquiry_id] = d;
@@ -210,6 +220,24 @@ export function InboxApp({
     setEditedBody("");
   }
 
+  // Only the initial load has nothing on screen to preserve. A refresh that
+  // fails after a write has already landed (e.g. recordOutcome, setStatus)
+  // must not replace a successful action with a full-screen error — it reads
+  // as "that didn't work" when it did. Surface those as an inline banner
+  // instead, below, and keep whatever was already loaded.
+  if (loadError && inquiries === null) {
+    return (
+      <main className="mx-auto flex w-full max-w-2xl flex-col items-start gap-4 px-4 py-10">
+        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-error-text)]">
+          {t.loadError}
+        </p>
+        <button type="button" onClick={() => void load()} className={secondaryClass}>
+          {t.retry}
+        </button>
+      </main>
+    );
+  }
+
   if (inquiries === null) {
     return (
       <main className="mx-auto w-full max-w-2xl px-4 py-10">
@@ -217,6 +245,15 @@ export function InboxApp({
       </main>
     );
   }
+
+  const errorBanner = loadError ? (
+    <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm leading-relaxed text-[var(--fd-error-text)]">
+      {t.loadError}{" "}
+      <button type="button" onClick={() => void load()} className="font-medium underline underline-offset-4">
+        {t.retry}
+      </button>
+    </p>
+  ) : null;
 
   // ------------------------------------------------------------ detail view
   if (open) {
@@ -227,6 +264,8 @@ export function InboxApp({
         <button type="button" onClick={() => setOpenId(null)} className={linkClass}>
           ← {d.back}
         </button>
+
+        {errorBanner}
 
         <header className="flex flex-col gap-1">
           <h1 className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fd-ink)]">
@@ -335,6 +374,7 @@ export function InboxApp({
           {connectingGmail ? t.gmail.connecting : t.gmail.connect}
         </button>
       )}
+      {errorBanner}
 
       <ChecklistCard
         freelancer={freelancer}
