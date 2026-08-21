@@ -158,7 +158,7 @@ export function buildDraftPrompt(request: DraftRequest): string {
   // The reason is the argument of the email, not background. Each reason type
   // gets its own definition of what the one ask must be.
   const REASON_BRIEF: Record<string, string> = {
-    anniversary: `ANNIVERSARY: reference the project by name and its month (e.g. "vorig jaar augustus"), note that a year has almost passed, and propose concretely holding space or planning a next edition or session. The one ask is about a date, not a chat.`,
+    anniversary: `ANNIVERSARY: reference the project by name and its month (e.g. "${locale === "nl" ? "vorig jaar augustus" : "last August"}"), note that a year has almost passed, and propose concretely holding space or planning a next edition or session. The one ask is about a date, not a chat.`,
     season: `SEASON: reference the project, name the planning season from the reason, and offer to reserve time before the calendar fills. Light urgency, never pushy. The one ask is reserving time.`,
     gap: `QUIET SPELL: reference the project and the time passed, share one genuine line about it, and ask exactly one concrete question about what is coming up for them. No generic catch-up.`,
     referral: `REFERRAL: thank them for the project, say you have room for similar clients, and ask if they know someone who might need the same \u2014 optionally also a short review. The one ask is the referral.`,
