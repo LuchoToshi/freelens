@@ -409,6 +409,9 @@ export const nl: DeepPartial<typeof en> = {
         },
         caption: "Klaar in ongeveer 20 seconden. Verstuurd vanuit je eigen inbox.",
         bridge: "Zo werkt het straks met jouw prijzen en jouw stijl.",
+        inquiryMeta: "Nieuwe aanvraag · 2 min geleden",
+        intro: "Er komt een aanvraag binnen. Twintig seconden later —",
+        orSeeLabel: "of ook:",
       },
       objections: {
         items: [
