@@ -38,7 +38,13 @@ export type AnalyticsEvent =
   | "draft_skipped"
   | "draft_regenerated"
   | "worked_example_clicked_hero"
-  | "sign_in_clicked_nav";
+  | "sign_in_clicked_nav"
+  | "demo_viewed"
+  | "demo_draft_generated"
+  | "demo_draft_generation_failed"
+  | "demo_draft_edited"
+  | "demo_cta_clicked_banner"
+  | "demo_cta_clicked_inline";
 
 type VercelAnalytics = (
   command: "event",

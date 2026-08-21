@@ -101,6 +101,16 @@ const en = {
     clientName: "Lisa (example)",
     message: "Hi! We are getting married next year and we love your style. Would you be available, and what would it roughly cost?",
   },
+  demo: {
+    bannerText: "You're viewing a demo with sample data. Nothing here is saved.",
+    bannerCta: "Create your account",
+    viewDraft: "See the reply",
+    pending: "The draft is still being written. Give it a few seconds, or try again.",
+    retry: "Try again",
+    editHint: "This is a real draft. Try editing it, your edits stay right here, nothing is saved.",
+    inlineCta: "Like what you see? Set up FrontDesk with your own voice.",
+    inlineCtaLink: "Create account",
+  },
   auth: {
     heading: "Sign in",
     intro: "One email, no password. We send you a sign-in link.",
@@ -301,6 +311,16 @@ const nl: typeof en = {
   sample: {
     clientName: "Lisa (voorbeeld)",
     message: "Hoi! We trouwen volgend jaar en je stijl spreekt ons erg aan. Zou je beschikbaar zijn, en wat zijn ongeveer de kosten?",
+  },
+  demo: {
+    bannerText: "Je bekijkt een demo met voorbeeldgegevens. Hier wordt niets opgeslagen.",
+    bannerCta: "Account aanmaken",
+    viewDraft: "Bekijk het antwoord",
+    pending: "Het concept wordt nog geschreven. Geef het even, of probeer opnieuw.",
+    retry: "Probeer opnieuw",
+    editHint: "Dit is een echt concept. Pas het gerust aan, je wijzigingen blijven hier, er wordt niets opgeslagen.",
+    inlineCta: "Wat vind je ervan? Zet FrontDesk op met je eigen stijl.",
+    inlineCtaLink: "Account aanmaken",
   },
   auth: {
     heading: "Inloggen",

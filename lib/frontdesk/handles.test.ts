@@ -15,7 +15,7 @@ describe("handles", () => {
   });
 
   it("rejects every reserved segment", () => {
-    for (const h of ["about", "try", "tool", "inbox", "setup", "admin", "api", "www"]) {
+    for (const h of ["about", "try", "tool", "inbox", "setup", "admin", "api", "www", "demo"]) {
       expect(isValidHandle(h), h).toBe(false);
     }
   });
@@ -24,6 +24,7 @@ describe("handles", () => {
     expect(isFrontdeskPath("/inbox")).toBe(true);
     expect(isFrontdeskPath("/setup")).toBe(true);
     expect(isFrontdeskPath("/admin")).toBe(true);
+    expect(isFrontdeskPath("/demo")).toBe(true);
     expect(isFrontdeskPath("/demo-emma")).toBe(true);
     expect(isFrontdeskPath("/")).toBe(false);
     expect(isFrontdeskPath("/about")).toBe(false);
@@ -34,7 +35,7 @@ describe("handles", () => {
 
   it("classifies chrome variants from one source", () => {
     // App surfaces: no chrome at all.
-    for (const p of ["/inbox", "/setup", "/admin", "/demo-emma"]) {
+    for (const p of ["/inbox", "/setup", "/admin", "/demo", "/demo-emma"]) {
       expect(chromeVariant(p), p).toBe("app");
     }
     // FrontDesk marketing pages get the FrontDesk footer.
