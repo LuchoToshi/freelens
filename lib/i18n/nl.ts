@@ -359,7 +359,7 @@ export const nl: DeepPartial<typeof en> = {
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
-      heroCtaTry: "Inloggen",
+      heroCtaTry: "Bekijk een echt antwoord",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",
