@@ -36,9 +36,22 @@ export interface WorkedExampleDemo {
   types: Record<"wedding" | "party" | "business" | "portrait", DemoType>;
   caption: string;
   bridge: string;
+  /** Sits above the inquiry card, framing it as just-arrived rather than a
+   *  form receipt. Type-agnostic, like caption/bridge below, so it stays
+   *  true no matter which chip is selected. */
+  inquiryMeta: string;
+  /** The before/after beat above the chips. Deliberately type-agnostic —
+   *  naming the selected type here would go stale the moment someone picks
+   *  a different chip, the same class of bug the product's own draft guards
+   *  exist to prevent. */
+  intro: string;
+  /** Label in front of the demoted chip row, e.g. "or see:". */
+  orSeeLabel: string;
 }
 
-const TYPE_KEYS = ["wedding", "party", "business", "portrait"] as const;
+const LEAD_KEY = "wedding" as const;
+const OTHER_KEYS = ["party", "business", "portrait"] as const;
+const TYPE_KEYS = [LEAD_KEY, ...OTHER_KEYS] as const;
 
 export function WorkedExample({
   demo,
@@ -74,20 +87,44 @@ export function WorkedExample({
       viewport={{ once: true, margin: "-80px" }}
       className="mx-auto flex w-full max-w-2xl flex-col gap-5"
     >
-      {/* The pick: four event types, wedding preselected so the section
-          works with zero interaction. Plain buttons, so keyboard access is
-          the platform's own. */}
-      <motion.div variants={riseIn(reduce)} className="flex flex-wrap gap-2">
-        {TYPE_KEYS.map((key) => (
+      {/* The before/after beat: the payoff stated up front, not just at the
+          bottom where it's easy to scroll past. */}
+      <motion.p variants={riseIn(reduce)} className="text-sm font-medium leading-relaxed text-white/85">
+        {demo.intro}
+      </motion.p>
+
+      {/* The pick: one persona leads (wedding, already preselected, so the
+          section works with zero interaction), the other three demoted to a
+          smaller row so this reads as one story instead of a feature matrix.
+          Plain buttons throughout, so keyboard access is the platform's own. */}
+      <motion.div variants={riseIn(reduce)} className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          aria-pressed={selected === LEAD_KEY}
+          onClick={() => setSelected(LEAD_KEY)}
+          className={`min-h-11 border px-5 text-base font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+            selected === LEAD_KEY
+              ? "border-white bg-white text-[var(--fd-ink)]"
+              : "border-white/30 bg-transparent text-white hover:border-white"
+          }`}
+        >
+          {demo.types[LEAD_KEY].label}
+        </button>
+
+        <span className="text-xs font-medium uppercase tracking-[0.15em] text-white/50">
+          {demo.orSeeLabel}
+        </span>
+
+        {OTHER_KEYS.map((key) => (
           <button
             key={key}
             type="button"
             aria-pressed={selected === key}
             onClick={() => setSelected(key)}
-            className={`min-h-11 border px-4 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+            className={`min-h-11 border px-3 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
               selected === key
                 ? "border-white bg-white text-[var(--fd-ink)]"
-                : "border-white/30 bg-transparent text-white hover:border-white"
+                : "border-white/30 bg-transparent text-white/70 hover:border-white hover:text-white"
             }`}
           >
             {demo.types[key].label}
@@ -105,6 +142,7 @@ export function WorkedExample({
           </span>
           <ExampleBadge />
         </div>
+        <p className="text-xs text-[var(--fd-slate)]">{demo.inquiryMeta}</p>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={selected} {...swap} className="flex flex-col gap-1.5">
             <p className="text-sm font-medium text-[var(--fd-ink)]">{active.clientName}</p>
