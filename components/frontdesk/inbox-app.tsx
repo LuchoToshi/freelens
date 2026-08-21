@@ -74,6 +74,7 @@ export function InboxApp({
   const dict = fdDict(freelancer.locale);
   const t = dict.inbox;
   const [inquiries, setInquiries] = useState<InquiryRow[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, DraftRow>>({});
   const [allDrafts, setAllDrafts] = useState<DraftRow[]>([]);
   const [bioConfirmedAt, setBioConfirmedAt] = useState<string | null>(
@@ -117,10 +118,15 @@ export function InboxApp({
   }
 
   const load = useCallback(async () => {
-    const { data: rows } = await sb
+    const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
       .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at")
       .order("created_at", { ascending: false });
+    if (inquiriesError) {
+      setLoadError(true);
+      return;
+    }
+    setLoadError(false);
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows } = await sb
       .from("drafts")
@@ -208,6 +214,16 @@ export function InboxApp({
     setRegenerating(false);
     await load();
     setEditedBody("");
+  }
+
+  if (loadError) {
+    return (
+      <main className="mx-auto w-full max-w-2xl px-4 py-10">
+        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-error-text)]">
+          {t.loadError}
+        </p>
+      </main>
+    );
   }
 
   if (inquiries === null) {

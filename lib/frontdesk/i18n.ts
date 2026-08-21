@@ -53,6 +53,7 @@ const en = {
     heading: "Inbox",
     empty: "No inquiries yet. Put your link in your bio and they will land here.",
     loading: "One moment.",
+    loadError: "Couldn't load your inbox. Check your connection and try again.",
     sampleBadge: "Example",
     checklist: {
       heading: "Go live",
@@ -252,6 +253,7 @@ const nl: typeof en = {
     heading: "Inbox",
     empty: "Nog geen aanvragen. Zet je link in je bio en ze komen hier binnen.",
     loading: "Momentje.",
+    loadError: "Je inbox kon niet worden geladen. Controleer je verbinding en probeer opnieuw.",
     sampleBadge: "Voorbeeld",
     checklist: {
       heading: "Ga live",
