@@ -365,7 +365,7 @@ export const en = {
       heroSub:
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
-      heroCtaTry: "Sign in",
+      heroCtaTry: "See a real reply",
       example: {
         label: "This is what one inquiry looks like.",
         inquiryLabel: "Inquiry",
@@ -415,6 +415,9 @@ export const en = {
         },
         caption: "Ready in about 20 seconds. Sent from your own inbox.",
         bridge: "This is how it will work with your prices and your style.",
+        inquiryMeta: "New inquiry · 2 min ago",
+        intro: "An inquiry lands. Twenty seconds later —",
+        orSeeLabel: "or see:",
       },
       objections: {
         items: [

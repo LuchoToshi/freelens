@@ -42,7 +42,11 @@ export default function Home() {
       />
 
       {/* 2 · The worked example: an ink gallery wall around a calm, readable draft. */}
-      <section aria-label={f.example.label} className="bg-[var(--fd-ink)] text-white">
+      <section
+        id="worked-example"
+        aria-label={f.example.label}
+        className="scroll-mt-16 bg-[var(--fd-ink)] text-white"
+      >
         <div className={`${container} flex flex-col gap-12 py-24 sm:py-32`}>
           <motion.h2
             variants={riseIn(reduce)}

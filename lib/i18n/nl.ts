@@ -359,7 +359,7 @@ export const nl: DeepPartial<typeof en> = {
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
-      heroCtaTry: "Inloggen",
+      heroCtaTry: "Bekijk een echt antwoord",
       example: {
         label: "Zo ziet één aanvraag eruit.",
         inquiryLabel: "Aanvraag",
@@ -409,6 +409,9 @@ export const nl: DeepPartial<typeof en> = {
         },
         caption: "Klaar in ongeveer 20 seconden. Verstuurd vanuit je eigen inbox.",
         bridge: "Zo werkt het straks met jouw prijzen en jouw stijl.",
+        inquiryMeta: "Nieuwe aanvraag · 2 min geleden",
+        intro: "Er komt een aanvraag binnen. Twintig seconden later —",
+        orSeeLabel: "of ook:",
       },
       objections: {
         items: [
