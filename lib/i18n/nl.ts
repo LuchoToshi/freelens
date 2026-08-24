@@ -145,7 +145,7 @@ export const nl: DeepPartial<typeof en> = {
 
   meta: {
     home: {
-      title: "FrontDesk: verlies geen klussen meer aan een traag antwoord",
+      title: "Freelens: verlies geen klussen meer aan een traag antwoord",
       description:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Gebouwd voor creatieve freelancers zoals fotografen, videografen, designers en illustratoren.",
     },
@@ -354,7 +354,7 @@ export const nl: DeepPartial<typeof en> = {
     },
 
     frontdesk: {
-      heroEyebrow: "FrontDesk",
+      heroEyebrow: "Je front desk",
       heroTitle: "Verlies geen klussen meer aan een traag antwoord.",
       heroSub:
         "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
@@ -417,7 +417,7 @@ export const nl: DeepPartial<typeof en> = {
         items: [
           {
             q: "Klinkt het echt als jij?",
-            a: "Ja. Je plakt een paar van je eigen antwoorden, en FrontDesk leert je toon. Warm of zakelijk, kort of uitgebreid, met of zonder emoji: het schrijft zoals jij schrijft.",
+            a: "Ja. Je plakt een paar van je eigen antwoorden, en Freelens leert je toon. Warm of zakelijk, kort of uitgebreid, met of zonder emoji: het schrijft zoals jij schrijft.",
           },
           {
             q: "Verzint het prijzen of belooft het datums?",
@@ -440,7 +440,7 @@ export const nl: DeepPartial<typeof en> = {
       trust:
         "Antwoorden worden met AI opgesteld. Jij keurt elk antwoord goed en verstuurt het zelf. Het e-mailadres van je klant gaat nooit naar de AI.",
       waitlist: {
-        heading: "FrontDesk opent binnenkort.",
+        heading: "Je front desk gaat binnenkort live.",
         sub: "Zet je op de lijst en je bent er als eerste bij. Geen spam, alleen een berichtje als je aan de beurt bent.",
         nameLabel: "Je naam",
         namePlaceholder: "Voornaam is genoeg",
@@ -459,7 +459,7 @@ export const nl: DeepPartial<typeof en> = {
         sending: "Momentje",
         done: "Je staat op de lijst. We laten van ons horen.",
         error: "Er ging iets mis. Probeer het zo nog eens.",
-        privacyNote: "We gebruiken je e-mailadres alleen om je op de hoogte te houden van FrontDesk. Uitschrijven kan altijd.",
+        privacyNote: "We gebruiken je e-mailadres alleen om je op de hoogte te houden van je front desk. Uitschrijven kan altijd.",
       },
     },
 
@@ -610,19 +610,19 @@ export const nl: DeepPartial<typeof en> = {
   aboutPage: {
     eyebrow: "Waarom Freelens bestaat",
     heading: "Je oude klanten zijn je volgende boeking.",
-    intro: "FrontDesk reageert al snel als er een nieuwe aanvraag binnenkomt. Dit is wat het doet met de klanten die je vertrouwen al hebben. De stille maanden van een freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die bijhoudt wanneer het natuurlijke moment is om weer contact te leggen, dus dat gebeurt niet. Of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",
+    intro: "Je front desk reageert al snel als er een nieuwe aanvraag binnenkomt. Dit is wat het doet met de klanten die je vertrouwen al hebben. De stille maanden van een freelancer zijn zelden een kwaliteitsprobleem. Het werk was goed. De klant was blij. Er is alleen niemand die bijhoudt wanneer het natuurlijke moment is om weer contact te leggen, dus dat gebeurt niet. Of het gebeurt als \u201ceven checken\u201d, en dat voelt voor iedereen ongemakkelijk.",
     what: {
-      h: "Wat FrontDesk doet",
-      p1: "FrontDesk houdt je oude klanten bij en let op het moment waarop contact zoeken zin heeft. Een jaar na de laatste shoot. Het seizoen waarin hun soort bedrijf nieuwe opdrachten brieft. Elke week levert het je twee tot vier mensen die een bericht waard zijn, elk met een specifieke reden, en schrijft de eerste mail in jouw toon.",
-      p2: "Jij past aan wat je wilt. Je verstuurt het zelf, vanuit je eigen inbox. FrontDesk verstuurt nooit iets naar wie dan ook.",
+      h: "Wat Freelens doet",
+      p1: "Freelens houdt je oude klanten bij en let op het moment waarop contact zoeken zin heeft. Een jaar na de laatste shoot. Het seizoen waarin hun soort bedrijf nieuwe opdrachten brieft. Elke week levert het je twee tot vier mensen die een bericht waard zijn, elk met een specifieke reden, en schrijft de eerste mail in jouw toon.",
+      p2: "Jij past aan wat je wilt. Je verstuurt het zelf, vanuit je eigen inbox. Freelens verstuurt nooit iets naar wie dan ook.",
     },
     boundary: {
-      h: "Wat FrontDesk over je klanten weet",
+      h: "Wat Freelens over je klanten weet",
       p1: "Een klantrecord bevat een naam, een bedrijf, wat je voor ze deed, wanneer dat was, ongeveer wat het waard was, het e-mailadres zodat de juiste persoon wordt aangeschreven, en eventuele notities die je zelf toevoegt. Notities kunnen in een concept terechtkomen, dus let op wat je erin zet. Geen telefoonnummers. Geen postadressen. Geen registratienummers. Je kunt alles exporteren en alles verwijderen, vanaf dag \u00e9\u00e9n, en je klantgegevens worden alleen gebruikt om je mails te schrijven, verder nergens voor.",
     },
     trust: {
       h: "Waarom de mails veilig zijn om te versturen",
-      p1: "Elke reden komt uit je eigen gegevens. Elke prijs komt uit de tarieven die je zelf hebt ingesteld, en een concept dat een bedrag verzint wordt weggegooid voordat het bij je komt. FrontDesk zegt nooit dat je vrij bent op een datum, want het kent je agenda niet. Klopt er iets niet, dan pas je het aan en blijft het aangepast.",
+      p1: "Elke reden komt uit je eigen gegevens. Elke prijs komt uit de tarieven die je zelf hebt ingesteld, en een concept dat een bedrag verzint wordt weggegooid voordat het bij je komt. Freelens zegt nooit dat je vrij bent op een datum, want het kent je agenda niet. Klopt er iets niet, dan pas je het aan en blijft het aangepast.",
       p2: "Dat is de hele opzet: de AI schrijft, de controles zijn gewone code, en jij beslist.",
     },
     tools: {
@@ -631,7 +631,7 @@ export const nl: DeepPartial<typeof en> = {
     },
     going: {
       h: "Waar dit heen gaat",
-      p1: "Dit onderdeel van FrontDesk is in besloten b\u00e8ta. Er is nog niets live voor het publiek, en dat zeggen we liever hardop dan dat we doen alsof. We stellen een eerste kleine groep freelancers samen die ermee gaan werken en ons vertellen wat er nog niet klopt. Ben je fotograaf, videograaf, ontwerper, illustrator of een andere creatieve freelancer? Zet je op de lijst, dan ben jij degene aan wie je beste klanten denken zodra ze hun volgende project plannen.",
+      p1: "Dit onderdeel van Freelens is in besloten b\u00e8ta. Er is nog niets live voor het publiek, en dat zeggen we liever hardop dan dat we doen alsof. We stellen een eerste kleine groep freelancers samen die ermee gaan werken en ons vertellen wat er nog niet klopt. Ben je fotograaf, videograaf, ontwerper, illustrator of een andere creatieve freelancer? Zet je op de lijst, dan ben jij degene aan wie je beste klanten denken zodra ze hun volgende project plannen.",
     },
     ctaPrimary: "Zet me op de wachtlijst",
     ctaSecondary: "Bekijk de gratis rekentools",
@@ -885,7 +885,7 @@ export const nl: DeepPartial<typeof en> = {
       body: "Gebruik je de app op /app: je account is een e-mailadres met een magic link, zonder wachtwoord. Klantrecords die je invoert (naam, klus, datum, bedrag, notities, nooit adressen, telefoonnummers of registratienummers) staan bij Supabase in de EU en zijn alleen door jou leesbaar. Conceptmails schrijft de Claude-API van Anthropic, ingesteld zonder training op jouw gegevens; het model ziet alleen het record dat jij invoerde. De wekelijkse mail loopt via Resend, alleen als er iets te melden is, met \u00e9\u00e9n klik om te stoppen. Alles exporteren of je account verwijderen, direct en definitief, kan in de app zelf.",
     },
     frontdesk: {
-      title: "De FrontDesk-app",
+      title: "Je profiel, aanvragen en concepten",
       body: "Meld je je aan als freelancer: je profiel (weergavenaam, vak, stad, een optionele foto en je afsluiting) wordt bewaard bij Supabase, alleen leesbaar door jou. Op je publieke pagina staan alleen je handle, weergavenaam, vak, stad en foto. De e-mails die je plakt zodat concepten klinken als jij, bewaren we als tekst in plaats van ze weg te gooien, zodat we je stijlprofiel opnieuw kunnen afleiden naarmate we beter worden in hoe we dat lezen; alleen jij kunt ze zien. Vult iemand je publieke aanvraagformulier in, dan bewaren we wat diegene invult: naam, optioneel een e-mailadres, de datum en het type evenement, het budget, het bericht, en via welk kanaal de aanvraag binnenkwam. Dat e-mailadres is alleen voor je eigen follow-up; het gaat nooit naar de Claude-API van Anthropic die je antwoord opstelt. Elk concept wordt eerst tegen je eigen pakketten en het bericht van de klant gecontroleerd voordat het bij je terechtkomt, en we bewaren elk concept samen met of je het ongewijzigd verstuurde, aanpaste, of oversloeg. Verwijder je account, dan verdwijnen je profiel, aanvragen en concepten mee, direct en definitief.",
     },
     gmail: {

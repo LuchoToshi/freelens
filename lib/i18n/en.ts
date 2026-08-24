@@ -142,7 +142,7 @@ export const en = {
 
   meta: {
     home: {
-      title: "FrontDesk: stop losing jobs to a slow reply",
+      title: "Freelens: stop losing jobs to a slow reply",
       description:
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. Built for creative freelancers such as photographers, videographers, designers and illustrators.",
     },
@@ -360,7 +360,7 @@ export const en = {
     },
 
     frontdesk: {
-      heroEyebrow: "FrontDesk",
+      heroEyebrow: "Your front desk",
       heroTitle: "Stop losing jobs to a slow reply.",
       heroSub:
         "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
@@ -423,7 +423,7 @@ export const en = {
         items: [
           {
             q: "Does it really sound like you?",
-            a: "Yes. You paste a few of your own replies, and FrontDesk learns your tone. Warm or businesslike, short or detailed, emoji or no emoji: it writes the way you write.",
+            a: "Yes. You paste a few of your own replies, and Freelens learns your tone. Warm or businesslike, short or detailed, emoji or no emoji: it writes the way you write.",
           },
           {
             q: "Does it invent prices or promise dates?",
@@ -446,7 +446,7 @@ export const en = {
       trust:
         "Replies are drafted with AI. You approve and send every one yourself. Your client's email address is never sent to the AI.",
       waitlist: {
-        heading: "FrontDesk is opening soon.",
+        heading: "Your front desk is opening soon.",
         sub: "Get on the list and you'll be first in. No spam, just a note when it's your turn.",
         nameLabel: "Your name",
         namePlaceholder: "First name is fine",
@@ -465,7 +465,7 @@ export const en = {
         sending: "One moment",
         done: "You're on the list. We'll be in touch.",
         error: "Something went wrong. Please try again in a moment.",
-        privacyNote: "We only use your email to keep you posted about FrontDesk. You can unsubscribe anytime.",
+        privacyNote: "We only use your email to keep you posted about your front desk. You can unsubscribe anytime.",
       },
     },
 
@@ -616,19 +616,19 @@ export const en = {
   aboutPage: {
     eyebrow: "Why Freelens exists",
     heading: "Your past clients are your next booking.",
-    intro: "FrontDesk already replies fast when a new inquiry lands. This is what it does with the clients who already trust you. A freelancer's quiet months are rarely a quality problem. The work was good. The client was happy. There is just nobody keeping track of when the natural moment to get back in touch arrives, so it does not happen. Or it happens as \u201cjust checking in,\u201d which feels awkward for everyone.",
+    intro: "Your front desk already replies fast when a new inquiry lands. This is what it does with the clients who already trust you. A freelancer's quiet months are rarely a quality problem. The work was good. The client was happy. There is just nobody keeping track of when the natural moment to get back in touch arrives, so it does not happen. Or it happens as \u201cjust checking in,\u201d which feels awkward for everyone.",
     what: {
-      h: "What FrontDesk does",
-      p1: "FrontDesk keeps track of your past clients and watches for the moments when getting in touch makes sense. A year since the last shoot. The season when their kind of business briefs new work. Each week it brings you two to four people worth a message, each with a specific reason, and writes the first email in your voice.",
-      p2: "You edit whatever you want. You send it yourself, from your own inbox. FrontDesk never sends anything to anyone.",
+      h: "What Freelens does",
+      p1: "Freelens keeps track of your past clients and watches for the moments when getting in touch makes sense. A year since the last shoot. The season when their kind of business briefs new work. Each week it brings you two to four people worth a message, each with a specific reason, and writes the first email in your voice.",
+      p2: "You edit whatever you want. You send it yourself, from your own inbox. Freelens never sends anything to anyone.",
     },
     boundary: {
-      h: "What FrontDesk knows about your clients",
+      h: "What Freelens knows about your clients",
       p1: "A client record holds their name, their company, what you did for them, when, roughly what it was worth, the email address so it can write to the right person, and any notes you add yourself. Notes can inform a draft, so what you put there matters. No phone numbers. No postal addresses. No company registration numbers. You can export everything and delete everything from day one, and your client data is used to write your emails and nothing else.",
     },
     trust: {
       h: "Why the emails are safe to send",
-      p1: "Every reason comes from your own records. Every price comes from the rates you set up yourself, and a draft that invents a number is thrown away before it reaches you. FrontDesk never says you are free on a date, because it does not know your calendar. If something is wrong, you correct it and it stays corrected.",
+      p1: "Every reason comes from your own records. Every price comes from the rates you set up yourself, and a draft that invents a number is thrown away before it reaches you. Freelens never says you are free on a date, because it does not know your calendar. If something is wrong, you correct it and it stays corrected.",
       p2: "That is the whole design: the AI writes, the checks are ordinary code, and you decide.",
     },
     tools: {
@@ -637,7 +637,7 @@ export const en = {
     },
     going: {
       h: "Where this is going",
-      p1: "This part of FrontDesk is in private beta. Nothing is live for the public yet, and we would rather say that than pretend otherwise. We are putting together a first small group of freelancers to use it and tell us what is wrong with it. If you're a photographer, videographer, designer, illustrator, or another creative freelancer, join the list and stay top of mind when your best clients have their next project.",
+      p1: "This part of Freelens is in private beta. Nothing is live for the public yet, and we would rather say that than pretend otherwise. We are putting together a first small group of freelancers to use it and tell us what is wrong with it. If you're a photographer, videographer, designer, illustrator, or another creative freelancer, join the list and stay top of mind when your best clients have their next project.",
     },
     ctaPrimary: "Put me on the waitlist",
     ctaSecondary: "See the free calculators",
@@ -891,7 +891,7 @@ export const en = {
       body: "If you use the app at /app: your account is an email address with a magic link, no password. Client records you enter (name, project, date, value, notes, never addresses, phone or registration numbers) are stored with Supabase in the EU, readable only by you. Draft emails are written by Anthropic's Claude API, configured without training on your data; the model sees only the record you entered. The weekly email goes through Resend, only when there is something to say, with a one-click stop. Export everything or delete your account, immediately and permanently, from inside the app.",
     },
     frontdesk: {
-      title: "The FrontDesk app",
+      title: "Your profile, inquiries, and drafts",
       body: "If you sign up as a freelancer: your profile (display name, craft, city, an optional photo, and how you sign off) is stored with Supabase, readable only by you. Only your handle, display name, craft, city and photo appear on your public page. Voice samples, the emails you paste in so drafts sound like you, are kept as text rather than discarded, so your style profile can be regenerated as we improve how we read it; only you can see them. When someone submits your public inquiry form, we store what they enter: their name, optionally their email, the event date, type and budget band, their message, and which channel sent them. Their email is for your own follow-up only; it is never passed to the Anthropic Claude API that drafts your reply. Every draft is checked against your own packages and their message before it reaches you, and we keep each one alongside whether you sent it as-is, edited it, or skipped it. Delete your account and your profile, inquiries and drafts go with it, immediately and permanently.",
     },
     gmail: {
