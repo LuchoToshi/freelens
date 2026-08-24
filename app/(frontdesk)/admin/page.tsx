@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AdminPageBody } from "@/components/frontdesk/admin-page-body";
 
 export const metadata: Metadata = {
-  title: "FrontDesk",
+  title: "Freelens",
   robots: { index: false, follow: false },
 };
 

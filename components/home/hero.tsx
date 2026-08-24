@@ -10,7 +10,7 @@ import { track } from "@/lib/analytics";
 /**
  * The statement. Type is the design: the approved headline at up to ~9vw in
  * Fraunces, word by word out of masks, the final phrase in italic. Behind it a
- * ghost "FrontDesk" layer drifts on scroll — CSS/transform parallax only, no
+ * ghost "Freelens" layer drifts on scroll — CSS/transform parallax only, no
  * WebGL, nothing blocking paint. Reduced motion collapses every trick to a
  * plain fade.
  *
@@ -51,7 +51,7 @@ export function HomeHero({
         style={{ y: ghostY }}
         className="pointer-events-none absolute -right-[6vw] top-[4vh] select-none font-serif text-[30vw] font-semibold leading-none tracking-tight text-[#1A1A1A]/[0.045]"
       >
-        FrontDesk
+        Freelens
       </motion.span>
 
       <div className={`${container} relative flex flex-col gap-8 py-20 sm:py-24`}>
