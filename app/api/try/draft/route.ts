@@ -5,6 +5,7 @@ import { generateDraft, DraftGenerationError } from "@/lib/rebooking/generateDra
 import type { Craft, Relationship } from "@/lib/rebooking/types";
 import { CRAFTS } from "@/lib/server/waitlist";
 import { salutationFor } from "@/lib/rebooking/salutation";
+import { createRateLimiter } from "@/lib/server/rateLimiter";
 
 /**
  * The one server round-trip of the anonymous trial.
@@ -21,16 +22,15 @@ import { salutationFor } from "@/lib/rebooking/salutation";
  */
 const WINDOW_MS = 24 * 60 * 60 * 1000;
 const MAX_PER_WINDOW = 3;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 10_000) hits.clear();
-  return recent.length > MAX_PER_WINDOW;
-}
+// Backstop, not a business figure: caps worst-case model spend on a public,
+// no-auth endpoint regardless of how per-IP identity resolves. Cheap to
+// raise once real trial traffic exists.
+const MAX_TOTAL_PER_WINDOW = 200;
+const rateLimited = createRateLimiter({
+  windowMs: WINDOW_MS,
+  maxPerKey: MAX_PER_WINDOW,
+  maxTotal: MAX_TOTAL_PER_WINDOW,
+});
 
 const MONTH_SHAPE = /^\d{4}-(0[1-9]|1[0-2])$/;
 

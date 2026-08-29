@@ -16,6 +16,7 @@ export const RESERVED_HANDLES = new Set([
   "admin",
   "api",
   "app",
+  "demo",
   "frontdesk",
   "freelens",
   "inbox",
@@ -44,7 +45,7 @@ export function isFrontdeskPath(pathname: string): boolean {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length !== 1) return false;
   const [first] = segments;
-  if (first === "inbox" || first === "setup" || first === "admin") return true;
+  if (first === "inbox" || first === "setup" || first === "admin" || first === "demo") return true;
   return isValidHandle(first);
 }
 
@@ -53,7 +54,7 @@ export function isFrontdeskPath(pathname: string): boolean {
  * routes here — nowhere else.
  *
  *   "app"       → FrontDesk product surfaces (/[handle], /inbox, /setup,
- *                 /admin): no Freelens chrome at all (ChromeGate).
+ *                 /admin, /demo): no Freelens chrome at all (ChromeGate).
  *   "frontdesk" → FrontDesk marketing pages: FrontDesk footer variant
  *                 (wordmark, About, Privacy, trust line).
  *   "legacy"    → everything else, including unknown routes: the original

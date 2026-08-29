@@ -146,4 +146,44 @@ describe("prompt builder", () => {
     expect(validateFrontdeskDraft(nudge, { kind: "nudge", packages: PACKAGES }).ok).toBe(true);
     expect(validateFrontdeskDraft(nudge, { kind: "reply", packages: PACKAGES }).ok).toBe(false);
   });
+
+  it("targets English cleanly for an English visitor with an English voice profile", () => {
+    // Regression guard for the class of bug PR #51 fixed in rebooking: a
+    // hardcoded non-ternary example string leaked the wrong language into the
+    // prompt even though target_language was set correctly. DRAFT_SYSTEM_TEMPLATE
+    // has no such hardcoded example today, but nothing asserted that before the
+    // demo route (spec §3) needed FrontDesk's English path verified, not assumed.
+    const english = buildDraftPrompt(
+      input({
+        targetLanguage: "en",
+        packages: [
+          { label: "Full day wedding", priceFromEur: 1950, unit: "per day", notes: "second photographer included" },
+        ],
+        voiceProfile: {
+          tone: "warm and personal",
+          formality: "informal",
+          sentence_length: "medium",
+          emoji: "rare",
+          greeting_style: "Hi {first name}!",
+          closing_habit: "suggests a call",
+          sign_off: "Best, Emma",
+          language_notes: "",
+          quirks: [],
+        },
+        inquiry: {
+          clientFirstName: "Lisa",
+          eventType: "wedding",
+          eventDate: "2027-06-12",
+          budgetBand: "1000-2500",
+          message: "Hi! We are getting married in June and are looking for a photographer.",
+        },
+        displayName: "Emma van Dijk",
+        signOff: "Best, Emma",
+      })
+    );
+    expect(english.system).toContain("Write in English.");
+    expect(english.system).not.toContain("Write in Dutch.");
+    expect(english.user).toContain("target_language: English");
+    expect(english.system + english.user).not.toMatch(/vorig jaar|trouwdag|Hoi |Groetjes/);
+  });
 });
