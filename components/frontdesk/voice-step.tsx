@@ -132,15 +132,9 @@ export function VoiceStep({
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="vp-signoff" className={labelClass}>{t.signOff}</label>
-            <input id="vp-signoff" value={profile.sign_off} onChange={(e) => set("sign_off", e.target.value)} className={inputClass} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="vp-notes" className={labelClass}>{t.notes}</label>
-            <input id="vp-notes" value={profile.language_notes} onChange={(e) => set("language_notes", e.target.value)} className={inputClass} />
-          </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="vp-notes" className={labelClass}>{t.notes}</label>
+          <input id="vp-notes" value={profile.language_notes} onChange={(e) => set("language_notes", e.target.value)} className={inputClass} />
         </div>
 
         <div className="flex flex-col gap-1.5">
