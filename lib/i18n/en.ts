@@ -416,7 +416,7 @@ export const en = {
         caption: "Ready in about 20 seconds. Sent from your own inbox.",
         bridge: "This is how it will work with your prices and your style.",
         inquiryMeta: "New inquiry · 2 min ago",
-        intro: "An inquiry lands. Twenty seconds later —",
+        intro: "An inquiry lands. Twenty seconds later:",
         orSeeLabel: "or see:",
       },
       objections: {
