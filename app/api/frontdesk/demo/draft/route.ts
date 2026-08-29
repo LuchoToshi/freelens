@@ -1,15 +1,16 @@
 import { fdDict } from "@/lib/frontdesk/i18n";
 import { detectLanguage } from "@/lib/frontdesk/draftGuards";
 import { FrontdeskGenerationError, generateFrontdeskDraft } from "@/lib/frontdesk/generateDraft";
+import { createRateLimiter } from "@/lib/server/rateLimiter";
 import {
   DEMO_BUDGET_BAND,
   DEMO_CLIENT_FIRST_NAME,
   DEMO_DISPLAY_NAME,
   DEMO_EVENT_TYPE,
-  DEMO_PACKAGES,
   DEMO_SIGN_OFF,
-  DEMO_VOICE_PROFILE,
   demoEventDate,
+  demoPackages,
+  demoVoiceProfile,
 } from "@/lib/frontdesk/demoFixture";
 
 /**
@@ -26,16 +27,15 @@ export const maxDuration = 300;
 
 const WINDOW_MS = 24 * 60 * 60 * 1000;
 const MAX_PER_WINDOW = 5;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  if (hits.size > 10_000) hits.clear();
-  return recent.length > MAX_PER_WINDOW;
-}
+// Backstop, not a business figure: caps worst-case model spend on a public,
+// no-auth endpoint regardless of how per-IP identity resolves. Cheap to
+// raise once real demo traffic exists.
+const MAX_TOTAL_PER_WINDOW = 200;
+const rateLimited = createRateLimiter({
+  windowMs: WINDOW_MS,
+  maxPerKey: MAX_PER_WINDOW,
+  maxTotal: MAX_TOTAL_PER_WINDOW,
+});
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
   try {
     const { body: draftBody } = await generateFrontdeskDraft({
       kind: "reply",
-      voiceProfile: DEMO_VOICE_PROFILE,
-      packages: DEMO_PACKAGES,
+      voiceProfile: demoVoiceProfile(locale),
+      packages: demoPackages(locale),
       inquiry: {
         clientFirstName: DEMO_CLIENT_FIRST_NAME,
         eventType: DEMO_EVENT_TYPE,

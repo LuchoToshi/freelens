@@ -108,7 +108,7 @@ const en = {
     pending: "The draft is still being written. Give it a few seconds, or try again.",
     retry: "Try again",
     editHint: "This is a real draft. Try editing it, your edits stay right here, nothing is saved.",
-    inlineCta: "Like what you see? Set up FrontDesk with your own voice.",
+    inlineCta: "Like what you see? Set up your front desk with your own voice.",
     inlineCtaLink: "Create account",
   },
   auth: {
@@ -319,7 +319,7 @@ const nl: typeof en = {
     pending: "Het concept wordt nog geschreven. Geef het even, of probeer opnieuw.",
     retry: "Probeer opnieuw",
     editHint: "Dit is een echt concept. Pas het gerust aan, je wijzigingen blijven hier, er wordt niets opgeslagen.",
-    inlineCta: "Wat vind je ervan? Zet FrontDesk op met je eigen stijl.",
+    inlineCta: "Wat vind je ervan? Zet je front desk op met je eigen stijl.",
     inlineCtaLink: "Account aanmaken",
   },
   auth: {

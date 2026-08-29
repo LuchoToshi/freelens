@@ -83,9 +83,11 @@ export async function POST(request: Request) {
     return Response.json(GENERIC_OK);
   }
 
-  // x-real-ip is platform-set on Vercel; the first x-forwarded-for hop can be
-  // seeded by the client. Weak either way (see plan: per-instance memory) —
-  // this just closes the trivial spoof.
+  // Both x-real-ip and the first x-forwarded-for hop are platform-set on
+  // Vercel: the edge overwrites this header rather than forwarding whatever
+  // a client sends, so neither is client-spoofable here (see Vercel's
+  // request-headers docs). The real weakness is per-instance memory, not
+  // header trust (see plan).
   const ip =
     request.headers.get("x-real-ip")?.trim() ||
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

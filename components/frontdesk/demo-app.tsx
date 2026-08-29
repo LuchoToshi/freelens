@@ -70,7 +70,7 @@ export function DemoApp() {
       <div className="flex flex-col gap-3 rounded-2xl bg-[var(--fd-accent)]/10 p-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{t.bannerText}</p>
         <Link
-          href="/inbox?ref=demo"
+          href="/setup?ref=demo"
           onClick={() => track("demo_cta_clicked_banner")}
           className={`${secondaryClass} w-fit shrink-0`}
         >
@@ -109,7 +109,7 @@ export function DemoApp() {
               <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-dashed border-[var(--fd-line)] p-4">
                 <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{t.inlineCta}</p>
                 <Link
-                  href="/inbox?ref=demo"
+                  href="/setup?ref=demo"
                   onClick={() => track("demo_cta_clicked_inline")}
                   className={`${primaryClass} w-fit`}
                 >
