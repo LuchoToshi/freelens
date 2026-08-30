@@ -19,6 +19,7 @@ import {
 } from "@/components/frontdesk/readiness-checklist";
 import { deriveGmailHealth, type GmailConnectionRow } from "@/lib/frontdesk/connectionHealth";
 import type { GapPackage } from "@/lib/frontdesk/packageGaps";
+import { buildTestFixture, testRegeneratedBody } from "@/lib/frontdesk/testFixture";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -118,6 +119,9 @@ export function InboxApp({
   const [packages, setPackages] = useState<GapPackage[]>([]);
   const [gmailConnection, setGmailConnection] = useState<GmailConnectionRow | null>(null);
   const [freelancerState, setFreelancerState] = useState(freelancer);
+  // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
+  // reload keeps the mode and leaving is a plain link back to /inbox.
+  const [testMode, setTestMode] = useState(false);
 
   const sb = supabaseBrowser();
 
@@ -137,9 +141,12 @@ export function InboxApp({
   // on open/close so a selection is shareable and survives a reload.
   useEffect(() => {
     const params = new URL(window.location.href).searchParams;
+    if (params.get("test") === "1") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
+      setTestMode(true);
+    }
     const q = params.get("queue") as QueueKey | null;
     if (q && QUEUE_ORDER.includes(q)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
       setActiveQueue(q);
       setQueueChosen(true);
     }
@@ -147,6 +154,17 @@ export function InboxApp({
      
     if (i) setOpenId(i);
   }, []);
+
+  function setTestModeAndReload(on: boolean) {
+    const url = new URL(window.location.href);
+    if (on) url.searchParams.set("test", "1");
+    else url.searchParams.delete("test");
+    url.searchParams.delete("i");
+    window.history.replaceState({}, "", url.toString());
+    setTestMode(on);
+    setOpenId(null);
+    void load();
+  }
 
   function syncUrl(id: string | null) {
     const url = new URL(window.location.href);
@@ -173,6 +191,22 @@ export function InboxApp({
   }
 
   const load = useCallback(async () => {
+    if (new URL(window.location.href).searchParams.get("test") === "1") {
+      const nowTs = new Date();
+      const fixture = buildTestFixture(nowTs, freelancer.locale);
+      setInquiries(fixture.inquiries as InquiryRow[]);
+      const latestFix: Record<string, DraftRow> = {};
+      for (const d of fixture.drafts as DraftRow[]) {
+        if (!latestFix[d.inquiry_id]) latestFix[d.inquiry_id] = d;
+      }
+      setDrafts(latestFix);
+      setReplyDrafts(latestFix);
+      setAllDrafts(fixture.drafts as DraftRow[]);
+      setPackages([]);
+      setLoadError(false);
+      setNow(nowTs);
+      return;
+    }
     const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
       .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at, replied_at, snoozed_until")
@@ -217,7 +251,7 @@ export function InboxApp({
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch; load() only calls setState after awaited network responses, never synchronously in the effect body
+     
     void load();
   }, [load]);
 
@@ -321,9 +355,34 @@ export function InboxApp({
     syncUrl(inquiry.id);
   }
 
+  // Test-mode mutations happen in local state only; nothing leaves the tab.
+  function patchLocalInquiry(id: string, patch: Partial<InquiryRow>) {
+    setInquiries((prev) => prev?.map((i) => (i.id === id ? { ...i, ...patch } : i)) ?? prev);
+  }
+  function patchLocalDraft(id: string, patch: Partial<DraftRow>) {
+    const apply = (d: DraftRow) => (d.id === id ? { ...d, ...patch } : d);
+    setDrafts((prev) => Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, apply(v)])));
+    setReplyDrafts((prev) => Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, apply(v)])));
+    setAllDrafts((prev) => prev.map(apply));
+  }
+
   async function recordOutcome(kind: "send" | "skip") {
     if (!open || !openDraft) return;
     track(kind === "skip" ? "draft_skipped" : "draft_sent");
+    if (testMode) {
+      if (kind === "skip") {
+        patchLocalDraft(openDraft.id, { outcome: "skipped" });
+      } else {
+        const untouched = editedBody === openDraft.body;
+        patchLocalDraft(openDraft.id, {
+          outcome: untouched ? "sent_as_is" : "edited",
+          final_body: untouched ? null : editedBody,
+        });
+        patchLocalInquiry(open.id, { status: "replied", replied_at: new Date().toISOString() });
+      }
+      setNow(new Date());
+      return;
+    }
     if (kind === "skip") {
       await sb
         .from("drafts")
@@ -350,12 +409,22 @@ export function InboxApp({
   async function snooze(days: number | null) {
     if (!open) return;
     const until = days ? new Date(now.getTime() + days * 86_400_000).toISOString() : null;
+    if (testMode) {
+      patchLocalInquiry(open.id, { snoozed_until: until });
+      setNow(new Date());
+      return;
+    }
     await sb.from("inquiries").update({ snoozed_until: until }).eq("id", open.id);
     await load();
   }
 
   async function setStatus(status: "booked" | "lost") {
     if (!open) return;
+    if (testMode) {
+      patchLocalInquiry(open.id, { status });
+      setNow(new Date());
+      return;
+    }
     await sb.from("inquiries").update({ status }).eq("id", open.id);
     await load();
   }
@@ -370,6 +439,19 @@ export function InboxApp({
 
   async function regenerate() {
     if (!open) return;
+    if (testMode) {
+      const draftId = drafts[open.id]?.id;
+      if (draftId) {
+        patchLocalDraft(draftId, {
+          body: testRegeneratedBody(freelancer.locale, open.client_name),
+          validation_status: "ready_for_review",
+          validation_failures: [],
+        });
+        setEditedBody("");
+        setNow(new Date());
+      }
+      return;
+    }
     setRegenerating(true);
     await fetch("/api/frontdesk/drafts/regenerate", {
       method: "POST",
@@ -663,17 +745,30 @@ export function InboxApp({
           {t.heading}
         </h1>
 
-        {GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
+        {testMode && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4">
+            <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{t.testMode.banner}</p>
+            <button
+              type="button"
+              onClick={() => setTestModeAndReload(false)}
+              className="text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
+            >
+              {t.testMode.exit}
+            </button>
+          </div>
+        )}
+
+        {!testMode && GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
           <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
             {t.gmail.connected}
           </p>
         )}
-        {GMAIL_CONNECT_ENABLED && gmailStatus === "error" && (
+        {!testMode && GMAIL_CONNECT_ENABLED && gmailStatus === "error" && (
           <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
             {t.gmail.error}
           </p>
         )}
-        {GMAIL_CONNECT_ENABLED && (
+        {!testMode && GMAIL_CONNECT_ENABLED && (
           <ConnectionHealthCard
             locale={freelancer.locale}
             health={deriveGmailHealth(gmailConnection, now)}
@@ -682,6 +777,7 @@ export function InboxApp({
           />
         )}
 
+        {!testMode && (
         <ReadinessCard
           freelancer={freelancerState}
           inquiries={inquiries}
@@ -699,7 +795,9 @@ export function InboxApp({
           gmailAvailable={GMAIL_CONNECT_ENABLED}
           gmailConnected={gmailConnection !== null && gmailConnection.revoked_at === null}
         />
+        )}
 
+        {!testMode && (
         <VoiceLearningCard
           freelancer={freelancerState}
           edits={allDrafts
@@ -719,11 +817,19 @@ export function InboxApp({
             await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
           }}
         />
+        )}
 
         {inquiries.length === 0 ? (
-          <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-slate)]">
-            {t.empty}
-          </p>
+          <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.empty}</p>
+            <button
+              type="button"
+              onClick={() => setTestModeAndReload(true)}
+              className="w-fit text-left text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
+            >
+              {t.testMode.enter}
+            </button>
+          </div>
         ) : (
           <>
             <div role="tablist" aria-label={t.heading} className="flex flex-wrap gap-1.5">

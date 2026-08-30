@@ -195,6 +195,12 @@ const en = {
           "You keep getting {type} inquiries, but no package mentions it. A matching package helps drafts quote the right price.",
       },
     },
+    testMode: {
+      banner:
+        "Test mode: everything below is fictional sample data. Nothing is saved, and your real inbox is untouched.",
+      exit: "Leave test mode",
+      enter: "Try a test run with fictional data",
+    },
     voiceLearning: {
       heading: "Voice learning",
       pausedNote: "Learning is paused. Your edits are not being analysed.",
@@ -639,6 +645,12 @@ const nl: typeof en = {
         uncoveredType:
           "Je krijgt steeds aanvragen voor {type}, maar geen pakket noemt het. Een passend pakket helpt concepten de juiste prijs te noemen.",
       },
+    },
+    testMode: {
+      banner:
+        "Testmodus: alles hieronder is fictieve voorbeelddata. Er wordt niets opgeslagen en je echte inbox blijft ongemoeid.",
+      exit: "Testmodus verlaten",
+      enter: "Doe een proefronde met fictieve data",
     },
     voiceLearning: {
       heading: "Stem leren",
