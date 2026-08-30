@@ -22,11 +22,13 @@ import {
   FrontdeskGenerationError,
   generateFrontdeskDraft,
 } from "@/lib/frontdesk/generateDraft";
+import { isPermitted } from "@/lib/frontdesk/permissions";
 
 export type PipelineOutcome =
   | "stored"
   | "no_voice_profile"
   | "inquiry_not_found"
+  | "not_permitted"
   | "generation_failed";
 
 export async function generateAndStoreDraft(
@@ -49,10 +51,21 @@ export async function generateAndStoreDraft(
 
   const { data: freelancer } = await db
     .from("freelancers")
-    .select("id, display_name, sign_off, locale, voice_profile")
+    .select("id, display_name, sign_off, locale, voice_profile, permission_levels")
     .eq("id", inquiry.freelancer_id)
     .maybeSingle();
   if (!freelancer?.voice_profile) return "no_voice_profile";
+
+  // Server-side permission check (§8.3, level 3 = prepare for review). All
+  // three write paths funnel through here, so lowering the level in the
+  // matrix stops submit, regenerate, AND the cron in one place — and the
+  // ceiling clamp inside isPermitted means a tampered stored level cannot
+  // grant anything the ceilings forbid.
+  const action = kind === "nudge" ? "prepare_followup" : "prepare_reply";
+  if (!isPermitted(action, 3, freelancer.permission_levels as Record<string, unknown> | null)) {
+    console.log(`frontdesk draft skipped: ${action} below level 3 for freelancer ${freelancer.id}`);
+    return "not_permitted";
+  }
 
   const { data: packageRows } = await db
     .from("packages")

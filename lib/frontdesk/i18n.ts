@@ -320,6 +320,16 @@ const en = {
       copied: "Copied",
       copyHint: "For a DM: copy and paste it back where they found you.",
       skip: "Skip this draft",
+      dismiss: {
+        prompt: "Why skip it? This helps the drafts get better.",
+        keep: "Keep the draft",
+        reasons: {
+          wrong_client: "Not the right client",
+          wrong_timing: "Not the right moment",
+          wrong_read: "The draft misread the inquiry",
+          not_interested: "Not interested in this job",
+        },
+      },
       markBooked: "Mark as booked",
       markLost: "Mark as lost",
     },
@@ -771,6 +781,16 @@ const nl: typeof en = {
       copied: "Gekopieerd",
       copyHint: "Voor een DM: kopieer en plak het terug waar ze je vonden.",
       skip: "Dit concept overslaan",
+      dismiss: {
+        prompt: "Waarom overslaan? Zo worden de concepten beter.",
+        keep: "Concept bewaren",
+        reasons: {
+          wrong_client: "Niet de juiste klant",
+          wrong_timing: "Niet het juiste moment",
+          wrong_read: "Het concept las de aanvraag verkeerd",
+          not_interested: "Geen interesse in deze klus",
+        },
+      },
       markBooked: "Markeer als geboekt",
       markLost: "Markeer als vervallen",
     },

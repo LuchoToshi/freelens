@@ -56,6 +56,7 @@ interface DraftRow {
   body: string;
   final_body?: string | null;
   outcome: string | null;
+  dismiss_reason?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
 }
@@ -114,6 +115,7 @@ export function InboxApp({
   const [sortBy, setSortBy] = useState<"urgency" | "newest" | "eventDate" | "value">("urgency");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [confirmOutcome, setConfirmOutcome] = useState<"booked" | "lost" | null>(null);
+  const [skipReasonOpen, setSkipReasonOpen] = useState(false);
   const [gmailStatus, setGmailStatus] = useState<"connected" | "error" | null>(null);
   const [connectingGmail, setConnectingGmail] = useState(false);
   const [packages, setPackages] = useState<GapPackage[]>([]);
@@ -218,7 +220,7 @@ export function InboxApp({
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
-      .select("id, inquiry_id, kind, body, final_body, outcome, created_at, language, validation_status, validation_failures")
+      .select("id, inquiry_id, kind, body, final_body, outcome, dismiss_reason, created_at, language, validation_status, validation_failures")
       .order("created_at", { ascending: false });
     if (draftsError) {
       setLoadError(true);
@@ -352,6 +354,7 @@ export function InboxApp({
     setEditedBody(drafts[inquiry.id]?.body ?? "");
     setCopied(false);
     setConfirmOutcome(null);
+    setSkipReasonOpen(false);
     syncUrl(inquiry.id);
   }
 
@@ -366,12 +369,16 @@ export function InboxApp({
     setAllDrafts((prev) => prev.map(apply));
   }
 
-  async function recordOutcome(kind: "send" | "skip") {
+  async function recordOutcome(kind: "send" | "skip", dismissReason?: string) {
     if (!open || !openDraft) return;
+    // §8.5: dismissal always carries a reason; the UI cannot reach this
+    // branch without one.
+    if (kind === "skip" && !dismissReason) return;
     track(kind === "skip" ? "draft_skipped" : "draft_sent");
+    setSkipReasonOpen(false);
     if (testMode) {
       if (kind === "skip") {
-        patchLocalDraft(openDraft.id, { outcome: "skipped" });
+        patchLocalDraft(openDraft.id, { outcome: "skipped", dismiss_reason: dismissReason });
       } else {
         const untouched = editedBody === openDraft.body;
         patchLocalDraft(openDraft.id, {
@@ -386,7 +393,11 @@ export function InboxApp({
     if (kind === "skip") {
       await sb
         .from("drafts")
-        .update({ outcome: "skipped", outcome_at: new Date().toISOString() })
+        .update({
+          outcome: "skipped",
+          dismiss_reason: dismissReason,
+          outcome_at: new Date().toISOString(),
+        })
         .eq("id", openDraft.id);
     } else {
       const untouched = editedBody === openDraft.body;
@@ -621,10 +632,45 @@ export function InboxApp({
             >
               {copied ? d.copied : d.copy}
             </button>
-            <button type="button" onClick={() => void recordOutcome("skip")} className={linkClass}>
+            <button
+              type="button"
+              aria-expanded={skipReasonOpen}
+              onClick={() => setSkipReasonOpen((v) => !v)}
+              className={linkClass}
+            >
               {d.skip}
             </button>
           </div>
+          {skipReasonOpen && (
+            <div
+              role="group"
+              aria-label={d.dismiss.prompt}
+              className="flex flex-col gap-2 rounded-xl border border-[var(--fd-line)] bg-[var(--fd-paper)] p-3"
+            >
+              <p className="text-sm font-medium text-[var(--fd-ink)]">{d.dismiss.prompt}</p>
+              <div className="flex flex-wrap gap-2">
+                {(["wrong_client", "wrong_timing", "wrong_read", "not_interested"] as const).map(
+                  (reason) => (
+                    <button
+                      key={reason}
+                      type="button"
+                      onClick={() => void recordOutcome("skip", reason)}
+                      className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
+                    >
+                      {d.dismiss.reasons[reason]}
+                    </button>
+                  )
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSkipReasonOpen(false)}
+                  className="inline-flex min-h-11 items-center px-2 text-xs font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
+                >
+                  {d.dismiss.keep}
+                </button>
+              </div>
+            </div>
+          )}
           <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.copyHint}</p>
         </div>
       ) : (
