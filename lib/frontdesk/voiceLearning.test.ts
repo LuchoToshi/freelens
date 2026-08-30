@@ -64,6 +64,13 @@ describe("voice learning proposals (§6.6): deterministic, paused-able, never fr
     ).toEqual([]);
   });
 
+  it("a profile missing dimensions signals nothing instead of crashing", () => {
+    const partial = { tone: "warm" } as unknown as VoiceProfile;
+    expect(deriveVoiceProposals(partial, [SIGNOFF_EDIT, SIGNOFF_EDIT], {}, false)).toEqual([
+      { key: "sign_off:Liefs, Em", dimension: "sign_off", value: "Liefs, Em", evidenceCount: 2 },
+    ]);
+  });
+
   it("an unchanged closing is not sign-off evidence", () => {
     const same = edit("Hi,\n\nTekst hier.\n\nGroetjes, Emma", "Hi,\n\nAndere tekst.\n\nGroetjes, Emma");
     expect(deriveVoiceProposals(PROFILE, [same, same], {}, false)).toEqual([]);

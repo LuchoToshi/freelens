@@ -49,8 +49,9 @@ export function deriveVoiceProposals(
   const proposals: VoiceProposal[] = [];
 
   // Sign-off: the freelancer keeps replacing the closing line with the same
-  // other one.
-  const configured = profile.sign_off.trim().toLowerCase();
+  // other one. The profile is stored jsonb, so a dimension can be absent —
+  // treat missing fields as "no signal", never as a crash.
+  const configured = (profile.sign_off ?? "").trim().toLowerCase();
   const replacements = new Map<string, number>();
   for (const e of edits) {
     const final = lastLine(e.final_body);
@@ -83,7 +84,7 @@ export function deriveVoiceProposals(
     medium: "short",
     short: null,
   };
-  const target = shorterStep[profile.sentence_length];
+  const target = profile.sentence_length ? shorterStep[profile.sentence_length] : null;
   if (target) {
     const shortened = edits.filter(
       (e) =>
