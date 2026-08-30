@@ -1,10 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
 import { fdDict } from "@/lib/frontdesk/i18n";
+import {
+  placeInquiry,
+  QUEUE_ORDER,
+  type QueueKey,
+  type QueuePlacement,
+} from "@/lib/frontdesk/queue";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import { shareLinks } from "@/lib/frontdesk/shareLinks";
 
@@ -30,10 +36,14 @@ interface InquiryRow {
   message: string | null;
   status: "new" | "replied" | "nudge_due" | "booked" | "lost";
   created_at: string;
+  replied_at: string | null;
+  snoozed_until: string | null;
 }
 
 interface DraftRow {
   id: string;
+  created_at: string;
+  language: string | null;
   inquiry_id: string;
   kind: "reply" | "nudge";
   body: string;
@@ -41,14 +51,6 @@ interface DraftRow {
   validation_status?: string | null;
   validation_failures?: string[] | null;
 }
-
-const STATUS_DOT: Record<InquiryRow["status"], string> = {
-  new: "bg-[#3b82f6]",
-  replied: "bg-[var(--fd-line-control)]",
-  nudge_due: "bg-[#f59e0b]",
-  booked: "bg-[#22c55e]",
-  lost: "bg-[#9ca3af]",
-};
 
 /** Plain-language line for a stored validation failure code (§10.7). Codes
  * may carry a suffix (price-not-in-packages:1950, date-mismatch:2027); the
@@ -96,6 +98,14 @@ export function InboxApp({
   const [editedBody, setEditedBody] = useState("");
   const [copied, setCopied] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, DraftRow>>({});
+  const [now, setNow] = useState(() => new Date());
+  const [activeQueue, setActiveQueue] = useState<QueueKey>("review");
+  const [queueChosen, setQueueChosen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"urgency" | "newest" | "eventDate" | "value">("urgency");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [confirmOutcome, setConfirmOutcome] = useState<"booked" | "lost" | null>(null);
   const [gmailStatus, setGmailStatus] = useState<"connected" | "error" | null>(null);
   const [connectingGmail, setConnectingGmail] = useState(false);
 
@@ -111,6 +121,29 @@ export function InboxApp({
     url.searchParams.delete("gmail");
     window.history.replaceState({}, "", url.toString());
   }, []);
+
+  // Deep link (DEC-6, safe default): /inbox?i=<id> selects an inquiry,
+  // /inbox?queue=<key> selects a queue. Read once on mount; kept in the URL
+  // on open/close so a selection is shareable and survives a reload.
+  useEffect(() => {
+    const params = new URL(window.location.href).searchParams;
+    const q = params.get("queue") as QueueKey | null;
+    if (q && QUEUE_ORDER.includes(q)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
+      setActiveQueue(q);
+      setQueueChosen(true);
+    }
+    const i = params.get("i");
+     
+    if (i) setOpenId(i);
+  }, []);
+
+  function syncUrl(id: string | null) {
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("i", id);
+    else url.searchParams.delete("i");
+    window.history.replaceState({}, "", url.toString());
+  }
 
   async function connectGmail() {
     setConnectingGmail(true);
@@ -132,7 +165,7 @@ export function InboxApp({
   const load = useCallback(async () => {
     const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
-      .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at")
+      .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at, replied_at, snoozed_until")
       .order("created_at", { ascending: false });
     if (inquiriesError) {
       setLoadError(true);
@@ -141,7 +174,7 @@ export function InboxApp({
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
-      .select("id, inquiry_id, kind, body, outcome, validation_status, validation_failures")
+      .select("id, inquiry_id, kind, body, outcome, created_at, language, validation_status, validation_failures")
       .order("created_at", { ascending: false });
     if (draftsError) {
       setLoadError(true);
@@ -149,11 +182,15 @@ export function InboxApp({
     }
     setLoadError(false);
     const latest: Record<string, DraftRow> = {};
+    const latestReply: Record<string, DraftRow> = {};
     for (const d of (draftRows as DraftRow[] | null) ?? []) {
       if (!latest[d.inquiry_id]) latest[d.inquiry_id] = d;
+      if (d.kind === "reply" && !latestReply[d.inquiry_id]) latestReply[d.inquiry_id] = d;
     }
     setDrafts(latest);
+    setReplyDrafts(latestReply);
     setAllDrafts((draftRows as DraftRow[] | null) ?? []);
+    setNow(new Date());
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sb is a singleton
   }, []);
 
@@ -179,9 +216,77 @@ export function InboxApp({
     else listHeadingRef.current?.focus();
   }, [openId]);
 
-  const sorted = inquiries
-    ? [...inquiries.filter((i) => i.source !== "sample"), ...inquiries.filter((i) => i.source === "sample")]
-    : null;
+  const timeZone = freelancer.timezone || "Europe/Amsterdam";
+  const placements = useMemo(() => {
+    const map: Record<string, QueuePlacement> = {};
+    for (const inquiry of inquiries ?? []) {
+      map[inquiry.id] = placeInquiry(inquiry, replyDrafts[inquiry.id] ?? null, now, timeZone);
+    }
+    return map;
+  }, [inquiries, replyDrafts, now, timeZone]);
+
+  const queueCounts = useMemo(() => {
+    const counts = Object.fromEntries(QUEUE_ORDER.map((q) => [q, 0])) as Record<QueueKey, number>;
+    for (const inquiry of inquiries ?? []) counts[placements[inquiry.id].queue] += 1;
+    return counts;
+  }, [inquiries, placements]);
+
+  // Default tab: the highest-priority non-empty queue — "what next" answers
+  // itself. Once the user picks a tab (or a deep link does), it sticks.
+  useEffect(() => {
+    if (queueChosen || !inquiries?.length) return;
+    const first = QUEUE_ORDER.find((q) => queueCounts[q] > 0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- derived initial tab; runs until the user or a deep link chooses
+    if (first) setActiveQueue(first);
+  }, [queueChosen, inquiries, queueCounts]);
+
+  const BAND_RANK: Record<string, number> = { "2500+": 3, "1000-2500": 2, "<1000": 1, unsure: 0 };
+  const visible = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    const rows = (inquiries ?? []).filter((inquiry) => {
+      if (placements[inquiry.id].queue !== activeQueue) return false;
+      if (typeFilter !== "all" && inquiry.event_type !== typeFilter) return false;
+      if (!needle) return true;
+      const hay = `${inquiry.client_name} ${inquiry.message ?? ""} ${
+        dict.public.form.types[inquiry.event_type]
+      }`.toLowerCase();
+      return hay.includes(needle);
+    });
+    const byUrgency = (a: InquiryRow, b: InquiryRow) => {
+      const da = placements[a.id].due;
+      const db = placements[b.id].due;
+      const oa = da?.kind === "overdue" ? da.days : -1;
+      const ob = db?.kind === "overdue" ? db.days : -1;
+      if (oa !== ob) return ob - oa;
+      return a.created_at < b.created_at ? -1 : 1; // oldest first: longest waiting
+    };
+    const sorters: Record<string, (a: InquiryRow, b: InquiryRow) => number> = {
+      urgency: byUrgency,
+      newest: (a, b) => (a.created_at > b.created_at ? -1 : 1),
+      eventDate: (a, b) => (a.event_date ?? "9999") < (b.event_date ?? "9999") ? -1 : 1,
+      value: (a, b) => (BAND_RANK[b.budget_band] ?? 0) - (BAND_RANK[a.budget_band] ?? 0),
+    };
+    rows.sort(sorters[sortBy]);
+    return [
+      ...rows.filter((i) => i.source !== "sample"),
+      ...rows.filter((i) => i.source === "sample"),
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- BAND_RANK and dict are render-stable
+  }, [inquiries, placements, activeQueue, typeFilter, search, sortBy]);
+
+  const filtersActive = search.trim() !== "" || typeFilter !== "all";
+
+  function dueLabel(placement: QueuePlacement): string | null {
+    const due = placement.due;
+    if (!due) return null;
+    const q = t.queues.due;
+    const withDate = (rel: string) => `${rel} (${due.date})`;
+    if (due.kind === "overdue") return withDate(q.overdueBy.replace("{n}", String(due.days)));
+    if (due.kind === "due_today") return withDate(q.dueToday);
+    if (due.kind === "due_tomorrow") return withDate(q.dueTomorrow);
+    if (due.kind === "snoozed") return q.snoozedUntil.replace("{date}", due.date);
+    return withDate(q.dueInDays.replace("{n}", String(due.days)));
+  }
 
   const open = openId ? inquiries?.find((i) => i.id === openId) : null;
   const openDraft = openId ? drafts[openId] : null;
@@ -190,6 +295,8 @@ export function InboxApp({
     setOpenId(inquiry.id);
     setEditedBody(drafts[inquiry.id]?.body ?? "");
     setCopied(false);
+    setConfirmOutcome(null);
+    syncUrl(inquiry.id);
   }
 
   async function recordOutcome(kind: "send" | "skip") {
@@ -215,6 +322,13 @@ export function InboxApp({
         .update({ status: "replied", replied_at: new Date().toISOString() })
         .eq("id", open.id);
     }
+    await load();
+  }
+
+  async function snooze(days: number | null) {
+    if (!open) return;
+    const until = days ? new Date(now.getTime() + days * 86_400_000).toISOString() : null;
+    await sb.from("inquiries").update({ snoozed_until: until }).eq("id", open.id);
     await load();
   }
 
@@ -293,7 +407,7 @@ export function InboxApp({
     <>
       <button
         type="button"
-        onClick={() => setOpenId(null)}
+        onClick={() => (setOpenId(null), syncUrl(null))}
         className={`${linkClass} lg:hidden`}
       >
         ← {d.back}
@@ -423,13 +537,86 @@ export function InboxApp({
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-[var(--fd-line)] pt-4">
-        <button type="button" onClick={() => void setStatus("booked")} className={secondaryClass}>
-          {d.markBooked}
-        </button>
-        <button type="button" onClick={() => void setStatus("lost")} className={secondaryClass}>
-          {d.markLost}
-        </button>
+      {openDraft && openDraft.body && (
+        <details className="rounded-2xl border border-[var(--fd-line)] bg-white px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-[var(--fd-ink)]">
+            {t.why.heading}
+          </summary>
+          <div className="flex flex-col gap-2 pt-2 text-sm leading-relaxed text-[var(--fd-slate)]">
+            <p>{t.why.language.replace("{lang}", openDraft.language === "nl" ? "Nederlands" : "English")}</p>
+            <p>{t.why.checks}</p>
+            <p>{t.why.prices}</p>
+          </div>
+        </details>
+      )}
+
+      <div
+        role="group"
+        aria-label={t.schedule.group}
+        className="flex flex-wrap items-center gap-3 border-t border-[var(--fd-line)] pt-4"
+      >
+        {open.snoozed_until && new Date(open.snoozed_until) > now ? (
+          <button type="button" onClick={() => void snooze(null)} className={secondaryClass}>
+            {t.schedule.unsnooze}
+          </button>
+        ) : (
+          <button type="button" onClick={() => void snooze(3)} className={secondaryClass}>
+            {t.schedule.snooze3}
+          </button>
+        )}
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.schedule.snoozedNote}</p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-[var(--fd-line)] pt-4">
+        {confirmOutcome ? (
+          <div
+            role="group"
+            aria-label={t.confirmOutcome[confirmOutcome]}
+            className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line-control)] bg-[var(--fd-paper)] p-4"
+          >
+            <p className="text-sm font-semibold text-[var(--fd-ink)]">
+              {t.confirmOutcome[confirmOutcome]}
+            </p>
+            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.confirmOutcome.note}</p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const outcome = confirmOutcome;
+                  setConfirmOutcome(null);
+                  void setStatus(outcome);
+                }}
+                className={primaryClass}
+              >
+                {t.confirmOutcome.confirm}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmOutcome(null)}
+                className={secondaryClass}
+              >
+                {t.confirmOutcome.cancel}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setConfirmOutcome("booked")}
+              className={secondaryClass}
+            >
+              {d.markBooked}
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmOutcome("lost")}
+              className={secondaryClass}
+            >
+              {d.markLost}
+            </button>
+          </div>
+        )}
       </div>
     </>
   ) : (
@@ -442,10 +629,10 @@ export function InboxApp({
   // One DOM, two shapes: a single column that swaps panes below lg (the
   // original behavior), a 24rem list beside a fluid detail pane from lg up.
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start lg:gap-x-10">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 lg:grid lg:h-dvh lg:min-h-0 lg:max-w-6xl lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-stretch lg:gap-x-10 lg:overflow-hidden lg:py-8">
       {errorBanner && <div className="lg:col-span-2">{errorBanner}</div>}
 
-      <div className={`${open ? "hidden lg:flex" : "flex"} flex-col gap-6`}>
+      <div className={`${open ? "hidden lg:flex" : "flex"} min-h-0 flex-col gap-6 lg:overflow-y-auto lg:pr-1`}>
         <h1
           ref={listHeadingRef}
           tabIndex={-1}
@@ -490,55 +677,155 @@ export function InboxApp({
             {t.empty}
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
-            {(sorted ?? []).map((inquiry) => (
-              <li key={inquiry.id}>
+          <>
+            <div role="tablist" aria-label={t.heading} className="flex flex-wrap gap-1.5">
+              {QUEUE_ORDER.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeQueue === q}
+                  onClick={() => {
+                    setActiveQueue(q);
+                    setQueueChosen(true);
+                  }}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                    activeQueue === q
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
+                      : "border-[var(--fd-line-control)] bg-white text-[var(--fd-slate)] hover:border-[var(--fd-ink)] hover:text-[var(--fd-ink)]"
+                  } focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)] focus-visible:outline-none`}
+                >
+                  {t.queues[q]} ({queueCounts[q]})
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-end gap-2">
+              <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
+                {t.toolbar.searchLabel}
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t.toolbar.searchPlaceholder}
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-3 text-sm text-[var(--fd-ink)] focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
+                {t.toolbar.sortLabel}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-sm text-[var(--fd-ink)]"
+                >
+                  <option value="urgency">{t.toolbar.sortUrgency}</option>
+                  <option value="newest">{t.toolbar.sortNewest}</option>
+                  <option value="eventDate">{t.toolbar.sortEventDate}</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
+                {t.toolbar.typeLabel}
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-sm text-[var(--fd-ink)]"
+                >
+                  <option value="all">{t.toolbar.typeAll}</option>
+                  {Object.entries(dict.public.form.types).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {filtersActive && (
                 <button
                   type="button"
-                  onClick={() => openDetail(inquiry)}
-                  aria-current={inquiry.id === openId ? "true" : undefined}
-                  className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition hover:border-[var(--fd-ink)] ${
-                    inquiry.id === openId
-                      ? "border-[var(--fd-ink)] bg-[var(--fd-paper-dim)]"
-                      : "border-[var(--fd-line)] bg-white"
-                  }`}
+                  onClick={() => {
+                    setSearch("");
+                    setTypeFilter("all");
+                    setSortBy("urgency");
+                  }}
+                  className={`${linkClass} min-h-11`}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`size-2.5 shrink-0 rounded-full ${STATUS_DOT[inquiry.status]}`}
-                  />
-                  <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="flex items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
-                        {inquiry.client_name}
-                      </span>
-                      {inquiry.source === "sample" && (
-                        <span className="shrink-0 rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-                          {t.sampleBadge}
-                        </span>
-                      )}
-                    </span>
-                    <span className="truncate text-xs text-[var(--fd-slate)]">
-                      {dict.public.form.types[inquiry.event_type]}
-                      {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 flex-col items-end gap-0.5">
-                    <span className="text-xs font-medium text-[var(--fd-slate)]">
-                      {t.status[inquiry.status]}
-                    </span>
-                    <span className="text-xs text-[var(--fd-slate)]">
-                      {inquiry.created_at.slice(0, 10)}
-                    </span>
-                  </span>
+                  {t.toolbar.reset}
                 </button>
-              </li>
-            ))}
-          </ul>
+              )}
+            </div>
+
+            {visible.length === 0 ? (
+              <div className="flex flex-col items-start gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
+                <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
+                  {filtersActive ? t.queues.empty.filtered : t.queues.empty[activeQueue]}
+                </p>
+                {filtersActive && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch("");
+                      setTypeFilter("all");
+                    }}
+                    className={linkClass}
+                  >
+                    {t.queues.empty.resetFilters}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {visible.map((inquiry) => {
+                  const placement = placements[inquiry.id];
+                  const due = dueLabel(placement);
+                  return (
+                    <li key={inquiry.id}>
+                      <button
+                        type="button"
+                        onClick={() => openDetail(inquiry)}
+                        aria-current={inquiry.id === openId ? "true" : undefined}
+                        className={`flex w-full flex-col gap-1 rounded-2xl border p-4 text-left transition hover:border-[var(--fd-ink)] ${
+                          inquiry.id === openId
+                            ? "border-[var(--fd-ink)] bg-[var(--fd-paper-dim)]"
+                            : "border-[var(--fd-line)] bg-white"
+                        }`}
+                      >
+                        <span className="flex w-full items-baseline justify-between gap-2">
+                          <span className="flex min-w-0 items-center gap-2">
+                            <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
+                              {inquiry.client_name}
+                            </span>
+                            {inquiry.source === "sample" && (
+                              <span className="shrink-0 rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                                {t.sampleBadge}
+                              </span>
+                            )}
+                          </span>
+                          <span className="shrink-0 text-xs font-semibold text-[var(--fd-ink)]">
+                            {t.queues.actions[placement.actionKey]}
+                          </span>
+                        </span>
+                        <span className="flex w-full items-baseline justify-between gap-2">
+                          <span className="truncate text-xs text-[var(--fd-slate)]">
+                            {dict.public.form.types[inquiry.event_type]}
+                            {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
+                          </span>
+                          <span className="shrink-0 text-xs text-[var(--fd-slate)]">
+                            {due ?? inquiry.created_at.slice(0, 10)}
+                          </span>
+                        </span>
+                        <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
+                          {t.queues.reasons[placement.reasonKey]}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
         )}
       </div>
 
-      <div className={`${open ? "flex" : "hidden lg:flex"} flex-col gap-6`}>
+      <div className={`${open ? "flex" : "hidden lg:flex"} min-h-0 flex-col gap-6 lg:overflow-y-auto lg:pr-1`}>
         {detailPane}
       </div>
     </main>
