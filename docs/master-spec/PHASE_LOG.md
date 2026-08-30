@@ -453,3 +453,48 @@ Both are user-hands checks; everything code-side that they exercise is
 covered above.
 
 **Not merged.**
+
+---
+
+## Phase 7 — Marketing, calculator, design-system cleanup (§22, §23)
+
+**Shipped — technical hygiene (§23.3):**
+- `app/robots.ts`: previews (any non-production `VERCEL_ENV`) disallow
+  everything; production disallows only /inbox, /setup, /admin,
+  /clients, /follow-ups, /app and /api/ and points at the sitemap.
+  Every authenticated page keeps its own noindex meta (verified — all
+  six carry it).
+- `app/sitemap.ts`: a closed list of the eleven static marketing/tool
+  routes; /[handle], authenticated and API surfaces are out by
+  construction, so no account, inquiry, client, quote or
+  calculator-result data can appear. Previews emit an empty sitemap.
+- Canonicals: `metadataBase` + relative canonical in the root layout —
+  each route resolves its own canonical against `NEXT_PUBLIC_SITE_URL`.
+- Verified live in both modes: local (preview path) serves
+  disallow-all robots and an empty sitemap; production-mode evaluation
+  returns the expected rules and the exact route list; canonicals
+  rendered per page.
+- Reduced-motion on home scroll reveals: already honoured (all six home
+  components go through the reduce-aware motion grammar) — §23.4 ✓.
+
+**Decision gates recorded:**
+- **DEC-9 (a):** no dark mode for now (not designed, not in source).
+- **DEC-15 (a):** calculators stay public; no account-backing, no
+  localStorage migration.
+- **DEC-14: NOT CLEARED.** The consent split (operational vs marketing,
+  with stored choice/timestamp/wording-version/source) is behind
+  "Legal review required" and the checklist says do not ship consent
+  changes before it. Nothing consent-related was changed. OWNER ACTION:
+  obtain the legal review, then this item unblocks.
+- **§22.5 gate: NOT CLEARED.** The calculator UI kit / modernisation
+  produces tax and rate surfaces; monetisation is gated on independent
+  verification of the calculations, which has not happened. Per §22.7
+  ("legacy tokens unchanged until a migration is planned") the legacy
+  `--fl-*` tokens and both large calculator components are untouched —
+  verified: no commit in Phases 1–7 touches components/rate/ or the
+  legacy token palette. OWNER ACTION: commission the independent
+  calculation check; the UI kit work should ride with it.
+
+**Verification:** 578 tests green, tsc and eslint clean.
+
+**Not merged.**
