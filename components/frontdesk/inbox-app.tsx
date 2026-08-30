@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
@@ -150,6 +150,23 @@ export function InboxApp({
     void load();
   }, [load]);
 
+  // Master–detail focus management: on mobile the panes swap wholesale, on
+  // desktop the detail fills in beside the list. Either way, moving focus to
+  // the pane's heading tells assistive tech what just happened and keeps
+  // keyboard users out of a hidden subtree. Skipped on first mount so page
+  // load never steals focus.
+  const listHeadingRef = useRef<HTMLHeadingElement>(null);
+  const detailHeadingRef = useRef<HTMLHeadingElement>(null);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    if (openId) detailHeadingRef.current?.focus();
+    else listHeadingRef.current?.focus();
+  }, [openId]);
+
   const sorted = inquiries
     ? [...inquiries.filter((i) => i.source !== "sample"), ...inquiries.filter((i) => i.source === "sample")]
     : null;
@@ -255,188 +272,221 @@ export function InboxApp({
     </p>
   ) : null;
 
-  // ------------------------------------------------------------ detail view
-  if (open) {
-    const d = t.detail;
-    const typeLabel = dict.public.form.types[open.event_type];
-    return (
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
-        <button type="button" onClick={() => setOpenId(null)} className={linkClass}>
-          ← {d.back}
-        </button>
+  // ----------------------------------------------------------- detail pane
+  // On mobile this pane replaces the list, exactly as before; from lg up the
+  // list stays put on the left and this fills the right column, so triaging
+  // several inquiries no longer round-trips through "back to the list".
+  const d = t.detail;
+  const detailPane = open ? (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpenId(null)}
+        className={`${linkClass} lg:hidden`}
+      >
+        ← {d.back}
+      </button>
 
-        {errorBanner}
+      <header className="flex flex-col gap-1">
+        {/* h2, not h1: on desktop it renders beside the list's h1, and on
+            mobile the list h1 is only display-hidden, so the outline keeps
+            one h1 either way. Focus lands here when an inquiry is opened. */}
+        <h2
+          ref={detailHeadingRef}
+          tabIndex={-1}
+          className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fd-ink)] outline-none"
+        >
+          {open.client_name}
+          {open.source === "sample" && (
+            <span className="rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+              {t.sampleBadge}
+            </span>
+          )}
+        </h2>
+        <p className="text-sm text-[var(--fd-slate)]">
+          {dict.public.form.types[open.event_type]}
+          {open.event_date ? ` · ${d.date}: ${open.event_date}` : ""} · {d.budget}: {open.budget_band}
+        </p>
+      </header>
 
-        <header className="flex flex-col gap-1">
-          <h1 className="flex items-center gap-2 font-serif text-2xl font-medium text-[var(--fd-ink)]">
-            {open.client_name}
-            {open.source === "sample" && (
-              <span className="rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-                {t.sampleBadge}
-              </span>
-            )}
-          </h1>
-          <p className="text-sm text-[var(--fd-slate)]">
-            {typeLabel}
-            {open.event_date ? ` · ${d.date}: ${open.event_date}` : ""} · {d.budget}: {open.budget_band}
+      {open.message && (
+        <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+            {d.message}
+          </span>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fd-ink)]">
+            {open.message}
           </p>
-        </header>
+        </div>
+      )}
 
-        {open.message && (
-          <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-              {d.message}
-            </span>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fd-ink)]">
-              {open.message}
-            </p>
-          </div>
-        )}
-
-        {openDraft ? (
-          <div className="flex flex-col gap-3">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-              {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
-            </span>
-            <textarea
-              aria-label={openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
-              rows={10}
-              value={editedBody}
-              onChange={(e) => setEditedBody(e.target.value)}
-              className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-sm leading-relaxed focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
-            />
-            <div className="flex flex-wrap items-center gap-3">
-              {open.client_email && (
-                <a
-                  href={mailtoHref(open.client_email, d.subject, editedBody)}
-                  onClick={() => void recordOutcome("send")}
-                  className={primaryClass}
-                >
-                  {d.send}
-                </a>
-              )}
-              <button
-                type="button"
-                onClick={copyReply}
-                className={open.client_email ? secondaryClass : primaryClass}
+      {openDraft ? (
+        <div className="flex flex-col gap-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+            {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
+          </span>
+          <textarea
+            aria-label={openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
+            rows={10}
+            value={editedBody}
+            onChange={(e) => setEditedBody(e.target.value)}
+            className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-sm leading-relaxed focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            {open.client_email && (
+              <a
+                href={mailtoHref(open.client_email, d.subject, editedBody)}
+                onClick={() => void recordOutcome("send")}
+                className={primaryClass}
               >
-                {copied ? d.copied : d.copy}
-              </button>
-              <button type="button" onClick={() => void recordOutcome("skip")} className={linkClass}>
-                {d.skip}
-              </button>
-            </div>
-            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.copyHint}</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
-            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.draftPending}</p>
+                {d.send}
+              </a>
+            )}
             <button
               type="button"
-              disabled={regenerating}
-              onClick={regenerate}
-              className={`${secondaryClass} w-fit`}
+              onClick={copyReply}
+              className={open.client_email ? secondaryClass : primaryClass}
             >
-              {regenerating ? d.regenerating : d.regenerate}
+              {copied ? d.copied : d.copy}
+            </button>
+            <button type="button" onClick={() => void recordOutcome("skip")} className={linkClass}>
+              {d.skip}
             </button>
           </div>
-        )}
-
-        <div className="flex flex-wrap items-center gap-3 border-t border-[var(--fd-line)] pt-4">
-          <button type="button" onClick={() => void setStatus("booked")} className={secondaryClass}>
-            {d.markBooked}
-          </button>
-          <button type="button" onClick={() => void setStatus("lost")} className={secondaryClass}>
-            {d.markLost}
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.copyHint}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
+          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.draftPending}</p>
+          <button
+            type="button"
+            disabled={regenerating}
+            onClick={regenerate}
+            className={`${secondaryClass} w-fit`}
+          >
+            {regenerating ? d.regenerating : d.regenerate}
           </button>
         </div>
-      </main>
-    );
-  }
-
-  // -------------------------------------------------------------- list view
-  return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
-      <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
-
-      {GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
-        <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
-          {t.gmail.connected}
-        </p>
       )}
-      {GMAIL_CONNECT_ENABLED && gmailStatus === "error" && (
-        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
-          {t.gmail.error}
-        </p>
-      )}
-      {GMAIL_CONNECT_ENABLED && (
-        <button type="button" disabled={connectingGmail} onClick={connectGmail} className={`${secondaryClass} w-fit`}>
-          {connectingGmail ? t.gmail.connecting : t.gmail.connect}
+
+      <div className="flex flex-wrap items-center gap-3 border-t border-[var(--fd-line)] pt-4">
+        <button type="button" onClick={() => void setStatus("booked")} className={secondaryClass}>
+          {d.markBooked}
         </button>
-      )}
-      {errorBanner}
+        <button type="button" onClick={() => void setStatus("lost")} className={secondaryClass}>
+          {d.markLost}
+        </button>
+      </div>
+    </>
+  ) : (
+    <p className="rounded-2xl border border-dashed border-[var(--fd-line)] p-8 text-sm leading-relaxed text-[var(--fd-slate)]">
+      {t.selectPrompt}
+    </p>
+  );
 
-      <ChecklistCard
-        freelancer={freelancer}
-        inquiries={inquiries}
-        allDrafts={allDrafts}
-        bioConfirmedAt={bioConfirmedAt}
-        onBioConfirmed={async () => {
-          const now = new Date().toISOString();
-          setBioConfirmedAt(now);
-          await sb
-            .from("freelancers")
-            .update({ link_in_bio_confirmed_at: now })
-            .eq("auth_user_id", session.user.id);
-        }}
-      />
+  // ------------------------------------------------- master–detail layout
+  // One DOM, two shapes: a single column that swaps panes below lg (the
+  // original behavior), a 24rem list beside a fluid detail pane from lg up.
+  return (
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 lg:grid lg:max-w-6xl lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start lg:gap-x-10">
+      {errorBanner && <div className="lg:col-span-2">{errorBanner}</div>}
 
-      {inquiries.length === 0 ? (
-        <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-slate)]">
-          {t.empty}
-        </p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {(sorted ?? []).map((inquiry) => (
-            <li key={inquiry.id}>
-              <button
-                type="button"
-                onClick={() => openDetail(inquiry)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-4 text-left transition hover:border-[var(--fd-ink)]"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`size-2.5 shrink-0 rounded-full ${STATUS_DOT[inquiry.status]}`}
-                />
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
-                      {inquiry.client_name}
-                    </span>
-                    {inquiry.source === "sample" && (
-                      <span className="shrink-0 rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-                        {t.sampleBadge}
+      <div className={`${open ? "hidden lg:flex" : "flex"} flex-col gap-6`}>
+        <h1
+          ref={listHeadingRef}
+          tabIndex={-1}
+          className="font-serif text-2xl font-medium text-[var(--fd-ink)] outline-none"
+        >
+          {t.heading}
+        </h1>
+
+        {GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
+          <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
+            {t.gmail.connected}
+          </p>
+        )}
+        {GMAIL_CONNECT_ENABLED && gmailStatus === "error" && (
+          <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
+            {t.gmail.error}
+          </p>
+        )}
+        {GMAIL_CONNECT_ENABLED && (
+          <button type="button" disabled={connectingGmail} onClick={connectGmail} className={`${secondaryClass} w-fit`}>
+            {connectingGmail ? t.gmail.connecting : t.gmail.connect}
+          </button>
+        )}
+
+        <ChecklistCard
+          freelancer={freelancer}
+          inquiries={inquiries}
+          allDrafts={allDrafts}
+          bioConfirmedAt={bioConfirmedAt}
+          onBioConfirmed={async () => {
+            const now = new Date().toISOString();
+            setBioConfirmedAt(now);
+            await sb
+              .from("freelancers")
+              .update({ link_in_bio_confirmed_at: now })
+              .eq("auth_user_id", session.user.id);
+          }}
+        />
+
+        {inquiries.length === 0 ? (
+          <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-slate)]">
+            {t.empty}
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {(sorted ?? []).map((inquiry) => (
+              <li key={inquiry.id}>
+                <button
+                  type="button"
+                  onClick={() => openDetail(inquiry)}
+                  aria-current={inquiry.id === openId ? "true" : undefined}
+                  className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition hover:border-[var(--fd-ink)] ${
+                    inquiry.id === openId
+                      ? "border-[var(--fd-ink)] bg-[var(--fd-paper-dim)]"
+                      : "border-[var(--fd-line)] bg-white"
+                  }`}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`size-2.5 shrink-0 rounded-full ${STATUS_DOT[inquiry.status]}`}
+                  />
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
+                        {inquiry.client_name}
                       </span>
-                    )}
+                      {inquiry.source === "sample" && (
+                        <span className="shrink-0 rounded-full border border-[var(--fd-line-control)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                          {t.sampleBadge}
+                        </span>
+                      )}
+                    </span>
+                    <span className="truncate text-xs text-[var(--fd-slate)]">
+                      {dict.public.form.types[inquiry.event_type]}
+                      {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
+                    </span>
                   </span>
-                  <span className="truncate text-xs text-[var(--fd-slate)]">
-                    {dict.public.form.types[inquiry.event_type]}
-                    {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
+                  <span className="flex shrink-0 flex-col items-end gap-0.5">
+                    <span className="text-xs font-medium text-[var(--fd-slate)]">
+                      {t.status[inquiry.status]}
+                    </span>
+                    <span className="text-xs text-[var(--fd-slate)]">
+                      {inquiry.created_at.slice(0, 10)}
+                    </span>
                   </span>
-                </span>
-                <span className="flex shrink-0 flex-col items-end gap-0.5">
-                  <span className="text-xs font-medium text-[var(--fd-slate)]">
-                    {t.status[inquiry.status]}
-                  </span>
-                  <span className="text-xs text-[var(--fd-slate)]">
-                    {inquiry.created_at.slice(0, 10)}
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className={`${open ? "flex" : "hidden lg:flex"} flex-col gap-6`}>
+        {detailPane}
+      </div>
     </main>
   );
 }

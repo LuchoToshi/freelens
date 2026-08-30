@@ -56,6 +56,7 @@ const en = {
     loadError: "Couldn't load your inbox. Check your connection and try again.",
     retry: "Try again",
     sampleBadge: "Example",
+    selectPrompt: "Select an inquiry to read it and send the prepared reply.",
     checklist: {
       heading: "Go live",
       bio: "Put your link in your bio",
@@ -271,6 +272,7 @@ const nl: typeof en = {
     loadError: "Je inbox kon niet worden geladen. Controleer je verbinding en probeer opnieuw.",
     retry: "Probeer opnieuw",
     sampleBadge: "Voorbeeld",
+    selectPrompt: "Kies een aanvraag om hem te lezen en het klaargezette antwoord te versturen.",
     checklist: {
       heading: "Ga live",
       bio: "Zet je link in je bio",
