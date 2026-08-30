@@ -113,3 +113,83 @@ default (a) `?i=<id>` deep links, plus `?queue=<key>`.
 then re-run the RLS script. Manual visual pass on /inbox at 1440px and
 375px (tabs, two-pane scrolling, snooze, confirm flow) — still nobody has
 seen these pixels.
+
+---
+
+## Phase 2 gates — executed 2026-08-30
+
+**Gate 1 — migrations 0010 + 0011 applied to production.**
+Path: `supabase link --project-ref sdtkwzuzfkhjfluxujkk` then
+`supabase db push` (CLI authenticates via its own login role; no DB
+password on this machine). `--dry-run` first confirmed exactly the two
+pending migrations. Evidence:
+- `supabase migration list --linked`: 0001–0009 already remote; after
+  push 0010 and 0011 both recorded remote.
+- Schema dump (`supabase db dump --linked -s public`) shows
+  `drafts.validation_status/validation_failures/validated_at` with the
+  intended CHECK, `freelancers.timezone` with its length check,
+  `inquiries.snoozed_until` — and the 8 RLS policies (own drafts / own
+  freelancer row / own inquiries / own packages …) byte-identical intact,
+  RLS still enabled on all core tables.
+- Additive only: prod `main` references none of the new columns;
+  frlns.com loads clean post-migration (checked in browser, zero console
+  errors).
+
+**Gate 2 — RLS suite re-run against production, post-migration.**
+`node scripts/verify-frontdesk-rls.mjs --yes` with keys fetched
+ephemerally from `supabase projects api-keys` (never written to disk).
+Result: **12/12 PASS, 0 FAIL, exit 0** — run twice, identical. Covers:
+A sees exactly own rows on all four tables, zero of B's, cross-tenant
+update touches 0 rows, anon sees zero rows everywhere and cannot insert,
+pre-existing `relationships` unchanged.
+
+**Gate 3 — manual visual QA at 1440×900 and 375×812.**
+Deviation, recorded: the authenticated pass ran against the SAME COMMIT
+served locally (`next dev` + local `supabase start` with all 11
+migrations and a disposable seeded freelancer — see
+`scripts/qa-gate3-seed.mjs`), because creating a throwaway auth user in
+the production DB for preview QA was blocked by the session's permission
+policy. The deployed preview was verified unauthenticated (login screen
+on /inbox, /clients, /follow-ups at both widths; no chrome leak; zero
+console errors) at
+`freelens-3da1xgzpq-28cvmfvmm5-2843s-projects.vercel.app`.
+
+Verified working, with a seeded occupant per queue:
+- Queue tabs with live counts summing to the inventory; default tab =
+  first non-empty queue; deep links `?queue=waiting` / `?queue=monitoring`
+  select the right tab.
+- Pane scrolling at 1440: detail pane scrolls internally, list column
+  and rail stay put (§26.1 chain works); no document-level horizontal
+  scroll at any width tested.
+- Follow-up due labels: "overdue by 3 days (2026-08-27)" — relative
+  wording plus exact date, derived at read time; snoozed rows show
+  "snoozed until 2026-09-02".
+- Snooze / Remove snooze both write and re-place the row live.
+- Outcome flow is two-step (group "Confirm: mark as booked?" with
+  consequence sentence); Cancel restores; Yes moves the row to Recently
+  completed and updates counts; GO LIVE checklist reacted ("first real
+  reply" ticked).
+- needs_review panel names the soft failure in plain language; failed
+  drafts show "No usable draft yet" with every failed check named and a
+  Regenerate button — never an empty editable draft. "Ready for review"
+  wording throughout (D20).
+- Monitoring: an item aged past the 10-minute grace window during QA and
+  moved to Missing information on the next render — live proof placement
+  is derived, never stored (D22/D23). Per-queue empty state shown.
+- Filtered-empty state with "Reset search and filters"; keyboard focus
+  lands on real controls with a visible ring, distinct from the active
+  tab; contrast: body ~19:1, muted slate on white ≈5.5:1 (AA).
+- Mobile 375: tabs wrap, toolbar stacks, list→detail stacks, bottom bar
+  carries all five destinations, outcome buttons reachable above it.
+
+**Defects:**
+- P1 (fixed, f4d9fde): unbroken long tokens (pasted URLs) in a client
+  message overflowed the message box at every width — `break-words`
+  added to both message renderers (inbox detail + reveal step); verified
+  wrapped afterwards.
+- P2 (open): a completed inquiry's detail still offers Mark as
+  booked/lost and Snooze — harmless but redundant after an outcome.
+- P2 (open): "Follow-ups" label wraps to two lines in the 375px bottom
+  bar.
+
+All three gates green. Not merged — per instruction.
