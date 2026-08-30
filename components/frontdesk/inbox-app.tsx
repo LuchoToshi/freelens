@@ -440,7 +440,7 @@ export function InboxApp({
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
             {d.message}
           </span>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--fd-ink)]">
+          <p className="break-words whitespace-pre-line text-sm leading-relaxed text-[var(--fd-ink)]">
             {open.message}
           </p>
         </div>

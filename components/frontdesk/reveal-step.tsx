@@ -143,7 +143,7 @@ export function RevealStep({
             {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
           </span>
           {inquiry.message && (
-            <p className="mt-1 text-sm leading-relaxed text-[var(--fd-slate)]">
+            <p className="mt-1 break-words text-sm leading-relaxed text-[var(--fd-slate)]">
               {inquiry.message}
             </p>
           )}
