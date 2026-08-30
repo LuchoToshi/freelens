@@ -328,7 +328,7 @@ const en = {
     },
     packages: {
       heading: "Your packages",
-      hint: "Drafts only ever use these prices, nothing is invented. At least one package to continue.",
+      hint: "Drafts only ever use these prices, nothing is invented \u2014 add-ons included. At least one package to continue.",
       labelLabel: "Name",
       priceLabel: "From (\u20ac)",
       unitLabel: "Unit (optional)",
@@ -338,6 +338,9 @@ const en = {
       add: "Add package",
       remove: "Remove",
       needOne: "Add at least one package to continue.",
+      addonAdd: "Add an add-on",
+      addonLabel: "Add-on",
+      priceExactLabel: "Price (\u20ac)",
     },
   },
 };
@@ -661,7 +664,7 @@ const nl: typeof en = {
     },
     packages: {
       heading: "Jouw pakketten",
-      hint: "Concepten gebruiken alleen deze prijzen, er wordt nooit een bedrag verzonnen. Minstens \u00e9\u00e9n pakket om verder te gaan.",
+      hint: "Concepten gebruiken alleen deze prijzen, er wordt nooit een bedrag verzonnen \u2014 ook voor extra opties. Minstens \u00e9\u00e9n pakket om verder te gaan.",
       labelLabel: "Naam",
       priceLabel: "Vanaf (\u20ac)",
       unitLabel: "Eenheid (optioneel)",
@@ -671,6 +674,9 @@ const nl: typeof en = {
       add: "Pakket toevoegen",
       remove: "Verwijderen",
       needOne: "Voeg minstens \u00e9\u00e9n pakket toe om verder te gaan.",
+      addonAdd: "Extra optie toevoegen",
+      addonLabel: "Extra optie",
+      priceExactLabel: "Prijs (\u20ac)",
     },
   },
 };

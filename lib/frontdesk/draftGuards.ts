@@ -49,10 +49,13 @@ export function detectLanguage(message: string | null | undefined, fallback: "nl
  */
 export function packagePriceDigits(packages: readonly PromptPackage[]): Set<string> {
   const digits = new Set<string>();
+  const add = (price: number) => {
+    digits.add(String(Math.trunc(price)));
+    digits.add(String(price).replace(/\D/g, ""));
+  };
   for (const p of packages) {
-    const whole = String(Math.trunc(p.priceFromEur));
-    digits.add(whole);
-    digits.add(String(p.priceFromEur).replace(/\D/g, ""));
+    add(p.priceFromEur);
+    for (const addon of p.addons ?? []) add(addon.priceEur);
   }
   return digits;
 }

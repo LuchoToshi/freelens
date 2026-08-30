@@ -84,6 +84,19 @@ describe("price guard", () => {
     expect(failures.join(";")).not.toMatch(/price-not-in-packages/);
     expect(findPriceLikeAmounts("op 12 juni 2027")).toEqual([]);
   });
+
+  it("a configured add-on price is allowed; an invented one still fails", () => {
+    const withAddons = [
+      { ...PACKAGES[0], addons: [{ label: "Second shooter", priceEur: 275 }] },
+    ];
+    const quoted = `${REPLY_PAD}Een tweede fotograaf kan erbij voor € 275, dan missen we niets van de dag.`;
+    expect(
+      validateFrontdeskDraftFull(quoted, { kind: "reply", packages: withAddons }).failures.join(";")
+    ).not.toMatch(/price-not-in-packages/);
+    expect(
+      validateFrontdeskDraftFull(quoted, { kind: "reply", packages: PACKAGES }).failures.join(";")
+    ).toMatch(/price-not-in-packages/);
+  });
 });
 
 describe("availability guard", () => {

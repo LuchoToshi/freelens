@@ -56,7 +56,7 @@ export async function generateAndStoreDraft(
 
   const { data: packageRows } = await db
     .from("packages")
-    .select("label, price_from_eur, unit, notes")
+    .select("label, price_from_eur, unit, notes, addons")
     .eq("freelancer_id", freelancer.id)
     .order("position");
   const packages: PromptPackage[] = (packageRows ?? []).map((p) => ({
@@ -64,6 +64,11 @@ export async function generateAndStoreDraft(
     priceFromEur: Number(p.price_from_eur),
     unit: p.unit,
     notes: p.notes,
+    addons: Array.isArray(p.addons)
+      ? (p.addons as { label?: unknown; price_eur?: unknown }[])
+          .filter((a) => typeof a.label === "string" && typeof a.price_eur === "number")
+          .map((a) => ({ label: a.label as string, priceEur: a.price_eur as number }))
+      : [],
   }));
 
   const language = detectLanguage(inquiry.message, freelancer.locale === "en" ? "en" : "nl");

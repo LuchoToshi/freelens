@@ -19,12 +19,18 @@ import { ProfessionPicker, type Profession } from "@/components/frontdesk/profes
  * because it decides the language of everything after it — including this
  * wizard, which re-renders in the chosen locale immediately.
  */
+export interface AddonRow {
+  label: string;
+  price: string;
+}
+
 export interface PackageRow {
   id?: string;
   label: string;
   price: string;
   unit: string;
   notes: string;
+  addons: AddonRow[];
 }
 
 const inputClass =
@@ -70,7 +76,7 @@ export function SetupWizard({
   const [photoError, setPhotoError] = useState<"" | "type" | "size" | "generic">("");
   const [freelancerId, setFreelancerId] = useState(freelancer?.id ?? null);
   const [packages, setPackages] = useState<PackageRow[]>([
-    { label: "", price: "", unit: "", notes: "" },
+    { label: "", price: "", unit: "", notes: "", addons: [] },
   ]);
   const [saving, setSaving] = useState(false);
   // How many times the reveal has been entered: from the second visit on,
@@ -92,7 +98,7 @@ export function SetupWizard({
   useEffect(() => {
     if (!freelancerId) return;
     sb.from("packages")
-      .select("id, label, price_from_eur, unit, notes")
+      .select("id, label, price_from_eur, unit, notes, addons")
       .eq("freelancer_id", freelancerId)
       .order("position")
       .then(({ data }) => {
@@ -104,6 +110,15 @@ export function SetupWizard({
               price: String(p.price_from_eur),
               unit: p.unit ?? "",
               notes: p.notes ?? "",
+              addons: (Array.isArray(p.addons) ? p.addons : [])
+                .filter(
+                  (a: { label?: unknown; price_eur?: unknown }) =>
+                    typeof a.label === "string" && typeof a.price_eur === "number"
+                )
+                .map((a: { label: string; price_eur: number }) => ({
+                  label: a.label,
+                  price: String(a.price_eur),
+                })),
             }))
           );
         }
@@ -176,6 +191,9 @@ export function SetupWizard({
         unit: p.unit.trim() || null,
         notes: p.notes.trim() || null,
         position: i,
+        addons: p.addons
+          .filter((a) => a.label.trim() && Number(a.price) > 0)
+          .map((a) => ({ label: a.label.trim(), price_eur: Number(a.price) })),
       }))
     );
     setSaving(false);
@@ -377,21 +395,94 @@ export function SetupWizard({
                   <input id={`pk-notes-${i}`} value={p.notes} maxLength={500} placeholder={t.packages.notesPlaceholder} onChange={(e) => setPackages((prev) => prev.map((x, j) => (j === i ? { ...x, notes: e.target.value } : x)))} className={inputClass} />
                 </div>
               </div>
-              {packages.length > 1 && (
+              {p.addons.map((a, k) => (
+                <div key={k} className="grid gap-3 pl-4 sm:grid-cols-[1fr_8rem_auto]">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor={`pk-addon-label-${i}-${k}`} className={labelClass}>
+                      {t.packages.addonLabel}
+                    </label>
+                    <input
+                      id={`pk-addon-label-${i}-${k}`}
+                      value={a.label}
+                      maxLength={120}
+                      onChange={(e) =>
+                        setPackages((prev) =>
+                          prev.map((x, j) =>
+                            j === i
+                              ? { ...x, addons: x.addons.map((y, l) => (l === k ? { ...y, label: e.target.value } : y)) }
+                              : x
+                          )
+                        )
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor={`pk-addon-price-${i}-${k}`} className={labelClass}>
+                      {t.packages.priceExactLabel}
+                    </label>
+                    <input
+                      id={`pk-addon-price-${i}-${k}`}
+                      inputMode="numeric"
+                      value={a.price}
+                      onChange={(e) =>
+                        setPackages((prev) =>
+                          prev.map((x, j) =>
+                            j === i
+                              ? {
+                                  ...x,
+                                  addons: x.addons.map((y, l) =>
+                                    l === k ? { ...y, price: e.target.value.replace(/[^\d]/g, "") } : y
+                                  ),
+                                }
+                              : x
+                          )
+                        )
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPackages((prev) =>
+                        prev.map((x, j) => (j === i ? { ...x, addons: x.addons.filter((_, l) => l !== k) } : x))
+                      )
+                    }
+                    className="self-end pb-2.5 text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
+                  >
+                    {t.packages.remove}
+                  </button>
+                </div>
+              ))}
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setPackages((prev) => prev.filter((_, j) => j !== i))}
+                  onClick={() =>
+                    setPackages((prev) =>
+                      prev.map((x, j) => (j === i ? { ...x, addons: [...x.addons, { label: "", price: "" }] } : x))
+                    )
+                  }
                   className="w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
                 >
-                  {t.packages.remove}
+                  {t.packages.addonAdd}
                 </button>
-              )}
+                {packages.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setPackages((prev) => prev.filter((_, j) => j !== i))}
+                    className="w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
+                  >
+                    {t.packages.remove}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
 
           <button
             type="button"
-            onClick={() => setPackages((prev) => [...prev, { label: "", price: "", unit: "", notes: "" }])}
+            onClick={() => setPackages((prev) => [...prev, { label: "", price: "", unit: "", notes: "", addons: [] }])}
             className={`${secondaryClass} w-fit`}
           >
             {t.packages.add}
