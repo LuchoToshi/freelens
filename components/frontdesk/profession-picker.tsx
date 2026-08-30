@@ -32,7 +32,7 @@ const chipClass =
   "inline-flex items-center gap-1 rounded-full bg-[var(--fd-line-control)]/40 py-1 pl-2.5 pr-1 text-sm text-[var(--fd-ink)]";
 const chipRemoveClass =
   "rounded-full p-0.5 leading-none text-[var(--fd-ink)]/70 hover:bg-[var(--fd-line-control)] hover:text-[var(--fd-ink)]";
-const inputClass = "min-w-24 flex-1 border-none bg-transparent p-1 text-sm outline-none";
+const inputClass = "min-w-24 flex-1 border-none bg-transparent p-1 text-base outline-none sm:text-sm";
 const popupClass =
   "max-h-64 overflow-auto rounded-lg border border-[var(--fd-line-control)] bg-white py-1 shadow-lg";
 const itemClass =

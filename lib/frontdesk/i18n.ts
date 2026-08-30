@@ -473,6 +473,7 @@ const en = {
       copied: "Copied",
       copyHint: "For a DM: copy and paste it back where they found you.",
       skip: "Skip this draft",
+      decideLater: "Decide later",
       dismiss: {
         prompt: "Why skip it? This helps the drafts get better.",
         keep: "Keep the draft",
@@ -1087,6 +1088,7 @@ const nl: typeof en = {
       copied: "Gekopieerd",
       copyHint: "Voor een DM: kopieer en plak het terug waar ze je vonden.",
       skip: "Dit concept overslaan",
+      decideLater: "Later beslissen",
       dismiss: {
         prompt: "Waarom overslaan? Zo worden de concepten beter.",
         keep: "Concept bewaren",

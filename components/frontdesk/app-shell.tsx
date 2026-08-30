@@ -38,7 +38,7 @@ export function AppShell({
       className={
         orientation === "side"
           ? "sticky top-0 hidden h-dvh w-44 shrink-0 flex-col gap-1 border-r border-[var(--fd-line)] px-3 py-8 lg:flex"
-          : "fixed inset-x-0 bottom-0 z-10 flex justify-around border-t border-[var(--fd-line)] bg-white px-2 py-1.5 lg:hidden"
+          : "fixed inset-x-0 bottom-0 z-10 flex justify-around border-t border-[var(--fd-line)] bg-white px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] lg:hidden"
       }
     >
       {DESTINATIONS.map(({ key, href }) => {
@@ -48,7 +48,11 @@ export function AppShell({
             key={key}
             href={href}
             aria-current={current ? "page" : undefined}
-            className={`rounded-xl px-3 py-2 text-sm ${
+            className={`${
+              orientation === "side"
+                ? "rounded-xl px-3 py-2 text-sm"
+                : "flex min-h-11 min-w-0 shrink items-center whitespace-nowrap rounded-lg px-1.5 py-2 text-xs"
+            } ${
               current
                 ? "bg-[var(--fd-paper)] font-semibold text-[var(--fd-ink)]"
                 : "text-[var(--fd-slate)] hover:text-[var(--fd-ink)]"
@@ -64,7 +68,7 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh">
       {nav("side")}
-      <div className="min-w-0 flex-1 pb-16 lg:pb-0">{children}</div>
+      <div className="min-w-0 flex-1 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">{children}</div>
       {nav("bottom")}
     </div>
   );

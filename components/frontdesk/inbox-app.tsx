@@ -368,8 +368,21 @@ export function InboxApp({
   const open = openId ? inquiries?.find((i) => i.id === openId) : null;
   const openDraft = openId ? drafts[openId] : null;
 
+  // A deep-linked open (?i=) sets openId before the drafts arrive and never
+  // passes through openDetail — without this, copy/send would act on an
+  // empty textarea. One initialization per opened inquiry; edits then win.
+  const editedForRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!openId || !drafts[openId]) return;
+    if (editedForRef.current === openId) return;
+    editedForRef.current = openId;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time init per opened inquiry, driven by async draft arrival
+    setEditedBody(drafts[openId].body ?? "");
+  }, [openId, drafts]);
+
   function openDetail(inquiry: InquiryRow) {
     setOpenId(inquiry.id);
+    editedForRef.current = inquiry.id;
     setEditedBody(drafts[inquiry.id]?.body ?? "");
     setCopied(false);
     setConfirmOutcome(null);
@@ -638,14 +651,14 @@ export function InboxApp({
             rows={10}
             value={editedBody}
             onChange={(e) => setEditedBody(e.target.value)}
-            className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-sm leading-relaxed focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
+            className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-base leading-relaxed focus-visible:border-[var(--fd-focus-ring)] sm:text-sm focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
           />
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
             {open.client_email && (
               <a
                 href={mailtoHref(open.client_email, d.subject, editedBody)}
                 onClick={() => void recordOutcome("send")}
-                className={primaryClass}
+                className={`${primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
               >
                 {d.send}
               </a>
@@ -653,7 +666,7 @@ export function InboxApp({
             <button
               type="button"
               onClick={copyReply}
-              className={open.client_email ? secondaryClass : primaryClass}
+              className={`${open.client_email ? secondaryClass : primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
             >
               {copied ? d.copied : d.copy}
             </button>
@@ -661,9 +674,24 @@ export function InboxApp({
               type="button"
               aria-expanded={skipReasonOpen}
               onClick={() => setSkipReasonOpen((v) => !v)}
-              className={linkClass}
+              className={`${secondaryClass} min-h-[52px] w-full lg:hidden`}
             >
               {d.skip}
+            </button>
+            <button
+              type="button"
+              aria-expanded={skipReasonOpen}
+              onClick={() => setSkipReasonOpen((v) => !v)}
+              className={`${linkClass} hidden lg:inline`}
+            >
+              {d.skip}
+            </button>
+            <button
+              type="button"
+              onClick={() => (setOpenId(null), syncUrl(null))}
+              className={`${secondaryClass} min-h-[52px] w-full lg:hidden`}
+            >
+              {d.decideLater}
             </button>
           </div>
           {skipReasonOpen && (
@@ -1014,7 +1042,7 @@ export function InboxApp({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={t.toolbar.searchPlaceholder}
-                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-3 text-sm text-[var(--fd-ink)] focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-3 text-base text-[var(--fd-ink)] focus-visible:border-[var(--fd-focus-ring)] sm:text-sm focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
@@ -1022,7 +1050,7 @@ export function InboxApp({
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-sm text-[var(--fd-ink)]"
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-base text-[var(--fd-ink)] sm:text-sm"
                 >
                   <option value="urgency">{t.toolbar.sortUrgency}</option>
                   <option value="newest">{t.toolbar.sortNewest}</option>
@@ -1034,7 +1062,7 @@ export function InboxApp({
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-sm text-[var(--fd-ink)]"
+                  className="min-h-11 rounded-xl border border-[var(--fd-line-control)] bg-white px-2 text-base text-[var(--fd-ink)] sm:text-sm"
                 >
                   <option value="all">{t.toolbar.typeAll}</option>
                   {Object.entries(dict.public.form.types).map(([key, label]) => (

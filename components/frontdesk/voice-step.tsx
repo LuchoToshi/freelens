@@ -13,7 +13,7 @@ import type { VoiceProfile } from "@/lib/frontdesk/prompts";
  * and lets the freelancer correct it. Their edits overwrite the profile.
  */
 const inputClass =
-  "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+  "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base sm:text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
 const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
 const primaryClass =
   "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50";

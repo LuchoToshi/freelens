@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,6 +8,14 @@ import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { ChromeGate } from "@/components/frontdesk/chrome-gate";
 import { en } from "@/lib/i18n/en";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Lets env(safe-area-inset-*) resolve on notched phones; the bottom nav
+  // and sticky controls pad by it (master spec §21.2).
+  viewportFit: "cover",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

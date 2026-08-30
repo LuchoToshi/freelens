@@ -69,7 +69,13 @@ export function EvidenceList({
   locale: FrontdeskLocale;
   items: EvidenceItem[];
 }) {
-  const e = fdDict(locale).inbox.evidence;
+  const dict = fdDict(locale);
+  const e = dict.inbox.evidence;
+  const typeLabels = dict.public.form.types as Record<string, string>;
+  const display = (item: EvidenceItem) =>
+    item.field === "eventType" && item.value !== null
+      ? (typeLabels[item.value] ?? item.value)
+      : item.value;
   return (
     <div className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
       <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
@@ -85,7 +91,7 @@ export function EvidenceList({
               {item.value === null ? (
                 <span className="italic text-[var(--fd-slate)]">{e.notStated}</span>
               ) : (
-                <span>{item.value}</span>
+                <span>{display(item)}</span>
               )}
               <ProvenanceChip locale={locale} kind={item.kind} />
               {item.confidence !== undefined && item.kind !== "missing" && (
