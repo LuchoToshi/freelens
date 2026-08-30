@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,6 +8,14 @@ import { LocaleProvider } from "@/components/i18n/locale-provider";
 import { ChromeGate } from "@/components/frontdesk/chrome-gate";
 import { en } from "@/lib/i18n/en";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Lets env(safe-area-inset-*) resolve on notched phones; the bottom nav
+  // and sticky controls pad by it (master spec §21.2).
+  viewportFit: "cover",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +36,10 @@ const fraunces = Fraunces({
 // English, because that is what is prerendered and what crawlers see. The
 // Dutch title is applied on the client once the visitor's choice is known.
 export const metadata: Metadata = {
+  // Canonicals resolve per page against the real origin (§23.3); "./" makes
+  // each route its own canonical without per-page boilerplate.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://frlns.com"),
+  alternates: { canonical: "./" },
   title: en.meta.home.title,
   description: en.meta.home.description,
 };

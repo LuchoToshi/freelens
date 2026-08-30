@@ -33,7 +33,7 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
         <button
           type="button"
           onClick={() => copy(base, "base")}
-          className="shrink-0 rounded-lg border border-[var(--fd-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-[var(--fd-line-control)] px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
         >
           {copied === "base" ? t.copied : t.copy}
         </button>
@@ -51,7 +51,7 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
             <button
               type="button"
               onClick={() => copy(url, tag)}
-              className="shrink-0 rounded-lg border border-[var(--fd-line-control)] px-3 py-1.5 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-lg border border-[var(--fd-line-control)] px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {copied === tag ? t.copied : t.copy}
             </button>

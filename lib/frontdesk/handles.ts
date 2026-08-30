@@ -45,7 +45,16 @@ export function isFrontdeskPath(pathname: string): boolean {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length !== 1) return false;
   const [first] = segments;
-  if (first === "inbox" || first === "setup" || first === "admin" || first === "demo") return true;
+  if (
+    first === "inbox" ||
+    first === "setup" ||
+    first === "admin" ||
+    first === "demo" ||
+    first === "clients" ||
+    first === "follow-ups"
+  ) {
+    return true;
+  }
   return isValidHandle(first);
 }
 

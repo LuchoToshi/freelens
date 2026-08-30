@@ -24,11 +24,18 @@ export interface VoiceProfile {
   quirks: string[];
 }
 
+export interface PackageAddon {
+  label: string;
+  priceEur: number;
+}
+
 export interface PromptPackage {
   label: string;
   priceFromEur: number;
   unit: string | null;
   notes: string | null;
+  /** Optional add-ons — exact prices under the same contract as the package. */
+  addons?: PackageAddon[];
 }
 
 export interface DraftPromptInput {
@@ -132,10 +139,13 @@ export function buildDraftPrompt(input: DraftPromptInput): { system: string; use
     input.packages.length === 0
       ? "(none configured)"
       : input.packages
-          .map(
-            (p) =>
-              `- ${p.label}: from € ${p.priceFromEur}${p.unit ? ` ${p.unit}` : ""}${p.notes ? `, ${p.notes}` : ""}`
-          )
+          .map((p) => {
+            const base = `- ${p.label}: from € ${p.priceFromEur}${p.unit ? ` ${p.unit}` : ""}${p.notes ? `, ${p.notes}` : ""}`;
+            const addons = (p.addons ?? [])
+              .map((a) => `\n  - add-on ${a.label}: € ${a.priceEur}`)
+              .join("");
+            return base + addons;
+          })
           .join("\n");
 
   const user = [

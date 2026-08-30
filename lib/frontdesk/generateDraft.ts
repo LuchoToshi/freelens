@@ -17,7 +17,7 @@ import {
   type DraftPromptInput,
   type VoiceProfile,
 } from "@/lib/frontdesk/prompts";
-import { validateFrontdeskDraft } from "@/lib/frontdesk/draftGuards";
+import { validateFrontdeskDraftFull } from "@/lib/frontdesk/draftGuards";
 
 const MODEL = process.env.FRONTDESK_DRAFT_MODEL ?? "claude-sonnet-5";
 export const MAX_ATTEMPTS = 3;
@@ -25,7 +25,9 @@ export const MAX_ATTEMPTS = 3;
 export class FrontdeskGenerationError extends Error {
   constructor(
     message: string,
-    readonly attempts: number
+    readonly attempts: number,
+    /** The last attempt's named failures, for the stored failed verdict (§10.7). */
+    readonly failures: string[] = []
   ) {
     super(message);
   }
@@ -67,29 +69,32 @@ export async function generateFrontdeskDraft(
   input: DraftPromptInput
 ): Promise<FrontdeskDraftResult> {
   const { system, user } = buildDraftPrompt(input);
-  let lastReason = "unknown";
+  let lastFailures: string[] = ["unknown"];
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const retryNote =
       attempt === 1
         ? ""
-        : `\n\nYour previous answer was rejected (${lastReason}). Follow every hard rule exactly this time.`;
+        : `\n\nYour previous answer was rejected (${lastFailures.join("; ")}). Follow every hard rule exactly this time.`;
     const text = (await callModel(system, user + retryNote, 500)).trim();
     if (!text) {
-      lastReason = "empty-response";
+      lastFailures = ["empty-response"];
       continue;
     }
-    const verdict = validateFrontdeskDraft(text, {
+    const verdict = validateFrontdeskDraftFull(text, {
       kind: input.kind,
       packages: input.packages,
+      eventDate: input.inquiry.eventDate,
+      signOff: input.signOff,
     });
     if (verdict.ok) return { body: text, attempts: attempt };
-    lastReason = verdict.reason ?? "invalid";
+    lastFailures = verdict.failures;
   }
 
   throw new FrontdeskGenerationError(
-    `no valid draft after ${MAX_ATTEMPTS} attempts (${lastReason})`,
-    MAX_ATTEMPTS
+    `no valid draft after ${MAX_ATTEMPTS} attempts (${lastFailures.join("; ")})`,
+    MAX_ATTEMPTS,
+    lastFailures
   );
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import { publicProfileByHandle } from "@/lib/frontdesk/server/publicProfile";
@@ -60,8 +61,7 @@ export default async function HandlePage({
     >
       <header className="flex flex-col items-center gap-3 text-center">
         {profile.photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- remote host not configured for next/image; a 96px avatar does not need optimization
-          <img
+          <Image
             src={profile.photoUrl}
             alt=""
             width={96}

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthGate, type FreelancerRow } from "@/components/frontdesk/auth-gate";
+import { AppShell } from "@/components/frontdesk/app-shell";
 import { InboxApp } from "@/components/frontdesk/inbox-app";
 import type { Session } from "@supabase/supabase-js";
 
@@ -35,5 +36,9 @@ function InboxOrRedirect({
   }, [setupIncomplete, router]);
 
   if (setupIncomplete) return null;
-  return <InboxApp session={session} freelancer={freelancer} />;
+  return (
+    <AppShell locale={freelancer.locale}>
+      <InboxApp session={session} freelancer={freelancer} />
+    </AppShell>
+  );
 }

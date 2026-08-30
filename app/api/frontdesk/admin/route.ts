@@ -87,6 +87,38 @@ export async function GET(request: Request) {
     };
   });
 
-  console.log(`frontdesk/admin: served rows:${rows.length} funnels:${funnels.length}`);
-  return Response.json({ ok: true, rows, funnels });
+  // Phase 8 monitoring (§30): draft-failure rate, queue depth, integration
+  // expiry — derived live, thresholds applied in the page. The daily cron
+  // logs the same numbers for log-based alerting.
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const [{ count: draftsWeek }, { count: failedWeek }, { count: awaiting }, { count: revoked }] =
+    await Promise.all([
+      db.from("drafts").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+      db
+        .from("drafts")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo)
+        .eq("validation_status", "failed"),
+      db
+        .from("inquiries")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["new", "nudge_due"])
+        .neq("source", "sample"),
+      db
+        .from("agent_gmail_connections")
+        .select("id", { count: "exact", head: true })
+        .not("revoked_at", "is", null),
+    ]);
+  const monitoring = {
+    draftsLast7d: draftsWeek ?? 0,
+    failedLast7d: failedWeek ?? 0,
+    failureRate: draftsWeek ? Math.round(((failedWeek ?? 0) / draftsWeek) * 100) : 0,
+    queueDepth: awaiting ?? 0,
+    revokedConnections: revoked ?? 0,
+  };
+
+  console.log(
+    `frontdesk/admin: served rows:${rows.length} funnels:${funnels.length} failRate:${monitoring.failureRate}% queueDepth:${monitoring.queueDepth} revoked:${monitoring.revokedConnections}`
+  );
+  return Response.json({ ok: true, rows, funnels, monitoring });
 }

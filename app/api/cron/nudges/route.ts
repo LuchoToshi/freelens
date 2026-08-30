@@ -1,22 +1,20 @@
 import { serviceClient } from "@/lib/frontdesk/server/clients";
 import { generateAndStoreDraft } from "@/lib/frontdesk/server/draftPipeline";
+import { nudgeVerdict, type FollowupCandidate } from "@/lib/frontdesk/followups";
 
 /**
- * The daily nudge sweep. An inquiry that was replied to 3+ days ago and has
- * gone quiet gets ONE follow-up draft and flips to nudge_due; the freelancer
- * sends it (status back to replied, clock reset) or ignores it. Two nudges
- * per inquiry, ever — the count comes back embedded in the same query that
- * selects candidates, and a nudge_due inquiry is never a candidate, so the
- * sweep cannot double-fire between freelancer actions.
+ * The daily nudge sweep. Candidates come from one query; every eligibility
+ * decision — quiet window (per-freelancer cadence), the 2-nudge cap, the
+ * global pause, the per-inquiry snooze, sample exclusion — lives in
+ * lib/frontdesk/followups.ts, pure and tested. Idempotency is structural: a
+ * stored nudge flips status to nudge_due, which is no longer a candidate.
  *
  * Auth and logging follow the weekly cron precedent: exact CRON_SECRET
  * bearer, counts in the logs and nothing else.
  */
 export const maxDuration = 300;
 
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const BATCH_CAP = 25;
-const MAX_NUDGES = 2;
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -26,15 +24,18 @@ export async function GET(request: Request) {
   }
 
   const db = serviceClient();
-  const threshold = new Date(Date.now() - THREE_DAYS_MS).toISOString();
+  const now = new Date();
 
+  // Anything quiet at least MIN_QUIET_DAYS is a candidate; the exact
+  // per-freelancer window is applied by the verdict below.
   const { data: candidates, error } = await db
     .from("inquiries")
-    .select("id, drafts(kind)")
+    .select(
+      "id, status, source, replied_at, snoozed_until, drafts(kind), freelancers!inner(followups_paused, followup_quiet_days)"
+    )
     .eq("status", "replied")
-    // Practice data never nudges anyone: the sample inquiry is invisible here.
     .neq("source", "sample")
-    .lt("replied_at", threshold)
+    .lt("replied_at", new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString())
     .limit(200);
   if (error) {
     console.error("cron/nudges: query_failed");
@@ -42,11 +43,24 @@ export async function GET(request: Request) {
   }
 
   const due = (candidates ?? [])
-    .filter(
-      (row) =>
-        ((row.drafts as { kind: string }[] | null) ?? []).filter((d) => d.kind === "nudge")
-          .length < MAX_NUDGES
-    )
+    .filter((row) => {
+      const freelancer = row.freelancers as unknown as {
+        followups_paused: boolean;
+        followup_quiet_days: number | null;
+      };
+      const candidate: FollowupCandidate = {
+        status: row.status,
+        source: row.source,
+        replied_at: row.replied_at,
+        snoozed_until: row.snoozed_until,
+        nudgeCount: ((row.drafts as { kind: string }[] | null) ?? []).filter(
+          (d) => d.kind === "nudge"
+        ).length,
+        followupsPaused: freelancer.followups_paused,
+        quietDays: freelancer.followup_quiet_days,
+      };
+      return nudgeVerdict(candidate, now).eligible;
+    })
     .slice(0, BATCH_CAP);
 
   let generated = 0;
@@ -61,8 +75,31 @@ export async function GET(request: Request) {
     }
   }
 
+  // Phase 8 monitoring: the same numbers the admin page shows, logged daily
+  // so a Vercel log alert can page on failRate / queueDepth / revoked.
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const [{ count: draftsWeek }, { count: failedWeek }, { count: awaiting }, { count: revoked }] =
+    await Promise.all([
+      db.from("drafts").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+      db
+        .from("drafts")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo)
+        .eq("validation_status", "failed"),
+      db
+        .from("inquiries")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["new", "nudge_due"])
+        .neq("source", "sample"),
+      db
+        .from("agent_gmail_connections")
+        .select("id", { count: "exact", head: true })
+        .not("revoked_at", "is", null),
+    ]);
+  const failRate = draftsWeek ? Math.round(((failedWeek ?? 0) / draftsWeek) * 100) : 0;
+
   console.log(
-    `cron/nudges: candidates:${candidates?.length ?? 0} due:${due.length} generated:${generated} failed:${failed}`
+    `cron/nudges: candidates:${candidates?.length ?? 0} due:${due.length} generated:${generated} failed:${failed} failRate:${failRate}% queueDepth:${awaiting ?? 0} revoked:${revoked ?? 0}`
   );
   return Response.json({ ok: true, generated, failed });
 }

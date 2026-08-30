@@ -64,7 +64,8 @@ describe("price guard", () => {
   it("accepts the exact package price in any common format", () => {
     for (const phrasing of ["€ 1.950", "€1950", "1950 euro", "vanaf € 1.950,-"]) {
       const body = `${REPLY_PAD}De hele trouwdag begint bij ${phrasing}, inclusief tweede fotograaf. Zullen we bellen?`;
-      expect(validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES }).ok, phrasing).toBe(true);
+      const { failures } = validateFrontdeskDraftFull(body, { kind: "reply", packages: PACKAGES });
+      expect(failures.join(";"), phrasing).not.toMatch(/price-not-in-packages/);
     }
   });
 
@@ -79,8 +80,22 @@ describe("price guard", () => {
 
   it("does not false-positive on dates and years", () => {
     const body = `${REPLY_PAD}Wat mooi dat jullie op 12 juni 2027 trouwen, daar denk ik graag over mee. Zullen we bellen?`;
-    expect(validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES }).ok).toBe(true);
+    const { failures } = validateFrontdeskDraftFull(body, { kind: "reply", packages: PACKAGES });
+    expect(failures.join(";")).not.toMatch(/price-not-in-packages/);
     expect(findPriceLikeAmounts("op 12 juni 2027")).toEqual([]);
+  });
+
+  it("a configured add-on price is allowed; an invented one still fails", () => {
+    const withAddons = [
+      { ...PACKAGES[0], addons: [{ label: "Second shooter", priceEur: 275 }] },
+    ];
+    const quoted = `${REPLY_PAD}Een tweede fotograaf kan erbij voor € 275, dan missen we niets van de dag.`;
+    expect(
+      validateFrontdeskDraftFull(quoted, { kind: "reply", packages: withAddons }).failures.join(";")
+    ).not.toMatch(/price-not-in-packages/);
+    expect(
+      validateFrontdeskDraftFull(quoted, { kind: "reply", packages: PACKAGES }).failures.join(";")
+    ).toMatch(/price-not-in-packages/);
   });
 });
 
@@ -102,7 +117,8 @@ describe("availability guard", () => {
 
   it("allows enthusiasm and checking language", () => {
     const body = `${REPLY_PAD}Wat een mooie datum, ik duik graag even in mijn agenda en kom er vrijblijvend op terug. Zullen we bellen?`;
-    expect(validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES }).ok).toBe(true);
+    const { failures } = validateFrontdeskDraftFull(body, { kind: "reply", packages: PACKAGES });
+    expect(failures.join(";")).not.toMatch(/availability-claim/);
   });
 });
 
@@ -111,7 +127,7 @@ describe("style guard", () => {
     const body = `${REPLY_PAD}Wat een mooie datum — ik duik er graag in. Zullen we bellen?`;
     const verdict = validateFrontdeskDraft(body, { kind: "reply", packages: PACKAGES });
     expect(verdict.ok).toBe(false);
-    expect(verdict.reason).toBe("em-dash");
+    expect(verdict.reason).toContain("em-dash");
   });
 });
 
@@ -185,5 +201,108 @@ describe("prompt builder", () => {
     expect(english.system).not.toContain("Write in Dutch.");
     expect(english.user).toContain("target_language: English");
     expect(english.system + english.user).not.toMatch(/vorig jaar|trouwdag|Hoi |Groetjes/);
+  });
+});
+
+// ---- Master spec Phase 1 (§10.5): the extended check set -------------------
+
+import { deriveValidationStatus, validateFrontdeskDraftFull } from "@/lib/frontdesk/draftGuards";
+
+const CTX = { kind: "reply" as const, packages: PACKAGES, signOff: "Groetjes, Emma" };
+
+const VALID_EN = [
+  "Hi Sanne!",
+  "",
+  "Thank you for thinking of me for your wedding. It sounds like a lovely day",
+  "and I would be happy to tell you more about how I work and what a full",
+  "wedding day with me looks like, from preparations to the last dance.",
+  "My full wedding day package starts at 1950 euro including a second",
+  "photographer, and I can walk you through what that covers on a short call.",
+  "",
+  "Groetjes, Emma",
+].join("\n");
+
+const VALID_NL = [
+  "Hoi Sanne!",
+  "",
+  "Wat leuk dat jullie aan mij denken voor jullie bruiloft. Ik vertel je",
+  "graag meer over hoe ik werk en hoe een hele trouwdag met mij eruitziet,",
+  "van de voorbereidingen tot de laatste dans, en wat jullie daarvan terugzien.",
+  "Mijn pakket voor een hele trouwdag begint bij 1950 euro inclusief tweede",
+  "fotograaf, en ik leg jullie in een kort gesprek graag uit wat daar allemaal",
+  "bij inbegrepen zit.",
+  "",
+  "Groetjes, Emma",
+].join("\n");
+
+describe("validateFrontdeskDraftFull", () => {
+  it("passes a complete draft in both languages", () => {
+    expect(validateFrontdeskDraftFull(VALID_EN, CTX)).toEqual({ ok: true, failures: [] });
+    expect(validateFrontdeskDraftFull(VALID_NL, CTX)).toEqual({ ok: true, failures: [] });
+  });
+
+  it("a greeting-only draft can never reach a ready state", () => {
+    const { ok, failures } = validateFrontdeskDraftFull("Hoi Sanne!\n\nGroetjes, Emma", CTX);
+    expect(ok).toBe(false);
+    expect(failures).toContain("body-only-greeting");
+    expect(deriveValidationStatus(failures)).toBe("failed");
+  });
+
+  it("flags a missing greeting in both languages", () => {
+    const en = VALID_EN.replace("Hi Sanne!", "So about your wedding day plans.");
+    const nl = VALID_NL.replace("Hoi Sanne!", "Over jullie plannen voor de bruiloft.");
+    expect(validateFrontdeskDraftFull(en, CTX).failures).toContain("greeting-missing");
+    expect(validateFrontdeskDraftFull(nl, CTX).failures).toContain("greeting-missing");
+  });
+
+  it("flags a missing sign-off but accepts a generic closing", () => {
+    const bare = VALID_EN.replace("\n\nGroetjes, Emma", "");
+    expect(validateFrontdeskDraftFull(bare, CTX).failures).toContain("signoff-missing");
+    const generic = VALID_EN.replace("Groetjes, Emma", "Warm regards, Emma");
+    expect(validateFrontdeskDraftFull(generic, CTX).ok).toBe(true);
+  });
+
+  it("flags unresolved placeholders of every shape", () => {
+    for (const bad of ["{{client_name}}", "[datum]", "TODO check this"]) {
+      const draft = VALID_EN.replace("what a full", `what a full ${bad}`);
+      expect(validateFrontdeskDraftFull(draft, CTX).failures).toContain("unresolved-placeholder");
+    }
+  });
+
+  it("flags a year that contradicts the inquiry's event date", () => {
+    const ctx = { ...CTX, eventDate: "2027-06-12" };
+    const wrong = VALID_EN.replace("your wedding", "your wedding in June 2026");
+    expect(validateFrontdeskDraftFull(wrong, ctx).failures).toContain("date-mismatch:2026");
+    const right = VALID_EN.replace("your wedding", "your wedding in June 2027");
+    expect(validateFrontdeskDraftFull(right, ctx).ok).toBe(true);
+  });
+
+  it("collects every failure at once instead of the first", () => {
+    const bad = "So, about the day. It costs 1234 euro and the date is open. [TBD]";
+    const { failures } = validateFrontdeskDraftFull(bad, CTX);
+    expect(failures.length).toBeGreaterThanOrEqual(4);
+    expect(failures.join(";")).toMatch(/price-not-in-packages:1234/);
+    expect(failures.join(";")).toMatch(/availability-claim/);
+    expect(failures.join(";")).toMatch(/unresolved-placeholder/);
+    expect(failures.join(";")).toMatch(/greeting-missing/);
+  });
+
+  it("existing guards still hold through the full validator", () => {
+    const emDash = VALID_EN.replace("second", "second — best");
+    expect(validateFrontdeskDraftFull(emDash, CTX).failures).toContain("em-dash");
+  });
+});
+
+describe("deriveValidationStatus", () => {
+  it("no failures is ready for review, never ready to send", () => {
+    expect(deriveValidationStatus([])).toBe("ready_for_review");
+  });
+
+  it("a missing recipient alone needs review rather than failing", () => {
+    expect(deriveValidationStatus(["recipient-missing"])).toBe("needs_review");
+  });
+
+  it("any hard failure fails the draft even next to a soft one", () => {
+    expect(deriveValidationStatus(["recipient-missing", "em-dash"])).toBe("failed");
   });
 });
