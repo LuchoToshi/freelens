@@ -193,3 +193,78 @@ Verified working, with a seeded occupant per queue:
   bar.
 
 All three gates green. Not merged — per instruction.
+
+---
+
+## Phase 3 — Onboarding, packages, voice, connection health (§14, §15, §6.5, §6.6)
+
+**DECISION GATE, DEC-8:** safe default **(a) conservative** recorded. The
+permission matrix itself is Phase 4 surface; nothing in Phase 3 needed a
+permission level because no agent action is autonomous yet. Nothing
+client-facing runs above "prepare a draft for review".
+
+**Scope shipped, in dependency order (one commit per unit):**
+1. `lib/frontdesk/readiness.ts` — §14 named-requirements model, derived
+   at read time: three required items gate go-live, optional items never
+   gate; no percentage exists anywhere. + tests.
+2. `lib/frontdesk/packageGaps.ts` — §6.5 deterministic gap observations
+   (no packages / unpriced package / ≥2 real inquiries of a type no
+   package covers, EN+NL keyword match). Gaps inform, never block. + tests.
+3. Migration **0012** (additive): `packages.addons jsonb`,
+   `freelancers.voice_learning_paused`, `freelancers.voice_proposal_decisions`.
+   Add-on prices join the price guard's allowed digit set and the prompt's
+   package table (the §2.1 contract extends to add-ons, never weakens:
+   test proves a configured add-on price passes and an invented one still
+   fails). Wizard packages step edits add-ons; hint names the boundary.
+4. `lib/frontdesk/voiceLearning.ts` — §6.6 proposals derived from the
+   freelancer's own `edited` drafts: sign-off replacement, emoji
+   added/stripped, substantial shortening. Never from a single edit;
+   pause honored; decisions persist under stable keys so rejections never
+   resurface. + tests (incl. partial-profile regression).
+5. `lib/frontdesk/connectionHealth.ts` — §15 state vocabulary; derives
+   connected/stale/revoked/disconnected from `agent_gmail_connections`;
+   states with no producing signal are never invented. + tests.
+6. `components/frontdesk/readiness-checklist.tsx` — ReadinessCard
+   (required band with why-lines naming what each item unblocks, optional
+   band, gaps), VoiceLearningCard (accept / reject / pause / resume),
+   ConnectionHealthCard (§15.2: what happened, affected, NOT affected,
+   next step, last sync — full EN+NL copy for all nine states). Replaces
+   the old Go-live card; same disappearance rule plus gaps.
+7. Test mode (§14.4): `/inbox?test=1` swaps loaders for a client-built
+   fictional fixture (ids `test-`, names marked fictional, EN+NL); every
+   write becomes a local-state mutation; real-account cards hide behind a
+   labeled banner with an exit; the empty state offers the mode.
+   Verified at the network layer: zero write requests during a full
+   fictional outcome flow.
+
+**Verification:** 547 tests green (added readiness 7, gaps 6, voice 8,
+connection 4, guard add-on case); tsc clean; eslint clean (one
+pre-existing warning in components/home/worked-example.tsx, untouched).
+Live check on the same commit against the local stack: readiness card
+renders required/optional/gaps; test mode enter/exit, fictional outcome,
+counts. One crash found live and fixed with a regression test (partial
+voice_profile jsonb). Migration 0012 applied to production (additive,
+`db push`, dry-run first) and the RLS suite re-run: **12/12 PASS**.
+
+**Deviations / flagged ambiguities (chosen safe, not guessed silently):**
+- "VoiceProfileEditor" as a distinct page does not exist: the nine
+  dimensions were already editable across wizard step 1 (sign_off) and
+  the voice mirror (the other eight); Phase 3 adds the missing learning
+  layer (proposals + pause) in the inbox where the evidence lives.
+- Learning proposals are deterministic comparisons, not an LLM analysis
+  pass — the spec mandates evidence counts and accept/reject/pause, not
+  a mechanism; deterministic keeps §2.1 trust properties checkable.
+- ConnectionHealth ships fully copy-complete while
+  `GMAIL_CONNECT_ENABLED` stays false (CASA): connecting / partial /
+  rate-limited / reconnecting / expired have no producing signal yet and
+  are therefore unreachable, by design, not invented.
+- Calendar (§6.8) is not in the Phase 3 scope line and no calendar code
+  exists; the readiness optional band lists Gmail only while available.
+- Go-live gating is expressed in the readiness surface and by the
+  existing structural gates (wizard requires packages + voice before
+  /inbox); the public page is NOT disabled for not-ready accounts, which
+  would break live users.
+
+**Not merged.** Cumulative gate for merge: none remaining beyond review —
+0010–0012 are applied, RLS is green, visual pass done at both widths for
+Phases 2 and 3 surfaces.
