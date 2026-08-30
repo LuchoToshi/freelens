@@ -498,3 +498,58 @@ covered above.
 **Verification:** 578 tests green, tsc and eslint clean.
 
 **Not merged.**
+
+---
+
+## Phase 8 — Rollout and validation (§30)
+
+**Migration verification with real data:** all 14 migrations applied and
+matching on the production database (`supabase migration list --linked`:
+14/14, local=remote). Each of 0010–0014 was dry-run first, applied
+individually across Phases 2–5, and followed by the full RLS suite —
+12/12 PASS after every one. Production `main` served real traffic
+against the migrated schema throughout.
+
+**Rollback: rehearsed, not just written** (see
+docs/master-spec/ROLLBACK.md). The normal rollback is code-only —
+proven continuously by production `main` running against 0010–0014.
+The full schema reversal (`supabase/rollback/rollback_0010_0014.sql`)
+was executed on the local production-shaped stack: 12 branch columns
+dropped, migration history forgotten, zero loss outside the dropped
+columns (drafts=4, inquiries=10 before and after), then re-applied via
+`migration up` (exactly 0010–0014) with 0010's backfill re-running as
+designed.
+
+**Monitoring:** the admin surface now opens with three tiles — draft
+failure rate over 7 days (attention at ≥10%), queue depth (inquiries
+awaiting action, attention at ≥50), and revoked Gmail connections
+(attention at >0). The daily nudges cron logs the same numbers
+(`failRate:… queueDepth:… revoked:…`) so a Vercel log alert can page on
+them without anyone visiting the page. OWNER ACTION: create the log
+alert in the Vercel dashboard keyed on those tokens.
+
+**Smoke tests** (`scripts/smoke-frontdesk.mjs`, run against both):
+- Production (frlns.com): home, inbox shell, demo page, end-to-end demo
+  draft generation all PASS; robots.txt and sitemap.xml 404 — the
+  audit's original finding, fixed on this branch, green on the preview.
+- Preview (Phase 7 build): 7/7 PASS including live draft generation.
+
+**Reconciliation — spec vs built:**
+| Phase | DoD | Status |
+|---|---|---|
+| 1 Trust | full check set, structured verdicts, failed-state honesty | ✓ shipped, gated, verified |
+| 2 Queue/shell | 7 queues, height chain, derived placement | ✓ (breakpoint lg not 860 — recorded) |
+| 3 Readiness | no percentage, gated go-live, test mode | ✓ (learning deterministic — recorded) |
+| 4 Provenance/permissions | ceilings unbreakable, nulls Not stated | ✓ (evidence client-read gap — recorded) |
+| 5 Follow-ups/memory | DEC-7, cap, stop conditions, memory controls | ✓ (Gmail-dependent stops deferred) |
+| 6 Mobile | approval on mobile, NL strings, no hover-only | ✓ code-side (real-device check = owner) |
+| 7 Marketing/SEO | robots/sitemap/canonicals, previews unindexed | ✓ (DEC-14 + §22.5 gates with owner) |
+| 8 Rollout | migrations verified, rollback rehearsed, monitoring | ✓ (log-alert wiring = owner) |
+
+**Open items that are the owner's, collected:** real-phone approval +
+Android 60fps check (Phase 6); DEC-14 legal review before any consent
+change; §22.5 independent calculator verification before monetisation;
+Vercel log alert on the cron's monitoring tokens; and the merge itself.
+
+**Not merged — the merge is the deliberate final act of this rollout
+and needs the explicit go.**

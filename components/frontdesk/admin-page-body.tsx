@@ -28,6 +28,13 @@ interface AdminData {
     outcomes: { sent_as_is: number; edited: number; skipped: number; regenerated: number };
     medianReplyMinutes: number | null;
   }[];
+  monitoring: {
+    draftsLast7d: number;
+    failedLast7d: number;
+    failureRate: number;
+    queueDepth: number;
+    revokedConnections: number;
+  };
 }
 
 export function AdminPageBody() {
@@ -64,6 +71,56 @@ function AdminView({ session }: { session: Session }) {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
       <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">FrontDesk admin</h1>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+          Monitoring
+        </h2>
+        <div className="flex flex-wrap gap-3">
+          {[
+            {
+              label: "Draft failure rate, 7d",
+              value: `${data.monitoring.failureRate}% (${data.monitoring.failedLast7d}/${data.monitoring.draftsLast7d})`,
+              // A tenth of drafts failing their own checks means the
+              // generator or the guards drifted: look before users do.
+              alert: data.monitoring.failureRate >= 10,
+            },
+            {
+              label: "Queue depth (awaiting action)",
+              value: String(data.monitoring.queueDepth),
+              alert: data.monitoring.queueDepth >= 50,
+            },
+            {
+              label: "Revoked Gmail connections",
+              value: String(data.monitoring.revokedConnections),
+              alert: data.monitoring.revokedConnections > 0,
+            },
+          ].map((m) => (
+            <div
+              key={m.label}
+              className={`flex min-w-44 flex-col gap-1 rounded-2xl border bg-white p-4 ${
+                m.alert ? "border-[var(--fd-error-text)]" : "border-[var(--fd-line)]"
+              }`}
+            >
+              <span className="text-xs uppercase tracking-wide text-[var(--fd-slate)]">
+                {m.label}
+              </span>
+              <span
+                className={`text-lg font-semibold ${
+                  m.alert ? "text-[var(--fd-error-text)]" : "text-[var(--fd-ink)]"
+                }`}
+              >
+                {m.value}
+                {m.alert ? " (attention)" : ""}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+          The daily cron logs failRate/queueDepth/revoked in the same shape; point a Vercel
+          log alert at those tokens for paging.
+        </p>
+      </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">

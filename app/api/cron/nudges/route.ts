@@ -75,8 +75,31 @@ export async function GET(request: Request) {
     }
   }
 
+  // Phase 8 monitoring: the same numbers the admin page shows, logged daily
+  // so a Vercel log alert can page on failRate / queueDepth / revoked.
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const [{ count: draftsWeek }, { count: failedWeek }, { count: awaiting }, { count: revoked }] =
+    await Promise.all([
+      db.from("drafts").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+      db
+        .from("drafts")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", weekAgo)
+        .eq("validation_status", "failed"),
+      db
+        .from("inquiries")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["new", "nudge_due"])
+        .neq("source", "sample"),
+      db
+        .from("agent_gmail_connections")
+        .select("id", { count: "exact", head: true })
+        .not("revoked_at", "is", null),
+    ]);
+  const failRate = draftsWeek ? Math.round(((failedWeek ?? 0) / draftsWeek) * 100) : 0;
+
   console.log(
-    `cron/nudges: candidates:${candidates?.length ?? 0} due:${due.length} generated:${generated} failed:${failed}`
+    `cron/nudges: candidates:${candidates?.length ?? 0} due:${due.length} generated:${generated} failed:${failed} failRate:${failRate}% queueDepth:${awaiting ?? 0} revoked:${revoked ?? 0}`
   );
   return Response.json({ ok: true, generated, failed });
 }
