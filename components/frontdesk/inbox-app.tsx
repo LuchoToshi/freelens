@@ -516,7 +516,7 @@ function ChecklistCard({
             <button
               type="button"
               onClick={() => void onBioConfirmed()}
-              className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
+              className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] px-3 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {c.bioDone}
             </button>
@@ -529,7 +529,7 @@ function ChecklistCard({
                 key={tag}
                 type="button"
                 onClick={() => void copyLink(url, tag)}
-                className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-slate)] transition hover:border-[var(--fd-ink)] hover:text-[var(--fd-ink)]"
+                className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] px-3 text-xs font-medium text-[var(--fd-slate)] transition hover:border-[var(--fd-ink)] hover:text-[var(--fd-ink)]"
               >
                 {copied === tag ? share.copied : share.variants[tag]}
               </button>
@@ -547,7 +547,7 @@ function ChecklistCard({
               href={`/${freelancer.handle}`}
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-[var(--fd-line-control)] px-2.5 py-1 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
+              className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] px-3 text-xs font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
             >
               {c.openPage}
             </a>

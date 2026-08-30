@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { Session } from "@supabase/supabase-js";
+import { arrive, arriveGroup } from "@/components/design/motion";
+import { TrustNote } from "@/components/frontdesk/trust-note";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 
 /**
@@ -48,6 +51,7 @@ export function RevealStep({
 }) {
   const t = fdDict(locale).setup.reveal;
   const dict = fdDict(locale);
+  const reduce = useReducedMotion();
   const [state, setState] = useState<"loading" | "ready" | "pending">("loading");
   const [payload, setPayload] = useState<SamplePayload | null>(null);
   const ran = useRef(false);
@@ -110,15 +114,27 @@ export function RevealStep({
 
   const inquiry = payload?.inquiry;
 
+  // The wizard's payoff moment: inquiry first, then the draft settles in, then
+  // the actions. Same arrive grammar as the core app; reduced motion collapses
+  // it to instant opacity via the helpers, and the draft text itself is in the
+  // DOM from the first frame either way.
   return (
-    <section className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
+    <motion.section
+      className="flex flex-col gap-5"
+      variants={arriveGroup(reduce)}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={arrive(reduce)} className="flex flex-col gap-1">
         <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.sub}</p>
-      </div>
+      </motion.div>
 
       {inquiry && (
-        <div className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+        <motion.div
+          variants={arrive(reduce)}
+          className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4"
+        >
           <span className="text-sm font-semibold text-[var(--fd-ink)]">
             {inquiry.client_name}
           </span>
@@ -131,30 +147,40 @@ export function RevealStep({
               {inquiry.message}
             </p>
           )}
-        </div>
+        </motion.div>
       )}
 
       {state === "ready" && payload?.draft ? (
-        <div className="whitespace-pre-line rounded-2xl border border-[var(--fd-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]">
+        <motion.div
+          variants={arrive(reduce)}
+          className="whitespace-pre-line rounded-2xl border border-[var(--fd-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]"
+        >
           {payload.draft.body}
-        </div>
+        </motion.div>
       ) : (
-        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
+        <motion.div
+          variants={arrive(reduce)}
+          className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5"
+        >
           <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.pending}</p>
           <button type="button" onClick={retry} className={`${secondaryClass} w-fit`}>
             {t.retry}
           </button>
-        </div>
+        </motion.div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
+      <motion.div variants={arrive(reduce)}>
+        <TrustNote>{t.trust}</TrustNote>
+      </motion.div>
+
+      <motion.div variants={arrive(reduce)} className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={onContinue} className={primaryClass}>
           {t.primary}
         </button>
         <button type="button" onClick={onAdjust} className={secondaryClass}>
           {t.secondary}
         </button>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }

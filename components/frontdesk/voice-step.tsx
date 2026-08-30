@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import { TrustNote } from "@/components/frontdesk/trust-note";
 import type { VoiceProfile } from "@/lib/frontdesk/prompts";
 
 /**
@@ -173,6 +174,7 @@ export function VoiceStep({
         onChange={(e) => setSamples(e.target.value)}
         className={`${inputClass} min-h-56 py-2 leading-relaxed`}
       />
+      <TrustNote>{t.trust}</TrustNote>
       {phase === "error" && (
         <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">{t.error}</p>
       )}
