@@ -96,7 +96,8 @@ export function placeInquiry(
   inquiry: QueueInquiry,
   latestReplyDraft: QueueDraft | null,
   now: Date,
-  timeZone: string
+  timeZone: string,
+  quietDays: number = FOLLOW_UP_QUIET_DAYS
 ): QueuePlacement {
   if (inquiry.status === "booked" || inquiry.status === "lost") {
     return { queue: "done", reasonKey: "outcomeRecorded", actionKey: "noAction" };
@@ -119,8 +120,8 @@ export function placeInquiry(
   if (inquiry.status === "nudge_due") {
     const repliedAt = inquiry.replied_at ? new Date(inquiry.replied_at) : null;
     const base = repliedAt ?? new Date(inquiry.created_at);
-    const dueDate = isoDatePlusDays(base, FOLLOW_UP_QUIET_DAYS, timeZone);
-    const delta = FOLLOW_UP_QUIET_DAYS - dayDiff(base, now, timeZone);
+    const dueDate = isoDatePlusDays(base, quietDays, timeZone);
+    const delta = quietDays - dayDiff(base, now, timeZone);
     return {
       queue: "followup",
       reasonKey: "followupDue",

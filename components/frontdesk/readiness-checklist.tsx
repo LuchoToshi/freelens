@@ -217,9 +217,17 @@ export function VoiceLearningCard({
 
   async function decide(p: VoiceProposal, accepted: boolean) {
     setBusy(true);
+    // §12.6: retain the prior value so an acceptance is reversible from the
+    // memory list; keep the evidence count for its "why".
+    const prior = profile![p.dimension];
     const nextDecisions: ProposalDecisions = {
       ...decisions,
-      [p.key]: accepted ? "accepted" : "rejected",
+      [p.key]: {
+        decision: accepted ? "accepted" : "rejected",
+        prev: typeof prior === "string" ? prior : undefined,
+        evidenceCount: p.evidenceCount,
+        at: new Date().toISOString(),
+      },
     };
     const nextProfile = accepted ? { ...profile!, [p.dimension]: p.value } : undefined;
     await onApply({ profile: nextProfile as VoiceProfile | undefined, decisions: nextDecisions });
@@ -254,7 +262,9 @@ export function VoiceLearningCard({
             <div key={p.key} className="flex flex-col gap-2 rounded-xl bg-[var(--fd-paper)] p-3">
               <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{label(p)}</p>
               <p className="text-xs text-[var(--fd-slate)]">
-                {v.evidence.replace("{n}", String(p.evidenceCount))}
+                {v.evidence
+                  .replace("{n}", String(p.evidenceCount))
+                  .replace("{m}", String(p.windowSize))}
               </p>
               <div className="flex flex-wrap gap-2">
                 <button type="button" disabled={busy} onClick={() => void decide(p, true)} className={smallButtonClass}>

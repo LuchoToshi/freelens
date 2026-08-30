@@ -4,6 +4,7 @@ import { fdDict, type FrontdeskDict } from "@/lib/frontdesk/i18n";
 /** Same discipline as lib/i18n/dictionary.test.ts, scoped to this dict. */
 const SAME_BY_DESIGN = new Set([
   "inbox.evidence.fields.budget", // "Budget" is the Dutch word too
+  "inbox.memory.dimensions.emoji", // "Emoji" is the Dutch word too
 
   // Dutch genuinely uses these English words for these concepts.
   "inbox.shell.inbox",

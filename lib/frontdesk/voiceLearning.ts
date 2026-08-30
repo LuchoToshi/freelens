@@ -15,19 +15,40 @@ export interface EditedDraft {
   final_body: string;
 }
 
+export type VoiceDimension = "sign_off" | "emoji" | "sentence_length";
+
 export interface VoiceProposal {
   /** Stable identity: `${dimension}:${value}` — the decision key. */
   key: string;
-  dimension: "sign_off" | "emoji" | "sentence_length";
+  dimension: VoiceDimension;
   /** The value the evidence points at, ready to apply. */
   value: string;
-  /** How many edited drafts exhibit the signal. Always >= 2. */
+  /** In how many of the window's edited drafts the signal appears (§12.4). */
   evidenceCount: number;
+  /** Size of the window actually inspected, for "{n} of your last {m}". */
+  windowSize: number;
 }
 
-export type ProposalDecisions = Record<string, "accepted" | "rejected">;
+/**
+ * A decision on a proposal. Phase 3 stored bare strings; Phase 5 stores an
+ * object that also retains the prior value (§12.6: an acceptance is
+ * reversible) and the evidence count for the memory list. Both shapes are
+ * readable. A key `never:<dimension>` blocks every future proposal for that
+ * dimension (§12.5 "never learn this").
+ */
+export interface ProposalDecision {
+  decision: "accepted" | "rejected";
+  prev?: string;
+  evidenceCount?: number;
+  at?: string;
+}
 
-const MIN_EVIDENCE = 2;
+export type ProposalDecisions = Record<string, "accepted" | "rejected" | ProposalDecision>;
+
+// DEC-7 (a): a proposal needs 3 occurrences within the last 5 comparable
+// drafts. A single edit must never create a rule (§12.4).
+const MIN_EVIDENCE = 3;
+const WINDOW = 5;
 const EMOJI = /\p{Extended_Pictographic}/u;
 const SHORTENED_BY = 0.3;
 
@@ -46,6 +67,9 @@ export function deriveVoiceProposals(
   paused: boolean
 ): VoiceProposal[] {
   if (paused) return [];
+  // Newest-first callers hand us history; only the last WINDOW comparable
+  // drafts count (DEC-7), so ancient habits cannot outvote current ones.
+  const window = edits.slice(0, WINDOW);
   const proposals: VoiceProposal[] = [];
 
   // Sign-off: the freelancer keeps replacing the closing line with the same
@@ -53,7 +77,7 @@ export function deriveVoiceProposals(
   // treat missing fields as "no signal", never as a crash.
   const configured = (profile.sign_off ?? "").trim().toLowerCase();
   const replacements = new Map<string, number>();
-  for (const e of edits) {
+  for (const e of window) {
     const final = lastLine(e.final_body);
     if (!final || final.length > 60) continue;
     if (final.toLowerCase() === configured) continue;
@@ -63,19 +87,25 @@ export function deriveVoiceProposals(
   }
   for (const [value, count] of replacements) {
     if (count >= MIN_EVIDENCE) {
-      proposals.push({ key: `sign_off:${value}`, dimension: "sign_off", value, evidenceCount: count });
+      proposals.push({
+        key: `sign_off:${value}`,
+        dimension: "sign_off",
+        value,
+        evidenceCount: count,
+        windowSize: window.length,
+      });
     }
   }
 
   // Emoji: edits keep adding emoji to a never-emoji profile, or keep
   // stripping every emoji from drafts that had them.
-  const added = edits.filter((e) => !EMOJI.test(e.body) && EMOJI.test(e.final_body)).length;
-  const removed = edits.filter((e) => EMOJI.test(e.body) && !EMOJI.test(e.final_body)).length;
+  const added = window.filter((e) => !EMOJI.test(e.body) && EMOJI.test(e.final_body)).length;
+  const removed = window.filter((e) => EMOJI.test(e.body) && !EMOJI.test(e.final_body)).length;
   if (profile.emoji === "never" && added >= MIN_EVIDENCE) {
-    proposals.push({ key: "emoji:rare", dimension: "emoji", value: "rare", evidenceCount: added });
+    proposals.push({ key: "emoji:rare", dimension: "emoji", value: "rare", evidenceCount: added, windowSize: window.length });
   }
   if (profile.emoji !== "never" && removed >= MIN_EVIDENCE) {
-    proposals.push({ key: "emoji:never", dimension: "emoji", value: "never", evidenceCount: removed });
+    proposals.push({ key: "emoji:never", dimension: "emoji", value: "never", evidenceCount: removed, windowSize: window.length });
   }
 
   // Length: edits keep cutting the draft down substantially.
@@ -86,7 +116,7 @@ export function deriveVoiceProposals(
   };
   const target = profile.sentence_length ? shorterStep[profile.sentence_length] : null;
   if (target) {
-    const shortened = edits.filter(
+    const shortened = window.filter(
       (e) =>
         e.body.length > 0 &&
         e.final_body.length > 0 &&
@@ -98,9 +128,12 @@ export function deriveVoiceProposals(
         dimension: "sentence_length",
         value: target,
         evidenceCount: shortened,
+        windowSize: window.length,
       });
     }
   }
 
-  return proposals.filter((p) => !(p.key in decisions));
+  return proposals.filter(
+    (p) => !(p.key in decisions) && !(`never:${p.dimension}` in decisions)
+  );
 }

@@ -29,6 +29,8 @@ import {
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
+import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
+import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -285,13 +287,20 @@ export function InboxApp({
   }, [openId]);
 
   const timeZone = freelancer.timezone || "Europe/Amsterdam";
+  const quietDays = resolveQuietDays(freelancerState.followup_quiet_days);
   const placements = useMemo(() => {
     const map: Record<string, QueuePlacement> = {};
     for (const inquiry of inquiries ?? []) {
-      map[inquiry.id] = placeInquiry(inquiry, replyDrafts[inquiry.id] ?? null, now, timeZone);
+      map[inquiry.id] = placeInquiry(
+        inquiry,
+        replyDrafts[inquiry.id] ?? null,
+        now,
+        timeZone,
+        quietDays
+      );
     }
     return map;
-  }, [inquiries, replyDrafts, now, timeZone]);
+  }, [inquiries, replyDrafts, now, timeZone, quietDays]);
 
   const queueCounts = useMemo(() => {
     const counts = Object.fromEntries(QUEUE_ORDER.map((q) => [q, 0])) as Record<QueueKey, number>;
@@ -721,6 +730,20 @@ export function InboxApp({
         </details>
       )}
 
+      {(open.status === "nudge_due" || open.status === "replied") && (
+        <FollowupScheduleCard
+          locale={freelancer.locale}
+          timeline={deriveFollowupTimeline(
+            open,
+            allDrafts
+              .filter((d) => d.inquiry_id === open.id && d.kind === "nudge")
+              .map((d) => ({ outcome: d.outcome, body: d.body })),
+            now
+          )}
+          quietDays={quietDays}
+        />
+      )}
+
       <div
         role="group"
         aria-label={t.schedule.group}
@@ -907,6 +930,43 @@ export function InboxApp({
                 .from("freelancers")
                 .update({ permission_levels: levels })
                 .eq("auth_user_id", session.user.id);
+            }}
+          />
+        )}
+
+        {!testMode && (
+          <MemoryListCard
+            freelancer={freelancerState}
+            onApply={async (change) => {
+              const update: Record<string, unknown> = {};
+              if (change.profile) update.voice_profile = change.profile;
+              if (change.decisions) update.voice_proposal_decisions = change.decisions;
+              if (change.paused !== undefined) update.voice_learning_paused = change.paused;
+              setFreelancerState((f) => ({
+                ...f,
+                voice_profile: (change.profile ?? f.voice_profile) as Record<string, unknown> | null,
+                voice_proposal_decisions: change.decisions ?? f.voice_proposal_decisions,
+                voice_learning_paused: change.paused ?? f.voice_learning_paused,
+              }));
+              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
+            }}
+          />
+        )}
+
+        {!testMode && (
+          <FollowupSettingsCard
+            freelancer={freelancerState}
+            quietDays={quietDays}
+            onChange={async (change) => {
+              const update: Record<string, unknown> = {};
+              if (change.quietDays !== undefined) update.followup_quiet_days = change.quietDays;
+              if (change.paused !== undefined) update.followups_paused = change.paused;
+              setFreelancerState((f) => ({
+                ...f,
+                followup_quiet_days: change.quietDays ?? f.followup_quiet_days,
+                followups_paused: change.paused ?? f.followups_paused,
+              }));
+              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
             }}
           />
         )}
