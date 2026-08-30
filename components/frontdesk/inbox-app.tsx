@@ -20,6 +20,15 @@ import {
 import { deriveGmailHealth, type GmailConnectionRow } from "@/lib/frontdesk/connectionHealth";
 import type { GapPackage } from "@/lib/frontdesk/packageGaps";
 import { buildTestFixture, testRegeneratedBody } from "@/lib/frontdesk/testFixture";
+import {
+  ActivityLogCard,
+  AgentProgress,
+  ApprovalContract,
+  EvidenceList,
+  PermissionMatrixCard,
+} from "@/components/frontdesk/agent-surfaces";
+import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
+import { deriveActivity } from "@/lib/frontdesk/activity";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -56,6 +65,7 @@ interface DraftRow {
   body: string;
   final_body?: string | null;
   outcome: string | null;
+  outcome_at?: string | null;
   dismiss_reason?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
@@ -220,7 +230,7 @@ export function InboxApp({
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
-      .select("id, inquiry_id, kind, body, final_body, outcome, dismiss_reason, created_at, language, validation_status, validation_failures")
+      .select("id, inquiry_id, kind, body, final_body, outcome, outcome_at, dismiss_reason, created_at, language, validation_status, validation_failures")
       .order("created_at", { ascending: false });
     if (draftsError) {
       setLoadError(true);
@@ -561,6 +571,8 @@ export function InboxApp({
         </div>
       )}
 
+      <EvidenceList locale={freelancer.locale} items={deriveInquiryEvidence(open)} />
+
       {openDraft && openDraft.validation_status === "failed" ? (
         <div
           role="alert"
@@ -575,6 +587,10 @@ export function InboxApp({
               <li key={code}>{validationReason(code, d)}</li>
             ))}
           </ul>
+          <AgentProgress
+            locale={freelancer.locale}
+            states={{ received: "done", drafting: "done", checks: "failed", ready: "pending" }}
+          />
           <button
             type="button"
             disabled={regenerating}
@@ -672,10 +688,15 @@ export function InboxApp({
             </div>
           )}
           <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.copyHint}</p>
+          <ApprovalContract locale={freelancer.locale} hasRecipient={Boolean(open.client_email)} />
         </div>
       ) : (
         <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--fd-line)] p-5">
           <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.draftPending}</p>
+          <AgentProgress
+            locale={freelancer.locale}
+            states={{ received: "done", drafting: "active", checks: "pending", ready: "pending" }}
+          />
           <button
             type="button"
             disabled={regenerating}
@@ -863,6 +884,31 @@ export function InboxApp({
             await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
           }}
         />
+        )}
+
+        {inquiries.length > 0 && (
+          <ActivityLogCard
+            locale={freelancer.locale}
+            entries={deriveActivity(inquiries, allDrafts)}
+            onOpenInquiry={(id) => {
+              const inquiry = inquiries.find((i) => i.id === id);
+              if (inquiry) openDetail(inquiry);
+            }}
+          />
+        )}
+
+        {!testMode && (
+          <PermissionMatrixCard
+            locale={freelancer.locale}
+            stored={freelancerState.permission_levels}
+            onChange={async (levels) => {
+              setFreelancerState((f) => ({ ...f, permission_levels: levels }));
+              await sb
+                .from("freelancers")
+                .update({ permission_levels: levels })
+                .eq("auth_user_id", session.user.id);
+            }}
+          />
         )}
 
         {inquiries.length === 0 ? (
