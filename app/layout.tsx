@@ -36,6 +36,10 @@ const fraunces = Fraunces({
 // English, because that is what is prerendered and what crawlers see. The
 // Dutch title is applied on the client once the visitor's choice is known.
 export const metadata: Metadata = {
+  // Canonicals resolve per page against the real origin (§23.3); "./" makes
+  // each route its own canonical without per-page boilerplate.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://frlns.com"),
+  alternates: { canonical: "./" },
   title: en.meta.home.title,
   description: en.meta.home.description,
 };
