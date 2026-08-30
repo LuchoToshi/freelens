@@ -154,13 +154,122 @@ const en = {
       body: "Scheduled, due, snoozed and completed follow-ups will live here as one workflow. Today, due follow-ups appear in the inbox queue.",
       cta: "Open follow-up queue",
     },
-    checklist: {
-      heading: "Go live",
-      bio: "Put your link in your bio",
-      bioDone: "Done",
-      test: "Send a test inquiry from your own page",
+    readiness: {
+      heading: "Ready to go live",
+      requiredHint:
+        "These are required before FrontDesk drafts replies for you. Each one names what it unblocks.",
+      optionalHeading: "Improves quality",
+      linkDone: "Done",
       openPage: "Open your page",
-      reply: "Send your first real reply",
+      items: {
+        package: {
+          label: "At least one package with an exact price",
+          why: "Drafts may only quote prices you set: without a package, no draft can mention money. Edit them in Settings.",
+        },
+        voice: {
+          label: "Confirmed voice profile",
+          why: "Without it a draft sounds like software, not like you. Confirm it in Settings.",
+        },
+        link: {
+          label: "Put your link in your bio",
+          why: "Inquiries can only arrive through your public page. Until the link is out there, nothing reaches this inbox.",
+        },
+        testInquiry: {
+          label: "Send a test inquiry from your own page",
+          why: "See exactly what a client sees, before a real one does.",
+        },
+        firstReply: {
+          label: "Send your first real reply",
+          why: "The whole loop, once: review the draft, make it yours, send it.",
+        },
+        gmail: {
+          label: "Connect Gmail",
+          why: "Lets FrontDesk watch threads for replies. Nothing is ever sent for you.",
+        },
+      },
+      gaps: {
+        heading: "Worth a look",
+        noPackages: "No packages yet, so drafts cannot mention any price until you add one.",
+        unpricedPackage: "\u201c{label}\u201d has no exact price, so drafts cannot quote it.",
+        uncoveredType:
+          "You keep getting {type} inquiries, but no package mentions it. A matching package helps drafts quote the right price.",
+      },
+    },
+    voiceLearning: {
+      heading: "Voice learning",
+      pausedNote: "Learning is paused. Your edits are not being analysed.",
+      pause: "Pause learning",
+      resume: "Resume learning",
+      accept: "Apply",
+      reject: "No thanks",
+      evidence: "Seen in {n} of your edited replies.",
+      proposeSignOff: "End replies with \u201c{value}\u201d?",
+      proposeRareEmoji: "Allow an occasional emoji?",
+      proposeNoEmoji: "Keep drafts emoji-free?",
+      proposeShorter: "Make drafts a step shorter?",
+    },
+    connection: {
+      heading: "Gmail connection",
+      connect: "Connect Gmail",
+      connecting: "Connecting\u2026",
+      lastSync: "Last successful sync: {date}.",
+      neverSynced: "No sync has happened yet.",
+      states: {
+        connected: {
+          happened: "Gmail is connected.",
+          affected: "Threads are being watched for replies.",
+          unaffected: "Nothing is ever sent for you.",
+          next: "Nothing to do.",
+        },
+        connecting: {
+          happened: "Connecting to Gmail\u2026",
+          affected: "Threads are not being watched yet.",
+          unaffected: "Your inquiries, drafts and packages are unaffected.",
+          next: "This usually takes a few seconds.",
+        },
+        expired: {
+          happened: "Google signed the connection out.",
+          affected: "No thread has been read since then.",
+          unaffected: "Your inquiries, drafts and packages are all intact; nothing was sent.",
+          next: "Reconnect when convenient. Inquiries through your public link keep arriving either way.",
+        },
+        revoked: {
+          happened: "Access was revoked on Google's side.",
+          affected: "Threads are no longer being watched.",
+          unaffected: "Your inquiries, drafts and packages are all intact; nothing was sent.",
+          next: "Reconnect to resume watching threads.",
+        },
+        partial: {
+          happened: "Part of the last sync failed.",
+          affected: "Some threads may be out of date.",
+          unaffected: "Everything already in your inbox is intact.",
+          next: "The next sync retries automatically.",
+        },
+        rate_limited: {
+          happened: "Google is rate-limiting requests.",
+          affected: "Syncing is temporarily slowed.",
+          unaffected: "Nothing is lost; reading resumes on its own.",
+          next: "No action needed.",
+        },
+        stale: {
+          happened: "No successful sync in over a day.",
+          affected: "New replies in Gmail may not be visible here yet.",
+          unaffected: "Your inquiries, drafts and packages are unaffected.",
+          next: "If this persists, reconnect Gmail.",
+        },
+        reconnecting: {
+          happened: "Re-establishing the connection\u2026",
+          affected: "Threads are not being watched right now.",
+          unaffected: "Everything already here is intact.",
+          next: "This resolves on its own.",
+        },
+        disconnected: {
+          happened: "Gmail is not connected.",
+          affected: "Threads are not watched for replies.",
+          unaffected: "Inquiries through your public link arrive either way; nothing is ever sent for you.",
+          next: "Connect when you want replies tracked automatically.",
+        },
+      },
     },
     status: {
       new: "New",
@@ -328,7 +437,7 @@ const en = {
     },
     packages: {
       heading: "Your packages",
-      hint: "Drafts only ever use these prices, nothing is invented \u2014 add-ons included. At least one package to continue.",
+      hint: "Drafts only ever use these prices, nothing is invented, add-ons included. At least one package to continue.",
       labelLabel: "Name",
       priceLabel: "From (\u20ac)",
       unitLabel: "Unit (optional)",
@@ -490,13 +599,122 @@ const nl: typeof en = {
       body: "Geplande, openstaande, gesnoozde en afgeronde opvolgers komen hier samen in een werkstroom. Vandaag vind je openstaande opvolgers in de inbox.",
       cta: "Open de opvolgerslijst",
     },
-    checklist: {
-      heading: "Ga live",
-      bio: "Zet je link in je bio",
-      bioDone: "Gedaan",
-      test: "Doe een testaanvraag via je eigen pagina",
+    readiness: {
+      heading: "Klaar om live te gaan",
+      requiredHint:
+        "Deze zijn nodig voordat FrontDesk antwoorden voor je klaarzet. Elk punt vertelt wat het vrijspeelt.",
+      optionalHeading: "Maakt het beter",
+      linkDone: "Gedaan",
       openPage: "Open je pagina",
-      reply: "Verstuur je eerste echte antwoord",
+      items: {
+        package: {
+          label: "Minstens \u00e9\u00e9n pakket met een exacte prijs",
+          why: "Concepten mogen alleen prijzen noemen die jij instelt: zonder pakket kan geen concept over geld beginnen. Aanpassen kan bij Instellingen.",
+        },
+        voice: {
+          label: "Bevestigd stemprofiel",
+          why: "Zonder klinkt een concept als software, niet als jij. Bevestigen kan bij Instellingen.",
+        },
+        link: {
+          label: "Zet je link in je bio",
+          why: "Aanvragen komen alleen binnen via je eigen pagina. Zolang de link nergens staat, bereikt niets deze inbox.",
+        },
+        testInquiry: {
+          label: "Doe een testaanvraag via je eigen pagina",
+          why: "Zie precies wat een klant ziet, voordat een echte dat doet.",
+        },
+        firstReply: {
+          label: "Verstuur je eerste echte antwoord",
+          why: "De hele cirkel, \u00e9\u00e9n keer: concept nalezen, van jou maken, versturen.",
+        },
+        gmail: {
+          label: "Koppel Gmail",
+          why: "Laat FrontDesk gesprekken volgen op antwoorden. Er wordt nooit iets voor je verstuurd.",
+        },
+      },
+      gaps: {
+        heading: "Het bekijken waard",
+        noPackages: "Nog geen pakketten, dus concepten kunnen geen prijs noemen tot je er een toevoegt.",
+        unpricedPackage: "\u201c{label}\u201d heeft geen exacte prijs, dus concepten kunnen die niet noemen.",
+        uncoveredType:
+          "Je krijgt steeds aanvragen voor {type}, maar geen pakket noemt het. Een passend pakket helpt concepten de juiste prijs te noemen.",
+      },
+    },
+    voiceLearning: {
+      heading: "Stem leren",
+      pausedNote: "Leren staat op pauze. Je bewerkingen worden niet geanalyseerd.",
+      pause: "Leren pauzeren",
+      resume: "Leren hervatten",
+      accept: "Toepassen",
+      reject: "Nee, bedankt",
+      evidence: "Gezien in {n} van je bewerkte antwoorden.",
+      proposeSignOff: "Antwoorden afsluiten met \u201c{value}\u201d?",
+      proposeRareEmoji: "Af en toe een emoji toestaan?",
+      proposeNoEmoji: "Concepten emoji-vrij houden?",
+      proposeShorter: "Concepten een stap korter maken?",
+    },
+    connection: {
+      heading: "Gmail-koppeling",
+      connect: "Koppel Gmail",
+      connecting: "Verbinden\u2026",
+      lastSync: "Laatste geslaagde synchronisatie: {date}.",
+      neverSynced: "Er is nog geen synchronisatie geweest.",
+      states: {
+        connected: {
+          happened: "Gmail is gekoppeld.",
+          affected: "Gesprekken worden gevolgd op antwoorden.",
+          unaffected: "Er wordt nooit iets voor je verstuurd.",
+          next: "Niets te doen.",
+        },
+        connecting: {
+          happened: "Verbinden met Gmail\u2026",
+          affected: "Gesprekken worden nog niet gevolgd.",
+          unaffected: "Je aanvragen, concepten en pakketten blijven ongemoeid.",
+          next: "Dit duurt meestal een paar seconden.",
+        },
+        expired: {
+          happened: "Google heeft de koppeling uitgelogd.",
+          affected: "Sindsdien is geen gesprek meer gelezen.",
+          unaffected: "Je aanvragen, concepten en pakketten zijn allemaal intact; er is niets verstuurd.",
+          next: "Koppel opnieuw wanneer het uitkomt. Aanvragen via je eigen link blijven sowieso binnenkomen.",
+        },
+        revoked: {
+          happened: "Toegang is aan de kant van Google ingetrokken.",
+          affected: "Gesprekken worden niet meer gevolgd.",
+          unaffected: "Je aanvragen, concepten en pakketten zijn allemaal intact; er is niets verstuurd.",
+          next: "Koppel opnieuw om gesprekken weer te volgen.",
+        },
+        partial: {
+          happened: "Een deel van de laatste synchronisatie is mislukt.",
+          affected: "Sommige gesprekken kunnen verouderd zijn.",
+          unaffected: "Alles wat al in je inbox staat is intact.",
+          next: "De volgende synchronisatie probeert het automatisch opnieuw.",
+        },
+        rate_limited: {
+          happened: "Google beperkt tijdelijk het aantal verzoeken.",
+          affected: "Synchroniseren gaat tijdelijk langzamer.",
+          unaffected: "Er gaat niets verloren; lezen gaat vanzelf verder.",
+          next: "Geen actie nodig.",
+        },
+        stale: {
+          happened: "Al meer dan een dag geen geslaagde synchronisatie.",
+          affected: "Nieuwe antwoorden in Gmail zijn hier mogelijk nog niet zichtbaar.",
+          unaffected: "Je aanvragen, concepten en pakketten blijven ongemoeid.",
+          next: "Houdt dit aan, koppel Gmail dan opnieuw.",
+        },
+        reconnecting: {
+          happened: "De verbinding wordt hersteld\u2026",
+          affected: "Gesprekken worden nu even niet gevolgd.",
+          unaffected: "Alles wat hier al staat is intact.",
+          next: "Dit lost zichzelf op.",
+        },
+        disconnected: {
+          happened: "Gmail is niet gekoppeld.",
+          affected: "Gesprekken worden niet gevolgd op antwoorden.",
+          unaffected: "Aanvragen via je eigen link komen sowieso binnen; er wordt nooit iets voor je verstuurd.",
+          next: "Koppel wanneer je antwoorden automatisch wilt volgen.",
+        },
+      },
     },
     status: {
       new: "Nieuw",
@@ -664,7 +882,7 @@ const nl: typeof en = {
     },
     packages: {
       heading: "Jouw pakketten",
-      hint: "Concepten gebruiken alleen deze prijzen, er wordt nooit een bedrag verzonnen \u2014 ook voor extra opties. Minstens \u00e9\u00e9n pakket om verder te gaan.",
+      hint: "Concepten gebruiken alleen deze prijzen, er wordt nooit een bedrag verzonnen, ook niet voor extra opties. Minstens \u00e9\u00e9n pakket om verder te gaan.",
       labelLabel: "Naam",
       priceLabel: "Vanaf (\u20ac)",
       unitLabel: "Eenheid (optioneel)",
