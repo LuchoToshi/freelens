@@ -65,3 +65,51 @@ Baseline before Phase 1: 38 files, 500 tests, all green.
 2. Re-run `scripts/verify-frontdesk-rls.mjs --yes` after the migration
    (spec §24.5). Not run now: the script creates/deletes production test
    users and the schema is unchanged until 0010 lands.
+
+## Phase 2 — shell, queue, workspace, accessibility baseline (30 Aug 2026)
+
+**Decisions applied** (owner said "go on" against the register's stated
+options): DEC-2 (a) `/inbox` stays canonical; DEC-4 (a) `freelancers.timezone`
+added (migration 0011, nullable, Europe/Amsterdam fallback); DEC-6 safe
+default (a) `?i=<id>` deep links, plus `?queue=<key>`.
+
+**Shipped:**
+- `lib/frontdesk/queue.ts`: the fixed seven-queue priority model as a pure
+  function — `now` injected (D23), overdue derived at read time in the
+  freelancer's timezone (D22/DEC-4), every placement carries a reason key
+  and an action key. 10 unit tests including a timezone-midnight case.
+- Migration 0011: `freelancers.timezone` + `inquiries.snoozed_until`.
+  Additive, reversible. SAME GATE AS 0010: apply before merge.
+- `AppShell`: five destinations, left rail ≥ lg, bottom bar below.
+  `/clients` and `/follow-ups` exist as honest not-built-yet destinations
+  with scope, the blocking decision named, and a real next action —
+  registered in `chromeVariant` so no Freelens chrome leaks (spec §"what
+  would break").
+- Inbox: queue tabs with real counts (all seven, zero included); search /
+  sort (urgency, newest, event date) / type filter / reset; rows lead with
+  the plain-language next action, carry who/what/when/value, the due label
+  in relative words PLUS the exact date, and the reason the item is there;
+  per-queue and filtered empty states, each with a next action.
+- Detail: Schedule group (snooze 3 days / unsnooze); booked/lost now
+  two-step confirmed inline (§7.7: outcomes are never one accidental
+  click); "Why this draft" disclosure naming language detection and the
+  deterministic checks.
+- §26.1 height chain: at lg the page is `h-dvh overflow-hidden` and each
+  pane scrolls internally with `min-h-0`.
+
+**Deviations, recorded:**
+- Breakpoint is lg (1024px), not the spec's 860px — the audit branch's
+  two-pane already breaks at lg and one boundary beats two.
+- Value sort omitted from the sort menu for now (budget_band is a coarse
+  4-value enum; the sorter exists in code).
+- "Agent monitoring" holds only freshly-submitted inquiries while their
+  draft generates; nothing else produces that state yet, and its empty
+  state says so rather than inventing occupants.
+- No DOM-level regression test for the height chain: the repo has no
+  component-test environment. The queue model carries the behavioural
+  tests; the height chain needs the manual pass below.
+
+**GATE — before merge (cumulative with Phase 1):** apply 0010 AND 0011,
+then re-run the RLS script. Manual visual pass on /inbox at 1440px and
+375px (tabs, two-pane scrolling, snooze, confirm flow) — still nobody has
+seen these pixels.
