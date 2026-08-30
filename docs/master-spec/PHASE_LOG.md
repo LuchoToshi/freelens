@@ -268,3 +268,75 @@ voice_profile jsonb). Migration 0012 applied to production (additive,
 **Not merged.** Cumulative gate for merge: none remaining beyond review —
 0010–0012 are applied, RLS is green, visual pass done at both widths for
 Phases 2 and 3 surfaces.
+
+---
+
+## Phase 4 — Provenance, approval, permissions, activity (§8, §9, §28)
+
+**DECISION GATES:** DEC-1 **(a) cap at 3** for confirm-a-date, state-a-price
+and close-a-lead (recommended = safe default; encoded as unraisable
+ceilings in `lib/frontdesk/permissions.ts`). DEC-16 **(a) never** — the
+safe default, and moot in code: nothing queues a send today; the mailto
+model means Freelens never sends at all, and the approval contract says
+exactly that before the buttons.
+
+**Shipped, in dependency order (one commit per unit):**
+1. `lib/frontdesk/permissions.ts` — five levels per action, ceilings per
+   §8.4, DEC-8 conservative defaults. Enforcement is at CONSUMPTION:
+   `effectiveLevel()` clamps whatever is stored, so a raw API write of
+   level 5 never takes effect — that is the §30 security property.
+   Security tests cover tampered values, garbage jsonb, and every
+   ceiling. Verified live: with `prepare_reply` stored at 1, the
+   regenerate API refuses with `not_permitted` (server-side, in the
+   single draft funnel, so submit and cron are covered identically).
+2. Migration **0013** (additive): `freelancers.permission_levels`,
+   `drafts.dismiss_reason` (the 0005 vocabulary). Applied to production
+   via `db push` (dry-run first); RLS suite re-run: **12/12 PASS**.
+   Skipping a draft now requires one of the four §6.11 reasons — the UI
+   cannot record a skip without one; verified persisted
+   (`skipped | wrong_timing`).
+3. `lib/frontdesk/provenance.ts` — the eight §9 kinds; inquiry fields
+   carry `inquiry`, absences are `missing` ("Not stated", never blank or
+   inferred), extractions are `interpretation` with whole-percent
+   confidence, and an extraction contradicting a typed field is a
+   `conflict` carrying both sides. + tests.
+4. `lib/frontdesk/activity.ts` — §28 entries derived at read time from
+   existing rows: the no-sensitive-content rule is structural (nothing is
+   stored, nothing sensitive is ever put in), and no event gets an
+   invented timestamp. + tests.
+5. `components/frontdesk/agent-surfaces.tsx` — ProvenanceChip (label +
+   monospace glyph + aria, never colour alone) and EvidenceList in the
+   detail pane; the §8.5 ApprovalContract (what happens on send, what
+   stays with the user, reversibility) above the never-pre-selected
+   buttons; AgentProgress naming real stages in the pending and failed
+   draft states; PermissionMatrixCard (all nine actions, selects
+   physically end at the ceiling — verified in-browser: send max 4,
+   date/price/close max 3); ActivityLogCard, filterable, entries
+   deep-link into the inquiry. Full EN/NL; parity walker green (one
+   loanword allowlisted: "Budget").
+
+**Verification:** 563 tests green (permissions 6, provenance 6, activity
+4, plus the dismiss-flow wiring); tsc and eslint clean. Live pass on the
+local stack: evidence list with chips on a real inquiry, approval
+contract rendered, dismiss flow end-to-end (reason required → stored →
+activity entry "(not the right moment)"), matrix ceilings in the DOM,
+permission enforcement refusing a level-1 regenerate.
+
+**Deviations / flagged ambiguities:**
+- `agent_project_evidence` is deny-all for clients (RLS with no user
+  policy, by design — Track B is server-side). The EvidenceList
+  therefore renders the readable kinds today (inquiry / missing /
+  conflict-capable) and consumes evidence-shaped rows through the same
+  renderer the moment a server surface supplies them; `connected` and
+  `suggestion` have no producer while Gmail is CASA-gated.
+- PermissionMatrix and ActivityLog live as collapsible cards in the
+  inbox list column — the shell has no separate settings page beyond the
+  setup wizard; recorded rather than inventing a new route.
+- `status.changed` for booked/lost is not narrated: `inquiries` stores
+  no timestamp for it, and the log never invents one. Candidate for a
+  future additive column.
+- The §30 "revocation cancels queued actions" test has no subject:
+  nothing queues actions yet. Revocation today = lowering a level, which
+  takes effect on the very next pipeline call (verified live).
+
+**Not merged.** Migrations 0010–0013 applied; RLS green after each.
