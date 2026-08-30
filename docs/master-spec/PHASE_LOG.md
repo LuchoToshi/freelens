@@ -340,3 +340,64 @@ permission enforcement refusing a level-1 regenerate.
   takes effect on the very next pipeline call (verified live).
 
 **Not merged.** Migrations 0010–0013 applied; RLS green after each.
+
+---
+
+## Phase 5 — Follow-ups, learning, memory (§11, §12)
+
+**DECISION GATES:** DEC-7 **(a) 3 occurrences within the last 5
+comparable drafts** (recommended = safe default; encoded as the window in
+`voiceLearning.ts`). DEC-11 recorded as **(a) email match + (c) manual
+merge** per the register's resolution — its subject (the Clients area) is
+not in the Phase 5 scope line and remains the honest not-built page;
+nothing implemented against it.
+
+**Shipped, in dependency order:**
+1. `lib/frontdesk/followups.ts` — the eligibility verdict extracted from
+   the cron, pure and tested: per-freelancer quiet window (migration
+   0014: `followup_quiet_days` 1–14, `followups_paused`), the 2-nudge
+   cap, the global pause, the per-inquiry snooze (a real gap: the old
+   sweep ignored `snoozed_until` entirely), sample exclusion, and the
+   structural idempotency guard (§11.7 test: once nudge_due, never a
+   candidate). The cron now consults the freelancer join and the verdict.
+2. DEC-7 in `voiceLearning.ts`: proposals need 3 of the last 5 edited
+   drafts (window test proves old habits outside the window cannot
+   vote); decisions upgraded to objects retaining the prior value
+   (§12.6 reversibility) and the evidence count — Phase 3's bare-string
+   shape still reads; `never:<dimension>` blocks a dimension for good.
+3. `lib/frontdesk/memory.ts` + `MemoryListCard` — settings and learned
+   preferences visually distinct (§12.3), learned items carry evidence
+   counts and offer revert ("that was a one-off"), never-learn, pause /
+   resume, and a two-step reset that reverts every accepted value to its
+   retained prior and never touches typed settings. A hand-edited
+   dimension counts as a setting again (tested).
+4. `FollowupScheduleCard` in the detail pane for replied/nudge_due
+   inquiries: cap usage, current state (§11.2 vocabulary where a
+   producer exists), why-this-timing naming the freelancer's own
+   cadence, and the standing brakes. `FollowupSettingsCard`: cadence
+   select (1–14 days) and the global pause. Queue placement uses the
+   same cadence, so due labels and the cron agree.
+
+**Verification:** 578 tests green (followups 9, memory 4, voice-learning
+rewritten for DEC-7); tsc and eslint clean. Live pass: schedule card
+rendering cap/state/brakes on a real nudge_due inquiry; changing the
+cadence to 7 updated the why-line immediately and persisted
+(`followup_quiet_days: 7` read back); memory list rendered settings with
+badges on a partial profile; all four collapsible cards coexist.
+Migration 0014 applied to production (dry-run first); RLS suite:
+**12/12 PASS**.
+
+**Deviations / flagged ambiguities:**
+- "Client replies" and "client declines" stop conditions need Gmail
+  (CASA) and NLP ([PROPOSED]); per §11.4 the cap and manual approval
+  remain the safety net. `sent`/`scheduled`/`approved` timeline states
+  with no producer are not invented.
+- Working hours and timezone-aware cron comparisons (§11.5): the sweep
+  still compares in UTC; the freelancer-facing due labels are
+  timezone-aware (Phase 2). Recorded, not silently fixed — a cron
+  re-run per timezone is a larger change than this phase warrants.
+- Learned-preference detection stays deterministic (sign-off, emoji,
+  length); `agent_user_corrections` (0005) as the long-term home is
+  deferred until a server-side learning pass exists.
+
+**Not merged.** Migrations 0010–0014 applied; RLS green after each.
