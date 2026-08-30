@@ -401,3 +401,55 @@ Migration 0014 applied to production (dry-run first); RLS suite:
   deferred until a server-side learning pass exists.
 
 **Not merged.** Migrations 0010–0014 applied; RLS green after each.
+
+---
+
+## Phase 6 — Mobile, responsive, performance (§21, §6.16)
+
+**Shipped:**
+- `MobileApprovalSheet` behavior (§6.16): below lg the approval actions
+  are stacked, full-width, 52px targets — send / copy / skip (reason
+  flow unchanged) / an explicit "Decide later" that closes the sheet and
+  keeps the item queued. The explicit back action for the collapsed
+  two-pane already existed and is verified.
+- Safe areas (§21.2): `viewport-fit=cover` via the layout's viewport
+  export; the fixed bottom bar and the content's bottom padding both pad
+  by `env(safe-area-inset-bottom)`.
+- Virtual-keyboard hygiene: every text input in the authenticated app
+  renders 16px below `sm` (14px from `sm` up), so iOS no longer zooms
+  the layout on focus — wizard, voice mirror, profession picker, inbox
+  search/sort/type and the draft textarea. The public form and login
+  were already 16px. Mobile surfaces scroll the page normally (no
+  dvh/overflow traps below lg), which is what keeps the textarea and
+  the submit reachable with the keyboard open.
+- Long-Dutch-string audit at 375, NL locale, all cards expanded, via an
+  in-page overflow scanner. Found and fixed:
+  - P2: bottom-bar labels ("Instellingen") overflowing the viewport;
+    compact text-xs items below lg (also cures the earlier
+    "Follow-ups" two-line wrap).
+  - P2: the evidence list showed the raw event-type value ("business")
+    instead of the NL label ("Zakelijk").
+  - **P1 (pre-existing, Phase 2): a deep-linked open (`?i=`) never
+    initialized the draft textarea — copy/send acted on an empty
+    body.** Fixed with a once-per-open initializer keyed to the draft's
+    async arrival; regenerate/openDetail paths unchanged. Verified
+    live: deep-linked open now fills the textarea.
+  - Public page: only "overflow" is the off-canvas honeypot (by
+    design); submit is 48px and never obscured; setup and test mode
+    clean.
+- Performance (§21.3): motion audit — all animation goes through the
+  shared grammar (opacity + transform only, reduced-motion collapse);
+  zero `transition-all`; no hover-only interactions (hover states are
+  affordances on tappable controls).
+
+**Verification:** 578 tests green, tsc and eslint clean; live NL pass at
+375 on inbox (list, detail, all four cards), test mode, public page,
+setup; viewport meta and safe-area classes confirmed in the DOM.
+
+**Remaining manual items (need a physical device, flagged per §30):**
+- Complete one approval on a real phone (the spec's MANUAL REVIEW item).
+- 60fps confirmation on a mid-range Android.
+Both are user-hands checks; everything code-side that they exercise is
+covered above.
+
+**Not merged.**
