@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
@@ -309,8 +310,7 @@ export function SetupWizard({
             <span className={labelClass}>{t.profile.photoLabel}</span>
             <div className="flex items-center gap-3">
               {photoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element -- tiny avatar preview
-                <img src={photoUrl} alt="" className="size-14 rounded-full border border-[var(--fd-line)] object-cover" />
+                <Image src={photoUrl} alt="" width={56} height={56} className="size-14 rounded-full border border-[var(--fd-line)] object-cover" />
               )}
               <input
                 type="file"
