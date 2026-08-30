@@ -66,6 +66,7 @@ export interface FreelancerRow {
   photo_url: string | null;
   locale: FrontdeskLocale;
   sign_off: string | null;
+  timezone: string | null;
   voice_profile: Record<string, unknown> | null;
   link_in_bio_confirmed_at: string | null;
 }
@@ -99,7 +100,7 @@ export function AuthGate({
       const { data } = await sb
         .from("freelancers")
         .select(
-          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, voice_profile, link_in_bio_confirmed_at"
+          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, timezone, voice_profile, link_in_bio_confirmed_at"
         )
         .maybeSingle();
       if (cancelled) return;
