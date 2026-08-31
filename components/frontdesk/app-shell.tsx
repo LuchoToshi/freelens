@@ -15,6 +15,7 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
  * real destinations with honest not-built-yet pages, not dead links.
  */
 const DESTINATIONS = [
+  { key: "home", href: "/home" },
   { key: "inbox", href: "/inbox" },
   { key: "clients", href: "/clients" },
   { key: "followups", href: "/follow-ups" },
