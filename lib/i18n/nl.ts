@@ -354,6 +354,46 @@ export const nl: DeepPartial<typeof en> = {
     },
 
     frontdesk: {
+      agent: {
+        heroEyebrow: "Je frontdesk, uit handen",
+        heroTitle: "Geef de balie uit handen. Hou de beslissingen.",
+        heroSub:
+          "Freelens leest elke aanvraag, plant het werk en zet de antwoorden klaar in jouw stem. Prijzen, datums en versturen blijven van jou.",
+        heroCta: "Vraag een uitnodiging",
+        heroCtaTry: "Zie hoe het werkt",
+        exampleLabel: "Jij vraagt. Het plant. Jij keurt goed.",
+        askLabel: "Jij vraagt",
+        ask: "Ga achter de stille leads van maart aan.",
+        planLabel: "Freelens plant",
+        planSteps: [
+          "4 stille gesprekken gevonden. Geen daarvan heeft afgezegd.",
+          "Voor elk een persoonlijke opvolging opstellen, alleen jouw prijzen en stem.",
+          "Jij leest na en verstuurt. Daarvoor beweegt er niets.",
+        ],
+        resultLabel: "Een week later",
+        result: "Twee reacties, één boeking. Elk concept kon je eerst aanpassen.",
+        approveNote: "Jij keurt goed voordat er iets beweegt.",
+        objections: [
+          {
+            q: "Verstuurt het zelf dingen?",
+            a: "Nee. Het zet klaar; jij verstuurt. Versturen, prijzen, datums en een lead sluiten zitten achter een plafond dat geen instelling opent.",
+          },
+          {
+            q: "Wat kan het eigenlijk zien?",
+            a: "Je aanvraagpagina en je eigen accountgegevens. Bij elk feit staat waar het vandaan komt, en wat leeg is blijft leeg in plaats van een gok te worden.",
+          },
+          {
+            q: "En als het iets fout heeft?",
+            a: "Jij ziet het concept als eerste. Sla het over met een reden en het leert ervan; pas het aan en jouw versie is wat de deur uitgaat. Van één bewerking maakt het nooit een regel.",
+          },
+        ],
+        followupQ: "Moet ik er dan constant bovenop zitten?",
+        followupA:
+          "Juist niet. Het laat de uitzonderingen zien: wat een beslissing nodig heeft, wat wacht, wat vanzelf liep. Een stil scherm betekent dat niets jou nodig heeft.",
+        waitlistHeading: "Alleen op uitnodiging, met opzet.",
+        waitlistSub:
+          "We openen een paar frontdesks tegelijk, zodat elke goed wordt ingericht. Zet je op de lijst, dan sturen we een uitnodiging als jij aan de beurt bent.",
+      },
       heroEyebrow: "Je front desk",
       heroTitle: "Verlies geen klussen meer aan een traag antwoord.",
       heroSub:
