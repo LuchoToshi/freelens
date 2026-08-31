@@ -604,3 +604,41 @@ platform doesn't expose to clients; policy + revoke-others shipped.
 
 Remaining round scope (A2 home, A3 intake, A4 setup-prefill, A5
 marketing, A6 rules): next units.
+
+## A2 — Agent-led home (addendum §2) — SHIPPED
+
+- Migration **0016** `agent_work_objects` (user-owned RLS, same policy
+  shape as the core tables); applied to production with 0015; RLS suite
+  **12/12 PASS** after both.
+- `/home` (ChromeGate-registered, first in the shell): summary line with
+  literal counts from the real queue placements; request bar with
+  account-derived suggestions (quiet-thread count, a missing-info name —
+  never canned); Needs you (top 5, deep-linking into the inbox); In
+  motion work-object cards (read-as line, plan steps with text+glyph
+  marks, Approve plan / Pause / Resume / Cancel — cancel keeps the
+  record); Recently done; the AgentScope card naming Reads / May do /
+  Never alone in words.
+- Request lifecycle (§2.3): the request route classifies into
+  answer / plan / clarify / cannot over a CLOSED action vocabulary
+  (prepare_reply, prepare_followup); parsing drops unknown actions and
+  foreign inquiry ids and rejects plans that lose every step. The
+  execute route re-checks `isPermitted` per step server-side — a stored
+  plan can never outrun the ceilings (§2.2). Client email never enters
+  the prompt; snapshot carries first names, statuses, literal day
+  counts. 5 parser/snapshot unit tests.
+- Verified live (local rig): home rendered "Freelens found 5 things
+  that need you. 3 jobs are running on their own." from real rows; a
+  plan object rendered In motion and, on Approve, executed server-side
+  and landed honestly in Recently done as "stopped" when generation was
+  unavailable — no spinner, no fake success (the §2.4 degraded rule).
+  The model leg itself could not run locally (no ANTHROPIC_API_KEY in
+  the local env); its call shape is byte-for-byte the proven draft
+  generator's, and the failure path is the verified one.
+- Deviations: `AgentThinking` is a text status line (reduced-motion safe)
+  rather than a bespoke animation; clarify answers arrive by typing a
+  follow-up request (no threaded conversation yet); the teardown's
+  "home at / behind a flag" is expressed as /home first in the shell
+  while /inbox stays the manual view — flag-at-root belongs with the
+  marketing split (A5).
+
+Remaining round scope: A3 intake, A4 setup prefill, A5 marketing, A6 rules.
