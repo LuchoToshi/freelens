@@ -136,6 +136,7 @@ export function InboxApp({
   // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
   // reload keeps the mode and leaving is a plain link back to /inbox.
   const [testMode, setTestMode] = useState(false);
+  const [authBannerDismissed, setAuthBannerDismissed] = useState(true);
 
   const sb = supabaseBrowser();
 
@@ -154,6 +155,8 @@ export function InboxApp({
   // /inbox?queue=<key> selects a queue. Read once on mount; kept in the URL
   // on open/close so a selection is shareable and survives a reload.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a per-device dismissal flag, unavailable during SSR
+    setAuthBannerDismissed(localStorage.getItem("fd-auth-banner-dismissed") === "1");
     const params = new URL(window.location.href).searchParams;
     if (params.get("test") === "1") {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
@@ -862,6 +865,23 @@ export function InboxApp({
         >
           {t.heading}
         </h1>
+
+        {!authBannerDismissed && !testMode && (
+          <div role="status" className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+            <p className="text-sm font-medium text-[var(--fd-ink)]">{dict.auth.stricterBanner}</p>
+            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{dict.auth.stricterBannerBody}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthBannerDismissed(true);
+                localStorage.setItem("fd-auth-banner-dismissed", "1");
+              }}
+              className="w-fit text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
+            >
+              {dict.auth.stricterBannerDismiss}
+            </button>
+          </div>
+        )}
 
         {testMode && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4">

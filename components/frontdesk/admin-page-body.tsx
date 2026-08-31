@@ -72,6 +72,8 @@ function AdminView({ session }: { session: Session }) {
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
       <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">FrontDesk admin</h1>
 
+      <InviteIssuer session={session} />
+
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
           Monitoring
@@ -196,5 +198,74 @@ function AdminView({ session }: { session: Session }) {
         </div>
       </section>
     </main>
+  );
+}
+
+/** Founder-only invite issuance (English-only internal tool, like the rest). */
+function InviteIssuer({ session }: { session: Session }) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "busy" | "error">("idle");
+  const [issued, setIssued] = useState<string | null>(null);
+
+  async function issue(e: React.FormEvent) {
+    e.preventDefault();
+    setState("busy");
+    try {
+      const res = await fetch("/api/frontdesk/admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ email: email || undefined }),
+      });
+      const payload = (await res.json()) as { ok: boolean; code?: string };
+      if (payload.ok && payload.code) {
+        setIssued(payload.code);
+        setState("idle");
+        setEmail("");
+        return;
+      }
+      setState("error");
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <section className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+        Issue an invite
+      </h2>
+      <form onSubmit={issue} className="flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
+          Bind to email (optional)
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="min-h-11 rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={state === "busy"}
+          className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] px-4 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)] disabled:opacity-50"
+        >
+          {state === "busy" ? "Issuing" : "Issue invite"}
+        </button>
+      </form>
+      {issued && (
+        <p className="text-sm text-[var(--fd-ink)]">
+          Invite: <code className="rounded bg-[var(--fd-paper)] px-2 py-1 font-mono">{issued}</code>{" "}
+          (expires in 30 days; share as /inbox?invite={issued})
+        </p>
+      )}
+      {state === "error" && (
+        <p role="alert" className="text-sm font-medium text-[var(--fd-error-text)]">
+          That did not work. Try again.
+        </p>
+      )}
+    </section>
   );
 }
