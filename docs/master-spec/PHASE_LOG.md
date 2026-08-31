@@ -642,3 +642,65 @@ marketing, A6 rules): next units.
   marketing split (A5).
 
 Remaining round scope: A3 intake, A4 setup prefill, A5 marketing, A6 rules.
+
+## A3–A6 — intake, prefilled setup, rules, marketing — SHIPPED
+
+**A3 · Hybrid client intake (§3).** Essentials first (name, email, "what
+are you planning?"); date/type/budget no longer gate submission. The desk
+then asks only the gaps it cannot infer, each with a why-line and quick
+chips, individually skippable, "send as is" always visible; the
+confirmation shows per-line provenance and leaves a missing budget as
+"Not settled yet". The classic form survives one link away with a way
+back, honeypot preserved, no Freelens branding. E2E: "We are getting
+married…" inferred wedding, so the desk asked TWO questions instead of
+three, and the row landed with the inferred type, the answered date and
+budget honestly `unsure`. **Defect found and fixed live:** the occasion
+lexicon had no word for "getting married", so the desk asked what the
+client had already said.
+
+**A4 · Agent-prefilled setup (§4).** A new first step reads a public page
+or pasted text and PROPOSES; the route writes nothing, so "nothing saves
+before the confirm gate" is structural. PrefillReview shows per-field
+provenance with whole-percent confidence, "Not found, add it" for
+missing fields, a flag on packages without a price, and flips a field to
+"you typed it" on edit. Verified live end to end (stubbed extraction, no
+local model key): edit flipped provenance, confirm carried values into
+the wizard. SSRF guard on the URL reader (http/https only, no localhost
+or private ranges) with tests. Empty-form exit stays first-class.
+**Defect found and fixed live:** the read error said "that page couldn't
+be read" even when text was pasted.
+
+**A6 · Reusable automations (§6).** Migration **0017** (`agent_rules`,
+user-owned RLS, plus the global `rules_paused` brake). A rule is proposed
+only after five identical UNEDITED approvals — edits are never evidence —
+and a declined shape never returns. Trials: the next three runs still
+ask, an unedited approval graduates, an edit resets the trial and is
+counted so drift is visible. The sentence names the ceiling as
+non-editable, and rules carry only the two prepare-actions, so none can
+send, price, confirm a date, or close a lead. Verified live: five seeded
+unedited approvals produced the proposal; accepting created a trial with
+run/edit counters.
+
+**A5 · Marketing (§5).** `/agent` carries the repositioned story in the
+same editorial system; `/` is untouched for comparison, and flipping the
+root is the owner's call. Verified live; added to the sitemap.
+
+**Round verification:** 597 tests green (agentRequest 5, prefill 6,
+rules 7, inference 1, plus the rest); tsc and eslint clean. Migrations
+0015–0017 applied to production, RLS **12/12 PASS** after each.
+
+**Round deviations / owner actions:**
+- **DEPLOY-COUPLED (A1):** switch the production Supabase email template
+  to code-only before/with this deploy, else the default template's link
+  still signs in whoever clicks it.
+- Passkeys deferred (no GA WebAuthn on hosted Supabase); the code path is
+  the stated fallback and the UI contract stays in the DS.
+- Per-device session LIST needs a server surface the platform doesn't
+  expose; policy + revoke-others shipped.
+- The model leg of the request bar and the prefill reader could not run
+  locally (no ANTHROPIC_API_KEY in the local env); both use the proven
+  draft-generator call shape and their failure paths were verified.
+- Rules currently propose from approval history and gate execution; the
+  automatic run-on-arrival wiring rides with the next agent pass.
+
+**Not merged** — branch `claude/agent-frontdesk`.
