@@ -118,3 +118,28 @@ export function afterRun(rule: RuleRow, outcome: "sent_as_is" | "edited" | "skip
   }
   return next;
 }
+
+/**
+ * What a rule actually buys the freelancer (§6). Preparation normally needs
+ * automation level 3; when the freelancer has lowered that action below 3,
+ * an ACTIVE rule for this exact shape still permits preparation — that is
+ * the automation they approved, scoped to the shape they proved.
+ *
+ * The grant tops out at "prepare for review" by construction: rules carry
+ * only the two prepare-actions, so no rule can reach sending, pricing,
+ * confirming a date, or closing a lead. A paused rule or a paused account
+ * grants nothing.
+ */
+export function ruleGrant(
+  action: RuleAction,
+  inquiry: { event_type: string; budget_band: string },
+  rules: readonly RuleRow[],
+  rulesPaused: boolean
+): RuleRow | null {
+  for (const rule of rules) {
+    if (rule.action !== action) continue;
+    if (!ruleApplies(rule, inquiry, rulesPaused)) continue;
+    return rule;
+  }
+  return null;
+}

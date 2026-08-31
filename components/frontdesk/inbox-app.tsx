@@ -30,7 +30,7 @@ import {
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
-import type { ApprovalSignal, RuleRow } from "@/lib/frontdesk/rules";
+import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
 import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
 
@@ -71,6 +71,7 @@ interface DraftRow {
   outcome: string | null;
   outcome_at?: string | null;
   dismiss_reason?: string | null;
+  rule_id?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
 }
@@ -238,7 +239,7 @@ export function InboxApp({
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
-      .select("id, inquiry_id, kind, body, final_body, outcome, outcome_at, dismiss_reason, created_at, language, validation_status, validation_failures")
+      .select("id, inquiry_id, kind, body, final_body, outcome, outcome_at, dismiss_reason, rule_id, created_at, language, validation_status, validation_failures")
       .order("created_at", { ascending: false });
     if (draftsError) {
       setLoadError(true);
@@ -433,7 +434,29 @@ export function InboxApp({
       setNow(new Date());
       return;
     }
+    // A rule that produced this draft learns from the outcome (§6): an
+    // unedited approval spends a trial run, an edit resets the trial and is
+    // counted so drift stays visible.
+    const producingRule = openDraft.rule_id
+      ? rules.find((r) => r.id === openDraft.rule_id)
+      : undefined;
+    async function recordRuleRun(outcome: "sent_as_is" | "edited" | "skipped") {
+      if (!producingRule) return;
+      const next = afterRun(producingRule, outcome);
+      await sb
+        .from("agent_rules")
+        .update({
+          status: next.status,
+          trial_runs_left: next.trial_runs_left,
+          ran_count: next.ran_count,
+          edited_count: next.edited_count,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", producingRule.id);
+    }
+
     if (kind === "skip") {
+      await recordRuleRun("skipped");
       await sb
         .from("drafts")
         .update({
@@ -444,6 +467,7 @@ export function InboxApp({
         .eq("id", openDraft.id);
     } else {
       const untouched = editedBody === openDraft.body;
+      await recordRuleRun(untouched ? "sent_as_is" : "edited");
       await sb
         .from("drafts")
         .update({
@@ -605,6 +629,42 @@ export function InboxApp({
       )}
 
       <EvidenceList locale={freelancer.locale} items={deriveInquiryEvidence(open)} />
+
+        {openDraft?.rule_id && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl bg-[var(--fd-paper)] px-4 py-3">
+            <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
+              {t.rules.producedBy.replace(
+                "{rule}",
+                (() => {
+                  const rule = rules.find((r) => r.id === openDraft.rule_id);
+                  if (!rule) return t.rules.producedByUnknown;
+                  const shape = rule.trigger.event_type
+                    ? (dict.public.form.types[
+                        rule.trigger.event_type as keyof typeof dict.public.form.types
+                      ] ?? rule.trigger.event_type)
+                    : t.rules.anyInquiry;
+                  return t.rules.sentence
+                    .replace("{trigger}", shape)
+                    .replace(
+                      "{action}",
+                      rule.action === "prepare_followup" ? t.rules.actionFollowup : t.rules.actionReply
+                    );
+                })()
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={async () => {
+                if (!openDraft.rule_id) return;
+                await sb.from("agent_rules").update({ status: "paused" }).eq("id", openDraft.rule_id);
+                await load();
+              }}
+              className="text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+            >
+              {t.rules.pause}
+            </button>
+          </div>
+        )}
 
       {openDraft && openDraft.validation_status === "failed" ? (
         <div

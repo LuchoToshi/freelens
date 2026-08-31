@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   afterRun,
+  ruleGrant,
   proposeRule,
   ruleApplies,
   PROPOSE_AFTER,
@@ -78,5 +79,25 @@ describe("automation rules (§6): born from repeated approvals only", () => {
 
     const edited = afterRun({ ...TRIAL_RULE, trial_runs_left: 1 }, "edited");
     expect(edited).toMatchObject({ status: "trial", trial_runs_left: TRIAL_RUNS, edited_count: 1 });
+  });
+});
+
+describe("what a rule grants (§6): scoped automation, never a new ceiling", () => {
+  const inquiry = { event_type: "wedding", budget_band: "2500+" };
+  const onRule: RuleRow = { ...TRIAL_RULE, status: "on" };
+
+  it("an active rule for the shape grants its own action only", () => {
+    expect(ruleGrant("prepare_reply", inquiry, [onRule], false)?.id).toBe("r1");
+    expect(ruleGrant("prepare_followup", inquiry, [onRule], false)).toBeNull();
+  });
+
+  it("a different shape, a paused rule, or a paused account grants nothing", () => {
+    expect(ruleGrant("prepare_reply", { event_type: "party", budget_band: "2500+" }, [onRule], false)).toBeNull();
+    expect(ruleGrant("prepare_reply", inquiry, [{ ...onRule, status: "paused" }], false)).toBeNull();
+    expect(ruleGrant("prepare_reply", inquiry, [onRule], true)).toBeNull();
+  });
+
+  it("a trial rule grants too — its output still comes back for review", () => {
+    expect(ruleGrant("prepare_reply", inquiry, [TRIAL_RULE], false)?.status).toBe("trial");
   });
 });

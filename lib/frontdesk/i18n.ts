@@ -349,6 +349,8 @@ const en = {
       pauseAll: "Pause all rules",
       resumeAll: "Resume all rules",
       ceilingNote: "No rule can send, price, confirm a date, or close a lead. Those always come back to you.",
+      producedBy: "Your rule: {rule}",
+      producedByUnknown: "a rule you have since removed",
     },
     memory: {
       heading: "What FrontDesk remembers",
@@ -1141,6 +1143,8 @@ const nl: typeof en = {
       pauseAll: "Alle regels pauzeren",
       resumeAll: "Alle regels hervatten",
       ceilingNote: "Geen regel kan versturen, prijzen noemen, een datum bevestigen of een lead sluiten. Dat komt altijd bij jou terug.",
+      producedBy: "Jouw regel: {rule}",
+      producedByUnknown: "een regel die je inmiddels hebt verwijderd",
     },
     memory: {
       heading: "Wat FrontDesk onthoudt",
