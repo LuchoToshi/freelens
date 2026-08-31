@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 import { publicProfileByHandle } from "@/lib/frontdesk/server/publicProfile";
 import { fdDict } from "@/lib/frontdesk/i18n";
-import { InquiryForm } from "@/components/frontdesk/inquiry-form";
+import { PublicIntake } from "@/components/frontdesk/public-intake";
 
 /**
  * The freelancer's public front door. To the client's eye this page IS the
@@ -78,7 +78,7 @@ export default async function HandlePage({
         </p>
       </header>
 
-      <InquiryForm
+      <PublicIntake
         handle={profile.handle}
         displayName={profile.displayName}
         locale={profile.locale}

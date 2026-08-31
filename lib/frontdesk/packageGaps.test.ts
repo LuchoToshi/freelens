@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectPackageGaps } from "@/lib/frontdesk/packageGaps";
+import { detectPackageGaps, inferEventType } from "@/lib/frontdesk/packageGaps";
 
 const WEDDING_PKG = { label: "Wedding full day", price_from_eur: 1950, notes: null };
 
@@ -59,5 +59,15 @@ describe("package gap detection (§6.5): deterministic, informative, never block
       ]
     );
     expect(gaps).toEqual([]);
+  });
+});
+
+describe("occasion inference (§3): only from the client's own words", () => {
+  it("finds the type in either language, and never guesses", () => {
+    expect(inferEventType("We trouwen in juni op het strand")).toBe("wedding");
+    expect(inferEventType("We are getting married next summer")).toBe("wedding");
+    expect(inferEventType("Need headshots for the team")).toBe("portrait");
+    expect(inferEventType("Hi, love your work, call me")).toBeNull();
+    expect(inferEventType(null)).toBeNull();
   });
 });
