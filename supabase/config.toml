@@ -412,3 +412,10 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+[auth.email.template.magic_link]
+subject = "Your Freelens sign-in code"
+# Local dev under colima only shares $HOME with the VM, so the template is
+# copied there (the repo copy in supabase/templates/ is the source of truth;
+# production uses the dashboard template).
+content_path = "/Users/shariffshariff/.freelens/templates/signin_code.html"

@@ -553,3 +553,54 @@ Vercel log alert on the cron's monitoring tokens; and the merge itself.
 
 **Not merged — the merge is the deliberate final act of this rollout
 and needs the explicit go.**
+
+---
+
+# Addendum round (31 Aug 2026) — Agent-Led Front Desk
+
+Handoff: `design_handoff_agentic_frontdesk/` + full DS project. The 30 Aug
+master spec gained only §36 (all four blocking decisions settled by the
+owner; DEC-1 and DEC-4 were already implemented as decided). Round scope:
+auth (§1), agent-led home (§2), hybrid intake (§3), prefilled setup (§4),
+marketing (§5), automation rules (§6). Round Phase 0 (validate paths,
+reproduce the "Hi there," defect) was already satisfied by the merged
+Phase 1 guards.
+
+## A1 — Authentication redesign (addendum §1) — SHIPPED on branch `claude/agent-frontdesk`
+
+Threat→design, implemented and E2E-verified on the local stack:
+- **No session-granting link exists in the app**: `signInWithOtp` sends
+  with no `emailRedirectTo` and `shouldCreateUser: false`; sign-in is a
+  typed six-digit code (`CodeInput`: one real input, six slots,
+  one-time-code autofill, wrong/expired/locked states, 38s resend).
+  E2E: code from the local mail catcher signed in; the email contained
+  the code and NO link.
+- **Invite-gated sign-up** (migration 0015, service-role-only table):
+  accounts are created solely by `/api/auth/invite` behind a
+  one-redemption conditional update; failures neutral ("used"/"invalid"
+  only). E2E: unknown email refused with invite-only copy; a fresh
+  invite created an account and landed in onboarding; reuse returned
+  "used"; garbage returned "invalid". Founders issue codes from /admin
+  (FRLNS-XXXX, 30-day expiry, optional email binding).
+- **Sessions**: per-device policy (30-day idle default / end-with-browser
+  → sessionStorage), client-side idle cap purging stale tokens, "Sign
+  out everywhere else" via `signOut({scope:"others"})` — all in the new
+  Security & sessions card on /setup (verified live). One-time
+  "sign-in got stricter" banner in the inbox. Full EN/NL; 578 tests.
+
+**DEPLOY-COUPLED OWNER ACTION (blocking for the security property):**
+the production Supabase email template must be switched to code-only
+(no `{{ .ConfirmationURL }}`, show `{{ .Token }}` — copy in
+`supabase/templates/signin_code.html`) at or before this branch's
+deploy; until then the default template's link still signs in whoever
+clicks it. Local dev template is wired in config.toml (via a $HOME copy
+because colima only shares $HOME with the Docker VM).
+
+**Deviations:** passkeys deferred — hosted Supabase has no GA WebAuthn
+sign-in and a custom credential+JWT path needs the project JWT secret;
+the UI contract (PasskeyButton/PasskeyPrompt) stays in the DS for that
+follow-up. Per-device session LIST likewise needs a server surface the
+platform doesn't expose to clients; policy + revoke-others shipped.
+
+Remaining round scope (A2 home, A3 intake, A4 setup-prefill, A5
+marketing, A6 rules): next units.
