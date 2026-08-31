@@ -700,7 +700,15 @@ rules 7, inference 1, plus the rest); tsc and eslint clean. Migrations
 - The model leg of the request bar and the prefill reader could not run
   locally (no ANTHROPIC_API_KEY in the local env); both use the proven
   draft-generator call shape and their failure paths were verified.
-- Rules currently propose from approval history and gate execution; the
-  automatic run-on-arrival wiring rides with the next agent pass.
+- Rules now act as well as propose (migration 0018): a rule is the
+  freelancer's own standing permission, scoped to the shape they proved.
+  Where an action sits below level 3, an active rule for that exact
+  shape permits preparation and nothing more — rules carry only the two
+  prepare-actions, so the ceilings are untouched. Rule-produced items
+  carry "Your rule: …" with an inline pause in both the ready and failed
+  states, and the producing rule learns from each outcome. Verified
+  live: with prepare_reply at level 1, the matching wedding inquiry
+  passed the gate while a party inquiry was still refused
+  not_permitted. 600 tests; RLS 12/12 after 0018.
 
 **Not merged** — branch `claude/agent-frontdesk`.
