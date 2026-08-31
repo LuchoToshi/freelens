@@ -13,6 +13,7 @@ import { VoiceStep } from "@/components/frontdesk/voice-step";
 import { RevealStep } from "@/components/frontdesk/reveal-step";
 import { ShareStep } from "@/components/frontdesk/share-step";
 import { ProfessionPicker, type Profession } from "@/components/frontdesk/profession-picker";
+import { PrefillStep, type PrefillApplied } from "@/components/frontdesk/prefill-step";
 
 /**
  * Onboarding, four steps, nothing external. The locale question comes first
@@ -54,6 +55,8 @@ export function SetupWizard({
   freelancer: FreelancerRow | null;
   onFreelancerChanged: () => void;
 }) {
+  // Step 05 is the agent prefill offer (addendum §4): new signups meet it
+  // between welcome and the profile form; the empty form stays one click away.
   const [step, setStep] = useState(freelancer ? 1 : 0);
   // A returning freelancer's stored locale is authoritative. A brand-new
   // signup has none yet: default to English for the SSR-safe first render,
@@ -235,7 +238,7 @@ export function SetupWizard({
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
-      {step >= 1 && (
+      {step >= 1 && step !== 5 && (
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
           {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4)))}
         </p>
@@ -253,10 +256,26 @@ export function SetupWizard({
               </p>
             ))}
           </div>
-          <button type="button" onClick={() => setStep(1)} className={`${primaryClass} w-fit`}>
+          <button type="button" onClick={() => setStep(freelancer ? 1 : 5)} className={`${primaryClass} w-fit`}>
             {t.welcome.cta}
           </button>
         </section>
+      )}
+
+      {step === 5 && (
+        <PrefillStep
+          session={session}
+          locale={locale}
+          onSkip={() => setStep(1)}
+          onApply={(applied: PrefillApplied) => {
+            if (applied.displayName) setDisplayName(applied.displayName);
+            if (applied.professions.length) setProfessions(applied.professions);
+            if (applied.location) setCity(applied.location);
+            if (applied.signOff) setSignOff(applied.signOff);
+            if (applied.packages.length) setPackages(applied.packages);
+            setStep(1);
+          }}
+        />
       )}
 
       {step === 1 && (

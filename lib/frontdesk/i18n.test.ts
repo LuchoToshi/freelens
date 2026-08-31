@@ -5,6 +5,7 @@ import { fdDict, type FrontdeskDict } from "@/lib/frontdesk/i18n";
 const SAME_BY_DESIGN = new Set([
   "inbox.evidence.fields.budget", // "Budget" is the Dutch word too
   "inbox.memory.dimensions.emoji", // "Emoji" is the Dutch word too
+  "setup.prefill.urlPlaceholder", // a URL scheme, not prose
 
   // Dutch genuinely uses these English words for these concepts.
   "inbox.shell.inbox",
