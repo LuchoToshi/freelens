@@ -29,6 +29,8 @@ import {
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
+import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
+import type { ApprovalSignal, RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
 import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
 
@@ -131,6 +133,7 @@ export function InboxApp({
   const [gmailStatus, setGmailStatus] = useState<"connected" | "error" | null>(null);
   const [connectingGmail, setConnectingGmail] = useState(false);
   const [packages, setPackages] = useState<GapPackage[]>([]);
+  const [rules, setRules] = useState<RuleRow[]>([]);
   const [gmailConnection, setGmailConnection] = useState<GmailConnectionRow | null>(null);
   const [freelancerState, setFreelancerState] = useState(freelancer);
   // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
@@ -159,7 +162,7 @@ export function InboxApp({
     setAuthBannerDismissed(localStorage.getItem("fd-auth-banner-dismissed") === "1");
     const params = new URL(window.location.href).searchParams;
     if (params.get("test") === "1") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
+       
       setTestMode(true);
     }
     const q = params.get("queue") as QueueKey | null;
@@ -256,6 +259,11 @@ export function InboxApp({
       .select("label, price_from_eur, notes")
       .order("position");
     setPackages((packageRows as GapPackage[] | null) ?? []);
+    const { data: ruleRows } = await sb
+      .from("agent_rules")
+      .select("id, trigger, action, status, trial_runs_left, ran_count, edited_count")
+      .order("created_at", { ascending: false });
+    setRules((ruleRows as RuleRow[] | null) ?? []);
     if (GMAIL_CONNECT_ENABLED) {
       const { data: gmailRow } = await sb
         .from("agent_gmail_connections")
@@ -379,7 +387,7 @@ export function InboxApp({
     if (!openId || !drafts[openId]) return;
     if (editedForRef.current === openId) return;
     editedForRef.current = openId;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time init per opened inquiry, driven by async draft arrival
+     
     setEditedBody(drafts[openId].body ?? "");
   }, [openId, drafts]);
 
@@ -997,6 +1005,50 @@ export function InboxApp({
                 voice_learning_paused: change.paused ?? f.voice_learning_paused,
               }));
               await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
+            }}
+          />
+        )}
+
+        {!testMode && (
+          <AutomationRulesCard
+            freelancer={freelancerState}
+            rules={rules}
+            approvals={allDrafts
+              .filter((d) => d.outcome)
+              .map((d) => {
+                const inquiry = inquiries.find((i) => i.id === d.inquiry_id);
+                return {
+                  kind: d.kind,
+                  event_type: inquiry?.event_type ?? "other",
+                  budget_band: inquiry?.budget_band ?? "unsure",
+                  outcome: d.outcome,
+                } satisfies ApprovalSignal;
+              })}
+            onCreate={async (proposal) => {
+              // evidenceCount -1 is the "don't suggest again" path: the rule
+              // is stored declined so the shape never proposes itself again.
+              await sb.from("agent_rules").insert({
+                freelancer_id: freelancerState.id,
+                trigger: proposal.trigger,
+                action: proposal.action,
+                status: proposal.evidenceCount === -1 ? "declined" : "trial",
+              });
+              await load();
+            }}
+            onUpdate={async (id, patch) => {
+              await sb.from("agent_rules").update(patch).eq("id", id);
+              await load();
+            }}
+            onDelete={async (id) => {
+              await sb.from("agent_rules").delete().eq("id", id);
+              await load();
+            }}
+            onPauseAll={async (paused) => {
+              setFreelancerState((f) => ({ ...f, rules_paused: paused }));
+              await sb
+                .from("freelancers")
+                .update({ rules_paused: paused })
+                .eq("auth_user_id", session.user.id);
             }}
           />
         )}

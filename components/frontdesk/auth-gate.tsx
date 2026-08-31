@@ -75,6 +75,7 @@ export interface FreelancerRow {
   permission_levels: Record<string, unknown> | null;
   followup_quiet_days: number | null;
   followups_paused: boolean | null;
+  rules_paused: boolean | null;
   link_in_bio_confirmed_at: string | null;
 }
 
@@ -107,7 +108,7 @@ export function AuthGate({
       const { data } = await sb
         .from("freelancers")
         .select(
-          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, timezone, voice_profile, voice_learning_paused, voice_proposal_decisions, permission_levels, followup_quiet_days, followups_paused, link_in_bio_confirmed_at"
+          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, timezone, voice_profile, voice_learning_paused, voice_proposal_decisions, permission_levels, followup_quiet_days, followups_paused, rules_paused, link_in_bio_confirmed_at"
         )
         .maybeSingle();
       if (cancelled) return;
