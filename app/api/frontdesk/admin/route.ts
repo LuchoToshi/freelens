@@ -122,3 +122,48 @@ export async function GET(request: Request) {
   );
   return Response.json({ ok: true, rows, funnels, monitoring });
 }
+
+/**
+ * Founder-issued invites (addendum §1): POST { email? } creates one invite
+ * code, optionally bound to an address. Same 404-style gate as GET.
+ */
+export async function POST(request: Request) {
+  const jwt = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (!jwt) return Response.json({ ok: false }, { status: 404 });
+  const asUser = asUserClient(jwt);
+  const { data: userData, error } = await asUser.auth.getUser(jwt);
+  if (error || !userData?.user) return Response.json({ ok: false }, { status: 404 });
+  const allowed = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (!allowed.includes(userData.user.email?.toLowerCase() ?? "")) {
+    return Response.json({ ok: false }, { status: 404 });
+  }
+
+  let body: { email?: unknown } = {};
+  try {
+    body = await request.json();
+  } catch {
+    // Empty body is fine: an unbound invite.
+  }
+  const email = String(body.email ?? "").trim().toLowerCase() || null;
+
+  // FRLNS-XXXX, unambiguous alphabet (no 0/O/1/I), 30-day expiry.
+  const alphabet = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  const bytes = crypto.getRandomValues(new Uint8Array(4));
+  const code = "FRLNS-" + [...bytes].map((b) => alphabet[b % alphabet.length]).join("");
+
+  const db = serviceClient();
+  const { error: insertError } = await db.from("invites").insert({
+    code,
+    issued_to_email: email,
+    expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  });
+  if (insertError) {
+    console.error("frontdesk/admin: invite_insert_failed");
+    return Response.json({ ok: false }, { status: 500 });
+  }
+  console.log("frontdesk/admin: invite_issued");
+  return Response.json({ ok: true, code });
+}

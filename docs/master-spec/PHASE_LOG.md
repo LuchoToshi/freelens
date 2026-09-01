@@ -553,3 +553,166 @@ Vercel log alert on the cron's monitoring tokens; and the merge itself.
 
 **Not merged — the merge is the deliberate final act of this rollout
 and needs the explicit go.**
+
+---
+
+# Addendum round (31 Aug 2026) — Agent-Led Front Desk
+
+Handoff: `design_handoff_agentic_frontdesk/` + full DS project. The 30 Aug
+master spec gained only §36 (all four blocking decisions settled by the
+owner; DEC-1 and DEC-4 were already implemented as decided). Round scope:
+auth (§1), agent-led home (§2), hybrid intake (§3), prefilled setup (§4),
+marketing (§5), automation rules (§6). Round Phase 0 (validate paths,
+reproduce the "Hi there," defect) was already satisfied by the merged
+Phase 1 guards.
+
+## A1 — Authentication redesign (addendum §1) — SHIPPED on branch `claude/agent-frontdesk`
+
+Threat→design, implemented and E2E-verified on the local stack:
+- **No session-granting link exists in the app**: `signInWithOtp` sends
+  with no `emailRedirectTo` and `shouldCreateUser: false`; sign-in is a
+  typed six-digit code (`CodeInput`: one real input, six slots,
+  one-time-code autofill, wrong/expired/locked states, 38s resend).
+  E2E: code from the local mail catcher signed in; the email contained
+  the code and NO link.
+- **Invite-gated sign-up** (migration 0015, service-role-only table):
+  accounts are created solely by `/api/auth/invite` behind a
+  one-redemption conditional update; failures neutral ("used"/"invalid"
+  only). E2E: unknown email refused with invite-only copy; a fresh
+  invite created an account and landed in onboarding; reuse returned
+  "used"; garbage returned "invalid". Founders issue codes from /admin
+  (FRLNS-XXXX, 30-day expiry, optional email binding).
+- **Sessions**: per-device policy (30-day idle default / end-with-browser
+  → sessionStorage), client-side idle cap purging stale tokens, "Sign
+  out everywhere else" via `signOut({scope:"others"})` — all in the new
+  Security & sessions card on /setup (verified live). One-time
+  "sign-in got stricter" banner in the inbox. Full EN/NL; 578 tests.
+
+**DEPLOY-COUPLED OWNER ACTION (attempted 1 Sep, blocked by the session's
+permission guard on production authentication changes — the production
+template is UNCHANGED and was verified so afterwards; a ready-to-paste
+version sits in `supabase/templates/signin_code.html`, and the current
+production template is attached to PR #57 for rollback):**
+the production Supabase email template must be switched to code-only
+(no `{{ .ConfirmationURL }}`, show `{{ .Token }}` — copy in
+`supabase/templates/signin_code.html`) at or before this branch's
+deploy; until then the default template's link still signs in whoever
+clicks it. Local dev template is wired in config.toml (via a $HOME copy
+because colima only shares $HOME with the Docker VM).
+
+**Deviations:** passkeys deferred — hosted Supabase has no GA WebAuthn
+sign-in and a custom credential+JWT path needs the project JWT secret;
+the UI contract (PasskeyButton/PasskeyPrompt) stays in the DS for that
+follow-up. Per-device session LIST likewise needs a server surface the
+platform doesn't expose to clients; policy + revoke-others shipped.
+
+Remaining round scope (A2 home, A3 intake, A4 setup-prefill, A5
+marketing, A6 rules): next units.
+
+## A2 — Agent-led home (addendum §2) — SHIPPED
+
+- Migration **0016** `agent_work_objects` (user-owned RLS, same policy
+  shape as the core tables); applied to production with 0015; RLS suite
+  **12/12 PASS** after both.
+- `/home` (ChromeGate-registered, first in the shell): summary line with
+  literal counts from the real queue placements; request bar with
+  account-derived suggestions (quiet-thread count, a missing-info name —
+  never canned); Needs you (top 5, deep-linking into the inbox); In
+  motion work-object cards (read-as line, plan steps with text+glyph
+  marks, Approve plan / Pause / Resume / Cancel — cancel keeps the
+  record); Recently done; the AgentScope card naming Reads / May do /
+  Never alone in words.
+- Request lifecycle (§2.3): the request route classifies into
+  answer / plan / clarify / cannot over a CLOSED action vocabulary
+  (prepare_reply, prepare_followup); parsing drops unknown actions and
+  foreign inquiry ids and rejects plans that lose every step. The
+  execute route re-checks `isPermitted` per step server-side — a stored
+  plan can never outrun the ceilings (§2.2). Client email never enters
+  the prompt; snapshot carries first names, statuses, literal day
+  counts. 5 parser/snapshot unit tests.
+- Verified live (local rig): home rendered "Freelens found 5 things
+  that need you. 3 jobs are running on their own." from real rows; a
+  plan object rendered In motion and, on Approve, executed server-side
+  and landed honestly in Recently done as "stopped" when generation was
+  unavailable — no spinner, no fake success (the §2.4 degraded rule).
+  The model leg itself could not run locally (no ANTHROPIC_API_KEY in
+  the local env); its call shape is byte-for-byte the proven draft
+  generator's, and the failure path is the verified one.
+- Deviations: `AgentThinking` is a text status line (reduced-motion safe)
+  rather than a bespoke animation; clarify answers arrive by typing a
+  follow-up request (no threaded conversation yet); the teardown's
+  "home at / behind a flag" is expressed as /home first in the shell
+  while /inbox stays the manual view — flag-at-root belongs with the
+  marketing split (A5).
+
+Remaining round scope: A3 intake, A4 setup prefill, A5 marketing, A6 rules.
+
+## A3–A6 — intake, prefilled setup, rules, marketing — SHIPPED
+
+**A3 · Hybrid client intake (§3).** Essentials first (name, email, "what
+are you planning?"); date/type/budget no longer gate submission. The desk
+then asks only the gaps it cannot infer, each with a why-line and quick
+chips, individually skippable, "send as is" always visible; the
+confirmation shows per-line provenance and leaves a missing budget as
+"Not settled yet". The classic form survives one link away with a way
+back, honeypot preserved, no Freelens branding. E2E: "We are getting
+married…" inferred wedding, so the desk asked TWO questions instead of
+three, and the row landed with the inferred type, the answered date and
+budget honestly `unsure`. **Defect found and fixed live:** the occasion
+lexicon had no word for "getting married", so the desk asked what the
+client had already said.
+
+**A4 · Agent-prefilled setup (§4).** A new first step reads a public page
+or pasted text and PROPOSES; the route writes nothing, so "nothing saves
+before the confirm gate" is structural. PrefillReview shows per-field
+provenance with whole-percent confidence, "Not found, add it" for
+missing fields, a flag on packages without a price, and flips a field to
+"you typed it" on edit. Verified live end to end (stubbed extraction, no
+local model key): edit flipped provenance, confirm carried values into
+the wizard. SSRF guard on the URL reader (http/https only, no localhost
+or private ranges) with tests. Empty-form exit stays first-class.
+**Defect found and fixed live:** the read error said "that page couldn't
+be read" even when text was pasted.
+
+**A6 · Reusable automations (§6).** Migration **0017** (`agent_rules`,
+user-owned RLS, plus the global `rules_paused` brake). A rule is proposed
+only after five identical UNEDITED approvals — edits are never evidence —
+and a declined shape never returns. Trials: the next three runs still
+ask, an unedited approval graduates, an edit resets the trial and is
+counted so drift is visible. The sentence names the ceiling as
+non-editable, and rules carry only the two prepare-actions, so none can
+send, price, confirm a date, or close a lead. Verified live: five seeded
+unedited approvals produced the proposal; accepting created a trial with
+run/edit counters.
+
+**A5 · Marketing (§5).** `/agent` carries the repositioned story in the
+same editorial system; `/` is untouched for comparison, and flipping the
+root is the owner's call. Verified live; added to the sitemap.
+
+**Round verification:** 597 tests green (agentRequest 5, prefill 6,
+rules 7, inference 1, plus the rest); tsc and eslint clean. Migrations
+0015–0017 applied to production, RLS **12/12 PASS** after each.
+
+**Round deviations / owner actions:**
+- **DEPLOY-COUPLED (A1):** switch the production Supabase email template
+  to code-only before/with this deploy, else the default template's link
+  still signs in whoever clicks it.
+- Passkeys deferred (no GA WebAuthn on hosted Supabase); the code path is
+  the stated fallback and the UI contract stays in the DS.
+- Per-device session LIST needs a server surface the platform doesn't
+  expose; policy + revoke-others shipped.
+- The model leg of the request bar and the prefill reader could not run
+  locally (no ANTHROPIC_API_KEY in the local env); both use the proven
+  draft-generator call shape and their failure paths were verified.
+- Rules now act as well as propose (migration 0018): a rule is the
+  freelancer's own standing permission, scoped to the shape they proved.
+  Where an action sits below level 3, an active rule for that exact
+  shape permits preparation and nothing more — rules carry only the two
+  prepare-actions, so the ceilings are untouched. Rule-produced items
+  carry "Your rule: …" with an inline pause in both the ready and failed
+  states, and the producing rule learns from each outcome. Verified
+  live: with prepare_reply at level 1, the matching wedding inquiry
+  passed the gate while a party inquiry was still refused
+  not_permitted. 600 tests; RLS 12/12 after 0018.
+
+**Not merged** — branch `claude/agent-frontdesk`.

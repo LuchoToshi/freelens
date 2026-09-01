@@ -29,7 +29,7 @@ export interface PackageGap {
  * a missed match produces a hint the freelancer can ignore, never a block.
  */
 const TYPE_WORDS: Record<string, string[]> = {
-  wedding: ["wedding", "bruiloft", "trouw"],
+  wedding: ["wedding", "bruiloft", "trouw", "married", "marry", "engag", "huwelijk"],
   party: ["party", "feest", "verjaardag", "birthday"],
   business: ["business", "zakelijk", "bedrijf", "corporate", "offsite", "event"],
   portrait: ["portrait", "portret", "headshot"],
@@ -68,4 +68,18 @@ export function detectPackageGaps(
     }
   }
   return gaps;
+}
+
+/**
+ * Deterministic occasion inference from the client's own words (§3: the
+ * message is the brief; the desk never asks what it already knows). Returns
+ * null when nothing matches — the conversation then asks, with a why-line.
+ */
+export function inferEventType(message: string | null): string | null {
+  if (!message) return null;
+  const haystack = message.toLowerCase();
+  for (const [type, words] of Object.entries(TYPE_WORDS)) {
+    if (words.some((w) => haystack.includes(w))) return type;
+  }
+  return null;
 }

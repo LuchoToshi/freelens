@@ -50,6 +50,7 @@ export function isFrontdeskPath(pathname: string): boolean {
     first === "setup" ||
     first === "admin" ||
     first === "demo" ||
+    first === "home" ||
     first === "clients" ||
     first === "follow-ups"
   ) {

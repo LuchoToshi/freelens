@@ -360,6 +360,46 @@ export const en = {
     },
 
     frontdesk: {
+      agent: {
+        heroEyebrow: "Your front desk, delegated",
+        heroTitle: "Delegate the desk. Keep the decisions.",
+        heroSub:
+          "Freelens reads every inquiry, plans the work, and prepares the replies in your voice. Prices, dates and sending stay yours.",
+        heroCta: "Ask for an invite",
+        heroCtaTry: "See how it works",
+        exampleLabel: "You ask. It plans. You approve.",
+        askLabel: "You ask",
+        ask: "Chase the quiet leads from March.",
+        planLabel: "Freelens plans",
+        planSteps: [
+          "Found 4 quiet threads. None of them declined.",
+          "Draft a personal follow-up for each, your prices and voice only.",
+          "You review and send. Nothing moves before that.",
+        ],
+        resultLabel: "A week later",
+        result: "Two replies, one booked. Every draft was yours to change first.",
+        approveNote: "You approve before anything moves.",
+        objections: [
+          {
+            q: "Will it send things on its own?",
+            a: "No. It prepares; you send. Sending, prices, dates and closing a lead are capped so no setting can unlock them.",
+          },
+          {
+            q: "What can it actually see?",
+            a: "Your inquiry page and your own account data. Every fact it states carries where it came from, and a blank stays blank rather than becoming a guess.",
+          },
+          {
+            q: "What if it gets something wrong?",
+            a: "You see the draft before anyone else does. Skip it with a reason and it learns; edit it and the edit is what ships. It never learns a rule from one edit.",
+          },
+        ],
+        followupQ: "So I have to babysit it?",
+        followupA:
+          "The opposite. It shows you the exceptions: what needs a decision, what is waiting, what ran on its own. A quiet screen means nothing needs you.",
+        waitlistHeading: "Invite-only, on purpose.",
+        waitlistSub:
+          "We open a few desks at a time so every one gets set up properly. Join the list and we send an invite when it's your turn.",
+      },
       heroEyebrow: "Your front desk",
       heroTitle: "Stop losing jobs to a slow reply.",
       heroSub:

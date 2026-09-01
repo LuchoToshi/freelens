@@ -23,6 +23,7 @@ import {
   generateFrontdeskDraft,
 } from "@/lib/frontdesk/generateDraft";
 import { isPermitted } from "@/lib/frontdesk/permissions";
+import { ruleGrant, type RuleRow } from "@/lib/frontdesk/rules";
 
 export type PipelineOutcome =
   | "stored"
@@ -51,7 +52,7 @@ export async function generateAndStoreDraft(
 
   const { data: freelancer } = await db
     .from("freelancers")
-    .select("id, display_name, sign_off, locale, voice_profile, permission_levels")
+    .select("id, display_name, sign_off, locale, voice_profile, permission_levels, rules_paused")
     .eq("id", inquiry.freelancer_id)
     .maybeSingle();
   if (!freelancer?.voice_profile) return "no_voice_profile";
@@ -62,7 +63,21 @@ export async function generateAndStoreDraft(
   // ceiling clamp inside isPermitted means a tampered stored level cannot
   // grant anything the ceilings forbid.
   const action = kind === "nudge" ? "prepare_followup" : "prepare_reply";
-  if (!isPermitted(action, 3, freelancer.permission_levels as Record<string, unknown> | null)) {
+  // An approved rule for this exact inquiry shape is the freelancer's own
+  // standing permission (§6): it lets preparation happen where they lowered
+  // the level, and it claims the resulting draft so the UI can say whose
+  // rule produced it. It can never grant more than "prepare for review".
+  const { data: ruleRows } = await db
+    .from("agent_rules")
+    .select("id, trigger, action, status, trial_runs_left, ran_count, edited_count")
+    .eq("freelancer_id", freelancer.id);
+  const rule = ruleGrant(
+    action,
+    { event_type: inquiry.event_type, budget_band: inquiry.budget_band },
+    (ruleRows as RuleRow[] | null) ?? [],
+    Boolean(freelancer.rules_paused)
+  );
+  if (!isPermitted(action, 3, freelancer.permission_levels as Record<string, unknown> | null) && !rule) {
     console.log(`frontdesk draft skipped: ${action} below level 3 for freelancer ${freelancer.id}`);
     return "not_permitted";
   }
@@ -125,6 +140,7 @@ export async function generateAndStoreDraft(
       body,
       language,
       prompt_version: DRAFT_PROMPT_VERSION,
+      rule_id: rule?.id ?? null,
       validation_status: deriveValidationStatus(failures),
       validation_failures: failures,
       validated_at: new Date().toISOString(),
@@ -151,6 +167,7 @@ export async function generateAndStoreDraft(
         freelancer_id: freelancer.id,
         kind,
         body: "",
+      rule_id: rule?.id ?? null,
         language,
         prompt_version: DRAFT_PROMPT_VERSION,
         validation_status: "failed",

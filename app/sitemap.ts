@@ -21,6 +21,7 @@ const MARKETING_ROUTES = [
   "/tool",
   "/try",
   "/demo",
+  "/agent",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

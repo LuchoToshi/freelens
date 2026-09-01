@@ -29,6 +29,8 @@ import {
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
+import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
+import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
 import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
 
@@ -69,6 +71,7 @@ interface DraftRow {
   outcome: string | null;
   outcome_at?: string | null;
   dismiss_reason?: string | null;
+  rule_id?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
 }
@@ -131,11 +134,13 @@ export function InboxApp({
   const [gmailStatus, setGmailStatus] = useState<"connected" | "error" | null>(null);
   const [connectingGmail, setConnectingGmail] = useState(false);
   const [packages, setPackages] = useState<GapPackage[]>([]);
+  const [rules, setRules] = useState<RuleRow[]>([]);
   const [gmailConnection, setGmailConnection] = useState<GmailConnectionRow | null>(null);
   const [freelancerState, setFreelancerState] = useState(freelancer);
   // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
   // reload keeps the mode and leaving is a plain link back to /inbox.
   const [testMode, setTestMode] = useState(false);
+  const [authBannerDismissed, setAuthBannerDismissed] = useState(true);
 
   const sb = supabaseBrowser();
 
@@ -154,9 +159,11 @@ export function InboxApp({
   // /inbox?queue=<key> selects a queue. Read once on mount; kept in the URL
   // on open/close so a selection is shareable and survives a reload.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a per-device dismissal flag, unavailable during SSR
+    setAuthBannerDismissed(localStorage.getItem("fd-auth-banner-dismissed") === "1");
     const params = new URL(window.location.href).searchParams;
     if (params.get("test") === "1") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
+       
       setTestMode(true);
     }
     const q = params.get("queue") as QueueKey | null;
@@ -232,7 +239,7 @@ export function InboxApp({
     setInquiries((rows as InquiryRow[] | null) ?? []);
     const { data: draftRows, error: draftsError } = await sb
       .from("drafts")
-      .select("id, inquiry_id, kind, body, final_body, outcome, outcome_at, dismiss_reason, created_at, language, validation_status, validation_failures")
+      .select("id, inquiry_id, kind, body, final_body, outcome, outcome_at, dismiss_reason, rule_id, created_at, language, validation_status, validation_failures")
       .order("created_at", { ascending: false });
     if (draftsError) {
       setLoadError(true);
@@ -253,6 +260,11 @@ export function InboxApp({
       .select("label, price_from_eur, notes")
       .order("position");
     setPackages((packageRows as GapPackage[] | null) ?? []);
+    const { data: ruleRows } = await sb
+      .from("agent_rules")
+      .select("id, trigger, action, status, trial_runs_left, ran_count, edited_count")
+      .order("created_at", { ascending: false });
+    setRules((ruleRows as RuleRow[] | null) ?? []);
     if (GMAIL_CONNECT_ENABLED) {
       const { data: gmailRow } = await sb
         .from("agent_gmail_connections")
@@ -376,7 +388,7 @@ export function InboxApp({
     if (!openId || !drafts[openId]) return;
     if (editedForRef.current === openId) return;
     editedForRef.current = openId;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time init per opened inquiry, driven by async draft arrival
+     
     setEditedBody(drafts[openId].body ?? "");
   }, [openId, drafts]);
 
@@ -422,7 +434,29 @@ export function InboxApp({
       setNow(new Date());
       return;
     }
+    // A rule that produced this draft learns from the outcome (§6): an
+    // unedited approval spends a trial run, an edit resets the trial and is
+    // counted so drift stays visible.
+    const producingRule = openDraft.rule_id
+      ? rules.find((r) => r.id === openDraft.rule_id)
+      : undefined;
+    async function recordRuleRun(outcome: "sent_as_is" | "edited" | "skipped") {
+      if (!producingRule) return;
+      const next = afterRun(producingRule, outcome);
+      await sb
+        .from("agent_rules")
+        .update({
+          status: next.status,
+          trial_runs_left: next.trial_runs_left,
+          ran_count: next.ran_count,
+          edited_count: next.edited_count,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", producingRule.id);
+    }
+
     if (kind === "skip") {
+      await recordRuleRun("skipped");
       await sb
         .from("drafts")
         .update({
@@ -433,6 +467,7 @@ export function InboxApp({
         .eq("id", openDraft.id);
     } else {
       const untouched = editedBody === openDraft.body;
+      await recordRuleRun(untouched ? "sent_as_is" : "edited");
       await sb
         .from("drafts")
         .update({
@@ -594,6 +629,42 @@ export function InboxApp({
       )}
 
       <EvidenceList locale={freelancer.locale} items={deriveInquiryEvidence(open)} />
+
+        {openDraft?.rule_id && (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl bg-[var(--fd-paper)] px-4 py-3">
+            <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
+              {t.rules.producedBy.replace(
+                "{rule}",
+                (() => {
+                  const rule = rules.find((r) => r.id === openDraft.rule_id);
+                  if (!rule) return t.rules.producedByUnknown;
+                  const shape = rule.trigger.event_type
+                    ? (dict.public.form.types[
+                        rule.trigger.event_type as keyof typeof dict.public.form.types
+                      ] ?? rule.trigger.event_type)
+                    : t.rules.anyInquiry;
+                  return t.rules.sentence
+                    .replace("{trigger}", shape)
+                    .replace(
+                      "{action}",
+                      rule.action === "prepare_followup" ? t.rules.actionFollowup : t.rules.actionReply
+                    );
+                })()
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={async () => {
+                if (!openDraft.rule_id) return;
+                await sb.from("agent_rules").update({ status: "paused" }).eq("id", openDraft.rule_id);
+                await load();
+              }}
+              className="text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+            >
+              {t.rules.pause}
+            </button>
+          </div>
+        )}
 
       {openDraft && openDraft.validation_status === "failed" ? (
         <div
@@ -863,6 +934,23 @@ export function InboxApp({
           {t.heading}
         </h1>
 
+        {!authBannerDismissed && !testMode && (
+          <div role="status" className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+            <p className="text-sm font-medium text-[var(--fd-ink)]">{dict.auth.stricterBanner}</p>
+            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{dict.auth.stricterBannerBody}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthBannerDismissed(true);
+                localStorage.setItem("fd-auth-banner-dismissed", "1");
+              }}
+              className="w-fit text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
+            >
+              {dict.auth.stricterBannerDismiss}
+            </button>
+          </div>
+        )}
+
         {testMode && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4">
             <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{t.testMode.banner}</p>
@@ -977,6 +1065,50 @@ export function InboxApp({
                 voice_learning_paused: change.paused ?? f.voice_learning_paused,
               }));
               await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
+            }}
+          />
+        )}
+
+        {!testMode && (
+          <AutomationRulesCard
+            freelancer={freelancerState}
+            rules={rules}
+            approvals={allDrafts
+              .filter((d) => d.outcome)
+              .map((d) => {
+                const inquiry = inquiries.find((i) => i.id === d.inquiry_id);
+                return {
+                  kind: d.kind,
+                  event_type: inquiry?.event_type ?? "other",
+                  budget_band: inquiry?.budget_band ?? "unsure",
+                  outcome: d.outcome,
+                } satisfies ApprovalSignal;
+              })}
+            onCreate={async (proposal) => {
+              // evidenceCount -1 is the "don't suggest again" path: the rule
+              // is stored declined so the shape never proposes itself again.
+              await sb.from("agent_rules").insert({
+                freelancer_id: freelancerState.id,
+                trigger: proposal.trigger,
+                action: proposal.action,
+                status: proposal.evidenceCount === -1 ? "declined" : "trial",
+              });
+              await load();
+            }}
+            onUpdate={async (id, patch) => {
+              await sb.from("agent_rules").update(patch).eq("id", id);
+              await load();
+            }}
+            onDelete={async (id) => {
+              await sb.from("agent_rules").delete().eq("id", id);
+              await load();
+            }}
+            onPauseAll={async (paused) => {
+              setFreelancerState((f) => ({ ...f, rules_paused: paused }));
+              await sb
+                .from("freelancers")
+                .update({ rules_paused: paused })
+                .eq("auth_user_id", session.user.id);
             }}
           />
         )}

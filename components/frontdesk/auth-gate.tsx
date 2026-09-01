@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import Link from "next/link";
+import { CodeInput, type CodeStatus } from "@/components/auth/code-input";
 
 /**
  * Supabase puts auth-callback errors (e.g. an expired magic link) in the URL
@@ -73,6 +75,7 @@ export interface FreelancerRow {
   permission_levels: Record<string, unknown> | null;
   followup_quiet_days: number | null;
   followups_paused: boolean | null;
+  rules_paused: boolean | null;
   link_in_bio_confirmed_at: string | null;
 }
 
@@ -105,7 +108,7 @@ export function AuthGate({
       const { data } = await sb
         .from("freelancers")
         .select(
-          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, timezone, voice_profile, voice_learning_paused, voice_proposal_decisions, permission_levels, followup_quiet_days, followups_paused, link_in_bio_confirmed_at"
+          "id, handle, display_name, craft, city, professions, location, photo_url, locale, sign_off, timezone, voice_profile, voice_learning_paused, voice_proposal_decisions, permission_levels, followup_quiet_days, followups_paused, rules_paused, link_in_bio_confirmed_at"
         )
         .maybeSingle();
       if (cancelled) return;
@@ -139,19 +142,33 @@ export function AuthGate({
 
 function Login({ locale }: { locale: FrontdeskLocale }) {
   const t = fdDict(locale).auth;
+  const [mode, setMode] = useState<"email" | "code" | "invite">("email");
   const [email, setEmail] = useState("");
-  const [phase, setPhase] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [phase, setPhase] = useState<"idle" | "sending" | "noAccount" | "error">("idle");
   const [redirectError, setRedirectError] = useState<"expired" | "generic" | null>(null);
   const [code, setCode] = useState("");
-  const [codePhase, setCodePhase] = useState<"idle" | "verifying" | "error">("idle");
+  const [codeStatus, setCodeStatus] = useState<CodeStatus>("idle");
+  const [attempts, setAttempts] = useState(0);
+  const [sentAt, setSentAt] = useState<number | null>(null);
+  const [cooldown, setCooldown] = useState(0);
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteState, setInviteState] = useState<"idle" | "checking" | "used" | "invalid">("idle");
 
   useEffect(() => {
     const url = new URL(window.location.href);
+    // Invite deep link: ?invite=FRLNS-XXXX opens sign-up with the code filled.
+    const invite = url.searchParams.get("invite");
+    if (invite) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
+      setInviteCode(invite.toUpperCase());
+      setMode("invite");
+      url.searchParams.delete("invite");
+      window.history.replaceState({}, "", url.toString());
+    }
     const hashParams = new URLSearchParams(capturedAuthHash.replace(/^#/, ""));
     const error = url.searchParams.get("error") ?? hashParams.get("error");
     if (!error) return;
     const errorCode = url.searchParams.get("error_code") ?? hashParams.get("error_code");
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of the auth callback's error redirect, not derivable from render since window.location isn't available server-side
     setRedirectError(errorCode === "otp_expired" ? "expired" : "generic");
     // Supabase's own error code/description, never shown to the user directly.
     console.error(
@@ -166,125 +183,257 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
     window.history.replaceState({}, "", url.toString());
   }, []);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setPhase("sending");
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(
+      () => setCooldown((c) => (c > 0 ? c - 1 : 0)),
+      1000
+    );
+    return () => clearInterval(id);
+  }, [cooldown]);
+
+  async function sendCode(): Promise<boolean> {
     const sb = supabaseBrowser();
+    // No emailRedirectTo, ever: the email carries a code, not a link, so no
+    // session-granting URL exists to forward or intercept (addendum §1.1).
+    // shouldCreateUser: false — accounts are only born in the invite route.
     const { error } = await sb.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/inbox` },
+      options: { shouldCreateUser: false },
     });
-    setPhase(error ? "error" : "sent");
+    if (error) {
+      const message = error.message.toLowerCase();
+      setPhase(message.includes("signup") || message.includes("not allowed") ? "noAccount" : "error");
+      return false;
+    }
+    setCode("");
+    setCodeStatus("idle");
+    setAttempts(0);
+    setSentAt(Date.now());
+    setCooldown(38);
+    return true;
   }
 
-  async function submitCode(e: React.FormEvent) {
+  async function submitEmail(e: React.FormEvent) {
     e.preventDefault();
-    setCodePhase("verifying");
+    setPhase("sending");
+    if (await sendCode()) {
+      setPhase("idle");
+      setMode("code");
+    }
+  }
+
+  async function verify(token: string) {
+    if (codeStatus === "locked" || codeStatus === "verifying") return;
+    setCodeStatus("verifying");
     const sb = supabaseBrowser();
-    const { error } = await sb.auth.verifyOtp({ email, token: code, type: "email" });
+    const { error } = await sb.auth.verifyOtp({ email, token, type: "email" });
     // On success, AuthGate's onAuthStateChange picks up the new session and
     // unmounts Login entirely — no local success state to set here.
-    if (error) setCodePhase("error");
+    if (!error) return;
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
+    setCode("");
+    if (nextAttempts >= 5) setCodeStatus("locked");
+    else if (sentAt && Date.now() - sentAt > 10 * 60_000) setCodeStatus("expired");
+    else setCodeStatus("error");
   }
+
+  async function submitInvite(e: React.FormEvent) {
+    e.preventDefault();
+    setInviteState("checking");
+    try {
+      const res = await fetch("/api/auth/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: inviteCode, email }),
+      });
+      const payload = (await res.json()) as { ok: boolean; reason?: string };
+      if (payload.ok) {
+        setInviteState("idle");
+        if (await sendCode()) setMode("code");
+        return;
+      }
+      setInviteState(payload.reason === "used" ? "used" : "invalid");
+    } catch {
+      setInviteState("invalid");
+    }
+  }
+
+  const codeError =
+    codeStatus === "error"
+      ? t.codeWrong.replace("{n}", String(Math.max(0, 5 - attempts)))
+      : codeStatus === "expired"
+        ? t.codeExpired
+        : codeStatus === "locked"
+          ? t.codeLocked
+          : undefined;
+
+  const inputClass =
+    "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+  const primaryClass =
+    "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:opacity-50";
+  const ghostClass =
+    "w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)] disabled:no-underline disabled:text-[var(--fd-slate)]";
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-16">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
-      </div>
       {redirectError && (
         <div role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm leading-relaxed text-[var(--fd-ink)]">
           <p className="font-medium">
             {redirectError === "expired" ? t.expiredHeading : t.redirectErrorHeading}
           </p>
           <p className="mt-1">{redirectError === "expired" ? t.expiredBody : t.redirectErrorBody}</p>
-          <button
-            type="button"
-            onClick={() => setRedirectError(null)}
-            className="mt-2 text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
-          >
+          <button type="button" onClick={() => setRedirectError(null)} className={`mt-2 ${ghostClass}`}>
             {t.backToSignIn}
           </button>
         </div>
       )}
-      {phase === "sent" ? (
-        <div className="flex flex-col gap-5">
-          <p role="status" className="rounded-2xl border border-[var(--fd-line)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]">
-            {t.sent}
-          </p>
-          <form onSubmit={submitCode} className="flex flex-col gap-3">
-            <label htmlFor="fd-auth-code" className="text-sm font-medium text-[var(--fd-ink)]">
-              {t.codeLabel}
+
+      {mode === "email" && (
+        <>
+          <div className="flex flex-col gap-2">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.codeIntro}</p>
+          </div>
+          <form onSubmit={submitEmail} className="flex flex-col gap-3">
+            <label htmlFor="fd-auth-email" className="text-sm font-medium text-[var(--fd-ink)]">
+              {t.emailLabel}
             </label>
             <input
-              id="fd-auth-code"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]*"
-              maxLength={6}
+              id="fd-auth-email"
+              type="email"
               required
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-center text-lg tracking-[0.3em] focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
             />
-            {codePhase === "error" && (
+            {phase === "noAccount" && (
               <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
-                {t.codeError}
+                {t.noAccount}
               </p>
             )}
-            <button
-              type="submit"
-              disabled={codePhase === "verifying" || code.length !== 6}
-              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:opacity-50"
-            >
-              {codePhase === "verifying" ? t.sending : t.codeSubmit}
+            {phase === "error" && (
+              <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
+                {t.error}
+              </p>
+            )}
+            <button type="submit" disabled={phase === "sending"} className={primaryClass}>
+              {phase === "sending" ? t.sending : t.sendCode}
             </button>
           </form>
+          <button type="button" onClick={() => setMode("invite")} className={ghostClass}>
+            {t.haveInvite}
+          </button>
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.trustLine}</p>
+        </>
+      )}
+
+      {mode === "code" && (
+        <>
           <div className="flex flex-col gap-2">
-            <p className="text-sm text-[var(--fd-slate)]">{t.openInboxHint}</p>
-            <div className="flex flex-wrap gap-2">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.codeHeading}</h1>
+            <p role="status" className="text-sm leading-relaxed text-[var(--fd-slate)]">
+              {t.codeSentTo.replace("{email}", email)}
+            </p>
+          </div>
+          <CodeInput
+            value={code}
+            onChange={(next) => {
+              setCode(next);
+              if (codeStatus === "error" || codeStatus === "expired") setCodeStatus("idle");
+            }}
+            onComplete={(token) => void verify(token)}
+            status={codeStatus}
+            errorText={codeError}
+            label={t.codeLabel}
+            checkingText={t.codeChecking}
+          />
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              disabled={cooldown > 0 || codeStatus === "verifying"}
+              onClick={() => void sendCode()}
+              className={ghostClass}
+            >
+              {cooldown > 0 ? t.resendIn.replace("{s}", String(cooldown)) : t.resend}
+            </button>
+            <div className="flex flex-wrap items-center gap-3">
               {providersForEmail(email).map((provider) => (
                 <a
                   key={provider.name}
                   href={provider.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[var(--fd-line-control)] bg-white px-5 text-base font-medium text-[var(--fd-ink)] transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white px-4 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]"
                 >
                   {t.openProvider.replace("{provider}", provider.name)}
                 </a>
               ))}
+              <button type="button" onClick={() => setMode("email")} className={ghostClass}>
+                {t.wrongAddress}
+              </button>
             </div>
           </div>
-        </div>
-      ) : (
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <label htmlFor="fd-auth-email" className="text-sm font-medium text-[var(--fd-ink)]">
-            {t.emailLabel}
-          </label>
-          <input
-            id="fd-auth-email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
-          />
-          {phase === "error" && (
-            <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
-              {t.error}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={phase === "sending"}
-            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:opacity-50"
-          >
-            {phase === "sending" ? t.sending : t.send}
-          </button>
-        </form>
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.unsolicited}</p>
+        </>
+      )}
+
+      {mode === "invite" && (
+        <>
+          <div className="flex flex-col gap-2">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.inviteHeading}</h1>
+            <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.inviteIntro}</p>
+          </div>
+          <form onSubmit={submitInvite} className="flex flex-col gap-3">
+            <label htmlFor="fd-auth-invite" className="text-sm font-medium text-[var(--fd-ink)]">
+              {t.inviteLabel}
+            </label>
+            <input
+              id="fd-auth-invite"
+              required
+              value={inviteCode}
+              onChange={(e) => {
+                setInviteCode(e.target.value.toUpperCase());
+                if (inviteState !== "idle") setInviteState("idle");
+              }}
+              className={`${inputClass} font-mono tracking-[0.08em]`}
+            />
+            <label htmlFor="fd-auth-invite-email" className="text-sm font-medium text-[var(--fd-ink)]">
+              {t.inviteEmailLabel}
+            </label>
+            <input
+              id="fd-auth-invite-email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputClass}
+            />
+            <span className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.inviteProveNote}</span>
+            {inviteState === "used" && (
+              <p role="alert" className="rounded-xl border border-[var(--fd-line)] bg-[var(--fd-paper)] p-3 text-sm leading-relaxed text-[var(--fd-ink)]">
+                {t.inviteUsed}
+              </p>
+            )}
+            {inviteState === "invalid" && (
+              <p role="alert" className="rounded-xl border border-[var(--fd-error-text)]/40 bg-white p-3 text-sm leading-relaxed text-[var(--fd-ink)]">
+                {t.inviteInvalid}
+              </p>
+            )}
+            <button type="submit" disabled={inviteState === "checking"} className={primaryClass}>
+              {inviteState === "checking" ? t.sending : t.inviteContinue}
+            </button>
+          </form>
+          <div className="flex flex-wrap items-center gap-4">
+            <button type="button" onClick={() => setMode("email")} className={ghostClass}>
+              {t.backToSignIn}
+            </button>
+            <Link href="/" className={ghostClass}>
+              {t.joinWaitlist}
+            </Link>
+          </div>
+        </>
       )}
     </main>
   );
