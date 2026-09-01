@@ -83,9 +83,11 @@ export function PrefillStep({
         })),
       };
       // One event per proposed field, per the tracking plan — packages counts
-      // as one field regardless of row count.
+      // as one field regardless of row count. Professions is excluded: this
+      // screen has no control to edit it, so it can never register as
+      // corrected, and counting it as proposed would guarantee it always
+      // reads as "accepted unedited."
       if (nextValues.displayName) track("prefill_field_proposed");
-      if (nextValues.professions.length) track("prefill_field_proposed");
       if (nextValues.location) track("prefill_field_proposed");
       if (nextValues.signOff) track("prefill_field_proposed");
       if (nextValues.packages.length) track("prefill_field_proposed");
