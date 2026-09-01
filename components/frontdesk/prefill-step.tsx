@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { track } from "@/lib/analytics";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { confidencePercent } from "@/lib/frontdesk/provenance";
 import type { PrefillResult } from "@/lib/frontdesk/server/prefill";
@@ -51,6 +52,7 @@ export function PrefillStep({
     "w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]";
 
   async function read() {
+    track("prefill_started");
     setMode("reading");
     try {
       const res = await fetch("/api/frontdesk/setup/prefill", {
@@ -67,7 +69,7 @@ export function PrefillStep({
         return;
       }
       setPrefill(payload.prefill);
-      setValues({
+      const nextValues: PrefillApplied = {
         displayName: payload.prefill.display_name ?? "",
         professions: payload.prefill.professions as Profession[],
         location: payload.prefill.location ?? "",
@@ -79,11 +81,29 @@ export function PrefillStep({
           notes: p.notes ?? "",
           addons: [],
         })),
-      });
+      };
+      // One event per proposed field, per the tracking plan — packages counts
+      // as one field regardless of row count. Professions is excluded: this
+      // screen has no control to edit it, so it can never register as
+      // corrected, and counting it as proposed would guarantee it always
+      // reads as "accepted unedited."
+      if (nextValues.displayName) track("prefill_field_proposed");
+      if (nextValues.location) track("prefill_field_proposed");
+      if (nextValues.signOff) track("prefill_field_proposed");
+      if (nextValues.packages.length) track("prefill_field_proposed");
+      setValues(nextValues);
+      track("prefill_reviewed");
       setMode("review");
     } catch {
       setMode("error");
     }
+  }
+
+  function markPackagesEdited() {
+    // Packages count as one field: fire once for the whole set, not once
+    // per row or per keystroke.
+    const alreadyEdited = Object.keys(edited).some((k) => k.startsWith("pkg-"));
+    if (!alreadyEdited) track("prefill_field_edited");
   }
 
   function sourceLabel(field: string, confidence: number | undefined, hasValue: boolean) {
@@ -147,7 +167,14 @@ export function PrefillStep({
           >
             {mode === "reading" ? t.reading : t.readButton}
           </button>
-          <button type="button" onClick={onSkip} className={ghostClass}>
+          <button
+            type="button"
+            onClick={() => {
+              track("prefill_skipped");
+              onSkip();
+            }}
+            className={ghostClass}
+          >
             {t.skip}
           </button>
         </div>
@@ -186,6 +213,7 @@ export function PrefillStep({
             placeholder={t.notFound}
             onChange={(e) => {
               setValues({ ...values, [field.key]: e.target.value });
+              if (!edited[field.key]) track("prefill_field_edited");
               setEdited((prev) => ({ ...prev, [field.key]: true }));
             }}
             className={inputClass}
@@ -215,6 +243,7 @@ export function PrefillStep({
                     const next = [...values.packages];
                     next[i] = { ...pkg, label: e.target.value };
                     setValues({ ...values, packages: next });
+                    markPackagesEdited();
                     setEdited((prev) => ({ ...prev, [`pkg-${i}`]: true }));
                   }}
                   className={inputClass}
@@ -228,6 +257,7 @@ export function PrefillStep({
                     const next = [...values.packages];
                     next[i] = { ...pkg, price: e.target.value.replace(/[^\d]/g, "") };
                     setValues({ ...values, packages: next });
+                    markPackagesEdited();
                     setEdited((prev) => ({ ...prev, [`pkg-${i}`]: true }));
                   }}
                   className={inputClass}
@@ -247,10 +277,24 @@ export function PrefillStep({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={() => onApply(values)} className={primaryClass}>
+        <button
+          type="button"
+          onClick={() => {
+            track("prefill_applied");
+            onApply(values);
+          }}
+          className={primaryClass}
+        >
           {t.confirm}
         </button>
-        <button type="button" onClick={onSkip} className={ghostClass}>
+        <button
+          type="button"
+          onClick={() => {
+            track("prefill_review_abandoned");
+            onSkip();
+          }}
+          className={ghostClass}
+        >
           {t.skip}
         </button>
       </div>
