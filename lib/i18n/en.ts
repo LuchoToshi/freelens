@@ -141,10 +141,15 @@ export const en = {
   },
 
   meta: {
+    agent: {
+      title: "Freelens: delegate the desk, keep the decisions",
+      description:
+        "Freelens reads every inquiry through your page, plans the work, and prepares the replies in your voice. Prices, dates and sending stay yours. Invite-only while we test.",
+    },
     home: {
       title: "Freelens: stop losing jobs to a slow reply",
       description:
-        "Every inquiry gets a fast, personal reply with your real prices, ready to send. Built for creative freelancers such as photographers, videographers, designers and illustrators.",
+        "Every inquiry through your page gets a fast, personal reply with your real prices, ready to send. Built for creative freelancers such as photographers, videographers, designers and illustrators.",
     },
     try: {
       title: "Try Freelens with 3 clients \u00b7 Freelens",
@@ -364,7 +369,7 @@ export const en = {
         heroEyebrow: "Your front desk, delegated",
         heroTitle: "Delegate the desk. Keep the decisions.",
         heroSub:
-          "Freelens reads every inquiry, plans the work, and prepares the replies in your voice. Prices, dates and sending stay yours.",
+          "Freelens reads every inquiry through your page, plans the work, and prepares the replies in your voice. Prices, dates and sending stay yours.",
         heroCta: "Ask for an invite",
         heroCtaTry: "See how it works",
         exampleLabel: "You ask. It plans. You approve.",
@@ -390,7 +395,7 @@ export const en = {
           },
           {
             q: "What if it gets something wrong?",
-            a: "You see the draft before anyone else does. Skip it with a reason and it learns; edit it and the edit is what ships. It never learns a rule from one edit.",
+            a: "You see the draft before anyone else does. Skip it and you say why, so the pattern is visible; edit it and your edit is what ships and what it learns from. It never turns one edit into a rule.",
           },
         ],
         followupQ: "So I have to babysit it?",
@@ -403,7 +408,7 @@ export const en = {
       heroEyebrow: "Your front desk",
       heroTitle: "Stop losing jobs to a slow reply.",
       heroSub:
-        "Every inquiry gets a fast, personal reply with your real prices, ready to send. You just tap send.",
+        "Every inquiry through your page gets a fast, personal reply with your real prices, ready to send. You just tap send.",
       heroCta: "Get early access",
       heroCtaTry: "See a real reply",
       example: {
@@ -416,7 +421,7 @@ export const en = {
         draftLabel: "The reply",
         draft:
           "Hi Lisa! Love that you're thinking of me for June 14. Weddings are what I do best. For a full wedding day I work with packages from €1,950, second shooter included. I'd love to check the date and hear your plans. Shall we hop on a quick call this week?\n\nEmma",
-        caption: "Ready in ~20 seconds. Sent from your own inbox.",
+        caption: "Ready in a few seconds. You send it yourself.",
       },
       demo: {
         types: {
@@ -453,7 +458,7 @@ export const en = {
               "Hi Amber! Lovely that you want to plan a portrait session. A good portrait session feels more like a good conversation than a photo shoot, and you can see that in the images. For portraits I work with a package from €350, editing of the best photos included. Tell me a little about what the portraits are for and I'll shape the session around it. I'd love to check the date. When works for you?\n\nEmma",
           },
         },
-        caption: "Ready in about 20 seconds. Sent from your own inbox.",
+        caption: "Ready in a few seconds. You send it yourself, from your own inbox or straight back where they found you.",
         bridge: "This is how it will work with your prices and your style.",
         inquiryMeta: "New inquiry · 2 min ago",
         intro: "An inquiry lands. Twenty seconds later:",
