@@ -438,9 +438,16 @@ export function SetupWizard({
               {fdDict(locale).auth.error}
             </p>
           )}
-          <button type="button" disabled={saving || photoBusy} onClick={saveProfile} className={primaryClass}>
-            {t.save}
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {!freelancer && (
+              <button type="button" onClick={() => setStep(5)} className={secondaryClass}>
+                {t.back}
+              </button>
+            )}
+            <button type="button" disabled={saving || photoBusy} onClick={saveProfile} className={primaryClass}>
+              {t.save}
+            </button>
+          </div>
         </section>
       )}
 
@@ -666,11 +673,15 @@ export function SetupWizard({
             setStep(4);
           }}
           onAdjust={() => setStep(3)}
+          onBack={() => setStep(2)}
         />
       )}
 
       {step === 4 && (
         <>
+          <button type="button" onClick={() => setStep(35)} className={`${secondaryClass} w-fit`}>
+            {t.back}
+          </button>
           <ShareStep locale={locale} handle={handle} />
           {/* Appearance sits after the link, never in front of a decision:
               it is the one thing here that is optional (handoff §11). */}

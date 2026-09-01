@@ -41,6 +41,7 @@ export function RevealStep({
   regenerate,
   onContinue,
   onAdjust,
+  onBack,
 }: {
   locale: FrontdeskLocale;
   session: Session;
@@ -48,6 +49,8 @@ export function RevealStep({
   regenerate: boolean;
   onContinue: () => void;
   onAdjust: () => void;
+  /** Back to the decision before this one; every step can be reconsidered. */
+  onBack?: () => void;
 }) {
   const t = fdDict(locale).setup.reveal;
   const dict = fdDict(locale);
@@ -202,6 +205,11 @@ export function RevealStep({
         <button type="button" onClick={onAdjust} className={secondaryClass}>
           {t.secondary}
         </button>
+        {onBack && (
+          <button type="button" onClick={onBack} className={secondaryClass}>
+            {dict.setup.back}
+          </button>
+        )}
         </div>
       </motion.div>
     </motion.section>

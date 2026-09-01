@@ -112,6 +112,8 @@ export default async function HandlePage({
         locale={profile.locale}
         srcChannel={srcChannel}
       />
+
+      <p className="text-center text-xs text-[var(--fl-slate)]">{t.public.intake.poweredBy}</p>
     </main>
   );
 }
