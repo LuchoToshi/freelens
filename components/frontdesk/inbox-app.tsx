@@ -30,11 +30,15 @@ import {
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
 import { GuardFailedPanel, GuardPanel } from "@/components/frontdesk/guard-panel";
+import { PlanRail } from "@/components/frontdesk/plan-rail";
+import { matchedPackage } from "@/lib/frontdesk/planSteps";
+import { SourceChip } from "@/components/frontdesk/source-chip";
 import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
 import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
+import { nextFollowupDate } from "@/lib/frontdesk/followups";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -670,6 +674,13 @@ export function InboxApp({
         </GuardFailedPanel>
       ) : openDraft ? (
         <div className="flex flex-col gap-3">
+          <PlanRail
+            locale={freelancer.locale}
+            body={editedBody}
+            packages={packages}
+            eventType={dict.public.form.types[open.event_type]}
+            eventDate={open.event_date}
+          />
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
             {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
           </span>
@@ -677,6 +688,8 @@ export function InboxApp({
             locale={freelancer.locale}
             status={openDraft.validation_status as never}
             failures={openDraft.validation_failures}
+            body={editedBody}
+            eventDate={open.event_date}
           />
           <textarea
             aria-label={openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
@@ -685,6 +698,21 @@ export function InboxApp({
             onChange={(e) => setEditedBody(e.target.value)}
             className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-base leading-relaxed focus-visible:border-[var(--fd-focus-ring)] sm:text-sm focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
           />
+          {(() => {
+            // The price sentence's source note (§8.8). Rendered under the
+            // draft, never inside it: validation language abutting the email
+            // text is what made an earlier version read as part of the reply.
+            const match = matchedPackage(editedBody, packages);
+            if (!match) return null;
+            return (
+              <p className="flex flex-wrap items-center gap-1.5 text-xs leading-relaxed text-[var(--fd-slate)]">
+                <SourceChip locale={freelancer.locale} kind="yours" />
+                {t.plan.priceNote
+                  .replace("{price}", match.asWritten)
+                  .replace("{package}", match.label)}
+              </p>
+            );
+          })()}
           <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
             {open.client_email && (
               <a
@@ -799,6 +827,11 @@ export function InboxApp({
               .filter((d) => d.inquiry_id === open.id && d.kind === "nudge")
               .map((d) => ({ outcome: d.outcome, body: d.body })),
             now
+          )}
+          nextDate={nextFollowupDate(
+            open.replied_at,
+            quietDays,
+            freelancer.timezone || "Europe/Amsterdam",
           )}
           quietDays={quietDays}
         />

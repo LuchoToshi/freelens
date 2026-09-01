@@ -280,6 +280,35 @@ const en = {
       },
       failedSuffix: "(stopped)",
     },
+    plan: {
+      heading: "What Freelens did",
+      steps: {
+        read: "Read the inquiry",
+        matched: "Matched your prices",
+        date: "Checked the date",
+        drafted: "Wrote the draft",
+      },
+      details: {
+        readWithDate: "A {type} inquiry, for {date}.",
+        readWithoutDate: "A {type} inquiry, with no date given.",
+        matchedPackage: "{price} is your {package} price.",
+        matchedNoNumber: "Nothing here matched a package, so the draft names no number.",
+        matchedNoPackages: "You have no packages set yet, so the draft names no number.",
+        dateNoCalendar: "No calendar connected, so the draft claims nothing about {date}.",
+        dateNone: "No date in the inquiry, so there was nothing to claim.",
+        draftedVoice: "In your words, with your sign-off, ready for you to read.",
+      },
+      priceNote: "{price} is your {package} price. Drafts never invent numbers.",
+    },
+    checks: {
+      passed: "Passed every check",
+      notes: {
+        price: "No invented prices, only {price} appears",
+        noPrice: "No prices, because none matched",
+        date: "No claim that {date} is free",
+        emDash: "No em dash",
+      },
+    },
     permissions: {
       heading: "Automation levels",
       intro:
@@ -396,6 +425,7 @@ const en = {
       capLine: "Follow-ups: {used} of {cap} used",
       why: "A follow-up is proposed after {days} quiet days, and only ever proposed: you send it.",
       brakes: "It stops when the client books, you close the lead, you snooze, or the cap is reached.",
+      consequence: "A draft appears for review on {date}. It waits for you, nothing sends itself.",
       states: {
         awaiting: "waiting for the quiet window",
         proposed: "one is ready for your review",
@@ -1116,6 +1146,35 @@ const nl: typeof en = {
       },
       failedSuffix: "(gestopt)",
     },
+    plan: {
+      heading: "Wat Freelens deed",
+      steps: {
+        read: "De aanvraag gelezen",
+        matched: "Je prijzen gematcht",
+        date: "De datum gecheckt",
+        drafted: "Het concept geschreven",
+      },
+      details: {
+        readWithDate: "Een aanvraag voor {type}, op {date}.",
+        readWithoutDate: "Een aanvraag voor {type}, zonder datum.",
+        matchedPackage: "{price} is je prijs voor {package}.",
+        matchedNoNumber: "Niets kwam overeen met een pakket, dus het concept noemt geen bedrag.",
+        matchedNoPackages: "Je hebt nog geen pakketten ingesteld, dus het concept noemt geen bedrag.",
+        dateNoCalendar: "Geen agenda gekoppeld, dus het concept beweert niets over {date}.",
+        dateNone: "Geen datum in de aanvraag, dus er viel niets te beweren.",
+        draftedVoice: "In jouw woorden, met jouw afsluiting, klaar om te lezen.",
+      },
+      priceNote: "{price} is je prijs voor {package}. Concepten verzinnen nooit bedragen.",
+    },
+    checks: {
+      passed: "Door elke controle heen",
+      notes: {
+        price: "Geen verzonnen bedragen, alleen {price} staat erin",
+        noPrice: "Geen bedragen, want niets kwam overeen",
+        date: "Geen bewering dat {date} vrij is",
+        emDash: "Geen kastlijntje",
+      },
+    },
     permissions: {
       heading: "Automatiseringsniveaus",
       intro:
@@ -1232,6 +1291,7 @@ const nl: typeof en = {
       capLine: "Opvolgingen: {used} van {cap} gebruikt",
       why: "Een opvolging wordt voorgesteld na {days} stille dagen, en alleen voorgesteld: versturen doe jij.",
       brakes: "Het stopt zodra de klant boekt, jij de lead sluit, jij snoozet of de limiet is bereikt.",
+      consequence: "Op {date} staat er een concept klaar om na te lezen. Het wacht op jou, er gaat vanzelf niets weg.",
       states: {
         awaiting: "wacht op de stille periode",
         proposed: "er staat er een klaar om na te lezen",

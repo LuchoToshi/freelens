@@ -1,6 +1,7 @@
 "use client";
 
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import { CheckNotes } from "@/components/frontdesk/plan-rail";
 
 /**
  * The deterministic checks, rendered (handoff §13 `GuardPanel`). Extracted
@@ -31,10 +32,19 @@ export function GuardPanel({
   locale,
   status,
   failures,
+  body,
+  eventDate,
 }: {
   locale: FrontdeskLocale;
   status: DraftValidationStatus | null | undefined;
   failures: readonly string[] | null | undefined;
+  /**
+   * The draft as shown. With it, the passed verdict lists what was actually
+   * checked in this draft; without it, the panel falls back to naming the
+   * checks that ran, which is the most it can honestly say.
+   */
+  body?: string;
+  eventDate?: string | null;
 }) {
   const d = fdDict(locale).inbox.detail;
   const codes = failures ?? [];
@@ -56,6 +66,7 @@ export function GuardPanel({
   }
 
   if (status === "ready_for_review") {
+    if (body) return <CheckNotes locale={locale} body={body} eventDate={eventDate ?? null} />;
     return (
       <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.validation.checksPassed}</p>
     );
