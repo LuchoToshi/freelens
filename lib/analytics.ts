@@ -29,6 +29,11 @@ export type AnalyticsEvent =
   | "quote_reopened"
   | "voice_confirmed"
   | "setup_completed"
+  | "prefill_started"
+  | "prefill_skipped"
+  | "prefill_field_proposed"
+  | "prefill_field_edited"
+  | "prefill_applied"
   /** Fires on click of the mailto link or the copy button — intent to send,
    *  not a confirmed send. Nothing in the product can observe whether the
    *  freelancer's mail client actually dispatched the message. Any funnel
