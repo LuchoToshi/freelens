@@ -3,6 +3,14 @@
 import { useMemo, useState } from "react";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { inferEventType } from "@/lib/frontdesk/packageGaps";
+import {
+  EVENT_TYPE_OTHER,
+  EVENT_TYPE_OTHER_MAX,
+  eventTypeLabel,
+  INTAKE_EVENT_TYPES,
+  UNSPECIFIED_EVENT_TYPE,
+  type IntakeEventType,
+} from "@/lib/frontdesk/eventTypes";
 
 /**
  * Hybrid intake (addendum §3): essentials first — the message IS the brief;
@@ -14,13 +22,13 @@ import { inferEventType } from "@/lib/frontdesk/packageGaps";
  * never as Freelens (ChromeGate promise), and keeps the honeypot.
  */
 
-const EVENT_TYPES = ["wedding", "party", "business", "portrait", "other"] as const;
 const BUDGET_BANDS = ["<1000", "1000-2500", "2500+", "unsure"] as const;
 const DATE_SHAPE = /^\d{4}-\d{2}-\d{2}$/;
 
 interface Answers {
   eventDate: string | null;
-  eventType: (typeof EVENT_TYPES)[number] | null;
+  eventType: IntakeEventType | null;
+  eventTypeOther: string;
   typeSource: "message" | "answer" | null;
   budget: (typeof BUDGET_BANDS)[number] | null;
 }
@@ -52,6 +60,7 @@ export function IntakeThread({
   const [answers, setAnswers] = useState<Answers>({
     eventDate: null,
     eventType: null,
+    eventTypeOther: "",
     typeSource: null,
     budget: null,
   });
@@ -85,6 +94,10 @@ export function IntakeThread({
 
   async function submit() {
     if (sending) return;
+    const settledType =
+      answers.eventType === EVENT_TYPE_OTHER && !answers.eventTypeOther.trim()
+        ? UNSPECIFIED_EVENT_TYPE
+        : (answers.eventType ?? UNSPECIFIED_EVENT_TYPE);
     setSending(true);
     try {
       const response = await fetch("/api/frontdesk/inquiries", {
@@ -97,7 +110,13 @@ export function IntakeThread({
           clientName: name,
           clientEmail: email,
           eventDate: answers.eventDate ?? "",
-          eventType: answers.eventType ?? "other",
+          // No answer means no answer: the desk stores that the client never
+          // said, rather than filing it as "Something else". The same applies
+          // to "Something else" abandoned before the follow-up was answered,
+          // which is reachable by skipping the question.
+          eventType: settledType,
+          eventTypeOther:
+            settledType === EVENT_TYPE_OTHER ? answers.eventTypeOther.trim() : null,
           budgetBand: answers.budget ?? "unsure",
           message,
         }),
@@ -227,20 +246,52 @@ export function IntakeThread({
           )}
 
           {current === "type" && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {EVENT_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => {
-                    setAnswers((a) => ({ ...a, eventType: type, typeSource: "answer" }));
-                    advance();
-                  }}
-                  className={chipClass}
-                >
-                  {form.types[type]}
-                </button>
-              ))}
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="flex flex-wrap gap-2">
+                {INTAKE_EVENT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    aria-pressed={answers.eventType === type}
+                    onClick={() => {
+                      setAnswers((a) => ({ ...a, eventType: type, typeSource: "answer" }));
+                      // "Something else" is the one chip that asks a follow-up,
+                      // so it stays on this question until it is answered.
+                      if (type !== EVENT_TYPE_OTHER) advance();
+                    }}
+                    className={`${chipClass} ${
+                      answers.eventType === type ? "border-[var(--fd-ink)]" : ""
+                    }`}
+                  >
+                    {form.types[type]}
+                  </button>
+                ))}
+              </div>
+              {answers.eventType === EVENT_TYPE_OTHER && (
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="it-type-other" className="text-sm text-[var(--fd-ink)]">
+                    {form.typeOtherLabel}
+                  </label>
+                  <input
+                    id="it-type-other"
+                    autoFocus
+                    value={answers.eventTypeOther}
+                    maxLength={EVENT_TYPE_OTHER_MAX}
+                    onChange={(e) =>
+                      setAnswers((a) => ({ ...a, eventTypeOther: e.target.value }))
+                    }
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    disabled={!answers.eventTypeOther.trim()}
+                    onClick={advance}
+                    className={`${primaryClass} w-fit`}
+                  >
+                    {t.dateConfirm}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -289,7 +340,9 @@ export function IntakeThread({
     { label: form.emailLabel, value: email, source: t.sourceYou },
     {
       label: form.typeLabel,
-      value: answers.eventType ? form.types[answers.eventType] : t.notSettled,
+      value: answers.eventType
+        ? eventTypeLabel(answers.eventType, answers.eventTypeOther, form.types)
+        : t.notSettled,
       source:
         answers.typeSource === "message"
           ? t.sourceMessage

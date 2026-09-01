@@ -33,6 +33,7 @@ import { GuardFailedPanel, GuardPanel } from "@/components/frontdesk/guard-panel
 import { PlanRail } from "@/components/frontdesk/plan-rail";
 import { matchedPackage } from "@/lib/frontdesk/planSteps";
 import { SourceChip } from "@/components/frontdesk/source-chip";
+import { eventTypeLabel } from "@/lib/frontdesk/eventTypes";
 import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
@@ -57,7 +58,8 @@ interface InquiryRow {
   client_name: string;
   client_email: string | null;
   event_date: string | null;
-  event_type: "wedding" | "party" | "business" | "portrait" | "other";
+  event_type: string;
+  event_type_other: string | null;
   budget_band: string;
   message: string | null;
   status: "new" | "replied" | "nudge_due" | "booked" | "lost";
@@ -221,7 +223,9 @@ export function InboxApp({
     }
     const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
-      .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at, replied_at, snoozed_until")
+      .select(
+        "id, source, src_channel, client_name, client_email, event_date, event_type, event_type_other, budget_band, message, status, created_at, replied_at, snoozed_until",
+      )
       .order("created_at", { ascending: false });
     if (inquiriesError) {
       setLoadError(true);
@@ -328,7 +332,7 @@ export function InboxApp({
       if (typeFilter !== "all" && inquiry.event_type !== typeFilter) return false;
       if (!needle) return true;
       const hay = `${inquiry.client_name} ${inquiry.message ?? ""} ${
-        dict.public.form.types[inquiry.event_type]
+        eventTypeLabel(inquiry.event_type, inquiry.event_type_other, dict.public.form.types)
       }`.toLowerCase();
       return hay.includes(needle);
     });
@@ -603,7 +607,7 @@ export function InboxApp({
           )}
         </h2>
         <p className="text-sm text-[var(--fd-slate)]">
-          {dict.public.form.types[open.event_type]}
+          {eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
           {open.event_date ? ` · ${d.date}: ${open.event_date}` : ""} · {d.budget}: {open.budget_band}
         </p>
       </header>
@@ -678,7 +682,7 @@ export function InboxApp({
             locale={freelancer.locale}
             body={editedBody}
             packages={packages}
-            eventType={dict.public.form.types[open.event_type]}
+            eventType={eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
             eventDate={open.event_date}
           />
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
@@ -1265,7 +1269,7 @@ export function InboxApp({
                         </span>
                         <span className="flex w-full items-baseline justify-between gap-2">
                           <span className="truncate text-xs text-[var(--fd-slate)]">
-                            {dict.public.form.types[inquiry.event_type]}
+                            {eventTypeLabel(inquiry.event_type, inquiry.event_type_other, dict.public.form.types)}
                             {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
                           </span>
                           <span className="shrink-0 text-xs text-[var(--fd-slate)]">

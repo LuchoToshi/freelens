@@ -1,4 +1,10 @@
 import { isValidHandle } from "@/lib/frontdesk/handles";
+import {
+  EVENT_TYPE_OTHER,
+  EVENT_TYPE_OTHER_MAX,
+  isSubmittableEventType,
+  needsOtherText,
+} from "@/lib/frontdesk/eventTypes";
 import { serviceClient } from "@/lib/frontdesk/server/clients";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import { sendEmail } from "@/lib/server/sendEmail";
@@ -33,7 +39,6 @@ function rateLimited(ip: string): boolean {
 const MAX_BODY_BYTES = 20_000;
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DATE_SHAPE = /^\d{4}-\d{2}-\d{2}$/;
-const EVENT_TYPES = new Set(["wedding", "party", "business", "portrait", "other"]);
 const BUDGET_BANDS = new Set(["<1000", "1000-2500", "2500+", "unsure"]);
 const SRC_CHANNELS = new Set(["ig", "tt", "li", "sig"]);
 const KNOWN_FIELDS = new Set([
@@ -103,6 +108,10 @@ export async function POST(request: Request) {
   const eventDate =
     typeof b.eventDate === "string" && DATE_SHAPE.test(b.eventDate) ? b.eventDate : null;
   const eventType = typeof b.eventType === "string" ? b.eventType : "";
+  const eventTypeOther =
+    typeof b.eventTypeOther === "string"
+      ? b.eventTypeOther.trim().slice(0, EVENT_TYPE_OTHER_MAX)
+      : "";
   const budgetBand = typeof b.budgetBand === "string" ? b.budgetBand : "";
   const message =
     typeof b.message === "string" && b.message.trim() ? b.message.trim().slice(0, 5000) : null;
@@ -114,7 +123,8 @@ export async function POST(request: Request) {
     !clientName ||
     !EMAIL_SHAPE.test(clientEmail) ||
     clientEmail.length > 254 ||
-    !EVENT_TYPES.has(eventType) ||
+    !isSubmittableEventType(eventType) ||
+    needsOtherText(eventType, eventTypeOther) ||
     !BUDGET_BANDS.has(budgetBand)
   ) {
     return Response.json({ ok: false }, { status: 400 });
@@ -140,6 +150,7 @@ export async function POST(request: Request) {
       client_email: clientEmail,
       event_date: eventDate,
       event_type: eventType,
+      event_type_other: eventType === EVENT_TYPE_OTHER ? eventTypeOther : null,
       budget_band: budgetBand,
       message,
       status: "new",

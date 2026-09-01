@@ -41,7 +41,7 @@ export async function generateAndStoreDraft(
   const { data: inquiry } = await db
     .from("inquiries")
     .select(
-      "id, freelancer_id, client_name, client_email, event_type, event_date, budget_band, message"
+      "id, freelancer_id, client_name, client_email, event_type, event_type_other, event_date, budget_band, message"
     )
     .eq("id", inquiryId)
     .maybeSingle();
@@ -109,7 +109,12 @@ export async function generateAndStoreDraft(
       packages,
       inquiry: {
         clientFirstName: String(inquiry.client_name).trim().split(/\s+/)[0] ?? "",
-        eventType: inquiry.event_type,
+        // A client who chose "Something else" described the work themselves;
+        // their words are the drafting context, not the word "other".
+        eventType:
+          inquiry.event_type === "other" && inquiry.event_type_other
+            ? String(inquiry.event_type_other)
+            : String(inquiry.event_type).replace(/_/g, " "),
         eventDate: inquiry.event_date,
         budgetBand: inquiry.budget_band,
         message: inquiry.message,

@@ -6,6 +6,7 @@
  * while the mode is active.
  */
 import type { FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import type { StoredEventType } from "@/lib/frontdesk/eventTypes";
 
 export interface TestInquiry {
   id: string;
@@ -14,7 +15,8 @@ export interface TestInquiry {
   client_name: string;
   client_email: string | null;
   event_date: string | null;
-  event_type: "wedding" | "party" | "business" | "portrait" | "other";
+  event_type: StoredEventType;
+  event_type_other?: string | null;
   budget_band: string;
   message: string | null;
   status: "new" | "replied" | "nudge_due" | "booked" | "lost";
@@ -79,10 +81,10 @@ export function buildTestFixture(now: Date, locale: FrontdeskLocale) {
 
   const inquiries: TestInquiry[] = [
     { id: "test-decision", source: "sample", src_channel: "ig", client_name: "Fleur de Vries (fictional)", client_email: null, event_date: null, event_type: "wedding", budget_band: "2500+", message: m.decision, status: "new", created_at: iso(2 * DAY), replied_at: null, snoozed_until: null },
-    { id: "test-review", source: "sample", src_channel: null, client_name: "Daan Jansen (fictional)", client_email: "daan@example.com", event_date: "2026-10-12", event_type: "business", budget_band: "1000-2500", message: m.review, status: "new", created_at: iso(1 * DAY), replied_at: null, snoozed_until: null },
-    { id: "test-failed", source: "sample", src_channel: null, client_name: "Saar Visser (fictional)", client_email: "saar@example.com", event_date: null, event_type: "party", budget_band: "<1000", message: m.failed, status: "new", created_at: iso(3 * DAY), replied_at: null, snoozed_until: null },
+    { id: "test-review", source: "sample", src_channel: null, client_name: "Daan Jansen (fictional)", client_email: "daan@example.com", event_date: "2026-10-12", event_type: "event", budget_band: "1000-2500", message: m.review, status: "new", created_at: iso(1 * DAY), replied_at: null, snoozed_until: null },
+    { id: "test-failed", source: "sample", src_channel: null, client_name: "Saar Visser (fictional)", client_email: "saar@example.com", event_date: null, event_type: "event", budget_band: "<1000", message: m.failed, status: "new", created_at: iso(3 * DAY), replied_at: null, snoozed_until: null },
     { id: "test-followup", source: "sample", src_channel: null, client_name: "Noor Bakker (fictional)", client_email: "noor@example.com", event_date: null, event_type: "wedding", budget_band: "2500+", message: m.followup, status: "nudge_due", created_at: iso(9 * DAY), replied_at: iso(6 * DAY), snoozed_until: null },
-    { id: "test-waiting", source: "sample", src_channel: null, client_name: "Lars Smit (fictional)", client_email: "lars@example.com", event_date: null, event_type: "portrait", budget_band: "1000-2500", message: m.waiting, status: "replied", created_at: iso(2 * DAY), replied_at: iso(1 * DAY), snoozed_until: null },
+    { id: "test-waiting", source: "sample", src_channel: null, client_name: "Lars Smit (fictional)", client_email: "lars@example.com", event_date: null, event_type: "other", event_type_other: "family portraits", budget_band: "1000-2500", message: m.waiting, status: "replied", created_at: iso(2 * DAY), replied_at: iso(1 * DAY), snoozed_until: null },
     { id: "test-done", source: "sample", src_channel: null, client_name: "Mila Peters (fictional)", client_email: "mila@example.com", event_date: null, event_type: "wedding", budget_band: "2500+", message: m.done, status: "booked", created_at: iso(12 * DAY), replied_at: iso(10 * DAY), snoozed_until: null },
   ];
 

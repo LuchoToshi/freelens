@@ -66,8 +66,18 @@ describe("occasion inference (§3): only from the client's own words", () => {
   it("finds the type in either language, and never guesses", () => {
     expect(inferEventType("We trouwen in juni op het strand")).toBe("wedding");
     expect(inferEventType("We are getting married next summer")).toBe("wedding");
-    expect(inferEventType("Need headshots for the team")).toBe("portrait");
+    expect(inferEventType("Een videoclip voor onze band")).toBe("music_video");
+    expect(inferEventType("We need reels for instagram")).toBe("social_content");
     expect(inferEventType("Hi, love your work, call me")).toBeNull();
     expect(inferEventType(null)).toBeNull();
+  });
+
+  it("never infers a type the form no longer offers", () => {
+    // Headshots used to infer "portrait". The question is now asked instead
+    // of answered with a value the client could not have chosen.
+    expect(inferEventType("Need headshots for the team")).toBeNull();
+    for (const retired of ["party", "business", "portrait"]) {
+      expect(inferEventType("a corporate birthday portrait party")).not.toBe(retired);
+    }
   });
 });
