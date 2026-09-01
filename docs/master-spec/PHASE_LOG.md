@@ -588,7 +588,11 @@ Threat→design, implemented and E2E-verified on the local stack:
   Security & sessions card on /setup (verified live). One-time
   "sign-in got stricter" banner in the inbox. Full EN/NL; 578 tests.
 
-**DEPLOY-COUPLED OWNER ACTION (blocking for the security property):**
+**DEPLOY-COUPLED OWNER ACTION (attempted 1 Sep, blocked by the session's
+permission guard on production authentication changes — the production
+template is UNCHANGED and was verified so afterwards; a ready-to-paste
+version sits in `supabase/templates/signin_code.html`, and the current
+production template is attached to PR #57 for rollback):**
 the production Supabase email template must be switched to code-only
 (no `{{ .ConfirmationURL }}`, show `{{ .Token }}` — copy in
 `supabase/templates/signin_code.html`) at or before this branch's
