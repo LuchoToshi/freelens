@@ -47,6 +47,9 @@ function providersForEmail(email: string): EmailProvider[] {
   return [GMAIL_PROVIDER, OUTLOOK_PROVIDER];
 }
 
+/** The sign-in service refuses a second email to the same address inside 60s. */
+const RESEND_COOLDOWN_SECONDS = 60;
+
 /**
  * FrontDesk's magic-link gate, copied from the /app pattern (agent-app.tsx),
  * not imported — the original stays untouched.
@@ -146,7 +149,7 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
   const t = fdDict(locale).auth;
   const [mode, setMode] = useState<"email" | "code" | "invite">("email");
   const [email, setEmail] = useState("");
-  const [phase, setPhase] = useState<"idle" | "sending" | "noAccount" | "error">("idle");
+  const [phase, setPhase] = useState<"idle" | "sending" | "noAccount" | "tooSoon" | "error">("idle");
   const [redirectError, setRedirectError] = useState<"expired" | "generic" | null>(null);
   const [code, setCode] = useState("");
   const [codeStatus, setCodeStatus] = useState<CodeStatus>("idle");
@@ -205,6 +208,17 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
     });
     if (error) {
       const message = error.message.toLowerCase();
+      // The service refuses a second email to the same address inside a minute
+      // and says how long is left. Reporting that as a generic failure sends
+      // the reader off to inspect an address that was never the problem, which
+      // is the single worst thing this screen can do: the account is fine, the
+      // request was simply early.
+      const tooSoon = message.match(/after (\d+) seconds?/);
+      if (tooSoon) {
+        setCooldown(Number(tooSoon[1]));
+        setPhase("tooSoon");
+        return false;
+      }
       setPhase(message.includes("signup") || message.includes("not allowed") ? "noAccount" : "error");
       return false;
     }
@@ -212,7 +226,12 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
     setCodeStatus("idle");
     setAttempts(0);
     setSentAt(Date.now());
-    setCooldown(38);
+    // Matches the sign-in service's own minimum gap between two emails to the
+    // same address (smtp_max_frequency, 60s). A shorter cooldown here re-enables
+    // the button before the server will accept the request, and the refusal
+    // comes back as the generic "that did not work", which reads as a problem
+    // with the address rather than as "too soon".
+    setCooldown(RESEND_COOLDOWN_SECONDS);
     return true;
   }
 
@@ -315,13 +334,26 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
                 {t.noAccount}
               </p>
             )}
+            {phase === "tooSoon" && (
+              <p className="text-sm font-medium text-[var(--fd-slate)]" role="status">
+                {t.tooSoon.replace("{s}", String(cooldown))}
+              </p>
+            )}
             {phase === "error" && (
               <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">
                 {t.error}
               </p>
             )}
-            <button type="submit" disabled={phase === "sending"} className={primaryClass}>
-              {phase === "sending" ? t.sending : t.sendCode}
+            <button
+              type="submit"
+              disabled={phase === "sending" || cooldown > 0}
+              className={primaryClass}
+            >
+              {phase === "sending"
+                ? t.sending
+                : cooldown > 0
+                  ? t.resendIn.replace("{s}", String(cooldown))
+                  : t.sendCode}
             </button>
           </form>
           <button type="button" onClick={() => setMode("invite")} className={ghostClass}>
