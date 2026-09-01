@@ -47,6 +47,9 @@ function providersForEmail(email: string): EmailProvider[] {
   return [GMAIL_PROVIDER, OUTLOOK_PROVIDER];
 }
 
+/** The sign-in service refuses a second email to the same address inside 60s. */
+const RESEND_COOLDOWN_SECONDS = 60;
+
 /**
  * FrontDesk's magic-link gate, copied from the /app pattern (agent-app.tsx),
  * not imported — the original stays untouched.
@@ -212,7 +215,12 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
     setCodeStatus("idle");
     setAttempts(0);
     setSentAt(Date.now());
-    setCooldown(38);
+    // Matches the sign-in service's own minimum gap between two emails to the
+    // same address (smtp_max_frequency, 60s). A shorter cooldown here re-enables
+    // the button before the server will accept the request, and the refusal
+    // comes back as the generic "that did not work", which reads as a problem
+    // with the address rather than as "too soon".
+    setCooldown(RESEND_COOLDOWN_SECONDS);
     return true;
   }
 
