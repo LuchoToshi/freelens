@@ -669,6 +669,24 @@ const en = {
       "The email now carries a six-digit code that only works on the device that asked for it. A forwarded email can't sign anyone in.",
     stricterBannerDismiss: "Got it",
   },
+  security: {
+    heading: "Account and sign-in",
+    intro:
+      "Where you are signed in, and how to end a session you no longer trust. Nothing here changes what the agent may do; that lives in the Control room.",
+    policyLegend: "On this device",
+    policyDevice: "Stay signed in (30-day idle limit)",
+    policyDeviceWhy: "Good for your own laptop or phone. A device unused for 30 days signs itself out.",
+    policyBrowser: "Sign out when the browser closes",
+    policyBrowserWhy: "Good for shared or public devices. Closing the browser ends the session.",
+    policyNote: "Applies from your next sign-in on this device.",
+    othersButton: "Sign out everywhere else",
+    othersBusy: "One moment",
+    othersDone: "Done. Every other device is signed out; this one stays.",
+    othersWhy: "Use this after signing in on a device you don't trust anymore.",
+    listNote:
+      "Freelens cannot show you a list of your devices: the sign-in service does not expose one. Signing out everywhere else works regardless, and does not depend on that list.",
+    link: "Account and sign-in",
+  },
   control: {
     heading: "Control room",
     lead: "What Freelens may do and what it remembers. Change anything, it applies from the next action.",
@@ -1571,6 +1589,24 @@ const nl: typeof en = {
     stricterBannerBody:
       "De e-mail bevat nu een zescijferige code die alleen werkt op het apparaat dat erom vroeg. Een doorgestuurde e-mail kan niemand aanmelden.",
     stricterBannerDismiss: "Begrepen",
+  },
+  security: {
+    heading: "Account en aanmelden",
+    intro:
+      "Waar je aangemeld bent, en hoe je een sessie be\u00ebindigt die je niet meer vertrouwt. Hier verandert niets aan wat de agent mag doen; dat staat in de Regelkamer.",
+    policyLegend: "Op dit apparaat",
+    policyDevice: "Aangemeld blijven (30 dagen inactief maximaal)",
+    policyDeviceWhy: "Handig op je eigen laptop of telefoon. Een apparaat dat 30 dagen niet gebruikt is meldt zichzelf af.",
+    policyBrowser: "Afmelden zodra de browser sluit",
+    policyBrowserWhy: "Handig op gedeelde of openbare apparaten. Browser dicht, sessie voorbij.",
+    policyNote: "Geldt vanaf je volgende aanmelding op dit apparaat.",
+    othersButton: "Overal anders afmelden",
+    othersBusy: "Momentje",
+    othersDone: "Gedaan. Elk ander apparaat is afgemeld; dit apparaat blijft aangemeld.",
+    othersWhy: "Gebruik dit nadat je bent aangemeld op een apparaat dat je niet meer vertrouwt.",
+    listNote:
+      "Freelens kan geen lijst van je apparaten laten zien: de aanmelddienst geeft die niet vrij. Overal anders afmelden werkt hoe dan ook, en heeft die lijst niet nodig.",
+    link: "Account en aanmelden",
   },
   control: {
     heading: "Regelkamer",

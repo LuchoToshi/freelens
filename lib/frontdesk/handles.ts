@@ -12,6 +12,7 @@ export const HANDLE_SHAPE = /^[a-z0-9][a-z0-9-]{2,29}$/;
  */
 export const RESERVED_HANDLES = new Set([
   "about",
+  "account",
   "accuracy",
   "admin",
   "api",
@@ -53,6 +54,7 @@ export function isFrontdeskPath(pathname: string): boolean {
     first === "demo" ||
     first === "home" ||
     first === "control" ||
+    first === "account" ||
     first === "clients" ||
     first === "follow-ups"
   ) {

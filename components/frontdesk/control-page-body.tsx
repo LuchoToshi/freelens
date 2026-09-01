@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { AuthGate, type FreelancerRow } from "@/components/frontdesk/auth-gate";
@@ -123,6 +124,13 @@ function ControlRoom({ session, freelancer }: { session: Session; freelancer: Fr
 
       <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{c.footer}</p>
       <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{c.stopNote}</p>
+
+      <Link
+        href="/account"
+        className="w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+      >
+        {dict.security.link}
+      </Link>
     </main>
   );
 }

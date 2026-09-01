@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
@@ -574,6 +575,12 @@ export function SetupWizard({
             displayName={displayName || handle}
             stored={freelancer?.appearance ?? null}
           />
+          <Link
+            href="/account"
+            className="w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
+          >
+            {fdDict(locale).security.link}
+          </Link>
         </>
       )}
     </main>

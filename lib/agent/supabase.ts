@@ -3,25 +3,31 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * One browser client. Sessions are per-device: the auth token lives in
- * localStorage, and a device idle past the cap is signed out on the next
- * visit, client-side, regardless of the token's own lifetime. Every table read
- * goes through RLS: the anon key can only ever see the signed-in user's own
- * rows.
- *
- * The end-with-browser policy is still honoured for anyone who chose it while
- * the setting existed — dropping the reader would move their token to another
- * store and sign them out — but nothing sets it any more.
+ * One browser client. Sessions are per-device: the freelancer chooses between
+ * the 30-day idle default and end-with-browser on /account, and the choice
+ * lives in localStorage and steers which store holds the auth token. A device
+ * idle past the cap is signed out on the next visit, client-side, regardless
+ * of the token's own lifetime. Every table read goes through RLS: the anon
+ * key can only ever see the signed-in user's own rows.
  */
 const POLICY_KEY = "fd-session-policy"; // "device" (default) | "browser"
 const LAST_ACTIVE_KEY = "fd-last-active";
 const IDLE_CAP_MS = 30 * 24 * 60 * 60 * 1000;
 
-function sessionPolicy(): "device" | "browser" {
+export function sessionPolicy(): "device" | "browser" {
   try {
     return localStorage.getItem(POLICY_KEY) === "browser" ? "browser" : "device";
   } catch {
     return "device";
+  }
+}
+
+/** Applies from the next sign-in on this device; the UI says so. */
+export function setSessionPolicy(policy: "device" | "browser") {
+  try {
+    localStorage.setItem(POLICY_KEY, policy);
+  } catch {
+    // Storage unavailable: the default policy applies.
   }
 }
 
