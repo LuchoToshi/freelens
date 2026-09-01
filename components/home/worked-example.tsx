@@ -51,7 +51,7 @@ export interface WorkedExampleDemo {
 
 const LEAD_KEY = "wedding" as const;
 const OTHER_KEYS = ["party", "business", "portrait"] as const;
-const TYPE_KEYS = [LEAD_KEY, ...OTHER_KEYS] as const;
+type TypeKey = typeof LEAD_KEY | (typeof OTHER_KEYS)[number];
 
 export function WorkedExample({
   demo,
@@ -63,7 +63,7 @@ export function WorkedExample({
   draftLabel: string;
 }) {
   const reduce = useReducedMotion();
-  const [selected, setSelected] = useState<(typeof TYPE_KEYS)[number]>("wedding");
+  const [selected, setSelected] = useState<TypeKey>("wedding");
   const active = demo.types[selected];
 
   const swap = reduce

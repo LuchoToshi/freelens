@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  ACCENTS,
+  accentTextColor,
   appearanceStyle,
+  contrast,
   DEFAULT_APPEARANCE,
   parseAppearance,
   serializeAppearance,
@@ -42,5 +45,20 @@ describe("appearance is a closed set (handoff §11)", () => {
     expect(dark["--fl-ink"]).not.toBe("#C07F16");
     expect(dark["--fl-paper"]).not.toBe(DEFAULT_APPEARANCE.tone);
     expect(dark.color).toBe(dark["--fl-ink"]);
+  });
+});
+
+describe("every accent stays readable (handoff §11 contrast)", () => {
+  it("picks a text colour that clears 4.5:1 on each accent in the palette", () => {
+    for (const accent of ACCENTS) {
+      expect(contrast(accent, accentTextColor(accent)), accent).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("keeps page text well clear of its ground in both themes", () => {
+    for (const theme of ["light", "dark"] as const) {
+      const style = appearanceStyle(parseAppearance({ theme }));
+      expect(contrast(style["--fl-ink"], style["--fl-paper"]), theme).toBeGreaterThanOrEqual(7);
+    }
   });
 });

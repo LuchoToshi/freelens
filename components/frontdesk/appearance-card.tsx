@@ -8,7 +8,9 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import {
   ACCENTS,
   appearanceStyle,
+  accentTextColor,
   DEFAULT_APPEARANCE,
+  isDefaultAppearance,
   parseAppearance,
   serializeAppearance,
   THEMES,
@@ -172,8 +174,11 @@ export function AppearanceCard({
             <span className="font-serif text-lg font-medium">{displayName}</span>
             <span className="text-xs opacity-70">{t.previewLine}</span>
             <span
-              style={{ backgroundColor: appearance.accent }}
-              className="mt-1 inline-flex min-h-9 items-center rounded-lg px-4 text-sm font-medium text-white"
+              style={{
+                backgroundColor: appearance.accent,
+                color: accentTextColor(appearance.accent),
+              }}
+              className="mt-1 inline-flex min-h-9 items-center rounded-lg px-4 text-sm font-medium"
             >
               {t.previewCta}
             </span>
@@ -186,7 +191,7 @@ export function AppearanceCard({
             {t.saved}
           </p>
         )}
-        {appearance !== DEFAULT_APPEARANCE && (
+        {!isDefaultAppearance(appearance) && (
           <button
             type="button"
             disabled={busy}

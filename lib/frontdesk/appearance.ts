@@ -50,6 +50,16 @@ export function parseAppearance(stored: unknown): Appearance {
 }
 
 /** The shape stored in the column; snake_case, like every other stored key. */
+/** Is this the untouched product look? Compared by value, not by identity. */
+export function isDefaultAppearance(appearance: Appearance): boolean {
+  return (
+    appearance.tone === DEFAULT_APPEARANCE.tone &&
+    appearance.accent === DEFAULT_APPEARANCE.accent &&
+    appearance.theme === DEFAULT_APPEARANCE.theme &&
+    appearance.coverUrl === null
+  );
+}
+
 export function serializeAppearance(appearance: Appearance): Record<string, unknown> {
   return {
     tone: appearance.tone,
@@ -81,7 +91,34 @@ export function appearanceStyle(appearance: Appearance): Record<string, string> 
     "--fl-slate": dark ? "rgba(247,245,241,0.72)" : "rgba(26,26,26,0.66)",
     "--fl-line": dark ? "rgba(247,245,241,0.20)" : "rgba(26,26,26,0.14)",
     "--fl-accent": appearance.accent,
+    "--fl-accent-text": accentTextColor(appearance.accent),
     backgroundColor: ground,
     color: ink,
   };
+}
+
+/**
+ * Readable text on the accent. The four accents differ enough in lightness
+ * that one fixed text colour fails contrast on at least one of them, so the
+ * text colour is derived rather than assumed: whichever of ink and paper
+ * contrasts better with the chosen accent wins. This is the reason the
+ * palette can stay a free choice without any of them producing an unreadable
+ * button.
+ */
+export function accentTextColor(accent: string): "#FFFFFF" | "#1A1A1A" {
+  return contrast(accent, "#FFFFFF") >= contrast(accent, "#1A1A1A") ? "#FFFFFF" : "#1A1A1A";
+}
+
+export function contrast(a: string, b: string): number {
+  const [l1, l2] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
+function luminance(hex: string): number {
+  const n = hex.replace("#", "");
+  const channels = [0, 2, 4].map((i) => {
+    const v = parseInt(n.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
 }

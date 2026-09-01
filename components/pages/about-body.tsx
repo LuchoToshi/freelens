@@ -4,10 +4,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BackLink } from "@/components/i18n/back-link";
 import { container } from "@/components/container";
-import { linkButtonClass, primaryButtonClass } from "@/components/button-classes";
+import { primaryButtonClass } from "@/components/button-classes";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
-const SECTIONS = ["what", "boundary", "trust", "tools", "going"] as const;
+const SECTIONS = ["what", "boundary", "trust", "going"] as const;
 
 /** The rebooking-first story, honest about the two data zones. */
 export function AboutPageBody() {
@@ -44,12 +44,9 @@ export function AboutPageBody() {
         })}
 
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/#waitlist" className={primaryButtonClass}>
+          <Link href="/#early-access" className={primaryButtonClass}>
             {a.ctaPrimary}
             <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-          <Link href="/rekentools" className={linkButtonClass}>
-            {a.ctaSecondary}
           </Link>
         </div>
       </div>

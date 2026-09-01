@@ -475,14 +475,6 @@ export const nl: DeepPartial<typeof en> = {
           "Alles exporteren of alles verwijderen, vanaf dag \u00e9\u00e9n",
         ],
       },
-      tools: {
-        eyebrow: "Ondertussen, gratis",
-        heading: "Gratis rekentools voor zzp'ers.",
-        body: "De deterministische belastingmotor achter Freelens is vandaag al live, gecontroleerd bij belastingdienst.nl.",
-        teaser: "De vaste 30%-regel zit er op echte cijfers tot \u20ac16.720 naast.",
-        teaserCta: "Bekijk het bewijs",
-        allCta: "Alle rekentools",
-      },
     },
 
     lifecycle: {
@@ -551,16 +543,11 @@ export const nl: DeepPartial<typeof en> = {
       p1: "Elke reden komt uit je eigen gegevens. Elke prijs komt uit de tarieven die je zelf hebt ingesteld, en een concept dat een bedrag verzint wordt weggegooid voordat het bij je komt. Freelens zegt nooit dat je vrij bent op een datum, want het kent je agenda niet. Klopt er iets niet, dan pas je het aan en blijft het aangepast.",
       p2: "Dat is de hele opzet: de AI schrijft, de controles zijn gewone code, en jij beslist.",
     },
-    tools: {
-      h: "De gratis rekentools",
-      p1: "Wat je moet vragen v\u00f3\u00f3r de klus, en wat er echt van jou is na de betaling. Gratis, zonder account, en je cijfers blijven in je browser.",
-    },
     going: {
       h: "Waar dit heen gaat",
       p1: "Dit onderdeel van Freelens is in besloten b\u00e8ta. Er is nog niets live voor het publiek, en dat zeggen we liever hardop dan dat we doen alsof. We stellen een eerste kleine groep freelancers samen die ermee gaan werken en ons vertellen wat er nog niet klopt. Ben je fotograaf, videograaf, ontwerper, illustrator of een andere creatieve freelancer? Zet je op de lijst, dan ben jij degene aan wie je beste klanten denken zodra ze hun volgende project plannen.",
     },
     ctaPrimary: "Zet me op de wachtlijst",
-    ctaSecondary: "Bekijk de gratis rekentools",
   },
 
 

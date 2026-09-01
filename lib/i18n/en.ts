@@ -481,14 +481,6 @@ export const en = {
           "Export everything or delete everything, from day one",
         ],
       },
-      tools: {
-        eyebrow: "Meanwhile, free",
-        heading: "Free calculators for Dutch freelancers.",
-        body: "The deterministic tax engine behind Freelens is live today, checked against belastingdienst.nl.",
-        teaser: "The flat 30% rule misses by up to \u20ac16.720 on real numbers.",
-        teaserCta: "See the evidence",
-        allCta: "All calculators",
-      },
     },
 
     lifecycle: {
@@ -557,16 +549,11 @@ export const en = {
       p1: "Every reason comes from your own records. Every price comes from the rates you set up yourself, and a draft that invents a number is thrown away before it reaches you. Freelens never says you are free on a date, because it does not know your calendar. If something is wrong, you correct it and it stays corrected.",
       p2: "That is the whole design: the AI writes, the checks are ordinary code, and you decide.",
     },
-    tools: {
-      h: "The free calculators",
-      p1: "What to charge before a job, and what is actually yours after payment. Free, no account, and your figures stay in your browser.",
-    },
     going: {
       h: "Where this is going",
       p1: "This part of Freelens is in private beta. Nothing is live for the public yet, and we would rather say that than pretend otherwise. We are putting together a first small group of freelancers to use it and tell us what is wrong with it. If you're a photographer, videographer, designer, illustrator, or another creative freelancer, join the list and stay top of mind when your best clients have their next project.",
     },
     ctaPrimary: "Put me on the waitlist",
-    ctaSecondary: "See the free calculators",
   },
 
 

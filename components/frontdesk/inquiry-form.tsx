@@ -256,7 +256,13 @@ export function InquiryForm({
       <button
         type="submit"
         disabled={state === "sending"}
-        className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50"
+        // The one place the freelancer's accent appears, with a text colour
+        // derived from it rather than assumed (handoff §11).
+        style={{
+          backgroundColor: "var(--fl-accent, var(--fd-ink))",
+          color: "var(--fl-accent-text, #FFFFFF)",
+        }}
+        className="inline-flex min-h-12 items-center justify-center rounded-xl px-6 text-base font-medium shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50"
       >
         {state === "sending" ? t.sending : t.submit}
       </button>

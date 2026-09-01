@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
@@ -77,6 +77,10 @@ export function AgentHome({
   // The desk always has something selected when there is something to decide;
   // a returning user lands on the top item (handoff §5.1 returning state).
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Choosing a row moves focus to the decision it opened: without this, a
+  // keyboard user picks an item and stays parked in the list, with the panel
+  // they asked for somewhere behind them.
+  const decisionHeadingRef = useRef<HTMLHeadingElement | null>(null);
 
   const timeZone = freelancer.timezone || "Europe/Amsterdam";
   const quietDays = resolveQuietDays(freelancer.followup_quiet_days);
@@ -326,7 +330,10 @@ export function AgentHome({
                     <li key={inquiry.id}>
                       <button
                         type="button"
-                        onClick={() => setSelectedId(inquiry.id)}
+                        onClick={() => {
+                          setSelectedId(inquiry.id);
+                          requestAnimationFrame(() => decisionHeadingRef.current?.focus());
+                        }}
                         aria-current={isSelected ? "true" : undefined}
                         className={`flex w-full flex-col gap-1 rounded-2xl border p-4 text-left transition hover:border-[var(--fd-ink)] ${
                           isSelected
@@ -403,7 +410,11 @@ export function AgentHome({
           ) : (
             <>
               <header className="flex flex-col gap-1">
-                <h2 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
+                <h2
+                  ref={decisionHeadingRef}
+                  tabIndex={-1}
+                  className="font-serif text-2xl font-medium text-[var(--fd-ink)] outline-none"
+                >
                   {selectedPlacement
                     ? dict.inbox.queues.actions[selectedPlacement.actionKey]
                     : selected.client_name}
