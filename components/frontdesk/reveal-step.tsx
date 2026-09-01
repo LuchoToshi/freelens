@@ -54,6 +54,7 @@ export function RevealStep({
   const reduce = useReducedMotion();
   const [state, setState] = useState<"loading" | "ready" | "pending">("loading");
   const [payload, setPayload] = useState<SamplePayload | null>(null);
+  const [copied, setCopied] = useState(false);
   const ran = useRef(false);
 
   useEffect(() => {
@@ -114,6 +115,12 @@ export function RevealStep({
 
   const inquiry = payload?.inquiry;
 
+  async function copyDraft(body: string) {
+    await navigator.clipboard.writeText(body);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
   // The wizard's payoff moment: inquiry first, then the draft settles in, then
   // the actions. Same arrive grammar as the core app; reduced motion collapses
   // it to instant opacity via the helpers, and the draft text itself is in the
@@ -135,6 +142,9 @@ export function RevealStep({
           variants={arrive(reduce)}
           className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4"
         >
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+            {t.inquiryLabel}
+          </span>
           <span className="text-sm font-semibold text-[var(--fd-ink)]">
             {inquiry.client_name}
           </span>
@@ -151,11 +161,21 @@ export function RevealStep({
       )}
 
       {state === "ready" && payload?.draft ? (
-        <motion.div
-          variants={arrive(reduce)}
-          className="whitespace-pre-line rounded-2xl border border-[var(--fd-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]"
-        >
-          {payload.draft.body}
+        <motion.div variants={arrive(reduce)} className="flex flex-col gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+            {t.draftLabel}
+          </span>
+          <div className="whitespace-pre-line rounded-2xl border border-[var(--fd-ink)] bg-white p-5 text-sm leading-relaxed text-[var(--fd-ink)]">
+            {payload.draft.body}
+          </div>
+          <button
+            type="button"
+            onClick={() => void copyDraft(payload.draft!.body)}
+            className={`${secondaryClass} w-fit`}
+          >
+            {copied ? t.copied : t.copy}
+          </button>
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.everyOne}</p>
         </motion.div>
       ) : (
         <motion.div
@@ -173,13 +193,16 @@ export function RevealStep({
         <TrustNote>{t.trust}</TrustNote>
       </motion.div>
 
-      <motion.div variants={arrive(reduce)} className="flex flex-wrap items-center gap-3">
+      <motion.div variants={arrive(reduce)} className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-[var(--fd-ink)]">{t.question}</span>
+        <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={onContinue} className={primaryClass}>
           {t.primary}
         </button>
         <button type="button" onClick={onAdjust} className={secondaryClass}>
           {t.secondary}
         </button>
+        </div>
       </motion.div>
     </motion.section>
   );

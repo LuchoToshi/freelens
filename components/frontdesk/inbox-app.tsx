@@ -114,6 +114,9 @@ export function InboxApp({
   const [openId, setOpenId] = useState<string | null>(null);
   const [editedBody, setEditedBody] = useState("");
   const [copied, setCopied] = useState(false);
+  // The draft has left for the client's channel (copied, or opened in mail),
+  // but nothing observable says it was sent.
+  const [handedOff, setHandedOff] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, DraftRow>>({});
   const [now, setNow] = useState(() => new Date());
@@ -503,8 +506,11 @@ export function InboxApp({
     await navigator.clipboard.writeText(editedBody);
     track("draft_copied");
     setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-    await recordOutcome("send");
+    setHandedOff(true);
+    setTimeout(() => setCopied(false), 4000);
+    // Deliberately does NOT record the outcome. Copying is not sending, and
+    // Freelens cannot see the mail that follows; the freelancer says when it
+    // went, which is also what starts the follow-up clock.
   }
 
   async function regenerate() {
@@ -586,6 +592,13 @@ export function InboxApp({
       >
         ← {d.back}
       </button>
+
+      <div className="flex flex-col gap-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+          {d.heading}
+        </p>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.intro}</p>
+      </div>
 
       <header className="flex flex-col gap-1">
         {/* h2, not h1: on desktop it renders beside the list's h1, and on
@@ -682,9 +695,20 @@ export function InboxApp({
             eventType={eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
             eventDate={open.event_date}
           />
-          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-            {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
-          </span>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+              {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
+            </span>
+            <span className="text-xs text-[var(--fd-slate)]">
+              {openDraft.outcome
+                ? d.status.sent
+                : handedOff
+                  ? d.status.copied
+                  : editedBody !== openDraft.body
+                    ? d.status.edited
+                    : d.status.prepared}
+            </span>
+          </div>
           <GuardPanel
             locale={freelancer.locale}
             status={openDraft.validation_status as never}
@@ -714,23 +738,26 @@ export function InboxApp({
               </p>
             );
           })()}
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+            {d.everyOne} {d.notSent}
+          </p>
           <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
+            <button
+              type="button"
+              onClick={copyReply}
+              className={`${primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
+            >
+              {copied ? d.copied : d.copy}
+            </button>
             {open.client_email && (
               <a
                 href={mailtoHref(open.client_email, d.subject, editedBody)}
-                onClick={() => void recordOutcome("send")}
-                className={`${primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
+                onClick={() => setHandedOff(true)}
+                className={`${secondaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
               >
                 {d.send}
               </a>
             )}
-            <button
-              type="button"
-              onClick={copyReply}
-              className={`${open.client_email ? secondaryClass : primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
-            >
-              {copied ? d.copied : d.copy}
-            </button>
             <button
               type="button"
               aria-expanded={skipReasonOpen}
@@ -755,6 +782,22 @@ export function InboxApp({
               {d.decideLater}
             </button>
           </div>
+          {handedOff && !openDraft.outcome && (
+            <div
+              role="status"
+              className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4"
+            >
+              <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{d.markSentHint}</p>
+              <button
+                type="button"
+                onClick={() => void recordOutcome("send")}
+                className={`${primaryClass} w-fit`}
+              >
+                {d.markSent}
+              </button>
+            </div>
+          )}
+
           {skipReasonOpen && (
             <div
               role="group"
