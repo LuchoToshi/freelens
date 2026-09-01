@@ -29,6 +29,13 @@ export const QUEUE_ORDER: readonly QueueKey[] = [
   "done",
 ];
 
+/**
+ * The queues the desk puts under "Needs you" (handoff §5.1). They are the
+ * leading slice of QUEUE_ORDER, which is what keeps the desk and the inbox in
+ * the same order: one list cannot be reordered without the other following.
+ */
+export const NEEDS_YOU_QUEUES: readonly QueueKey[] = QUEUE_ORDER.slice(0, 3);
+
 export interface QueueInquiry {
   status: "new" | "replied" | "nudge_due" | "booked" | "lost";
   created_at: string;
