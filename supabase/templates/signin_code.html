@@ -1,4 +1,41 @@
-<h2>Your Freelens sign-in code</h2>
-<p style="font-size:28px;font-family:monospace;letter-spacing:0.2em;margin:16px 0;"><strong>{{ .Token }}</strong></p>
-<p>Type this code on the device and browser where you asked for it. It works for 10 minutes.</p>
-<p>Didn't ask for a code? Someone typed your address. Nothing happens unless the code is entered there; you can ignore this email. A forwarded email can't sign anyone in.</p>
+<!doctype html>
+<html lang="en">
+  <body style="margin:0; padding:0; background-color:#f4f4f5; font-family:Arial, sans-serif; color:#18181b;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f4f5; padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:560px; background-color:#ffffff; border-radius:12px;">
+            <tr>
+              <td style="padding:40px;">
+                <h1 style="margin:0 0 16px; font-size:24px; line-height:32px; color:#18181b;">
+                  Your Freelens sign-in code
+                </h1>
+
+                <p style="margin:0 0 28px; font-size:16px; line-height:24px; color:#52525b;">
+                  Type this code on the device and browser where you asked for it.
+                </p>
+
+                <p style="margin:0 0 28px; font-family:'Courier New', Courier, monospace; font-size:34px; line-height:40px; letter-spacing:8px; font-weight:bold; color:#18181b;">
+                  {{ .Token }}
+                </p>
+
+                <p style="margin:0 0 16px; font-size:14px; line-height:21px; color:#71717a;">
+                  The code works for 10 minutes and only in the browser that requested it.
+                </p>
+
+                <p style="margin:0 0 28px; font-size:14px; line-height:21px; color:#71717a;">
+                  Didn’t ask for a code? Someone typed your address. Nothing happens unless the code is entered there, so you can ignore this email. A forwarded email can’t sign anyone in.
+                </p>
+
+                <p style="margin:0; font-size:16px; line-height:24px; color:#52525b;">
+                  Thanks,<br>
+                  The Freelens team
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
