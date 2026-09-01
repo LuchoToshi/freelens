@@ -24,7 +24,9 @@ describe("package gap detection (§6.5): deterministic, informative, never block
         { event_type: "portrait", source: "form" },
       ]
     );
-    expect(gaps).toEqual([{ key: "uncoveredType", detail: "portrait" }]);
+    // The count is part of the finding: the freelancer can check it against
+    // their own inbox.
+    expect(gaps).toEqual([{ key: "uncoveredType", detail: "portrait", count: 2 }]);
   });
 
   it("one inquiry is not a pattern, and sample inquiries never count", () => {

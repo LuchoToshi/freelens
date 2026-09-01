@@ -101,12 +101,13 @@ const en = {
   },
   inbox: {
     heading: "Inbox",
-    empty: "No inquiries yet. Put your link in your bio and they will land here.",
+    intro: "Client inquiries land here. Freelens prepares a reply for each one; you read it, change what you want, and send it yourself.",
+    empty: "No inquiries yet. Share your link and new requests will appear here, each with a reply prepared for you.",
     loading: "One moment.",
     loadError: "Couldn't load your inbox. Check your connection and try again.",
     retry: "Try again",
     sampleBadge: "Example",
-    selectPrompt: "Select an inquiry to read it and send the prepared reply.",
+    selectPrompt: "Select an inquiry to read the client's message and the reply Freelens prepared.",
     toControl: "What Freelens may do and remembers: the Control room",
     shell: {
       home: "Home",
@@ -167,7 +168,7 @@ const en = {
     },
     toolbar: {
       searchLabel: "Search inquiries",
-      searchPlaceholder: "Name, message, type",
+      searchPlaceholder: "Search by client, service or message",
       sortLabel: "Sort",
       sortUrgency: "By urgency",
       sortNewest: "Newest first",
@@ -243,6 +244,8 @@ const en = {
         heading: "Worth a look",
         noPackages: "No packages yet, so drafts cannot mention any price until you add one.",
         unpricedPackage: "\u201c{label}\u201d has no exact price, so drafts cannot quote it.",
+        uncoveredTypeCounted:
+          "{n} inquiries so far were for {type}, and none of your packages covers it. A matching package lets drafts quote a real price instead of leaving the number out.",
         uncoveredType:
           "You keep getting {type} inquiries, but no package mentions it. A matching package helps drafts quote the right price.",
       },
@@ -1061,12 +1064,13 @@ const nl: typeof en = {
   },
   inbox: {
     heading: "Inbox",
-    empty: "Nog geen aanvragen. Zet je link in je bio en ze komen hier binnen.",
+    intro: "Hier komen aanvragen van klanten binnen. Freelens stelt bij elke aanvraag een antwoord op; jij leest het na, past aan wat je wilt en verstuurt het zelf.",
+    empty: "Nog geen aanvragen. Deel je link, dan verschijnen nieuwe aanvragen hier, elk met een antwoord dat al voor je klaarstaat.",
     loading: "Momentje.",
     loadError: "Je inbox kon niet worden geladen. Controleer je verbinding en probeer opnieuw.",
     retry: "Probeer opnieuw",
     sampleBadge: "Voorbeeld",
-    selectPrompt: "Kies een aanvraag om hem te lezen en het klaargezette antwoord te versturen.",
+    selectPrompt: "Kies een aanvraag om het bericht van de klant te lezen en het antwoord dat Freelens opstelde.",
     toControl: "Wat Freelens mag doen en onthoudt: de Regelkamer",
     shell: {
       home: "Thuis",
@@ -1127,7 +1131,7 @@ const nl: typeof en = {
     },
     toolbar: {
       searchLabel: "Aanvragen zoeken",
-      searchPlaceholder: "Naam, bericht, type",
+      searchPlaceholder: "Zoek op klant, dienst of bericht",
       sortLabel: "Sorteren",
       sortUrgency: "Op urgentie",
       sortNewest: "Nieuwste eerst",
@@ -1203,6 +1207,8 @@ const nl: typeof en = {
         heading: "Het bekijken waard",
         noPackages: "Nog geen pakketten, dus concepten kunnen geen prijs noemen tot je er een toevoegt.",
         unpricedPackage: "\u201c{label}\u201d heeft geen exacte prijs, dus concepten kunnen die niet noemen.",
+        uncoveredTypeCounted:
+          "Er kwamen tot nu toe {n} aanvragen voor {type} binnen, en geen van je pakketten dekt dat. Met een passend pakket kunnen concepten een echte prijs noemen in plaats van het bedrag weg te laten.",
         uncoveredType:
           "Je krijgt steeds aanvragen voor {type}, maar geen pakket noemt het. Een passend pakket helpt concepten de juiste prijs te noemen.",
       },

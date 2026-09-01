@@ -29,6 +29,8 @@ export interface ActivityInquiry {
   id: string;
   client_name: string;
   created_at: string;
+  /** "sample" rows are the onboarding example, seeded by the product itself. */
+  source?: string;
 }
 
 export interface ActivityDraft {
@@ -53,10 +55,15 @@ export function deriveActivity(
   inquiries: readonly ActivityInquiry[],
   drafts: readonly ActivityDraft[]
 ): ActivityEntry[] {
-  const byId = new Map(inquiries.map((i) => [i.id, i]));
+  // The sample inquiry exists so a new desk has something to look at. It is a
+  // real row, which is exactly why it has to be kept out of here: an activity
+  // log that mixes the product's own demo with the freelancer's history is
+  // one they cannot trust for either purpose.
+  const own = inquiries.filter((i) => i.source !== "sample");
+  const byId = new Map(own.map((i) => [i.id, i]));
   const entries: ActivityEntry[] = [];
 
-  for (const inquiry of inquiries) {
+  for (const inquiry of own) {
     entries.push({
       type: "inquiry.received",
       at: inquiry.created_at,

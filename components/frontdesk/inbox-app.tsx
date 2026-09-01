@@ -971,6 +971,7 @@ export function InboxApp({
         >
           {t.heading}
         </h1>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
 
         {testMode && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4">

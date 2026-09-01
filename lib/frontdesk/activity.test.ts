@@ -66,3 +66,28 @@ describe("activity log (§28): derived, plain, free of sensitive content", () =>
     expect(entries.some((e) => e.type === "draft.approved")).toBe(false);
   });
 });
+
+describe("the log is the freelancer's own history (not the product's demo)", () => {
+  it("leaves the onboarding sample out entirely", () => {
+    const entries = deriveActivity(
+      [
+        { id: "real", client_name: "Noor", created_at: "2026-08-20T10:00:00Z", source: "form" },
+        { id: "sample", client_name: "Lisa (example)", created_at: "2026-08-21T10:00:00Z", source: "sample" },
+      ],
+      [
+        { inquiry_id: "real", kind: "reply", created_at: "2026-08-20T10:01:00Z", outcome: null, body: "Hi Noor" },
+        { inquiry_id: "sample", kind: "reply", created_at: "2026-08-21T10:01:00Z", outcome: null, body: "Hi Lisa" },
+      ],
+    );
+    expect(entries.map((e) => e.clientName)).toEqual(["Noor", "Noor"]);
+    expect(entries.some((e) => e.clientName.includes("example"))).toBe(false);
+  });
+
+  it("still shows rows that carry no source, which predate the field", () => {
+    const entries = deriveActivity(
+      [{ id: "old", client_name: "Sam", created_at: "2026-08-01T10:00:00Z" }],
+      [],
+    );
+    expect(entries).toHaveLength(1);
+  });
+});
