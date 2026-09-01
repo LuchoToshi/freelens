@@ -55,6 +55,45 @@ URLs redirect permanently to `/`.
 - **Subdomains stay display-only.** Real subdomains are reserved for actual
   accounts. Use `example.frlns.com` as the placeholder in documentation and UI.
 
+### 0.5 Decisions taken during implementation (phases 1 to 8)
+Recorded here because each one departs from, or resolves, something the spec
+left open. All are live in the branch.
+
+- **A third stored intake value, `unspecified` (§9).** The hybrid thread lets
+  a client skip the type question; it used to file that as `other`. "The
+  client did not say" and "the client said it is something else" are different
+  facts, and the conditional required field makes the difference matter, so
+  the skip path stores `unspecified`. Never offered in the form.
+- **Occasion inference moved onto the new vocabulary.** `inferEventType` no
+  longer returns `party`, `business` or `portrait`, because a client can no
+  longer choose them. A message about headshots now produces a question rather
+  than a retired answer.
+- **Security & Sessions is deleted, not hidden (§5.2).** Nothing else rendered
+  it and §10 excludes sessions from the Control Room, so the component, its
+  copy and the policy setter are gone. **The product no longer offers "sign
+  out everywhere else."** The policy reader stays so anyone who chose
+  end-with-browser keeps their session.
+- **The inbox no longer renders agent settings (§10).** Permissions, memory
+  and follow-up cadence moved to `/control` rather than living in two places;
+  the inbox links there. Activity and the automation rules card stay in the
+  inbox, where the inquiry and draft data they derive from is already loaded.
+- **The shell's Tools destination became the Control room.** It pointed at
+  `/tool`, which is a redirect since the deletion.
+- **Accent text colour is derived, not fixed (§11).** One fixed colour fails
+  contrast on at least one accent in the palette, so the readable colour is
+  computed and tested at 4.5:1 for all four.
+
+### 0.6 Written but not applied
+- **Migrations `0019_intake_event_types.sql` and `0020_freelancer_appearance.sql`
+  are in the repo and have not been run against any database.** Until 0019 is
+  applied, the new intake options fail the existing CHECK constraint; until
+  0020 is applied, appearance saves fail. Both are additive.
+- **The homepage worked example still demonstrates the retired four types.**
+  It is marketing content with its own per-type drafts in both locales, so
+  rewriting it is a copy decision, not a mechanical one.
+
+---
+
 ## 1. Executive summary
 
 Freelens is an AI front desk for creative freelancers: an inquiry arrives through the freelancer's public page, Freelens drafts a personal reply from their real prices and voice within ~20 seconds, and the freelancer reviews and sends it themselves. The approved direction turns the product's first screen from a form-led dashboard into an **agent-led desk**: the freelancer states outcomes or handles decisions the agent has prepared; the agent prefills, labels its sources, marks missing facts as missing, and never acts externally without approval.
