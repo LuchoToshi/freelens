@@ -41,16 +41,14 @@ describe("the Dutch dictionary covers the English one", () => {
       "common.nav.contact",
       "meta.privacy.title",
       "privacyPage.eyebrow",
-      "home.rebooking.waitlist.crafts.illustrator",
       "home.frontdesk.heroEyebrow",
       "home.frontdesk.waitlist.crafts.illustrator",
       // A first name is not copy; the mock client is Lisa in both languages.
       "home.frontdesk.example.clientName",
       "home.frontdesk.demo.types.wedding.clientName",
       // A number range with no thousands separator reads the same in both.
-      "home.frontdesk.demo.types.portrait.budget",
+      "home.frontdesk.demo.types.social_content.budget",
       "meta.home.title",
-      "home.privacy.ariaLabel",
       // Dutch uses these words unchanged.
       // The breakdown table is keyed BY the English label, so English maps to
       // itself by construction. Only the Dutch side carries a translation.
@@ -100,6 +98,6 @@ describe("fallback behaviour", () => {
     // the merge rather than by leaving a real gap in the shipped dictionary.
     const merged = getDictionary("nl");
     expect(typeof merged.common.brand).toBe("string");
-    expect(merged.home.hero.contexts.length).toBeGreaterThan(0);
+    expect(typeof merged.home.frontdesk.demo.types.wedding.label).toBe("string");
   });
 });

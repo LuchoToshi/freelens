@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ExampleBadge } from "@/components/example-badge";
 import { EASE, riseIn, stagger } from "@/components/home/home-motion";
 
@@ -33,7 +33,7 @@ export interface DemoType {
 }
 
 export interface WorkedExampleDemo {
-  types: Record<"wedding" | "party" | "business" | "portrait", DemoType>;
+  types: Record<"wedding" | "event" | "brand_film" | "social_content", DemoType>;
   caption: string;
   bridge: string;
   /** Sits above the inquiry card, framing it as just-arrived rather than a
@@ -50,7 +50,7 @@ export interface WorkedExampleDemo {
 }
 
 const LEAD_KEY = "wedding" as const;
-const OTHER_KEYS = ["party", "business", "portrait"] as const;
+const OTHER_KEYS = ["event", "brand_film", "social_content"] as const;
 type TypeKey = typeof LEAD_KEY | (typeof OTHER_KEYS)[number];
 
 export function WorkedExample({
@@ -66,8 +66,12 @@ export function WorkedExample({
   const [selected, setSelected] = useState<TypeKey>("wedding");
   const active = demo.types[selected];
 
+  // Keyed remount rather than AnimatePresence: the exiting child's animation
+  // never completed here, so `mode="wait"` held the old card on screen forever
+  // and every chip showed the wedding reply. The card only ever needed an
+  // entrance, so the swap is the entrance and nothing has to finish leaving.
   const swap = reduce
-    ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } }
+    ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
     : {
         initial: { opacity: 0, y: 10, filter: "blur(5px)" },
         animate: {
@@ -76,7 +80,6 @@ export function WorkedExample({
           filter: "blur(0px)",
           transition: { duration: 0.45, ease: EASE },
         },
-        exit: { opacity: 0, transition: { duration: 0.1 } },
       };
 
   return (
@@ -143,14 +146,12 @@ export function WorkedExample({
           <ExampleBadge />
         </div>
         <p className="text-xs text-[var(--fd-slate)]">{demo.inquiryMeta}</p>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={selected} {...swap} className="flex flex-col gap-1.5">
-            <p className="text-sm font-medium text-[var(--fd-ink)]">{active.clientName}</p>
-            <p className="fl-tnum text-sm text-[var(--fd-slate)]">
-              {active.label} · {active.eventDate} · {active.budget}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+        <motion.div key={selected} {...swap} className="flex flex-col gap-1.5">
+          <p className="text-sm font-medium text-[var(--fd-ink)]">{active.clientName}</p>
+          <p className="fl-tnum text-sm text-[var(--fd-slate)]">
+            {active.label} · {active.eventDate} · {active.budget}
+          </p>
+        </motion.div>
       </motion.div>
 
       <motion.div
@@ -164,15 +165,13 @@ export function WorkedExample({
         {/* min-height fits the longest draft at each breakpoint, so switching
             chips never moves the content below the card. */}
         <div className="min-h-[29rem] border-t border-[var(--fd-line)] pt-4 sm:min-h-[19rem]">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.p
-              key={selected}
-              {...swap}
-              className="whitespace-pre-line font-serif text-[1.15rem] leading-[1.75] text-[var(--fd-ink)]"
-            >
-              {active.draft}
-            </motion.p>
-          </AnimatePresence>
+          <motion.p
+            key={selected}
+            {...swap}
+            className="whitespace-pre-line font-serif text-[1.15rem] leading-[1.75] text-[var(--fd-ink)]"
+          >
+            {active.draft}
+          </motion.p>
         </div>
       </motion.div>
 
