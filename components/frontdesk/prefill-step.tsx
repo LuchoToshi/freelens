@@ -84,6 +84,10 @@ export function PrefillStep({
           price: p.price_from_eur === null ? "" : String(p.price_from_eur),
           unit: p.unit ?? "",
           notes: p.notes ?? "",
+          // Extraction reads a number off a page; it cannot know how the
+          // freelancer counts it, so the question stays open for them.
+          chargeBy: null,
+          priceIsFrom: false,
           addons: [],
         })),
       };

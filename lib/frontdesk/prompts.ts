@@ -9,6 +9,8 @@
  * message itself is the client's own text and may legitimately contain
  * whatever they chose to write).
  */
+import { packagePromptLine, type ChargeBy } from "@/lib/frontdesk/packages";
+
 export const VOICE_PROMPT_VERSION = "voice-v1";
 export const DRAFT_PROMPT_VERSION = "draft-v1";
 
@@ -32,6 +34,10 @@ export interface PackageAddon {
 export interface PromptPackage {
   label: string;
   priceFromEur: number;
+  /** How the price is counted, when the freelancer said. */
+  chargeBy?: ChargeBy | null;
+  /** True when the amount is a starting price rather than the price. */
+  priceIsFrom?: boolean;
   unit: string | null;
   notes: string | null;
   /** Optional add-ons — exact prices under the same contract as the package. */
@@ -140,7 +146,10 @@ export function buildDraftPrompt(input: DraftPromptInput): { system: string; use
       ? "(none configured)"
       : input.packages
           .map((p) => {
-            const base = `- ${p.label}: from € ${p.priceFromEur}${p.unit ? ` ${p.unit}` : ""}${p.notes ? `, ${p.notes}` : ""}`;
+            // "from" only when the freelancer said the amount is a starting
+            // price. Describing an exact price as "from" invites the draft to
+            // present a fixed fee as an opening number.
+            const base = `- ${packagePromptLine(p)}`;
             const addons = (p.addons ?? [])
               .map((a) => `\n  - add-on ${a.label}: € ${a.priceEur}`)
               .join("");
