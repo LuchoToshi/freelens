@@ -5,6 +5,7 @@ import { isValidHandle } from "@/lib/frontdesk/handles";
 import { publicProfileByHandle } from "@/lib/frontdesk/server/publicProfile";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import { PublicIntake } from "@/components/frontdesk/public-intake";
+import { appearanceStyle } from "@/lib/frontdesk/appearance";
 
 /**
  * The freelancer's public front door. To the client's eye this page IS the
@@ -57,8 +58,20 @@ export default async function HandlePage({
   return (
     <main
       lang={profile.locale}
+      // The freelancer's three choices, applied as tokens the page already
+      // uses. Layout, type and spacing are untouched by any of them.
+      style={appearanceStyle(profile.appearance) as React.CSSProperties}
       className="mx-auto flex w-full max-w-md flex-col gap-8 px-4 py-10 sm:py-14"
     >
+      {profile.appearance.coverUrl && (
+        <Image
+          src={profile.appearance.coverUrl}
+          alt=""
+          width={640}
+          height={240}
+          className="h-40 w-full rounded-2xl border border-[var(--fl-line)] object-cover"
+        />
+      )}
       <header className="flex flex-col items-center gap-3 text-center">
         {profile.photoUrl && (
           <Image

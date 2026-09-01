@@ -15,6 +15,7 @@ import { ShareStep } from "@/components/frontdesk/share-step";
 import { ProfessionPicker, type Profession } from "@/components/frontdesk/profession-picker";
 import { PrefillStep, type PrefillApplied } from "@/components/frontdesk/prefill-step";
 import { HandleField } from "@/components/frontdesk/handle-field";
+import { AppearanceCard } from "@/components/frontdesk/appearance-card";
 import { DECISION_ORDER, DecisionRail, type DecisionKey } from "@/components/frontdesk/decision-rail";
 
 /**
@@ -562,7 +563,19 @@ export function SetupWizard({
         />
       )}
 
-      {step === 4 && <ShareStep locale={locale} handle={handle} />}
+      {step === 4 && (
+        <>
+          <ShareStep locale={locale} handle={handle} />
+          {/* Appearance sits after the link, never in front of a decision:
+              it is the one thing here that is optional (handoff §11). */}
+          <AppearanceCard
+            session={session}
+            locale={locale}
+            displayName={displayName || handle}
+            stored={freelancer?.appearance ?? null}
+          />
+        </>
+      )}
     </main>
   );
 }
