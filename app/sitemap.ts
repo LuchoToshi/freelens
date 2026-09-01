@@ -12,14 +12,7 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://frlns.com";
 const MARKETING_ROUTES = [
   "",
   "/about",
-  "/accuracy",
-  "/methodology",
   "/privacy",
-  "/tarief",
-  "/offertes",
-  "/rekentools",
-  "/tool",
-  "/try",
   "/demo",
   "/agent",
 ];

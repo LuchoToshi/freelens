@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BackLink } from "@/components/i18n/back-link";
 import { container } from "@/components/container";
-import { linkButtonClass, primaryButtonClass } from "@/components/app/styles";
+import { linkButtonClass, primaryButtonClass } from "@/components/button-classes";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 const SECTIONS = ["what", "boundary", "trust", "tools", "going"] as const;

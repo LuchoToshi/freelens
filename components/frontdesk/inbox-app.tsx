@@ -29,7 +29,7 @@ import {
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
-import { GuardFailedPanel, GuardPanel, validationReason } from "@/components/frontdesk/guard-panel";
+import { GuardFailedPanel, GuardPanel } from "@/components/frontdesk/guard-panel";
 import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
