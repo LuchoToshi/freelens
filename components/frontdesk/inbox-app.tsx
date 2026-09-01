@@ -29,6 +29,8 @@ import {
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
+import { GuardFailedPanel, GuardPanel, validationReason } from "@/components/frontdesk/guard-panel";
+import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
@@ -74,21 +76,6 @@ interface DraftRow {
   rule_id?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
-}
-
-/** Plain-language line for a stored validation failure code (§10.7). Codes
- * may carry a suffix (price-not-in-packages:1950, date-mismatch:2027); the
- * prefix picks the copy and unknown codes fall back to the raw code, which
- * is still text-first and honest. */
-function validationReason(code: string, d: { validation: { reasons: Record<string, string> } }): string {
-  const base = code.split(":")[0];
-  const key = base.startsWith("reply-length") || base.startsWith("nudge-length") ? "length" : base;
-  return d.validation.reasons[key] ?? code;
-}
-
-function mailtoHref(email: string, subject: string, body: string): string {
-  const crlf = body.replace(/\n/g, "\r\n");
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(crlf)}`;
 }
 
 const primaryClass =
@@ -667,19 +654,7 @@ export function InboxApp({
         )}
 
       {openDraft && openDraft.validation_status === "failed" ? (
-        <div
-          role="alert"
-          className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-error-text)]/40 bg-white p-5"
-        >
-          <span className="text-sm font-semibold text-[var(--fd-ink)]">
-            {d.validation.failedHeading}
-          </span>
-          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.validation.failedIntro}</p>
-          <ul className="list-disc pl-5 text-sm leading-relaxed text-[var(--fd-slate)]">
-            {(openDraft.validation_failures ?? []).map((code) => (
-              <li key={code}>{validationReason(code, d)}</li>
-            ))}
-          </ul>
+        <GuardFailedPanel locale={freelancer.locale} failures={openDraft.validation_failures}>
           <AgentProgress
             locale={freelancer.locale}
             states={{ received: "done", drafting: "done", checks: "failed", ready: "pending" }}
@@ -692,31 +667,17 @@ export function InboxApp({
           >
             {regenerating ? d.regenerating : d.regenerate}
           </button>
-        </div>
+        </GuardFailedPanel>
       ) : openDraft ? (
         <div className="flex flex-col gap-3">
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
             {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
           </span>
-          {openDraft.validation_status === "needs_review" &&
-            (openDraft.validation_failures ?? []).length > 0 && (
-              <div
-                role="status"
-                className="rounded-xl border border-[var(--fd-line)] bg-[var(--fd-paper)] px-4 py-3 text-sm leading-relaxed text-[var(--fd-slate)]"
-              >
-                <p className="font-medium text-[var(--fd-ink)]">{d.validation.needsReview}</p>
-                <ul className="list-disc pl-5">
-                  {(openDraft.validation_failures ?? []).map((code) => (
-                    <li key={code}>{validationReason(code, d)}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          {openDraft.validation_status === "ready_for_review" && (
-            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
-              {d.validation.checksPassed}
-            </p>
-          )}
+          <GuardPanel
+            locale={freelancer.locale}
+            status={openDraft.validation_status as never}
+            failures={openDraft.validation_failures}
+          />
           <textarea
             aria-label={openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
             rows={10}

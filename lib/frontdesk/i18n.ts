@@ -228,6 +228,16 @@ const en = {
           "You keep getting {type} inquiries, but no package mentions it. A matching package helps drafts quote the right price.",
       },
     },
+    sources: {
+      aria: "Source: {kind}",
+      kinds: {
+        yours: "Yours",
+        suggested: "Suggested",
+        learned: "Learned",
+        missing: "Missing",
+        inquiry: "From the inquiry",
+      },
+    },
     evidence: {
       heading: "What we know",
       notStated: "Not stated",
@@ -273,15 +283,17 @@ const en = {
     permissions: {
       heading: "Automation levels",
       intro:
-        "What the agent may do, per action. Ceilings are product promises and cannot be raised: nothing is ever sent, priced, or confirmed without you.",
+        "What Freelens may do. Two switches, because those are the two things it can actually do today. Nothing is ever sent, priced, or confirmed without you.",
       ceiling: "Hard ceiling: level {n}.",
-      levels: {
-        1: "Observe & organise",
-        2: "Suggest only",
-        3: "Prepare for review",
-        4: "Execute after approval",
-        5: "Auto-run (read-only)",
+      on: "On",
+      off: "Off",
+      fixed: {
+        send_message: "Always you. Freelens never sends.",
+        confirm_date: "Never. Only you can commit a date.",
+        state_price: "Only your set prices. Never invented.",
       },
+      onlyToday:
+        "Only what works today is shown. New permissions appear here when they actually ship, off by default.",
       actions: {
         extract_details: "Extract inquiry details",
         organize: "Group and prioritise",
@@ -1022,6 +1034,16 @@ const nl: typeof en = {
           "Je krijgt steeds aanvragen voor {type}, maar geen pakket noemt het. Een passend pakket helpt concepten de juiste prijs te noemen.",
       },
     },
+    sources: {
+      aria: "Bron: {kind}",
+      kinds: {
+        yours: "Van jou",
+        suggested: "Voorgesteld",
+        learned: "Geleerd",
+        missing: "Ontbreekt",
+        inquiry: "Uit de aanvraag",
+      },
+    },
     evidence: {
       heading: "Wat we weten",
       notStated: "Niet vermeld",
@@ -1067,15 +1089,17 @@ const nl: typeof en = {
     permissions: {
       heading: "Automatiseringsniveaus",
       intro:
-        "Wat de agent mag, per actie. Plafonds zijn productbeloftes en kunnen niet omhoog: er wordt nooit iets verstuurd, geprijsd of bevestigd zonder jou.",
+        "Wat Freelens mag. Twee schakelaars, want dat zijn de twee dingen die het vandaag echt kan. Er wordt nooit iets verstuurd, geprijsd of bevestigd zonder jou.",
       ceiling: "Hard plafond: niveau {n}.",
-      levels: {
-        1: "Observeren & ordenen",
-        2: "Alleen voorstellen",
-        3: "Klaarzetten om na te lezen",
-        4: "Uitvoeren na akkoord",
-        5: "Zelfstandig (alleen-lezen)",
+      on: "Aan",
+      off: "Uit",
+      fixed: {
+        send_message: "Altijd jij. Freelens verstuurt nooit.",
+        confirm_date: "Nooit. Alleen jij legt een datum vast.",
+        state_price: "Alleen jouw eigen prijzen. Nooit verzonnen.",
       },
+      onlyToday:
+        "Alleen wat vandaag werkt staat hier. Nieuwe rechten verschijnen zodra ze echt bestaan, standaard uit.",
       actions: {
         extract_details: "Aanvraagdetails uitlezen",
         organize: "Groeperen en prioriteren",

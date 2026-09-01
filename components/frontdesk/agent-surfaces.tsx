@@ -207,11 +207,22 @@ export function PermissionMatrixCard({
   const m = fdDict(locale).inbox.permissions;
   const [busy, setBusy] = useState(false);
 
-  async function setLevel(action: ActionKey, level: AutomationLevel) {
+  // Only two actions are genuinely switchable today: preparing a reply draft
+  // and preparing a follow-up draft. Everything else the agent might one day
+  // do either has no code path or is capped at "you do it", so it is stated
+  // as a fixed fact rather than offered as a control (handoff decisions 11,
+  // 12, 13). Levels above "prepare for review" are gone from the UI: the
+  // pipeline only ever asks isPermitted(..., 3, ...), so 4 and 5 changed
+  // nothing while implying autonomy that does not exist.
+  const TOGGLEABLE: ActionKey[] = ["prepare_reply", "prepare_followup"];
+  const ON: AutomationLevel = 3;
+  const OFF: AutomationLevel = 1;
+
+  async function setEnabled(action: ActionKey, enabled: boolean) {
     setBusy(true);
     const next: Record<string, number> = {};
     for (const key of ACTION_ORDER) next[key] = effectiveLevel(key, stored);
-    next[action] = Math.min(level, ACTION_RULES[action].ceiling);
+    next[action] = Math.min(enabled ? ON : OFF, ACTION_RULES[action].ceiling);
     await onChange(next);
     setBusy(false);
   }
@@ -223,38 +234,43 @@ export function PermissionMatrixCard({
       </summary>
       <div className="flex flex-col gap-3 pt-3">
         <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{m.intro}</p>
-        {ACTION_ORDER.map((action) => {
-          const rule = ACTION_RULES[action];
-          const level = effectiveLevel(action, stored);
-          const options: AutomationLevel[] = [1, 2, 3, 4, 5].filter(
-            (l): l is AutomationLevel => l <= rule.ceiling
-          );
+
+        {TOGGLEABLE.map((action) => {
+          const enabled = effectiveLevel(action, stored) >= ON;
           return (
             <div key={action} className="flex flex-col gap-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-sm text-[var(--fd-ink)]">{m.actions[action]}</span>
-                <select
-                  aria-label={m.actions[action]}
-                  value={level}
-                  disabled={busy}
-                  onChange={(e) => void setLevel(action, Number(e.target.value) as AutomationLevel)}
-                  className="min-h-9 rounded-lg border border-[var(--fd-line-control)] bg-white px-2 text-xs text-[var(--fd-ink)]"
-                >
-                  {options.map((l) => (
-                    <option key={l} value={l}>
-                      {l} · {m.levels[l]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {rule.ceiling < 5 && (
-                <p className="text-[11px] leading-relaxed text-[var(--fd-slate)]">
-                  {m.ceiling.replace("{n}", String(rule.ceiling))} {(m.ceilingWhy as Record<string, string>)[action] ?? ""}
-                </p>
-              )}
+                <span className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={enabled}
+                    disabled={busy}
+                    onChange={(e) => void setEnabled(action, e.target.checked)}
+                    className="h-4 w-4 accent-[var(--fd-ink)]"
+                  />
+                  <span className="text-xs text-[var(--fd-slate)]">
+                    {enabled ? m.on : m.off}
+                  </span>
+                </span>
+              </label>
+              <p className="text-[11px] leading-relaxed text-[var(--fd-slate)]">
+                {(m.ceilingWhy as Record<string, string>)[action] ?? ""}
+              </p>
             </div>
           );
         })}
+
+        <div className="flex flex-col gap-2 border-t border-[var(--fd-line)] pt-3">
+          {(["send_message", "confirm_date", "state_price"] as const).map((action) => (
+            <p key={action} className="text-xs leading-relaxed text-[var(--fd-slate)]">
+              <span className="font-medium text-[var(--fd-ink)]">{m.actions[action]}</span>{" "}
+              {m.fixed[action]}
+            </p>
+          ))}
+        </div>
+
+        <p className="text-[11px] leading-relaxed text-[var(--fd-slate)]">{m.onlyToday}</p>
       </div>
     </details>
   );
