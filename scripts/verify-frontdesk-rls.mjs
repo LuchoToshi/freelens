@@ -208,6 +208,19 @@ async function main() {
   });
   check("anon cannot insert an inquiry", !!anonInsertErr);
 
+  const { error: anonWoInsertErr } = await asAnon.from("agent_work_objects").insert({
+    freelancer_id: rows.a.freelancerId,
+    request_text: "intruder request",
+  });
+  check("anon cannot insert a work object", !!anonWoInsertErr);
+
+  const { error: anonRuleInsertErr } = await asAnon.from("agent_rules").insert({
+    freelancer_id: rows.a.freelancerId,
+    trigger: { event_type: "wedding", budget_band: "unsure" },
+    action: "prepare_reply",
+  });
+  check("anon cannot insert an agent rule", !!anonRuleInsertErr);
+
   const { data: anonRel } = await asAnon.from("relationships").select("id");
   check("pre-existing relationships still hidden from anon", (anonRel ?? []).length === 0);
 }
