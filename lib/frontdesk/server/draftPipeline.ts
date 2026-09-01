@@ -34,7 +34,9 @@ export type PipelineOutcome =
 
 export async function generateAndStoreDraft(
   inquiryId: string,
-  kind: "reply" | "nudge"
+  kind: "reply" | "nudge",
+  /** A one-off wording steer for this draft; never stored, never learned. */
+  adjustment?: string | null,
 ): Promise<PipelineOutcome> {
   const db = serviceClient();
 
@@ -122,6 +124,7 @@ export async function generateAndStoreDraft(
       displayName: freelancer.display_name,
       signOff: freelancer.sign_off,
       targetLanguage: language,
+      adjustment: adjustment ?? null,
     });
     const latencyMs = Date.now() - startedAt;
 

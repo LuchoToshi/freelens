@@ -34,6 +34,7 @@ import { PlanRail } from "@/components/frontdesk/plan-rail";
 import { matchedPackage } from "@/lib/frontdesk/planSteps";
 import { SourceChip } from "@/components/frontdesk/source-chip";
 import { eventTypeLabel } from "@/lib/frontdesk/eventTypes";
+import { CUSTOM_ADJUSTMENT_MAX, TONE_ADJUSTMENTS } from "@/lib/frontdesk/toneAdjustments";
 import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
@@ -117,6 +118,11 @@ export function InboxApp({
   // The draft has left for the client's channel (copied, or opened in mail),
   // but nothing observable says it was sent.
   const [handedOff, setHandedOff] = useState(false);
+  // A one-off wording steer for the draft on screen. Never stored: this is
+  // not the voice profile, and one impatient afternoon should not become a
+  // standing instruction.
+  const [adjustOpen, setAdjustOpen] = useState(false);
+  const [customAdjustment, setCustomAdjustment] = useState("");
   const [regenerating, setRegenerating] = useState(false);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, DraftRow>>({});
   const [now, setNow] = useState(() => new Date());
@@ -513,7 +519,7 @@ export function InboxApp({
     // went, which is also what starts the follow-up clock.
   }
 
-  async function regenerate() {
+  async function regenerate(adjustment?: string) {
     if (!open) return;
     if (testMode) {
       const draftId = drafts[open.id]?.id;
@@ -535,9 +541,11 @@ export function InboxApp({
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ inquiryId: open.id }),
+      body: JSON.stringify({ inquiryId: open.id, adjustment: adjustment ?? null }),
     }).catch(() => null);
     track("draft_regenerated");
+    setAdjustOpen(false);
+    setCustomAdjustment("");
     setRegenerating(false);
     await load();
     setEditedBody("");
@@ -680,7 +688,7 @@ export function InboxApp({
           <button
             type="button"
             disabled={regenerating}
-            onClick={regenerate}
+            onClick={() => void regenerate()}
             className={`${secondaryClass} w-fit`}
           >
             {regenerating ? d.regenerating : d.regenerate}
@@ -782,6 +790,66 @@ export function InboxApp({
               {d.decideLater}
             </button>
           </div>
+          {/* Secondary actions, visually below the copy button: a rewrite of
+              this one reply, never a change to the saved voice profile. */}
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              aria-expanded={adjustOpen}
+              onClick={() => setAdjustOpen((v) => !v)}
+              className={`${linkClass} w-fit`}
+            >
+              {d.adjust}
+            </button>
+            {adjustOpen && (
+              <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+                <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.adjustIntro}</p>
+                <div className="flex flex-wrap gap-2">
+                  {TONE_ADJUSTMENTS.map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={regenerating}
+                      onClick={() => void regenerate(key)}
+                      className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)] disabled:opacity-50"
+                    >
+                      {d.adjustments[key]}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="fd-adjust" className="text-xs font-medium text-[var(--fd-slate)]">
+                    {d.adjustCustomLabel}
+                  </label>
+                  <input
+                    id="fd-adjust"
+                    value={customAdjustment}
+                    maxLength={CUSTOM_ADJUSTMENT_MAX}
+                    placeholder={d.adjustCustomPlaceholder}
+                    onChange={(e) => setCustomAdjustment(e.target.value)}
+                    className="min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base sm:text-sm"
+                  />
+                  <button
+                    type="button"
+                    disabled={regenerating || !customAdjustment.trim()}
+                    onClick={() => void regenerate(customAdjustment)}
+                    className={`${secondaryClass} w-fit`}
+                  >
+                    {regenerating ? d.regenerating : d.adjustApply}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  disabled={regenerating}
+                  onClick={() => void regenerate()}
+                  className={`${linkClass} w-fit`}
+                >
+                  {d.regenerate}
+                </button>
+              </div>
+            )}
+          </div>
+
           {handedOff && !openDraft.outcome && (
             <div
               role="status"
@@ -841,7 +909,7 @@ export function InboxApp({
           <button
             type="button"
             disabled={regenerating}
-            onClick={regenerate}
+            onClick={() => void regenerate()}
             className={`${secondaryClass} w-fit`}
           >
             {regenerating ? d.regenerating : d.regenerate}
