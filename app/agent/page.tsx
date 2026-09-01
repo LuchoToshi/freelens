@@ -25,7 +25,7 @@ export default function AgentHomepage() {
   const f = t.home.frontdesk;
   const a = f.agent;
   const reduce = useReducedMotion();
-  useDocumentTitle(t.meta.home.title, t.meta.home.description);
+  useDocumentTitle(t.meta.agent.title, t.meta.agent.description);
 
   return (
     <main className="min-h-screen bg-[var(--fd-paper)] text-[var(--fd-ink)]">

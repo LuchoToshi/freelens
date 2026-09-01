@@ -144,10 +144,15 @@ export const nl: DeepPartial<typeof en> = {
   },
 
   meta: {
+    agent: {
+      title: "Freelens: geef de balie uit handen, hou de beslissingen",
+      description:
+        "Freelens leest elke aanvraag via je eigen pagina, plant het werk en zet de antwoorden klaar in jouw stem. Prijzen, datums en versturen blijven van jou. Alleen op uitnodiging zolang we testen.",
+    },
     home: {
       title: "Freelens: verlies geen klussen meer aan een traag antwoord",
       description:
-        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Gebouwd voor creatieve freelancers zoals fotografen, videografen, designers en illustratoren.",
+        "Elke aanvraag via je eigen pagina krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Gebouwd voor creatieve freelancers zoals fotografen, videografen, designers en illustratoren.",
     },
     try: {
       title: "Probeer Freelens met 3 klanten \u00b7 Freelens",
@@ -358,7 +363,7 @@ export const nl: DeepPartial<typeof en> = {
         heroEyebrow: "Je frontdesk, uit handen",
         heroTitle: "Geef de balie uit handen. Hou de beslissingen.",
         heroSub:
-          "Freelens leest elke aanvraag, plant het werk en zet de antwoorden klaar in jouw stem. Prijzen, datums en versturen blijven van jou.",
+          "Freelens leest elke aanvraag via je eigen pagina, plant het werk en zet de antwoorden klaar in jouw stem. Prijzen, datums en versturen blijven van jou.",
         heroCta: "Vraag een uitnodiging",
         heroCtaTry: "Zie hoe het werkt",
         exampleLabel: "Jij vraagt. Het plant. Jij keurt goed.",
@@ -384,7 +389,7 @@ export const nl: DeepPartial<typeof en> = {
           },
           {
             q: "En als het iets fout heeft?",
-            a: "Jij ziet het concept als eerste. Sla het over met een reden en het leert ervan; pas het aan en jouw versie is wat de deur uitgaat. Van één bewerking maakt het nooit een regel.",
+            a: "Jij ziet het concept als eerste. Sla je het over, dan zeg je waarom, zodat het patroon zichtbaar is; pas je het aan, dan gaat jouw versie de deur uit en daar leert het van. Van één bewerking maakt het nooit een regel.",
           },
         ],
         followupQ: "Moet ik er dan constant bovenop zitten?",
@@ -397,7 +402,7 @@ export const nl: DeepPartial<typeof en> = {
       heroEyebrow: "Je front desk",
       heroTitle: "Verlies geen klussen meer aan een traag antwoord.",
       heroSub:
-        "Elke aanvraag krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
+        "Elke aanvraag via je eigen pagina krijgt een snel, persoonlijk antwoord met jouw echte prijzen, klaar om te versturen. Jij tikt alleen op verzenden.",
       heroCta: "Zet me op de lijst",
       heroCtaTry: "Bekijk een echt antwoord",
       example: {
@@ -410,7 +415,7 @@ export const nl: DeepPartial<typeof en> = {
         draftLabel: "Het antwoord",
         draft:
           "Hoi Lisa! Wat leuk dat je aan me denkt voor 14 juni. Bruiloften vastleggen is echt mijn ding. Voor een hele trouwdag werk ik met pakketten vanaf €1.950, inclusief tweede fotograaf. Ik check de datum graag even en hoor graag jullie plannen. Zullen we deze week kort bellen?\n\nEmma",
-        caption: "Klaar in ~20 seconden. Verstuurd vanuit je eigen inbox.",
+        caption: "In een paar seconden klaar. Jij verstuurt hem zelf.",
       },
       demo: {
         types: {
@@ -447,7 +452,7 @@ export const nl: DeepPartial<typeof en> = {
               "Hoi Nadia! Leuk dat je een portretshoot wilt plannen. Een goede portretsessie voelt meer als een goed gesprek dan als een fotoshoot, en dat zie je terug in de beelden. Voor een portretsessie werk ik met een pakket vanaf €350, inclusief nabewerking van de beste foto's. Vertel me iets over waar de portretten voor zijn, dan stem ik de aanpak daarop af. Ik check de datum graag even. Wanneer schikt het jou?\n\nEmma",
           },
         },
-        caption: "Klaar in ongeveer 20 seconden. Verstuurd vanuit je eigen inbox.",
+        caption: "In een paar seconden klaar. Jij verstuurt hem zelf, vanuit je eigen inbox of gewoon terug waar ze je vonden.",
         bridge: "Zo werkt het straks met jouw prijzen en jouw stijl.",
         inquiryMeta: "Nieuwe aanvraag · 2 min geleden",
         intro: "Er komt een aanvraag binnen. Twintig seconden later:",
