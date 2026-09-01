@@ -71,3 +71,25 @@ export function demoEventDate(): string {
   const target = new Date(d.getFullYear(), d.getMonth() + 4, 15);
   return `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-15`;
 }
+
+/**
+ * A worked example to set up from when there is nothing to read yet
+ * (handoff §5.2 no-context path). It reuses the demo desk's own numbers, so
+ * the example a newcomer starts from is the same one the product demonstrates
+ * everywhere else. Every value arrives labeled as an example and stops being
+ * one the moment it is typed over.
+ */
+export function demoSetupExample(locale: FrontdeskLocale) {
+  return {
+    displayName: DEMO_DISPLAY_NAME,
+    professions: ["photographer"],
+    location: "Amsterdam",
+    signOff: DEMO_SIGN_OFF,
+    packages: demoPackages(locale).map((p) => ({
+      label: p.label,
+      price: String(p.priceFromEur),
+      unit: p.unit ?? "",
+      notes: p.notes ?? "",
+    })),
+  };
+}

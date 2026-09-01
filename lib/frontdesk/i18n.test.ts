@@ -9,7 +9,8 @@ const SAME_BY_DESIGN = new Set([
 
   // Dutch genuinely uses these English words for these concepts.
   "inbox.shell.inbox",
-  "inbox.shell.tools",
+  // "Accent" is the Dutch word too.
+  "setup.appearance.accentLabel",
   // "Product" is the same word in Dutch.
   "inbox.shell.navLabel",
   // "Type" is the same word in Dutch.

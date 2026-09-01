@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
 import { fdDict } from "@/lib/frontdesk/i18n";
@@ -25,14 +26,20 @@ import {
   AgentProgress,
   ApprovalContract,
   EvidenceList,
-  PermissionMatrixCard,
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
+import { GuardFailedPanel, GuardPanel } from "@/components/frontdesk/guard-panel";
+import { PlanRail } from "@/components/frontdesk/plan-rail";
+import { matchedPackage } from "@/lib/frontdesk/planSteps";
+import { SourceChip } from "@/components/frontdesk/source-chip";
+import { eventTypeLabel } from "@/lib/frontdesk/eventTypes";
+import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
-import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
+import { FollowupScheduleCard } from "@/components/frontdesk/memory-followups";
+import { nextFollowupDate } from "@/lib/frontdesk/followups";
 
 /**
  * One inbox. Every read and write here goes through the browser client under
@@ -51,7 +58,8 @@ interface InquiryRow {
   client_name: string;
   client_email: string | null;
   event_date: string | null;
-  event_type: "wedding" | "party" | "business" | "portrait" | "other";
+  event_type: string;
+  event_type_other: string | null;
   budget_band: string;
   message: string | null;
   status: "new" | "replied" | "nudge_due" | "booked" | "lost";
@@ -74,21 +82,6 @@ interface DraftRow {
   rule_id?: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
-}
-
-/** Plain-language line for a stored validation failure code (§10.7). Codes
- * may carry a suffix (price-not-in-packages:1950, date-mismatch:2027); the
- * prefix picks the copy and unknown codes fall back to the raw code, which
- * is still text-first and honest. */
-function validationReason(code: string, d: { validation: { reasons: Record<string, string> } }): string {
-  const base = code.split(":")[0];
-  const key = base.startsWith("reply-length") || base.startsWith("nudge-length") ? "length" : base;
-  return d.validation.reasons[key] ?? code;
-}
-
-function mailtoHref(email: string, subject: string, body: string): string {
-  const crlf = body.replace(/\n/g, "\r\n");
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(crlf)}`;
 }
 
 const primaryClass =
@@ -230,7 +223,9 @@ export function InboxApp({
     }
     const { data: rows, error: inquiriesError } = await sb
       .from("inquiries")
-      .select("id, source, src_channel, client_name, client_email, event_date, event_type, budget_band, message, status, created_at, replied_at, snoozed_until")
+      .select(
+        "id, source, src_channel, client_name, client_email, event_date, event_type, event_type_other, budget_band, message, status, created_at, replied_at, snoozed_until",
+      )
       .order("created_at", { ascending: false });
     if (inquiriesError) {
       setLoadError(true);
@@ -337,7 +332,7 @@ export function InboxApp({
       if (typeFilter !== "all" && inquiry.event_type !== typeFilter) return false;
       if (!needle) return true;
       const hay = `${inquiry.client_name} ${inquiry.message ?? ""} ${
-        dict.public.form.types[inquiry.event_type]
+        eventTypeLabel(inquiry.event_type, inquiry.event_type_other, dict.public.form.types)
       }`.toLowerCase();
       return hay.includes(needle);
     });
@@ -612,7 +607,7 @@ export function InboxApp({
           )}
         </h2>
         <p className="text-sm text-[var(--fd-slate)]">
-          {dict.public.form.types[open.event_type]}
+          {eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
           {open.event_date ? ` · ${d.date}: ${open.event_date}` : ""} · {d.budget}: {open.budget_band}
         </p>
       </header>
@@ -667,19 +662,7 @@ export function InboxApp({
         )}
 
       {openDraft && openDraft.validation_status === "failed" ? (
-        <div
-          role="alert"
-          className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-error-text)]/40 bg-white p-5"
-        >
-          <span className="text-sm font-semibold text-[var(--fd-ink)]">
-            {d.validation.failedHeading}
-          </span>
-          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.validation.failedIntro}</p>
-          <ul className="list-disc pl-5 text-sm leading-relaxed text-[var(--fd-slate)]">
-            {(openDraft.validation_failures ?? []).map((code) => (
-              <li key={code}>{validationReason(code, d)}</li>
-            ))}
-          </ul>
+        <GuardFailedPanel locale={freelancer.locale} failures={openDraft.validation_failures}>
           <AgentProgress
             locale={freelancer.locale}
             states={{ received: "done", drafting: "done", checks: "failed", ready: "pending" }}
@@ -692,31 +675,26 @@ export function InboxApp({
           >
             {regenerating ? d.regenerating : d.regenerate}
           </button>
-        </div>
+        </GuardFailedPanel>
       ) : openDraft ? (
         <div className="flex flex-col gap-3">
+          <PlanRail
+            locale={freelancer.locale}
+            body={editedBody}
+            packages={packages}
+            eventType={eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
+            eventDate={open.event_date}
+          />
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
             {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
           </span>
-          {openDraft.validation_status === "needs_review" &&
-            (openDraft.validation_failures ?? []).length > 0 && (
-              <div
-                role="status"
-                className="rounded-xl border border-[var(--fd-line)] bg-[var(--fd-paper)] px-4 py-3 text-sm leading-relaxed text-[var(--fd-slate)]"
-              >
-                <p className="font-medium text-[var(--fd-ink)]">{d.validation.needsReview}</p>
-                <ul className="list-disc pl-5">
-                  {(openDraft.validation_failures ?? []).map((code) => (
-                    <li key={code}>{validationReason(code, d)}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          {openDraft.validation_status === "ready_for_review" && (
-            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
-              {d.validation.checksPassed}
-            </p>
-          )}
+          <GuardPanel
+            locale={freelancer.locale}
+            status={openDraft.validation_status as never}
+            failures={openDraft.validation_failures}
+            body={editedBody}
+            eventDate={open.event_date}
+          />
           <textarea
             aria-label={openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
             rows={10}
@@ -724,6 +702,21 @@ export function InboxApp({
             onChange={(e) => setEditedBody(e.target.value)}
             className="min-h-56 w-full rounded-2xl border border-[var(--fd-line-control)] bg-white px-4 py-3 text-base leading-relaxed focus-visible:border-[var(--fd-focus-ring)] sm:text-sm focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none"
           />
+          {(() => {
+            // The price sentence's source note (§8.8). Rendered under the
+            // draft, never inside it: validation language abutting the email
+            // text is what made an earlier version read as part of the reply.
+            const match = matchedPackage(editedBody, packages);
+            if (!match) return null;
+            return (
+              <p className="flex flex-wrap items-center gap-1.5 text-xs leading-relaxed text-[var(--fd-slate)]">
+                <SourceChip locale={freelancer.locale} kind="yours" />
+                {t.plan.priceNote
+                  .replace("{price}", match.asWritten)
+                  .replace("{package}", match.label)}
+              </p>
+            );
+          })()}
           <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
             {open.client_email && (
               <a
@@ -838,6 +831,11 @@ export function InboxApp({
               .filter((d) => d.inquiry_id === open.id && d.kind === "nudge")
               .map((d) => ({ outcome: d.outcome, body: d.body })),
             now
+          )}
+          nextDate={nextFollowupDate(
+            open.replied_at,
+            quietDays,
+            freelancer.timezone || "Europe/Amsterdam",
           )}
           quietDays={quietDays}
         />
@@ -1037,39 +1035,6 @@ export function InboxApp({
         )}
 
         {!testMode && (
-          <PermissionMatrixCard
-            locale={freelancer.locale}
-            stored={freelancerState.permission_levels}
-            onChange={async (levels) => {
-              setFreelancerState((f) => ({ ...f, permission_levels: levels }));
-              await sb
-                .from("freelancers")
-                .update({ permission_levels: levels })
-                .eq("auth_user_id", session.user.id);
-            }}
-          />
-        )}
-
-        {!testMode && (
-          <MemoryListCard
-            freelancer={freelancerState}
-            onApply={async (change) => {
-              const update: Record<string, unknown> = {};
-              if (change.profile) update.voice_profile = change.profile;
-              if (change.decisions) update.voice_proposal_decisions = change.decisions;
-              if (change.paused !== undefined) update.voice_learning_paused = change.paused;
-              setFreelancerState((f) => ({
-                ...f,
-                voice_profile: (change.profile ?? f.voice_profile) as Record<string, unknown> | null,
-                voice_proposal_decisions: change.decisions ?? f.voice_proposal_decisions,
-                voice_learning_paused: change.paused ?? f.voice_learning_paused,
-              }));
-              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
-            }}
-          />
-        )}
-
-        {!testMode && (
           <AutomationRulesCard
             freelancer={freelancerState}
             rules={rules}
@@ -1114,21 +1079,12 @@ export function InboxApp({
         )}
 
         {!testMode && (
-          <FollowupSettingsCard
-            freelancer={freelancerState}
-            quietDays={quietDays}
-            onChange={async (change) => {
-              const update: Record<string, unknown> = {};
-              if (change.quietDays !== undefined) update.followup_quiet_days = change.quietDays;
-              if (change.paused !== undefined) update.followups_paused = change.paused;
-              setFreelancerState((f) => ({
-                ...f,
-                followup_quiet_days: change.quietDays ?? f.followup_quiet_days,
-                followups_paused: change.paused ?? f.followups_paused,
-              }));
-              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
-            }}
-          />
+          <Link
+            href="/control"
+            className="w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+          >
+            {t.toControl}
+          </Link>
         )}
 
         {inquiries.length === 0 ? (
@@ -1271,7 +1227,7 @@ export function InboxApp({
                         </span>
                         <span className="flex w-full items-baseline justify-between gap-2">
                           <span className="truncate text-xs text-[var(--fd-slate)]">
-                            {dict.public.form.types[inquiry.event_type]}
+                            {eventTypeLabel(inquiry.event_type, inquiry.event_type_other, dict.public.form.types)}
                             {inquiry.event_date ? ` · ${inquiry.event_date}` : ""} · {inquiry.budget_band}
                           </span>
                           <span className="shrink-0 text-xs text-[var(--fd-slate)]">

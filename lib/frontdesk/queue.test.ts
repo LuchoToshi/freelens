@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { dayDiff, placeInquiry, QUEUE_ORDER, type QueueInquiry } from "@/lib/frontdesk/queue";
+import {
+  dayDiff,
+  NEEDS_YOU_QUEUES,
+  placeInquiry,
+  QUEUE_ORDER,
+  type QueueInquiry,
+} from "@/lib/frontdesk/queue";
 
 const TZ = "Europe/Amsterdam";
 const NOW = new Date("2026-08-30T10:00:00Z");
@@ -99,6 +105,22 @@ describe("the fixed queue-priority model", () => {
     for (const p of cases) {
       expect(p.reasonKey).toBeTruthy();
       expect(p.actionKey).toBeTruthy();
+    }
+  });
+});
+
+describe("the desk and the inbox order the same work the same way (handoff §5.1)", () => {
+  it("Needs you is the leading slice of the inbox order, not a second opinion", () => {
+    expect(NEEDS_YOU_QUEUES).toEqual(QUEUE_ORDER.slice(0, NEEDS_YOU_QUEUES.length));
+  });
+
+  it("Needs you holds exactly the queues that ask the freelancer for something", () => {
+    expect([...NEEDS_YOU_QUEUES]).toEqual(["decision", "review", "missing"]);
+  });
+
+  it("nothing the desk watches on its own is filed under Needs you", () => {
+    for (const queue of ["followup", "waiting", "monitoring", "done"] as const) {
+      expect(NEEDS_YOU_QUEUES).not.toContain(queue);
     }
   });
 });

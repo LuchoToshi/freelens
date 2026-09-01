@@ -95,6 +95,31 @@ export interface FollowupTimeline {
     | "capReached";
 }
 
+/**
+ * The day a follow-up draft would appear, if the client stays quiet: the
+ * reply date plus the quiet window, in the freelancer's own timezone. Returns
+ * null when there is nothing to date — no reply yet, or the timeline is not
+ * waiting on the client. A date is only shown where one is real.
+ */
+export function nextFollowupDate(
+  repliedAt: string | null,
+  quietDays: number,
+  timeZone: string,
+): string | null {
+  if (!repliedAt) return null;
+  const replied = new Date(repliedAt);
+  if (Number.isNaN(replied.getTime())) return null;
+  const due = new Date(replied.getTime() + quietDays * 24 * 60 * 60 * 1000);
+  // en-CA renders ISO order, which is the format the rest of the product
+  // stores and displays dates in.
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone,
+  }).format(due);
+}
+
 export function deriveFollowupTimeline(
   inquiry: {
     status: string;

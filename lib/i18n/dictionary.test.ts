@@ -37,39 +37,21 @@ describe("the Dutch dictionary covers the English one", () => {
     // unchanged, a bare percentage, an acronym, or a numeric placeholder.
     const SAME_BY_DESIGN = new Set([
       "common.brand",
-      "common.nav.rebooking",
-      "agent.title",
-      "agent.numbers.noData",
-      "agent.onboarding.importPlaceholder",
       "common.nav.privacy",
       "common.nav.contact",
       "meta.privacy.title",
       "privacyPage.eyebrow",
-      "home.rebooking.waitlist.crafts.illustrator",
       "home.frontdesk.heroEyebrow",
       "home.frontdesk.waitlist.crafts.illustrator",
       // A first name is not copy; the mock client is Lisa in both languages.
       "home.frontdesk.example.clientName",
       "home.frontdesk.demo.types.wedding.clientName",
       // A number range with no thousands separator reads the same in both.
-      "home.frontdesk.demo.types.portrait.budget",
-      "app.shell.eyebrow",
+      "home.frontdesk.demo.types.social_content.budget",
       "meta.home.title",
-      "home.privacy.ariaLabel",
-      "app.moneyArrived.amountPlaceholder",
-      "app.moneyArrived.labelLabel",
-      "app.paymentHistory.vatLabel",
-      "app.paymentHistory.vatPrefix",
-      "app.settings.treatments.0",
-      "app.settings.treatments.9",
-      "app.settings.treatments.21",
-      "app.settings.treatments.kor",
       // Dutch uses these words unchanged.
-      "app.weekly.steps.buffer",
-      "app.decision.later",
       // The breakdown table is keyed BY the English label, so English maps to
       // itself by construction. Only the Dutch side carries a translation.
-      ...Object.keys(en.app.breakdown).map((k) => `app.breakdown.${k}`),
     ]);
     // A value that is only digits and separators is a number, not copy: an
     // amount placeholder like "1500" is identical in every language.
@@ -116,6 +98,6 @@ describe("fallback behaviour", () => {
     // the merge rather than by leaving a real gap in the shipped dictionary.
     const merged = getDictionary("nl");
     expect(typeof merged.common.brand).toBe("string");
-    expect(merged.home.hero.contexts.length).toBeGreaterThan(0);
+    expect(typeof merged.home.frontdesk.demo.types.wedding.label).toBe("string");
   });
 });

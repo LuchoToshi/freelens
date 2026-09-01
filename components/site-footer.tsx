@@ -77,22 +77,12 @@ function LegacyFooter({
   // address is configured: a mailto that bounces is worse than none.
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
 
-  // A closing call to action that points at the page you are already reading is
-  // not an action. On /tool the band keeps the wordmark and the trust line and
-  // drops the button.
-  const showCta = pathname !== "/tool";
+  // The closing call to action points at the front desk, and never at the
+  // page you are already reading.
+  const showCta = pathname !== "/";
 
-  // The CTA button and the "After payment" list link share a destination;
-  // only one of the two renders. Where the button shows, the list entry
-  // yields; on /tool the button is gone and the list entry stays.
   const links = [
-    { href: "/rekentools", label: t.common.nav.tools },
-    { href: "/tarief", label: t.common.nav.beforeJob },
-    ...(showCta ? [] : [{ href: "/tool", label: t.common.nav.afterPayment }]),
-    { href: "/offertes", label: t.common.nav.quotes },
     { href: "/about", label: t.common.nav.about },
-    { href: "/accuracy", label: t.common.nav.accuracy },
-    { href: "/methodology", label: t.common.nav.methodology },
     { href: "/privacy", label: t.common.nav.privacy },
     ...(contactEmail
       ? [{ href: `mailto:${contactEmail}`, label: t.common.nav.contact }]
@@ -114,7 +104,7 @@ function LegacyFooter({
           </p>
           {showCta && (
             <Link
-              href="/tool"
+              href="/#early-access"
               className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-white px-6 text-base font-medium text-[var(--fl-ink)] transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
             >
               {t.common.footer.cta}

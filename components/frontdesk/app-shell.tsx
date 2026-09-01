@@ -10,16 +10,17 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
  * the shell and the two-pane inbox break at the same width (deviation
  * recorded in the phase log).
  *
- * Tools and Settings point at the surfaces that already own that scope
- * (the public calculator and the setup editor). Clients and Follow-ups are
- * real destinations with honest not-built-yet pages, not dead links.
+ * Control room and Settings own the two settings scopes: what the agent may
+ * do and what it remembers, and the page the client sees. Clients and
+ * Follow-ups are real destinations with honest not-built-yet pages, not dead
+ * links.
  */
 const DESTINATIONS = [
   { key: "home", href: "/home" },
   { key: "inbox", href: "/inbox" },
   { key: "clients", href: "/clients" },
   { key: "followups", href: "/follow-ups" },
-  { key: "tools", href: "/tool" },
+  { key: "control", href: "/control" },
   { key: "settings", href: "/setup" },
 ] as const;
 

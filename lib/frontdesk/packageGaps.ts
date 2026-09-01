@@ -30,10 +30,40 @@ export interface PackageGap {
  */
 const TYPE_WORDS: Record<string, string[]> = {
   wedding: ["wedding", "bruiloft", "trouw", "married", "marry", "engag", "huwelijk"],
+  event: [
+    "event",
+    "evenement",
+    "party",
+    "feest",
+    "verjaardag",
+    "birthday",
+    "corporate",
+    "offsite",
+    "zakelijk",
+    "bedrijf",
+    "conference",
+    "congres",
+  ],
+  brand_film: ["brand film", "merkfilm", "commercial", "reclame", "campagne", "campaign"],
+  music_video: ["music video", "videoclip", "muziekvideo", "clip"],
+  real_estate: ["real estate", "vastgoed", "makelaar", "woning", "interieur", "interior"],
+  social_content: ["social", "instagram", "tiktok", "reels", "content", "socials"],
+  // Legacy types keep their words so an older inquiry still matches a package;
+  // nothing infers them any more, because the form no longer offers them.
   party: ["party", "feest", "verjaardag", "birthday"],
-  business: ["business", "zakelijk", "bedrijf", "corporate", "offsite", "event"],
+  business: ["business", "zakelijk", "bedrijf", "corporate", "offsite"],
   portrait: ["portrait", "portret", "headshot"],
 };
+
+/** The types inference may produce: what the form offers, nothing retired. */
+const INFERABLE_TYPES = [
+  "wedding",
+  "event",
+  "brand_film",
+  "music_video",
+  "real_estate",
+  "social_content",
+] as const;
 
 /** How many real inquiries of one type it takes before a gap is worth naming. */
 const UNCOVERED_THRESHOLD = 2;
@@ -78,8 +108,8 @@ export function detectPackageGaps(
 export function inferEventType(message: string | null): string | null {
   if (!message) return null;
   const haystack = message.toLowerCase();
-  for (const [type, words] of Object.entries(TYPE_WORDS)) {
-    if (words.some((w) => haystack.includes(w))) return type;
+  for (const type of INFERABLE_TYPES) {
+    if (TYPE_WORDS[type].some((w) => haystack.includes(w))) return type;
   }
   return null;
 }

@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
+import {
+  EVENT_TYPE_OTHER,
+  EVENT_TYPE_OTHER_MAX,
+  INTAKE_EVENT_TYPES,
+  needsOtherText,
+  type IntakeEventType,
+} from "@/lib/frontdesk/eventTypes";
 
 /**
  * The inquiry form. Mobile-first, one screen, under a minute to fill.
@@ -9,7 +16,6 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
  * The `website` field is the honeypot the rest of the repo uses: hidden from
  * humans, filled only by bots, answered generically by the server.
  */
-const EVENT_TYPES = ["wedding", "party", "business", "portrait", "other"] as const;
 const BUDGET_BANDS = [
   { value: "<1000", key: "under" },
   { value: "1000-2500", key: "mid" },
@@ -41,7 +47,10 @@ export function InquiryForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [eventType, setEventType] = useState<(typeof EVENT_TYPES)[number]>("wedding");
+  const [eventType, setEventType] = useState<IntakeEventType>("wedding");
+  const [otherText, setOtherText] = useState("");
+  const [otherError, setOtherError] = useState(false);
+  const otherRef = useRef<HTMLInputElement | null>(null);
   const [budget, setBudget] = useState<(typeof BUDGET_BANDS)[number]["value"]>("unsure");
   const [message, setMessage] = useState("");
   const [website, setWebsite] = useState("");
@@ -50,6 +59,13 @@ export function InquiryForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (state === "sending") return;
+    // "Something else" with nothing after it leaves the freelancer an inquiry
+    // that names no work, so it is refused here and at the API.
+    if (needsOtherText(eventType, otherText)) {
+      setOtherError(true);
+      otherRef.current?.focus();
+      return;
+    }
     setState("sending");
     try {
       const response = await fetch("/api/frontdesk/inquiries", {
@@ -62,6 +78,7 @@ export function InquiryForm({
           clientEmail: email,
           eventDate: eventDate || null,
           eventType,
+          eventTypeOther: eventType === EVENT_TYPE_OTHER ? otherText.trim() : null,
           budgetBand: budget,
           message,
           website,
@@ -135,16 +152,53 @@ export function InquiryForm({
         <select
           id="fd-type"
           value={eventType}
-          onChange={(e) => setEventType(e.target.value as (typeof EVENT_TYPES)[number])}
+          onChange={(e) => {
+            const next = e.target.value as IntakeEventType;
+            setEventType(next);
+            setOtherError(false);
+            // Revealing the field is only half of it: without moving focus,
+            // a keyboard user tabs past a required question they never saw.
+            if (next === EVENT_TYPE_OTHER) requestAnimationFrame(() => otherRef.current?.focus());
+          }}
           className={inputClass}
         >
-          {EVENT_TYPES.map((value) => (
+          {INTAKE_EVENT_TYPES.map((value) => (
             <option key={value} value={value}>
               {t.types[value]}
             </option>
           ))}
         </select>
       </div>
+
+      {eventType === EVENT_TYPE_OTHER && (
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="fd-type-other" className={labelClass}>
+            {t.typeOtherLabel}
+          </label>
+          <input
+            id="fd-type-other"
+            ref={otherRef}
+            value={otherText}
+            maxLength={EVENT_TYPE_OTHER_MAX}
+            aria-invalid={otherError || undefined}
+            aria-describedby={otherError ? "fd-type-other-error" : undefined}
+            onChange={(e) => {
+              setOtherText(e.target.value);
+              if (otherError) setOtherError(false);
+            }}
+            className={inputClass}
+          />
+          {otherError && (
+            <p
+              id="fd-type-other-error"
+              role="alert"
+              className="text-xs font-medium text-[var(--fd-error-text)]"
+            >
+              {t.typeOtherRequired}
+            </p>
+          )}
+        </div>
+      )}
 
       <fieldset className="flex flex-col gap-2">
         <legend className={labelClass}>{t.budgetLabel}</legend>
@@ -202,7 +256,13 @@ export function InquiryForm({
       <button
         type="submit"
         disabled={state === "sending"}
-        className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50"
+        // The one place the freelancer's accent appears, with a text colour
+        // derived from it rather than assumed (handoff §11).
+        style={{
+          backgroundColor: "var(--fl-accent, var(--fd-ink))",
+          color: "var(--fl-accent-text, #FFFFFF)",
+        }}
+        className="inline-flex min-h-12 items-center justify-center rounded-xl px-6 text-base font-medium shadow-sm transition-transform hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50"
       >
         {state === "sending" ? t.sending : t.submit}
       </button>

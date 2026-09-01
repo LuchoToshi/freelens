@@ -8,6 +8,7 @@
  * own identity beyond what they put on their public page.
  */
 import { serviceClient } from "@/lib/frontdesk/server/clients";
+import { parseAppearance, type Appearance } from "@/lib/frontdesk/appearance";
 
 export interface PublicProfile {
   handle: string;
@@ -16,13 +17,14 @@ export interface PublicProfile {
   city: string | null;
   photoUrl: string | null;
   locale: "nl" | "en";
+  appearance: Appearance;
 }
 
 export async function publicProfileByHandle(handle: string): Promise<PublicProfile | null> {
   const db = serviceClient();
   const { data, error } = await db
     .from("freelancers")
-    .select("handle, display_name, craft, city, photo_url, locale")
+    .select("handle, display_name, craft, city, photo_url, locale, appearance")
     .eq("handle", handle)
     .maybeSingle();
   if (error || !data) return null;
@@ -33,5 +35,6 @@ export async function publicProfileByHandle(handle: string): Promise<PublicProfi
     city: data.city,
     photoUrl: data.photo_url,
     locale: data.locale,
+    appearance: parseAppearance(data.appearance),
   };
 }

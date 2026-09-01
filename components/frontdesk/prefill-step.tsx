@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { track } from "@/lib/analytics";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { confidencePercent } from "@/lib/frontdesk/provenance";
+import { demoSetupExample } from "@/lib/frontdesk/demoFixture";
 import type { PrefillResult } from "@/lib/frontdesk/server/prefill";
 import type { PackageRow } from "@/components/frontdesk/setup-wizard";
 import type { Profession } from "@/components/frontdesk/profession-picker";
@@ -43,6 +44,10 @@ export function PrefillStep({
   const [prefill, setPrefill] = useState<PrefillResult | null>(null);
   const [edited, setEdited] = useState<Record<string, boolean>>({});
   const [values, setValues] = useState<PrefillApplied | null>(null);
+  // The example path (§5.2): values that came from the worked example rather
+  // than from anything the freelancer shared. Kept separate from `prefill` so
+  // no example value can ever be labeled as something read from a page.
+  const [fromExample, setFromExample] = useState(false);
 
   const inputClass =
     "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base sm:text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
@@ -99,6 +104,21 @@ export function PrefillStep({
     }
   }
 
+  function startFromExample() {
+    const example = demoSetupExample(locale);
+    setValues({
+      displayName: example.displayName,
+      professions: example.professions as Profession[],
+      location: example.location,
+      signOff: example.signOff,
+      packages: example.packages.map((p) => ({ ...p, addons: [] })),
+    });
+    setPrefill(null);
+    setEdited({});
+    setFromExample(true);
+    setMode("review");
+  }
+
   function markPackagesEdited() {
     // Packages count as one field: fire once for the whole set, not once
     // per row or per keystroke.
@@ -108,6 +128,7 @@ export function PrefillStep({
 
   function sourceLabel(field: string, confidence: number | undefined, hasValue: boolean) {
     if (edited[field]) return t.sourceYou;
+    if (fromExample) return t.exampleChip;
     if (!hasValue) return t.notFound;
     const pct = confidence === undefined ? null : confidencePercent(confidence);
     const from = prefill?.source === "url" ? t.sourcePage : t.sourceText;
@@ -179,11 +200,19 @@ export function PrefillStep({
           </button>
         </div>
         <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.privacyNote}</p>
+
+        <div className="flex flex-col gap-2 border-t border-[var(--fd-line)] pt-4">
+          <span className="text-sm font-medium text-[var(--fd-ink)]">{t.exampleHeading}</span>
+          <button type="button" onClick={startFromExample} className={`${ghostClass} text-left`}>
+            {t.exampleButton}
+          </button>
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.exampleNote}</p>
+        </div>
       </section>
     );
   }
 
-  if (!values || !prefill) return null;
+  if (!values || (!prefill && !fromExample)) return null;
 
   const fields: {
     key: keyof PrefillApplied & ("displayName" | "location" | "signOff");
@@ -199,7 +228,9 @@ export function PrefillStep({
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.reviewHeading}</h1>
-        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.reviewIntro}</p>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
+          {fromExample ? t.exampleNote : t.reviewIntro}
+        </p>
       </div>
 
       {fields.map((field) => (
@@ -221,7 +252,7 @@ export function PrefillStep({
           <span className="text-xs text-[var(--fd-slate)]">
             {sourceLabel(
               field.key,
-              prefill.confidence[field.confidenceKey],
+              prefill?.confidence[field.confidenceKey],
               Boolean(values[field.key])
             )}
           </span>
@@ -266,8 +297,8 @@ export function PrefillStep({
               <span className="text-xs text-[var(--fd-slate)]">
                 {sourceLabel(
                   `pkg-${i}`,
-                  prefill.packages[i]?.confidence,
-                  Boolean(prefill.packages[i]?.label)
+                  prefill?.packages[i]?.confidence,
+                  Boolean(pkg.label)
                 )}
                 {!pkg.price && ` · ${t.priceMissing}`}
               </span>

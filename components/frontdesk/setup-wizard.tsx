@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
@@ -14,6 +15,9 @@ import { RevealStep } from "@/components/frontdesk/reveal-step";
 import { ShareStep } from "@/components/frontdesk/share-step";
 import { ProfessionPicker, type Profession } from "@/components/frontdesk/profession-picker";
 import { PrefillStep, type PrefillApplied } from "@/components/frontdesk/prefill-step";
+import { HandleField } from "@/components/frontdesk/handle-field";
+import { AppearanceCard } from "@/components/frontdesk/appearance-card";
+import { DECISION_ORDER, DecisionRail, type DecisionKey } from "@/components/frontdesk/decision-rail";
 
 /**
  * Onboarding, four steps, nothing external. The locale question comes first
@@ -45,6 +49,14 @@ const secondaryClass =
 // Matches the input's `accept` attribute and the "up to 2MB" copy below.
 const PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+
+/**
+ * Which decision each step is asking about (handoff §5.2). The wizard keeps
+ * its step numbers — the flow itself is unchanged — but what the freelancer
+ * reads is the decision, never a position in a form march.
+ */
+const STEP_DECISION: Record<number, DecisionKey> = { 1: "who", 2: "prices", 3: "voice", 35: "voice", 4: "link" };
+const DECISION_STEP: Record<DecisionKey, number> = { who: 1, prices: 2, voice: 3, link: 4 };
 
 export function SetupWizard({
   session,
@@ -89,6 +101,7 @@ export function SetupWizard({
 
   const t = fdDict(locale).setup;
   const sb = supabaseBrowser();
+  const currentDecision: DecisionKey | undefined = STEP_DECISION[step];
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -238,10 +251,13 @@ export function SetupWizard({
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
-      {step >= 1 && step !== 5 && (
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
-          {t.stepOf.replace("{n}", String(Math.min(step === 35 ? 3 : step, 4)))}
-        </p>
+      {currentDecision && (
+        <DecisionRail
+          locale={locale}
+          current={currentDecision}
+          settled={DECISION_ORDER.slice(0, DECISION_ORDER.indexOf(currentDecision))}
+          onOpen={(key) => setStep(DECISION_STEP[key])}
+        />
       )}
 
       {step === 0 && (
@@ -308,22 +324,12 @@ export function SetupWizard({
             </div>
           </fieldset>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="su-handle" className={labelClass}>{t.profile.handleLabel}</label>
-            <input
-              id="su-handle"
-              value={handle}
-              maxLength={30}
-              onChange={(e) => setHandle(e.target.value.toLowerCase().trim())}
-              className={inputClass}
-            />
-            <p className="text-xs text-[var(--fd-slate)]">{t.profile.handleHint}</p>
-            {error === "handle" && (
-              <p className="text-xs font-medium text-[var(--fd-error-text)]" role="alert">
-                {t.profile.handleTaken}
-              </p>
-            )}
-          </div>
+          <HandleField
+            locale={locale}
+            value={handle}
+            onChange={setHandle}
+            errorTaken={error === "handle"}
+          />
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="su-name" className={labelClass}>{t.profile.nameLabel}</label>
@@ -558,7 +564,25 @@ export function SetupWizard({
         />
       )}
 
-      {step === 4 && <ShareStep locale={locale} handle={handle} />}
+      {step === 4 && (
+        <>
+          <ShareStep locale={locale} handle={handle} />
+          {/* Appearance sits after the link, never in front of a decision:
+              it is the one thing here that is optional (handoff §11). */}
+          <AppearanceCard
+            session={session}
+            locale={locale}
+            displayName={displayName || handle}
+            stored={freelancer?.appearance ?? null}
+          />
+          <Link
+            href="/account"
+            className="w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]"
+          >
+            {fdDict(locale).security.link}
+          </Link>
+        </>
+      )}
     </main>
   );
 }

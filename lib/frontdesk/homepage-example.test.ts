@@ -5,11 +5,11 @@ import { validateFrontdeskDraft } from "./draftGuards";
 
 describe("homepage worked example obeys the product's own guards", () => {
   // The demo freelancer's package set: the whitelist every demo draft's
-  // prices are checked against. Wedding names €1.950 and portrait €350
-  // because these exist; party and business name none.
+  // prices are checked against. Only the wedding package exists, so only the
+  // wedding draft may name a number; the other three must name none, which is
+  // exactly the rule the product enforces on a real draft.
   const packages = [
     { label: "Bruiloft (hele dag)", priceFromEur: 1950, unit: null, notes: null },
-    { label: "Portretsessie", priceFromEur: 350, unit: null, notes: null },
   ];
 
   it.each([
@@ -21,7 +21,7 @@ describe("homepage worked example obeys the product's own guards", () => {
     expect(result.ok, JSON.stringify(result)).toBe(true);
   });
 
-  const TYPES = ["wedding", "party", "business", "portrait"] as const;
+  const TYPES = ["wedding", "event", "brand_film", "social_content"] as const;
   it.each(
     TYPES.flatMap((t) => [
       [`nl ${t}`, nl.home?.frontdesk?.demo?.types?.[t]?.draft],
@@ -33,12 +33,12 @@ describe("homepage worked example obeys the product's own guards", () => {
     expect(result.ok, JSON.stringify(result)).toBe(true);
   });
 
-  it("wedding names its package price; party and business name none", () => {
+  it("only the draft with a package behind it names a number", () => {
     for (const dict of [nl.home!.frontdesk!.demo!, en.home.frontdesk.demo]) {
       expect(dict.types!.wedding!.draft).toMatch(/1[.,]950/);
-      expect(dict.types!.portrait!.draft).toMatch(/350/);
-      expect(dict.types!.party!.draft).not.toMatch(/€\s?\d/);
-      expect(dict.types!.business!.draft).not.toMatch(/€\s?\d/);
+      for (const t of ["event", "brand_film", "social_content"] as const) {
+        expect(dict.types![t]!.draft, t).not.toMatch(/€\s?\d/);
+      }
     }
   });
 });

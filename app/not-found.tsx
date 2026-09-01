@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { container } from "@/components/container";
-import { linkButtonClass } from "@/components/app/styles";
+import { linkButtonClass } from "@/components/button-classes";
 import { useDocumentTitle, useT } from "@/components/i18n/locale-provider";
 
 export default function NotFound() {

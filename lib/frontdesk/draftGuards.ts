@@ -64,24 +64,38 @@ const EURO_MARKED = /(?:€\s?[\d.,]+|\b[\d.,]+\s?(?:euro|eur)\b)/gi;
 const BARE_NUMBER = /\b\d{3,}\b/g;
 const YEAR_SHAPE = /^(19|20)\d{2}$/;
 
-/** Amounts found in a draft, normalized to bare digit strings. */
-export function findPriceLikeAmounts(text: string): string[] {
-  const found: string[] = [];
+/**
+ * Amounts found in a draft: the digits the guard compares, and the text as it
+ * actually appears in the draft, so a surface can quote the amount the reader
+ * can see rather than a reformatted version of it.
+ */
+export function findPriceMentions(text: string): { digits: string; asWritten: string }[] {
+  const found: { digits: string; asWritten: string }[] = [];
   // Euro-marked amounts first; strip them from the text so the bare-number
   // scan cannot re-match fragments of a dotted-thousands amount ("1.950"
   // must not surface again as "950").
   let rest = text;
   for (const m of text.matchAll(EURO_MARKED)) {
     const digits = m[0].replace(/\D/g, "");
-    if (digits) found.push(digits);
+    if (digits) {
+      // The amount pattern is greedy about separators, so it can swallow the
+      // sentence's own full stop; the digits are unaffected, but the quoted
+      // form must not read "€ 1.950.".
+      found.push({ digits, asWritten: m[0].trim().replace(/[.,]+$/, "") });
+    }
     rest = rest.replace(m[0], " ");
   }
   for (const m of rest.matchAll(BARE_NUMBER)) {
     const raw = m[0];
     if (YEAR_SHAPE.test(raw)) continue; // years echo dates, not prices
-    found.push(raw);
+    found.push({ digits: raw, asWritten: raw });
   }
   return found;
+}
+
+/** Amounts found in a draft, normalized to bare digit strings. */
+export function findPriceLikeAmounts(text: string): string[] {
+  return findPriceMentions(text).map((m) => m.digits);
 }
 
 // ---------------------------------------------------------------- style guard

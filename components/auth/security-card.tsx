@@ -9,11 +9,17 @@ import {
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 
 /**
- * Security & sessions (addendum §1.2 flow 6, scoped to what the platform
- * exposes today): the per-device session policy, and "sign out everywhere
- * else" via refresh-token revocation. The per-device session LIST needs a
- * server surface the hosted tier doesn't offer the client — recorded as a
- * deviation, not faked.
+ * Account and sign-in: the per-device session policy, and "sign out everywhere
+ * else" via refresh-token revocation.
+ *
+ * This lives on /account rather than in setup or the Control room. The Control
+ * room answers what the agent may do; this answers where you are signed in.
+ * Mixing them was what made an earlier version read as if revoking a session
+ * were an agent permission.
+ *
+ * There is deliberately no device list. The hosted sign-in service exposes no
+ * per-device session listing to the client, so the page says that outright
+ * instead of showing a plausible-looking list it cannot stand behind.
  */
 export function SecurityCard({ locale }: { locale: FrontdeskLocale }) {
   const t = fdDict(locale).security;
@@ -28,9 +34,7 @@ export function SecurityCard({ locale }: { locale: FrontdeskLocale }) {
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-ink)]">
-        {t.heading}
-      </h2>
+      <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium text-[var(--fd-ink)]">{t.policyLegend}</legend>
@@ -75,6 +79,7 @@ export function SecurityCard({ locale }: { locale: FrontdeskLocale }) {
           </p>
         )}
         <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.othersWhy}</p>
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.listNote}</p>
       </div>
     </section>
   );

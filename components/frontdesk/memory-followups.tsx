@@ -170,10 +170,13 @@ export function FollowupScheduleCard({
   locale,
   timeline,
   quietDays,
+  nextDate,
 }: {
   locale: FrontdeskLocale;
   timeline: FollowupTimeline;
   quietDays: number;
+  /** The day a draft would appear, when one genuinely would. */
+  nextDate: string | null;
 }) {
   const f = fdDict(locale).inbox.followupSchedule;
   return (
@@ -185,6 +188,9 @@ export function FollowupScheduleCard({
         · {f.states[timeline.stateKey]}
       </p>
       <p>{f.why.replace("{days}", String(quietDays))}</p>
+      {nextDate && timeline.stateKey === "awaiting" && (
+        <p>{f.consequence.replace("{date}", nextDate)}</p>
+      )}
       <p>{f.brakes}</p>
     </div>
   );

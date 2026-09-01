@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   deriveFollowupTimeline,
   MAX_NUDGES,
+  nextFollowupDate,
   nudgeVerdict,
   resolveQuietDays,
   type FollowupCandidate,
@@ -99,5 +100,25 @@ describe("the follow-up timeline (§11.7): every state visible", () => {
         NOW
       )
     ).toEqual({ used: 2, cap: 2, stateKey: "capReached" });
+  });
+});
+
+describe("the day a follow-up would appear (handoff §8 follow-ups)", () => {
+  it("is the reply date plus the quiet window", () => {
+    expect(nextFollowupDate("2026-06-01T09:00:00Z", 3, "Europe/Amsterdam")).toBe("2026-06-04");
+  });
+
+  it("has no date to give when there is no reply yet", () => {
+    expect(nextFollowupDate(null, 3, "Europe/Amsterdam")).toBeNull();
+  });
+
+  it("lands on the freelancer's own day, not UTC's", () => {
+    // 23:30 in Amsterdam is already the next day locally.
+    expect(nextFollowupDate("2026-06-01T21:30:00Z", 1, "Europe/Amsterdam")).toBe("2026-06-02");
+    expect(nextFollowupDate("2026-06-01T21:30:00Z", 1, "UTC")).toBe("2026-06-02");
+  });
+
+  it("refuses to invent a date from an unparseable timestamp", () => {
+    expect(nextFollowupDate("not a date", 3, "UTC")).toBeNull();
   });
 });

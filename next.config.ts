@@ -20,6 +20,23 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
+
+  // The Dutch rate and quote calculators, their explainer pages and the
+  // legacy rebooking app were removed. Those URLs were indexed and linked
+  // from the footer, so they redirect permanently to the front desk rather
+  // than returning 404 and losing whatever they had accumulated.
+  async redirects() {
+    return [
+      "/tarief",
+      "/offertes",
+      "/rekentools",
+      "/tool",
+      "/try",
+      "/accuracy",
+      "/methodology",
+      "/app",
+    ].map((source) => ({ source, destination: "/", permanent: true }));
+  },
 };
 
 export default nextConfig;

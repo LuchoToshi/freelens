@@ -14,7 +14,7 @@ import { fill } from "@/lib/i18n";
  */
 const VERSION_DATE = "2026-08-17";
 
-const SECTION_KEYS = ["calc", "analytics", "email", "app", "frontdesk", "gmail", "never", "rights"] as const;
+const SECTION_KEYS = ["frontdesk", "analytics", "email", "gmail", "never", "rights"] as const;
 
 export function PrivacyPageBody() {
   const t = useT();

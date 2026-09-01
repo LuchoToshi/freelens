@@ -3,8 +3,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * One browser client. Sessions are per-device (addendum §1.1): the freelancer
- * chooses between the 30-day idle default and end-with-browser; the choice
+ * One browser client. Sessions are per-device: the freelancer chooses between
+ * the 30-day idle default and end-with-browser on /account, and the choice
  * lives in localStorage and steers which store holds the auth token. A device
  * idle past the cap is signed out on the next visit, client-side, regardless
  * of the token's own lifetime. Every table read goes through RLS: the anon

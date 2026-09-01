@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict } from "@/lib/frontdesk/i18n";
-import { placeInquiry, type QueueKey } from "@/lib/frontdesk/queue";
+import { NEEDS_YOU_QUEUES, placeInquiry } from "@/lib/frontdesk/queue";
 import { resolveQuietDays } from "@/lib/frontdesk/followups";
 import type { FreelancerRow } from "@/components/frontdesk/auth-gate";
 import type { AgentStep } from "@/lib/frontdesk/server/agentRequest";
+import { DraftPanel } from "@/components/frontdesk/draft-panel";
+import { GuardPanel } from "@/components/frontdesk/guard-panel";
+import { SourceChip } from "@/components/frontdesk/source-chip";
 
 /**
  * The agent-led home (addendum §2.1): summary line with literal numbers,
@@ -26,6 +29,7 @@ interface HomeInquiry {
   replied_at: string | null;
   client_email: string | null;
   snoozed_until: string | null;
+  event_date: string | null;
 }
 
 interface HomeDraft {
@@ -34,6 +38,8 @@ interface HomeDraft {
   outcome: string | null;
   validation_status?: string | null;
   validation_failures?: string[] | null;
+  /** The draft verbatim: the decision panel shows what would send (handoff §6). */
+  body: string | null;
   created_at: string;
 }
 
@@ -49,8 +55,6 @@ interface WorkObjectRow {
   updated_at: string;
 }
 
-const NEEDS_YOU_QUEUES: QueueKey[] = ["decision", "review", "missing"];
-
 export function AgentHome({
   session,
   freelancer,
@@ -60,6 +64,7 @@ export function AgentHome({
 }) {
   const dict = fdDict(freelancer.locale);
   const h = dict.home;
+  const dsk = dict.desk;
   const sb = supabaseBrowser();
 
   const [inquiries, setInquiries] = useState<HomeInquiry[] | null>(null);
@@ -69,19 +74,40 @@ export function AgentHome({
   const [request, setRequest] = useState("");
   const [requestState, setRequestState] = useState<"idle" | "thinking" | "error">("idle");
   const [busyObject, setBusyObject] = useState<string | null>(null);
+  // The desk always has something selected when there is something to decide;
+  // a returning user lands on the top item (handoff §5.1 returning state).
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Choosing a row moves focus to the decision it opened: without this, a
+  // keyboard user picks an item and stays parked in the list, with the panel
+  // they asked for somewhere behind them.
+  const decisionHeadingRef = useRef<HTMLHeadingElement | null>(null);
 
   const timeZone = freelancer.timezone || "Europe/Amsterdam";
   const quietDays = resolveQuietDays(freelancer.followup_quiet_days);
+
+  // The greeting names the hour it is actually said in, in the freelancer's own
+  // timezone, so someone opening the desk at night is never told it is morning.
+  const localHour = Number(
+    new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone }).format(now),
+  );
+  const firstName = freelancer.display_name.trim().split(" ")[0] || freelancer.display_name;
+  const greetingWord =
+    localHour < 12 ? dsk.greetingMorning : localHour < 18 ? dsk.greetingAfternoon : dsk.greetingEvening;
+  const greetingText = `${greetingWord}, ${firstName}.`;
 
   const load = useCallback(async () => {
     const [{ data: rows }, { data: draftRows }, { data: objects }] = await Promise.all([
       sb
         .from("inquiries")
-        .select("id, source, client_name, status, created_at, replied_at, client_email, snoozed_until")
+        .select(
+          "id, source, client_name, status, created_at, replied_at, client_email, snoozed_until, event_date",
+        )
         .order("created_at", { ascending: false }),
       sb
         .from("drafts")
-        .select("inquiry_id, kind, outcome, validation_status, validation_failures, created_at")
+        .select(
+          "inquiry_id, kind, outcome, validation_status, validation_failures, body, created_at",
+        )
         .order("created_at", { ascending: false }),
       sb
         .from("agent_work_objects")
@@ -139,15 +165,16 @@ export function AgentHome({
   );
   const recentlyDone = workObjects.filter((w) => w.status === "done" || w.status === "failed").slice(0, 5);
 
-  const suggestions = useMemo(() => {
-    const list: string[] = [];
+  // Plain computation: the React Compiler memoizes this, and a manual useMemo
+  // here is the one thing it cannot preserve across the dictionary reads below.
+  const suggestions: string[] = [];
+  {
     const quiet = (inquiries ?? []).filter((i) => placements[i.id]?.queue === "followup").length;
-    if (quiet > 0) list.push(h.suggestQuiet.replace("{n}", String(quiet)));
+    if (quiet > 0) suggestions.push(h.suggestQuiet.replace("{n}", String(quiet)));
     const missing = (inquiries ?? []).find((i) => placements[i.id]?.queue === "missing");
-    if (missing) list.push(h.suggestMissing.replace("{name}", missing.client_name.split(" ")[0]));
-    if (list.length === 0) list.push(h.suggestFirst);
-    return list.slice(0, 3);
-  }, [inquiries, placements, h]);
+    if (missing) suggestions.push(h.suggestMissing.replace("{name}", missing.client_name.split(" ")[0]));
+    if (suggestions.length === 0) suggestions.push(h.suggestFirst);
+  }
 
   async function submitRequest(text: string) {
     const trimmed = text.trim();
@@ -201,16 +228,28 @@ export function AgentHome({
   }
 
   const needsCount = needsYou.length;
+  const selected =
+    needsYou.find((i) => i.id === selectedId) ?? needsYou[0] ?? null;
+  const selectedDraft = selected ? replyDrafts[selected.id] ?? null : null;
+  const selectedPlacement = selected ? placements[selected.id] : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
       <header className="flex flex-col gap-2">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{h.heading}</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
+          {greetingText}
+        </h1>
         <p className="text-base leading-relaxed text-[var(--fd-slate)]">
-          {needsCount > 0
-            ? h.summaryNeeds.replace("{n}", String(needsCount))
-            : h.summaryClear}{" "}
-          {runningCount > 0 && h.summaryRunning.replace("{m}", String(runningCount))}
+          {needsCount === 0
+            ? dsk.summaryClear
+            : needsCount === 1
+              ? dsk.summaryOne
+              : dsk.summaryMany.replace("{n}", String(needsCount))}{" "}
+          {runningCount === 1
+            ? dsk.watchingOne
+            : runningCount > 1
+              ? dsk.watchingMany.replace("{m}", String(runningCount))
+              : ""}
         </p>
       </header>
 
@@ -253,7 +292,7 @@ export function AgentHome({
           </p>
         )}
         <div className="flex flex-wrap gap-2">
-          {suggestions.map((s) => (
+          {suggestions.slice(0, 3).map((s) => (
             <button
               key={s}
               type="button"
@@ -268,104 +307,196 @@ export function AgentHome({
         <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{h.understandingSafe}</p>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-          {h.needsYou}
-        </h2>
-        {needsYou.length === 0 ? (
-          <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-4 text-sm leading-relaxed text-[var(--fd-slate)]">
-            {h.needsYouEmpty}
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {needsYou.map((inquiry) => {
-              const placement = placements[inquiry.id];
-              return (
-                <li key={inquiry.id}>
-                  <Link
-                    href={`/inbox?i=${inquiry.id}`}
-                    className="flex flex-wrap items-baseline justify-between gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-4 transition hover:border-[var(--fd-ink)]"
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start">
+        {/* Left: what needs a decision, then what is running on its own. */}
+        <div className="flex flex-col gap-6">
+          <section className="flex flex-col gap-3">
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                {dsk.needsYou} · {needsCount}
+              </h2>
+              <p className="text-xs text-[var(--fd-slate)]">{dsk.needsYouSub}</p>
+            </div>
+            {needsYou.length === 0 ? (
+              <p className="rounded-2xl border border-[var(--fd-line)] bg-white p-4 text-sm leading-relaxed text-[var(--fd-slate)]">
+                {h.needsYouEmpty}
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {needsYou.map((inquiry) => {
+                  const placement = placements[inquiry.id];
+                  const isSelected = selected?.id === inquiry.id;
+                  return (
+                    <li key={inquiry.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedId(inquiry.id);
+                          requestAnimationFrame(() => decisionHeadingRef.current?.focus());
+                        }}
+                        aria-current={isSelected ? "true" : undefined}
+                        className={`flex w-full flex-col gap-1 rounded-2xl border p-4 text-left transition hover:border-[var(--fd-ink)] ${
+                          isSelected
+                            ? "border-l-[3px] border-[var(--fd-ink)] bg-[var(--fd-paper-dim)]"
+                            : "border-[var(--fd-line)] bg-white"
+                        }`}
+                      >
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="truncate text-sm font-semibold text-[var(--fd-ink)]">
+                            {inquiry.client_name}
+                          </span>
+                          <span className="shrink-0 text-xs text-[var(--fd-slate)]">
+                            {inquiry.created_at.slice(0, 10)}
+                          </span>
+                        </span>
+                        <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
+                          {dict.inbox.queues.reasons[placement.reasonKey]}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {inMotion.length > 0 && (
+            <section className="flex flex-col gap-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                {dsk.inMotion} · {inMotion.length}
+              </h2>
+              {inMotion.map((w) => (
+                <WorkObjectCard
+                  key={w.id}
+                  workObject={w}
+                  locale={freelancer.locale}
+                  busy={busyObject === w.id}
+                  onAct={(action) => void act(w.id, action)}
+                />
+              ))}
+            </section>
+          )}
+
+          {recentlyDone.length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                {dsk.recentlyDone}
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {recentlyDone.map((w) => (
+                  <li
+                    key={w.id}
+                    className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-3"
                   >
-                    <span className="text-sm font-medium text-[var(--fd-ink)]">
-                      {inquiry.client_name}
-                    </span>
-                    <span className="text-xs text-[var(--fd-slate)]">
-                      {dict.inbox.queues.actions[placement.actionKey as keyof typeof dict.inbox.queues.actions] ?? placement.actionKey}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <Link
-          href="/inbox"
-          className="w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
-        >
-          {h.openInbox}
-        </Link>
-      </section>
+                    <span className="text-sm text-[var(--fd-ink)]">{w.request_text}</span>
+                    {w.result?.summary && (
+                      <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
+                        {w.status === "failed" ? h.objectFailed : w.result.summary}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
 
-      {inMotion.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-            {h.inMotion}
-          </h2>
-          {inMotion.map((w) => (
-            <WorkObjectCard
-              key={w.id}
-              workObject={w}
-              locale={freelancer.locale}
-              busy={busyObject === w.id}
-              onAct={(action) => void act(w.id, action)}
-            />
-          ))}
-        </section>
-      )}
+        {/* Right: the selected decision, its evidence, and the draft verbatim. */}
+        <div className="flex flex-col gap-4">
+          {!selected ? (
+            <p className="rounded-2xl border border-dashed border-[var(--fd-line)] p-8 text-sm leading-relaxed text-[var(--fd-slate)]">
+              {dsk.selectPrompt}
+            </p>
+          ) : (
+            <>
+              <header className="flex flex-col gap-1">
+                <h2
+                  ref={decisionHeadingRef}
+                  tabIndex={-1}
+                  className="font-serif text-2xl font-medium text-[var(--fd-ink)] outline-none"
+                >
+                  {selectedPlacement
+                    ? dict.inbox.queues.actions[selectedPlacement.actionKey]
+                    : selected.client_name}
+                </h2>
+                <p className="text-sm text-[var(--fd-slate)]">
+                  {selected.client_name}
+                  {selected.event_date ? ` · ${selected.event_date}` : ""}
+                </p>
+              </header>
 
-      {recentlyDone.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-            {h.recentlyDone}
-          </h2>
-          <ul className="flex flex-col gap-2">
-            {recentlyDone.map((w) => (
-              <li
-                key={w.id}
-                className="flex flex-col gap-1 rounded-2xl border border-[var(--fd-line)] bg-white p-4"
-              >
-                <span className="text-sm font-medium text-[var(--fd-ink)]">{w.request_text}</span>
-                {w.result?.summary && (
-                  <span className="text-xs leading-relaxed text-[var(--fd-slate)]">
-                    {w.status === "failed" ? h.objectFailed : w.result.summary}
+              <div className="flex flex-col gap-1 rounded-2xl bg-[var(--fd-paper-dim)] px-4 py-3">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                  {dsk.why}
+                </span>
+                <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
+                  {selectedPlacement ? dict.inbox.queues.reasons[selectedPlacement.reasonKey] : ""}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+                  {dsk.sources}
+                </span>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--fd-slate)]">
+                  <span className="inline-flex items-center gap-1.5">
+                    {dsk.sourceMessage} <SourceChip locale={freelancer.locale} kind="inquiry" />
                   </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                  <span className="inline-flex items-center gap-1.5">
+                    {dsk.sourcePrice} <SourceChip locale={freelancer.locale} kind="yours" />
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    {dsk.sourceVoice} <SourceChip locale={freelancer.locale} kind="yours" />
+                  </span>
+                </div>
+              </div>
 
-      <section className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-          {h.scopeHeading}
-        </h2>
-        <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
-          <span className="font-medium">{h.scopeReadsLabel}</span> {h.scopeReads}
-        </p>
-        <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
-          <span className="font-medium">{h.scopeMayLabel}</span> {h.scopeMay}
-        </p>
-        <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
-          <span className="font-medium">{h.scopeNeverLabel}</span> {h.scopeNever}
-        </p>
+              {selectedDraft && (
+                <>
+                  <GuardPanel
+                    locale={freelancer.locale}
+                    status={selectedDraft.validation_status as never}
+                    failures={selectedDraft.validation_failures}
+                  />
+                  {selectedDraft.body && (
+                    <DraftPanel
+                      locale={freelancer.locale}
+                      kind={selectedDraft.kind}
+                      body={selectedDraft.body}
+                    />
+                  )}
+                </>
+              )}
+
+              <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+                {selected.client_email ? dsk.consequence : dsk.consequenceCopy}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={`/inbox?i=${selected.id}`}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-5 text-base font-medium text-white"
+                >
+                  {dsk.reviewAndSend}
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <section className="flex flex-col gap-1 border-t border-[var(--fd-line)] pt-4 text-xs leading-relaxed text-[var(--fd-slate)]">
+        <p>{dsk.capabilityReads}</p>
+        <p>{dsk.capabilityMay}</p>
+        <p>{dsk.capabilityNever}</p>
         <Link
-          href="/inbox"
-          className="w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
+          href="/control"
+          className="w-fit font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
         >
-          {h.scopeChange}
+          {dsk.capabilityLink}
         </Link>
       </section>
+
     </main>
   );
 }
