@@ -15,6 +15,8 @@ import { RevealStep } from "@/components/frontdesk/reveal-step";
 import { ShareStep } from "@/components/frontdesk/share-step";
 import { ProfessionPicker, type Profession } from "@/components/frontdesk/profession-picker";
 import { PrefillStep, type PrefillApplied } from "@/components/frontdesk/prefill-step";
+import { resizeImage } from "@/lib/frontdesk/resizeImage";
+import { craftForProfession } from "@/lib/frontdesk/professions";
 import { HandleField } from "@/components/frontdesk/handle-field";
 import { AppearanceCard } from "@/components/frontdesk/appearance-card";
 import { DECISION_ORDER, DecisionRail, type DecisionKey } from "@/components/frontdesk/decision-rail";
@@ -48,7 +50,10 @@ const secondaryClass =
 
 // Matches the input's `accept` attribute and the "up to 2MB" copy below.
 const PHOTO_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+// The field accepts what a phone camera produces; the browser shrinks it
+// before upload, so the cap is about what is reasonable to read, not what the
+// storage bucket can hold.
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 
 /**
  * Which decision each step is asking about (handoff §5.2). The wizard keeps
@@ -167,7 +172,10 @@ export function SetupWizard({
           display_name: displayName.trim(),
           // craft/city are kept in sync for consumers that have not moved to
           // professions/location yet (WP4, phase 1 - see 0008 migration).
-          craft: professions[0],
+          // craft is still a five-value column; a profession outside those
+          // five is stored as "other" there and kept verbatim in professions,
+          // which is what every surface actually displays.
+          craft: craftForProfession(professions[0]),
           city: location,
           primary_profession: professions[0],
           professions,
@@ -234,10 +242,11 @@ export function SetupWizard({
       return;
     }
     setPhotoBusy(true);
+    const { file: upload } = await resizeImage(file);
     const path = `${session.user.id}/avatar`;
     const { error: uploadError } = await sb.storage
       .from("frontdesk-avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, upload, { upsert: true, contentType: upload.type });
     if (uploadError) {
       console.error("Avatar upload failed:", uploadError.message);
       setPhotoBusy(false);
@@ -333,7 +342,17 @@ export function SetupWizard({
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="su-name" className={labelClass}>{t.profile.nameLabel}</label>
-            <input id="su-name" value={displayName} maxLength={80} onChange={(e) => setDisplayName(e.target.value)} className={inputClass} />
+            <input
+              id="su-name"
+              value={displayName}
+              maxLength={80}
+              aria-describedby="su-name-hint"
+              onChange={(e) => setDisplayName(e.target.value)}
+              className={inputClass}
+            />
+            <p id="su-name-hint" className="text-xs leading-relaxed text-[var(--fd-slate)]">
+              {t.profile.nameHint}
+            </p>
           </div>
 
           <ProfessionPicker locale={locale} value={professions} onChange={setProfessions} />
@@ -351,6 +370,7 @@ export function SetupWizard({
 
           <div className="flex flex-col gap-1.5">
             <span className={labelClass}>{t.profile.photoLabel}</span>
+            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.profile.photoHint}</p>
             <div className="flex items-center gap-3">
               {photoUrl && (
                 <Image src={photoUrl} alt="" width={56} height={56} className="size-14 rounded-full border border-[var(--fd-line)] object-cover" />
@@ -359,14 +379,33 @@ export function SetupWizard({
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 aria-label={t.profile.photoLabel}
+                disabled={photoBusy}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) void uploadPhoto(file);
                 }}
                 className="text-sm text-[var(--fd-slate)]"
               />
+              {photoUrl && !photoBusy && (
+                <button
+                  type="button"
+                  onClick={() => setPhotoUrl("")}
+                  className="text-xs font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4"
+                >
+                  {t.profile.photoRemove}
+                </button>
+              )}
             </div>
-            {photoBusy && <p className="text-xs text-[var(--fd-slate)]">{t.profile.photoUploading}</p>}
+            {photoBusy && (
+              <p role="status" className="text-xs text-[var(--fd-slate)]">
+                {t.profile.photoUploading}
+              </p>
+            )}
+            {photoUrl && !photoBusy && (
+              <p role="status" className="text-xs text-[var(--fd-slate)]">
+                {t.profile.photoDone}
+              </p>
+            )}
             {photoError && (
               <p className="text-xs font-medium text-[var(--fd-error-text)]" role="alert">
                 {photoError === "type"

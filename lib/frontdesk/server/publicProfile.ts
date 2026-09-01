@@ -14,6 +14,8 @@ export interface PublicProfile {
   handle: string;
   displayName: string;
   craft: "photographer" | "videographer";
+  /** The freelancer's own words for their work; may be empty. */
+  professions: string[];
   city: string | null;
   photoUrl: string | null;
   locale: "nl" | "en";
@@ -24,7 +26,7 @@ export async function publicProfileByHandle(handle: string): Promise<PublicProfi
   const db = serviceClient();
   const { data, error } = await db
     .from("freelancers")
-    .select("handle, display_name, craft, city, photo_url, locale, appearance")
+    .select("handle, display_name, craft, professions, city, photo_url, locale, appearance")
     .eq("handle", handle)
     .maybeSingle();
   if (error || !data) return null;
@@ -32,6 +34,7 @@ export async function publicProfileByHandle(handle: string): Promise<PublicProfi
     handle: data.handle,
     displayName: data.display_name,
     craft: data.craft,
+    professions: Array.isArray(data.professions) ? (data.professions as string[]) : [],
     city: data.city,
     photoUrl: data.photo_url,
     locale: data.locale,
