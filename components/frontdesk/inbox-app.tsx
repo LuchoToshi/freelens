@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
+import Link from "next/link";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { track } from "@/lib/analytics";
 import { fdDict } from "@/lib/frontdesk/i18n";
@@ -25,7 +26,6 @@ import {
   AgentProgress,
   ApprovalContract,
   EvidenceList,
-  PermissionMatrixCard,
 } from "@/components/frontdesk/agent-surfaces";
 import { deriveInquiryEvidence } from "@/lib/frontdesk/provenance";
 import { deriveActivity } from "@/lib/frontdesk/activity";
@@ -38,7 +38,7 @@ import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
 import { deriveFollowupTimeline, resolveQuietDays } from "@/lib/frontdesk/followups";
-import { FollowupScheduleCard, FollowupSettingsCard, MemoryListCard } from "@/components/frontdesk/memory-followups";
+import { FollowupScheduleCard } from "@/components/frontdesk/memory-followups";
 import { nextFollowupDate } from "@/lib/frontdesk/followups";
 
 /**
@@ -1035,39 +1035,6 @@ export function InboxApp({
         )}
 
         {!testMode && (
-          <PermissionMatrixCard
-            locale={freelancer.locale}
-            stored={freelancerState.permission_levels}
-            onChange={async (levels) => {
-              setFreelancerState((f) => ({ ...f, permission_levels: levels }));
-              await sb
-                .from("freelancers")
-                .update({ permission_levels: levels })
-                .eq("auth_user_id", session.user.id);
-            }}
-          />
-        )}
-
-        {!testMode && (
-          <MemoryListCard
-            freelancer={freelancerState}
-            onApply={async (change) => {
-              const update: Record<string, unknown> = {};
-              if (change.profile) update.voice_profile = change.profile;
-              if (change.decisions) update.voice_proposal_decisions = change.decisions;
-              if (change.paused !== undefined) update.voice_learning_paused = change.paused;
-              setFreelancerState((f) => ({
-                ...f,
-                voice_profile: (change.profile ?? f.voice_profile) as Record<string, unknown> | null,
-                voice_proposal_decisions: change.decisions ?? f.voice_proposal_decisions,
-                voice_learning_paused: change.paused ?? f.voice_learning_paused,
-              }));
-              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
-            }}
-          />
-        )}
-
-        {!testMode && (
           <AutomationRulesCard
             freelancer={freelancerState}
             rules={rules}
@@ -1112,21 +1079,12 @@ export function InboxApp({
         )}
 
         {!testMode && (
-          <FollowupSettingsCard
-            freelancer={freelancerState}
-            quietDays={quietDays}
-            onChange={async (change) => {
-              const update: Record<string, unknown> = {};
-              if (change.quietDays !== undefined) update.followup_quiet_days = change.quietDays;
-              if (change.paused !== undefined) update.followups_paused = change.paused;
-              setFreelancerState((f) => ({
-                ...f,
-                followup_quiet_days: change.quietDays ?? f.followup_quiet_days,
-                followups_paused: change.paused ?? f.followups_paused,
-              }));
-              await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
-            }}
-          />
+          <Link
+            href="/control"
+            className="w-fit text-sm font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+          >
+            {t.toControl}
+          </Link>
         )}
 
         {inquiries.length === 0 ? (

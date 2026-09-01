@@ -98,12 +98,13 @@ const en = {
     retry: "Try again",
     sampleBadge: "Example",
     selectPrompt: "Select an inquiry to read it and send the prepared reply.",
+    toControl: "What Freelens may do and remembers: the Control room",
     shell: {
       home: "Home",
       inbox: "Inbox",
       clients: "Clients",
       followups: "Follow-ups",
-      tools: "Tools",
+      control: "Control room",
       settings: "Settings",
       navLabel: "Product",
     },
@@ -668,6 +669,14 @@ const en = {
       "The email now carries a six-digit code that only works on the device that asked for it. A forwarded email can't sign anyone in.",
     stricterBannerDismiss: "Got it",
   },
+  control: {
+    heading: "Control room",
+    lead: "What Freelens may do and what it remembers. Change anything, it applies from the next action.",
+    footer:
+      "Only what works today is shown. New permissions appear here when they actually ship, off by default.",
+    stopNote:
+      "There is no single switch that stops everything at once. To stop one piece of work, stop it on its own card, so nothing else is interrupted halfway.",
+  },
   desk: {
     greetingMorning: "Morning",
     greetingAfternoon: "Afternoon",
@@ -693,6 +702,7 @@ const en = {
     capabilityReads: "Reads: your inquiry page.",
     capabilityMay: "May prepare: reply and follow-up drafts.",
     capabilityNever: "Never: sends, quotes new prices, confirms dates.",
+    capabilityLink: "Open the Control room",
   },
   home: {
     heading: "Home",
@@ -972,12 +982,13 @@ const nl: typeof en = {
     retry: "Probeer opnieuw",
     sampleBadge: "Voorbeeld",
     selectPrompt: "Kies een aanvraag om hem te lezen en het klaargezette antwoord te versturen.",
+    toControl: "Wat Freelens mag doen en onthoudt: de Regelkamer",
     shell: {
       home: "Thuis",
       inbox: "Inbox",
       clients: "Klanten",
       followups: "Opvolgers",
-      tools: "Tools",
+      control: "Regelkamer",
       settings: "Instellingen",
       navLabel: "Product",
     },
@@ -1542,6 +1553,14 @@ const nl: typeof en = {
       "De e-mail bevat nu een zescijferige code die alleen werkt op het apparaat dat erom vroeg. Een doorgestuurde e-mail kan niemand aanmelden.",
     stricterBannerDismiss: "Begrepen",
   },
+  control: {
+    heading: "Regelkamer",
+    lead: "Wat Freelens mag doen en wat het onthoudt. Wijzig iets en het geldt vanaf de volgende actie.",
+    footer:
+      "Alleen wat vandaag werkt staat hier. Nieuwe rechten verschijnen hier zodra ze er echt zijn, standaard uit.",
+    stopNote:
+      "Er is geen knop die alles in een keer stopt. Wil je een taak stoppen, doe dat op de kaart van die taak zelf, dan wordt er niets anders halverwege onderbroken.",
+  },
   desk: {
       greetingMorning: "Goedemorgen",
       greetingAfternoon: "Goedemiddag",
@@ -1567,6 +1586,7 @@ const nl: typeof en = {
       capabilityReads: "Leest: je aanvraagpagina.",
       capabilityMay: "Mag klaarzetten: antwoord- en opvolgconcepten.",
       capabilityNever: "Nooit: versturen, nieuwe prijzen noemen, datums bevestigen.",
+      capabilityLink: "Open de Regelkamer",
   },
   home: {
     heading: "Thuis",

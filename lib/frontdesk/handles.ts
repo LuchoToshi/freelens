@@ -16,6 +16,7 @@ export const RESERVED_HANDLES = new Set([
   "admin",
   "api",
   "app",
+  "control",
   "demo",
   "frontdesk",
   "freelens",
@@ -51,6 +52,7 @@ export function isFrontdeskPath(pathname: string): boolean {
     first === "admin" ||
     first === "demo" ||
     first === "home" ||
+    first === "control" ||
     first === "clients" ||
     first === "follow-ups"
   ) {

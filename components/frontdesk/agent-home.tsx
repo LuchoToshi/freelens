@@ -478,6 +478,12 @@ export function AgentHome({
         <p>{dsk.capabilityReads}</p>
         <p>{dsk.capabilityMay}</p>
         <p>{dsk.capabilityNever}</p>
+        <Link
+          href="/control"
+          className="w-fit font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
+        >
+          {dsk.capabilityLink}
+        </Link>
       </section>
 
     </main>
