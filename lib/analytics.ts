@@ -31,6 +31,8 @@ export type AnalyticsEvent =
   | "setup_completed"
   | "prefill_started"
   | "prefill_skipped"
+  | "prefill_reviewed"
+  | "prefill_review_abandoned"
   | "prefill_field_proposed"
   | "prefill_field_edited"
   | "prefill_applied"

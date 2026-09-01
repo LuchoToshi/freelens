@@ -90,6 +90,7 @@ export function PrefillStep({
       if (nextValues.signOff) track("prefill_field_proposed");
       if (nextValues.packages.length) track("prefill_field_proposed");
       setValues(nextValues);
+      track("prefill_reviewed");
       setMode("review");
     } catch {
       setMode("error");
@@ -284,7 +285,14 @@ export function PrefillStep({
         >
           {t.confirm}
         </button>
-        <button type="button" onClick={onSkip} className={ghostClass}>
+        <button
+          type="button"
+          onClick={() => {
+            track("prefill_review_abandoned");
+            onSkip();
+          }}
+          className={ghostClass}
+        >
           {t.skip}
         </button>
       </div>
