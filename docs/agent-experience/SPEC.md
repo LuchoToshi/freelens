@@ -83,14 +83,25 @@ left open. All are live in the branch.
   contrast on at least one accent in the palette, so the readable colour is
   computed and tested at 4.5:1 for all four.
 
-### 0.6 Written but not applied
-- **Migrations `0019_intake_event_types.sql` and `0020_freelancer_appearance.sql`
-  are in the repo and have not been run against any database.** Until 0019 is
-  applied, the new intake options fail the existing CHECK constraint; until
-  0020 is applied, appearance saves fail. Both are additive.
-- **The homepage worked example still demonstrates the retired four types.**
-  It is marketing content with its own per-type drafts in both locales, so
-  rewriting it is a copy decision, not a mechanical one.
+### 0.6 Applied and resolved (owner instruction, 1 Sep)
+- **Migrations 0019 and 0020 are applied to production** (`sdtkwzuzfkhjfluxujkk`).
+  Existing `event_type` values were checked first: wedding, portrait, other,
+  business and party, all inside the widened constraint.
+- **Sign out everywhere else has a home again: `/account`.** Its own route,
+  reached from the Control room and from the end of setup. The Control room
+  stays exclusively agent concerns, and setup keeps it out of the decision
+  queue, so both §5.2 and §10 hold. The page states that no device list exists
+  rather than showing one it cannot stand behind.
+- **The homepage demonstrates the current vocabulary** (wedding, event, brand
+  film, social content), and its guard test asserts that only the draft with a
+  package behind it names a number.
+- **Fixed while verifying: the homepage chips never swapped the card**, on
+  production too. `AnimatePresence mode="wait"` never completed its exit, so
+  every chip showed the wedding reply. Replaced with a keyed remount.
+- **`/about` rewritten.** It described the deleted rebooking product in the
+  present tense, and its meta description still described the original
+  money-and-bookkeeping product. Nine orphaned homepage sections deleted with
+  it.
 
 ---
 
