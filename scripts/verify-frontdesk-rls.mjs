@@ -3,13 +3,17 @@
 // Run:  node scripts/verify-frontdesk-rls.mjs --yes
 //
 // Creates two throwaway freelancers (A, B) with real auth users, gives each an
-// inquiry and a draft via the service role (exactly how production writes
-// them), then signs in as A through the anon key — a real JWT, the same path
-// the app uses — and proves:
-//   1. A sees exactly A's rows on all four tables
+// inquiry, a draft, a work object, and an agent rule via the service role
+// (exactly how production writes them), then signs in as A through the anon
+// key — a real JWT, the same path the app uses — and proves:
+//   1. A sees exactly A's rows on all six tables
 //   2. A sees zero of B's rows, and an update against B's inquiry touches 0 rows
 //   3. anon (no session) sees zero rows everywhere and cannot insert
 //   4. pre-existing tables (relationships, 0001) still behave unchanged for A
+// agent_work_objects (0016) and agent_rules (0017) use the same
+// freelancer-scoped policy shape as the rest — checked here so a regression
+// in that shape doesn't ship silently for the two newest, most autonomous
+// tables in the schema.
 // Cleans up after itself. Prints PASS/FAIL lines; exits non-zero on any FAIL.
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
@@ -99,7 +103,26 @@ async function main() {
       language: "nl",
     });
     if (dErr) throw new Error(`draft ${tag}: ${dErr.message}`);
-    rows[tag] = { freelancerId: f.id, inquiryId: inq.id };
+    const { data: wo, error: woErr } = await svc
+      .from("agent_work_objects")
+      .insert({
+        freelancer_id: f.id,
+        request_text: `RLS test request for ${tag}`,
+      })
+      .select("id")
+      .single();
+    if (woErr) throw new Error(`work object ${tag}: ${woErr.message}`);
+    const { data: rule, error: ruleErr } = await svc
+      .from("agent_rules")
+      .insert({
+        freelancer_id: f.id,
+        trigger: { event_type: "wedding", budget_band: "unsure" },
+        action: "prepare_reply",
+      })
+      .select("id")
+      .single();
+    if (ruleErr) throw new Error(`agent rule ${tag}: ${ruleErr.message}`);
+    rows[tag] = { freelancerId: f.id, inquiryId: inq.id, workObjectId: wo.id, ruleId: rule.id };
   }
 
   // --- As freelancer A, through the anon key: a real app-context session ---
@@ -128,6 +151,37 @@ async function main() {
   const { data: bDrafts } = await asA.from("drafts").select("id").eq("freelancer_id", rows.b.freelancerId);
   check("A sees zero of B's drafts", bDrafts?.length === 0);
 
+  const { data: myWorkObjects } = await asA.from("agent_work_objects").select("id, freelancer_id");
+  check(
+    "A sees exactly own work objects",
+    myWorkObjects?.length === 1 && myWorkObjects[0].freelancer_id === rows.a.freelancerId
+  );
+  const { data: bWorkObjects } = await asA
+    .from("agent_work_objects")
+    .select("id")
+    .eq("freelancer_id", rows.b.freelancerId);
+  check("A sees zero of B's work objects", bWorkObjects?.length === 0);
+  const { data: woUpdated } = await asA
+    .from("agent_work_objects")
+    .update({ status: "paused" })
+    .eq("id", rows.b.workObjectId)
+    .select("id");
+  check("A's update against B's work object touches 0 rows", woUpdated?.length === 0);
+
+  const { data: myRules } = await asA.from("agent_rules").select("id, freelancer_id");
+  check(
+    "A sees exactly own agent rules",
+    myRules?.length === 1 && myRules[0].freelancer_id === rows.a.freelancerId
+  );
+  const { data: bRules } = await asA.from("agent_rules").select("id").eq("freelancer_id", rows.b.freelancerId);
+  check("A sees zero of B's agent rules", bRules?.length === 0);
+  const { data: ruleUpdated } = await asA
+    .from("agent_rules")
+    .update({ status: "paused" })
+    .eq("id", rows.b.ruleId)
+    .select("id");
+  check("A's update against B's agent rule touches 0 rows", ruleUpdated?.length === 0);
+
   const { data: updated } = await asA
     .from("inquiries")
     .update({ status: "booked" })
@@ -142,7 +196,7 @@ async function main() {
 
   // --- As anon: no session at all ---
   const asAnon = createClient(url, anonKey, { auth: { persistSession: false } });
-  for (const table of ["freelancers", "packages", "inquiries", "drafts"]) {
+  for (const table of ["freelancers", "packages", "inquiries", "drafts", "agent_work_objects", "agent_rules"]) {
     const { data } = await asAnon.from(table).select("id");
     check(`anon sees zero rows in ${table}`, (data ?? []).length === 0);
   }
