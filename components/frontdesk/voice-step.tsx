@@ -42,6 +42,7 @@ export function VoiceStep({
     (existingProfile as VoiceProfile | null) ?? null
   );
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   async function extract() {
     setPhase("extracting");
@@ -69,10 +70,18 @@ export function VoiceStep({
   async function confirm() {
     if (!profile) return;
     setSaving(true);
+    setSaveError(false);
     const sb = supabaseBrowser();
     // The freelancer's edits win: whatever is on screen becomes the profile.
-    await sb.from("freelancers").update({ voice_profile: profile }).eq("auth_user_id", session.user.id);
+    const { error } = await sb
+      .from("freelancers")
+      .update({ voice_profile: profile })
+      .eq("auth_user_id", session.user.id);
     setSaving(false);
+    if (error) {
+      setSaveError(true);
+      return;
+    }
     onDone();
   }
 
@@ -147,6 +156,10 @@ export function VoiceStep({
             className={inputClass}
           />
         </div>
+
+        {saveError && (
+          <p className="text-sm font-medium text-[var(--fd-error-text)]" role="alert">{t.saveError}</p>
+        )}
 
         <div className="flex items-center gap-3">
           <button type="button" onClick={() => setPhase("paste")} className={secondaryClass}>

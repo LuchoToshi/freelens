@@ -45,16 +45,24 @@ export function AppearanceCard({
   const [busy, setBusy] = useState(false);
   const [uploadError, setUploadError] = useState<"" | "type" | "size" | "generic">("");
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   async function apply(next: Appearance) {
+    const previous = appearance;
     setAppearance(next);
     setSaved(false);
+    setSaveError(false);
     setBusy(true);
-    await sb
+    const { error } = await sb
       .from("freelancers")
       .update({ appearance: serializeAppearance(next) })
       .eq("auth_user_id", session.user.id);
     setBusy(false);
+    if (error) {
+      setAppearance(previous);
+      setSaveError(true);
+      return;
+    }
     setSaved(true);
   }
 
@@ -189,6 +197,11 @@ export function AppearanceCard({
         {saved && !busy && (
           <p role="status" className="text-xs text-[var(--fd-slate)]">
             {t.saved}
+          </p>
+        )}
+        {saveError && (
+          <p role="alert" className="text-xs font-medium text-[var(--fd-error-text)]">
+            {t.saveError}
           </p>
         )}
         {!isDefaultAppearance(appearance) && (
