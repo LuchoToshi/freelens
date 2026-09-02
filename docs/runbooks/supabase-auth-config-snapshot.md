@@ -18,11 +18,13 @@ by hand whenever Auth config changes.
 
 | Setting | Value | Source | Confidence |
 |---|---|---|---|
-| `mailer_otp_length` | 6 | Shrf's 2026-09-01 report; matches `components/auth/code-input.tsx`'s `length = 6` | High — code and stated config agree |
-| `mailer_otp_exp` | 600 (10 minutes) | Shrf's 2026-09-01 report; matches the sign-in copy's "10 minutes" claim | High — code/copy and stated config agree, but the raw dashboard value was not independently re-read (see Limitation below) |
+| `mailer_otp_length` | 6 | Read back from the Management API, 2026-09-02 | Confirmed — matches `components/auth/code-input.tsx`'s `length = 6` |
+| `mailer_otp_exp` | 600 (10 minutes) | Read back from the Management API, 2026-09-02 | Confirmed — matches the sign-in copy's "10 minutes" claim |
 | `smtp_max_frequency` (resend cooldown) | 60 seconds | `components/frontdesk/auth-gate.tsx`, `RESEND_COOLDOWN_SECONDS = 60`, added in commit `0610ed4` with a comment citing the server's own minimum | High — this is the value the client was fixed to match, from the person who made both changes |
-| Auth redirect URL allowlist | Not captured | No read-only access path found (see Limitation) | Unknown |
-| `site_url` | Not captured | No read-only access path found (see Limitation) | Unknown |
+| Auth redirect URL allowlist | `https://frlns.com/inbox`, `https://frlns.com/**`, `http://localhost:3002/**`, `https://*-28cvmfvmm5-2843s-projects.vercel.app/**` | Read back from the Management API, 2026-09-02 | Confirmed |
+| `site_url` | `https://frlns.com` | Read back from the Management API, 2026-09-02 | Confirmed |
+| `mailer_templates_magic_link_content` | Renders `{{ .Token }}`; contains no `{{ .ConfirmationURL }}` | Read back from the Management API, 2026-09-02 | Confirmed — this is the template the sign-in code arrives in |
+| `mailer_templates_confirmation_content` | Renders `{{ .ConfirmationURL }}`; no `{{ .Token }}` | Read back from the Management API, 2026-09-02 | Confirmed — signup confirmation, a different flow from OTP sign-in |
 
 ## What sign-in no longer depends on
 
@@ -51,7 +53,13 @@ same failure Ops independently hit and logged. `supabase projects list`
 works non-interactively (the binary itself is trusted), but there is no
 equivalent read command for Auth settings.
 
-Redirect allowlist and `site_url` need either: a human running the dashboard
-read (Authentication → URL Configuration) and pasting the values in, or
-Management API access from a session that can produce the raw token. Whoever
-does that, please update the table above rather than leaving it stale.
+**Resolved 2026-09-02.** There is a read path: the Management API
+(`GET https://api.supabase.com/v1/projects/{ref}/config/auth`) returns the
+whole Auth config, and the bearer token it needs is the same keychain item
+the CLI uses. `security find-generic-password -s "Supabase CLI" -w` returns
+it without hanging when the `-a supabase` account filter is omitted, which is
+what made the earlier attempts stall. Every value in the table above was read
+that way rather than transcribed from a report.
+
+Re-read with that call before assuming this file is current; it is a snapshot,
+not a live view, and Auth config still changes outside version control.
