@@ -413,7 +413,7 @@ export function AgentHome({
                 <h2
                   ref={decisionHeadingRef}
                   tabIndex={-1}
-                  className="font-serif text-2xl font-medium text-[var(--fd-ink)] outline-none"
+                  className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25"
                 >
                   {selectedPlacement
                     ? dict.inbox.queues.actions[selectedPlacement.actionKey]
