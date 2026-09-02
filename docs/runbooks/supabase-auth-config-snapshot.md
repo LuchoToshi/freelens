@@ -63,3 +63,63 @@ that way rather than transcribed from a report.
 
 Re-read with that call before assuming this file is current; it is a snapshot,
 not a live view, and Auth config still changes outside version control.
+
+## Session lifetime
+
+Read back 2026-09-02.
+
+| Setting | Value | What it means |
+|---|---|---|
+| `jwt_exp` | 3600 | Access token lives an hour, then the client refreshes it silently. Not a sign-in prompt. |
+| `sessions_timebox` | 0 | No absolute session expiry. |
+| `sessions_inactivity_timeout` | 0 | No server-side idle expiry. |
+| `refresh_token_rotation_enabled` | true | Refresh tokens rotate; reuse inside 10s is tolerated for races. |
+
+**A signed-in device therefore stays signed in indefinitely, server-side.** The
+30-day idle rule the product promises is enforced entirely client-side, in
+`lib/agent/supabase.ts` (`IDLE_CAP_MS`), which signs a device out on its next
+visit after 30 days of no activity.
+
+Setting `sessions_inactivity_timeout` to make that rule server-side returns
+**402 Payment Required** — session timeouts are a paid-plan feature on this
+project's current plan. If the plan changes, set it to 2592000 so the two
+halves agree; until then the client is the only enforcement and a cleared
+localStorage is the only other way a session ends.
+
+## The credential this file was read with
+
+**What it is.** The Supabase CLI's personal access token, belonging to the
+project owner's Supabase account.
+
+**Where it lives.** macOS Keychain, service `Supabase CLI`. Read it with
+`security find-generic-password -s "Supabase CLI" -w`. Do **not** add
+`-a supabase`: that account filter is what makes the lookup hang on a GUI
+prompt in a headless session, which is why two earlier attempts concluded the
+credential was unreachable.
+
+**What depends on it.**
+
+- Reading Auth config: `GET https://api.supabase.com/v1/projects/{ref}/config/auth` — the only read path for everything in this file.
+- Writing Auth config: the same endpoint with `PATCH`. The OTP length and expiry fixes of 2026-09-01 went through it.
+- `supabase link`, `supabase db push`, `supabase migration list`, `supabase projects api-keys`.
+
+**Scope.** Full account access — every project, read and write, including
+schema and auth. Wider than this file's read needs. Correct today only because
+the account owns exactly one production project and the same person operates
+both; revisit the moment either stops being true.
+
+**Owner.** The project owner. Nobody else holds it, and no agent session
+should copy it anywhere: use the read path above, never the value.
+
+**Never** paste the token into documentation, logs, screenshots, commits,
+chat, or an agent prompt. This file deliberately records how to read it and
+nothing about what it says.
+
+**Rotating it.** Supabase dashboard → Account → Access Tokens → revoke the old
+token and generate a new one, then `supabase login` on the machine to write the
+new value into the Keychain item. Revoking takes effect immediately, so expect
+the next `db push` or config read to fail until the login is redone.
+
+**When the Management API path stops being used**, delete the token and this
+section with it rather than leaving a live credential documented for a
+capability nothing needs.
