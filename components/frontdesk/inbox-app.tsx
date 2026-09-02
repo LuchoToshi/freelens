@@ -670,8 +670,12 @@ export function InboxApp({
               type="button"
               onClick={async () => {
                 if (!openDraft.rule_id) return;
-                await sb.from("agent_rules").update({ status: "paused" }).eq("id", openDraft.rule_id);
-                await load();
+                const { error } = await sb
+                  .from("agent_rules")
+                  .update({ status: "paused" })
+                  .eq("id", openDraft.rule_id);
+                setSaveError(error !== null);
+                if (!error) await load();
               }}
               className="text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4"
             >
