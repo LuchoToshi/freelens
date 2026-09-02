@@ -232,7 +232,7 @@ function Swatches<T extends string>({
             aria-label={value}
             onClick={() => onPick(value)}
             style={{ backgroundColor: value }}
-            className={`size-9 rounded-lg border-2 ${
+            className={`size-11 rounded-lg border-2 ${
               current === value ? "border-[var(--fd-ink)]" : "border-[var(--fd-line)]"
             }`}
           />
