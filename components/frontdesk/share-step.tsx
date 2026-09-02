@@ -39,7 +39,12 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <details className="rounded-2xl border border-[var(--fd-line)] bg-white px-4 py-3">
+        <summary className="cursor-pointer text-sm font-medium text-[var(--fd-ink)]">
+          {t.trackingSummary}
+        </summary>
+        <div className="flex flex-col gap-2 pt-3">
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.trackingIntro}</p>
         {variants.map(({ tag, url }) => (
           <div key={tag} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--fd-line)] bg-white p-3">
             <div className="flex min-w-0 flex-col">
@@ -57,7 +62,8 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
             </button>
           </div>
         ))}
-      </div>
+        </div>
+      </details>
 
       <Link
         href="/inbox"

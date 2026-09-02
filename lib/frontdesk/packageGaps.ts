@@ -21,6 +21,8 @@ export interface PackageGap {
   key: "noPackages" | "unpricedPackage" | "uncoveredType";
   /** For unpricedPackage: the package's label. For uncoveredType: the type. */
   detail?: string;
+  /** For uncoveredType: how many real inquiries of that type were counted. */
+  count?: number;
 }
 
 /**
@@ -94,7 +96,9 @@ export function detectPackageGaps(
     const words = TYPE_WORDS[type];
     if (!words || count < UNCOVERED_THRESHOLD) continue;
     if (!words.some((w) => haystack.includes(w))) {
-      gaps.push({ key: "uncoveredType", detail: type });
+      // The count travels with the gap: a recommendation the freelancer
+      // cannot check against their own inbox is just an assertion.
+      gaps.push({ key: "uncoveredType", detail: type, count });
     }
   }
   return gaps;

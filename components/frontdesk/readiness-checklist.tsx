@@ -165,10 +165,17 @@ export function ReadinessCard({
                 {g.key === "noPackages" && r.gaps.noPackages}
                 {g.key === "unpricedPackage" && r.gaps.unpricedPackage.replace("{label}", g.detail ?? "")}
                 {g.key === "uncoveredType" &&
-                  r.gaps.uncoveredType.replace(
-                    "{type}",
-                    dict.public.form.types[g.detail as keyof typeof dict.public.form.types] ?? g.detail ?? ""
-                  )}
+                  (g.count
+                    ? r.gaps.uncoveredTypeCounted
+                        .replace("{n}", String(g.count))
+                        .replace(
+                          "{type}",
+                          dict.public.form.types[g.detail as keyof typeof dict.public.form.types] ?? g.detail ?? ""
+                        )
+                    : r.gaps.uncoveredType.replace(
+                        "{type}",
+                        dict.public.form.types[g.detail as keyof typeof dict.public.form.types] ?? g.detail ?? ""
+                      ))}
               </li>
             ))}
           </ul>

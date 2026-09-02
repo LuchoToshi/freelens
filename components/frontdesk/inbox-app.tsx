@@ -34,6 +34,7 @@ import { PlanRail } from "@/components/frontdesk/plan-rail";
 import { matchedPackage } from "@/lib/frontdesk/planSteps";
 import { SourceChip } from "@/components/frontdesk/source-chip";
 import { eventTypeLabel } from "@/lib/frontdesk/eventTypes";
+import { CUSTOM_ADJUSTMENT_MAX, TONE_ADJUSTMENTS } from "@/lib/frontdesk/toneAdjustments";
 import { mailtoHref } from "@/lib/frontdesk/draftBody";
 import { AutomationRulesCard } from "@/components/frontdesk/automation-rules";
 import { afterRun, type ApprovalSignal, type RuleRow } from "@/lib/frontdesk/rules";
@@ -114,6 +115,14 @@ export function InboxApp({
   const [openId, setOpenId] = useState<string | null>(null);
   const [editedBody, setEditedBody] = useState("");
   const [copied, setCopied] = useState(false);
+  // The draft has left for the client's channel (copied, or opened in mail),
+  // but nothing observable says it was sent.
+  const [handedOff, setHandedOff] = useState(false);
+  // A one-off wording steer for the draft on screen. Never stored: this is
+  // not the voice profile, and one impatient afternoon should not become a
+  // standing instruction.
+  const [adjustOpen, setAdjustOpen] = useState(false);
+  const [customAdjustment, setCustomAdjustment] = useState("");
   const [regenerating, setRegenerating] = useState(false);
   const [replyDrafts, setReplyDrafts] = useState<Record<string, DraftRow>>({});
   const [now, setNow] = useState(() => new Date());
@@ -133,7 +142,6 @@ export function InboxApp({
   // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
   // reload keeps the mode and leaving is a plain link back to /inbox.
   const [testMode, setTestMode] = useState(false);
-  const [authBannerDismissed, setAuthBannerDismissed] = useState(true);
 
   const sb = supabaseBrowser();
 
@@ -152,11 +160,9 @@ export function InboxApp({
   // /inbox?queue=<key> selects a queue. Read once on mount; kept in the URL
   // on open/close so a selection is shareable and survives a reload.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a per-device dismissal flag, unavailable during SSR
-    setAuthBannerDismissed(localStorage.getItem("fd-auth-banner-dismissed") === "1");
     const params = new URL(window.location.href).searchParams;
     if (params.get("test") === "1") {
-       
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a URL param, unavailable during SSR
       setTestMode(true);
     }
     const q = params.get("queue") as QueueKey | null;
@@ -506,11 +512,14 @@ export function InboxApp({
     await navigator.clipboard.writeText(editedBody);
     track("draft_copied");
     setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-    await recordOutcome("send");
+    setHandedOff(true);
+    setTimeout(() => setCopied(false), 4000);
+    // Deliberately does NOT record the outcome. Copying is not sending, and
+    // Freelens cannot see the mail that follows; the freelancer says when it
+    // went, which is also what starts the follow-up clock.
   }
 
-  async function regenerate() {
+  async function regenerate(adjustment?: string) {
     if (!open) return;
     if (testMode) {
       const draftId = drafts[open.id]?.id;
@@ -532,9 +541,11 @@ export function InboxApp({
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ inquiryId: open.id }),
+      body: JSON.stringify({ inquiryId: open.id, adjustment: adjustment ?? null }),
     }).catch(() => null);
     track("draft_regenerated");
+    setAdjustOpen(false);
+    setCustomAdjustment("");
     setRegenerating(false);
     await load();
     setEditedBody("");
@@ -589,6 +600,13 @@ export function InboxApp({
       >
         ← {d.back}
       </button>
+
+      <div className="flex flex-col gap-1">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+          {d.heading}
+        </p>
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{d.intro}</p>
+      </div>
 
       <header className="flex flex-col gap-1">
         {/* h2, not h1: on desktop it renders beside the list's h1, and on
@@ -670,7 +688,7 @@ export function InboxApp({
           <button
             type="button"
             disabled={regenerating}
-            onClick={regenerate}
+            onClick={() => void regenerate()}
             className={`${secondaryClass} w-fit`}
           >
             {regenerating ? d.regenerating : d.regenerate}
@@ -685,9 +703,20 @@ export function InboxApp({
             eventType={eventTypeLabel(open.event_type, open.event_type_other, dict.public.form.types)}
             eventDate={open.event_date}
           />
-          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
-            {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
-          </span>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
+              {openDraft.kind === "nudge" ? d.draftNudge : d.draftReply}
+            </span>
+            <span className="text-xs text-[var(--fd-slate)]">
+              {openDraft.outcome
+                ? d.status.sent
+                : handedOff
+                  ? d.status.copied
+                  : editedBody !== openDraft.body
+                    ? d.status.edited
+                    : d.status.prepared}
+            </span>
+          </div>
           <GuardPanel
             locale={freelancer.locale}
             status={openDraft.validation_status as never}
@@ -717,23 +746,26 @@ export function InboxApp({
               </p>
             );
           })()}
+          <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+            {d.everyOne} {d.notSent}
+          </p>
           <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
+            <button
+              type="button"
+              onClick={copyReply}
+              className={`${primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
+            >
+              {copied ? d.copied : d.copy}
+            </button>
             {open.client_email && (
               <a
                 href={mailtoHref(open.client_email, d.subject, editedBody)}
-                onClick={() => void recordOutcome("send")}
-                className={`${primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
+                onClick={() => setHandedOff(true)}
+                className={`${secondaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
               >
                 {d.send}
               </a>
             )}
-            <button
-              type="button"
-              onClick={copyReply}
-              className={`${open.client_email ? secondaryClass : primaryClass} min-h-[52px] w-full lg:min-h-12 lg:w-auto`}
-            >
-              {copied ? d.copied : d.copy}
-            </button>
             <button
               type="button"
               aria-expanded={skipReasonOpen}
@@ -758,6 +790,82 @@ export function InboxApp({
               {d.decideLater}
             </button>
           </div>
+          {/* Secondary actions, visually below the copy button: a rewrite of
+              this one reply, never a change to the saved voice profile. */}
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              aria-expanded={adjustOpen}
+              onClick={() => setAdjustOpen((v) => !v)}
+              className={`${linkClass} w-fit`}
+            >
+              {d.adjust}
+            </button>
+            {adjustOpen && (
+              <div className="flex flex-col gap-3 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
+                <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.adjustIntro}</p>
+                <div className="flex flex-wrap gap-2">
+                  {TONE_ADJUSTMENTS.map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={regenerating}
+                      onClick={() => void regenerate(key)}
+                      className="inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)] disabled:opacity-50"
+                    >
+                      {d.adjustments[key]}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="fd-adjust" className="text-xs font-medium text-[var(--fd-slate)]">
+                    {d.adjustCustomLabel}
+                  </label>
+                  <input
+                    id="fd-adjust"
+                    value={customAdjustment}
+                    maxLength={CUSTOM_ADJUSTMENT_MAX}
+                    placeholder={d.adjustCustomPlaceholder}
+                    onChange={(e) => setCustomAdjustment(e.target.value)}
+                    className="min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base sm:text-sm"
+                  />
+                  <button
+                    type="button"
+                    disabled={regenerating || !customAdjustment.trim()}
+                    onClick={() => void regenerate(customAdjustment)}
+                    className={`${secondaryClass} w-fit`}
+                  >
+                    {regenerating ? d.regenerating : d.adjustApply}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  disabled={regenerating}
+                  onClick={() => void regenerate()}
+                  className={`${linkClass} w-fit`}
+                >
+                  {d.regenerate}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {handedOff && !openDraft.outcome && (
+            <div
+              role="status"
+              className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4"
+            >
+              <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{d.markSentHint}</p>
+              <button
+                type="button"
+                onClick={() => void recordOutcome("send")}
+                className={`${primaryClass} w-fit`}
+              >
+                {d.markSent}
+              </button>
+            </div>
+          )}
+
           {skipReasonOpen && (
             <div
               role="group"
@@ -801,7 +909,7 @@ export function InboxApp({
           <button
             type="button"
             disabled={regenerating}
-            onClick={regenerate}
+            onClick={() => void regenerate()}
             className={`${secondaryClass} w-fit`}
           >
             {regenerating ? d.regenerating : d.regenerate}
@@ -931,23 +1039,7 @@ export function InboxApp({
         >
           {t.heading}
         </h1>
-
-        {!authBannerDismissed && !testMode && (
-          <div role="status" className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-4">
-            <p className="text-sm font-medium text-[var(--fd-ink)]">{dict.auth.stricterBanner}</p>
-            <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{dict.auth.stricterBannerBody}</p>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthBannerDismissed(true);
-                localStorage.setItem("fd-auth-banner-dismissed", "1");
-              }}
-              className="w-fit text-xs font-medium text-[var(--fd-ink)] underline decoration-[var(--fd-line)] underline-offset-4 hover:decoration-[var(--fd-ink)]"
-            >
-              {dict.auth.stricterBannerDismiss}
-            </button>
-          </div>
-        )}
+        <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
 
         {testMode && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--fd-ink)] bg-[var(--fd-paper)] p-4">

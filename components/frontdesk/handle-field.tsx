@@ -5,13 +5,18 @@ import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
 import { isValidHandle } from "@/lib/frontdesk/handles";
 
 /**
- * The public link name (handoff §5.2 link rules).
+ * The public link name.
  *
- * Two rules shape this field. The name is shown in the form it reads in —
- * the typed value with a muted `.frlns.com` after it — and availability is
- * stated only after a real check against the database. Shape alone proves
- * nothing about whether a name is free, so before the check, and whenever the
- * check itself fails, the field says nothing rather than guessing "available".
+ * The field shows the link the freelancer will actually get, built from what
+ * they are typing, in the one format the product serves: frlns.com/name.
+ * An earlier version decorated the input with ".frlns.com" while the note
+ * underneath said the page opens at frlns.com/name, which are two different
+ * addresses and left the reader unable to tell which one they were choosing.
+ *
+ * Availability is stated only after a real check against the database. Shape
+ * alone proves nothing about whether a name is free, so before the check, and
+ * whenever the check itself fails, the field says nothing rather than guessing
+ * "available".
  */
 type CheckState =
   | { kind: "idle" }
@@ -20,7 +25,7 @@ type CheckState =
   | { kind: "taken" }
   | { kind: "unknown" };
 
-export const HANDLE_SUFFIX = ".frlns.com";
+export const HANDLE_HOST = "frlns.com";
 
 export function HandleField({
   locale,
@@ -80,24 +85,36 @@ export function HandleField({
       <label htmlFor="su-handle" className="text-sm font-medium text-[var(--fd-ink)]">
         {t.handleLabel}
       </label>
-      <div className="flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white pr-3 focus-within:border-[var(--fd-focus-ring)] focus-within:ring-2 focus-within:ring-[var(--fd-focus-ring)]/25">
+      <div className="flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white pl-3 focus-within:border-[var(--fd-focus-ring)] focus-within:ring-2 focus-within:ring-[var(--fd-focus-ring)]/25">
+        <span aria-hidden="true" className="shrink-0 text-sm text-[var(--fd-slate)]">
+          {HANDLE_HOST}/
+        </span>
         <input
           id="su-handle"
           value={value}
           maxLength={30}
           autoComplete="off"
           spellCheck={false}
-          aria-describedby="su-handle-hint"
+          aria-describedby="su-handle-hint su-handle-preview"
           onChange={(e) => onChange(e.target.value.toLowerCase().trim())}
           onBlur={() => void runCheck()}
-          className="min-h-11 min-w-0 flex-1 rounded-l-lg bg-transparent px-3 text-base focus-visible:outline-none sm:text-sm"
+          className="min-h-11 min-w-0 flex-1 rounded-r-lg bg-transparent px-1 text-base focus-visible:outline-none sm:text-sm"
         />
-        <span aria-hidden="true" className="shrink-0 text-sm text-[var(--fd-slate)]">
-          {HANDLE_SUFFIX}
-        </span>
       </div>
+      <p id="su-handle-preview" className="text-sm text-[var(--fd-ink)]">
+        {value ? (
+          <>
+            {t.handlePreviewLabel}{" "}
+            <span className="font-mono">
+              {HANDLE_HOST}/{value}
+            </span>
+          </>
+        ) : (
+          <span className="text-[var(--fd-slate)]">{t.handlePreviewEmpty}</span>
+        )}
+      </p>
       <p id="su-handle-hint" className="text-xs leading-relaxed text-[var(--fd-slate)]">
-        {t.handleExample} {t.handleHint}
+        {t.handleHint}
       </p>
       {verdict && (
         <p
@@ -109,7 +126,6 @@ export function HandleField({
           {verdict}
         </p>
       )}
-      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{t.handlePathNote}</p>
     </div>
   );
 }

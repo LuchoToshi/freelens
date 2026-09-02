@@ -6,6 +6,7 @@ import { publicProfileByHandle } from "@/lib/frontdesk/server/publicProfile";
 import { fdDict } from "@/lib/frontdesk/i18n";
 import { PublicIntake } from "@/components/frontdesk/public-intake";
 import { appearanceStyle } from "@/lib/frontdesk/appearance";
+import { professionLabel } from "@/lib/frontdesk/professions";
 
 /**
  * The freelancer's public front door. To the client's eye this page IS the
@@ -16,6 +17,15 @@ import { appearanceStyle } from "@/lib/frontdesk/appearance";
  * throws at the root otherwise lands here.
  */
 type Params = { handle: string };
+
+/** One line naming the work, from the freelancer's own professions. */
+function profileCraftLine(
+  profile: { professions: string[]; craft: "photographer" | "videographer"; locale: "nl" | "en" },
+  t: ReturnType<typeof fdDict>,
+): string {
+  if (profile.professions.length === 0) return t.public.craft[profile.craft];
+  return profile.professions.map((p) => professionLabel(p, profile.locale)).join(" · ");
+}
 type Search = { src?: string };
 
 const SRC_CHANNELS = new Set(["ig", "tt", "li", "sig"]);
@@ -31,10 +41,10 @@ export async function generateMetadata({
   if (!profile) return {};
   const t = fdDict(profile.locale);
   return {
-    title: `${profile.displayName} · ${t.public.craft[profile.craft]}`,
+    title: `${profile.displayName} · ${profileCraftLine(profile, t)}`,
     description: profile.city
-      ? `${t.public.craft[profile.craft]} · ${profile.city}`
-      : t.public.craft[profile.craft],
+      ? `${profileCraftLine(profile, t)} · ${profile.city}`
+      : profileCraftLine(profile, t),
   };
 }
 
@@ -86,7 +96,12 @@ export default async function HandlePage({
           {profile.displayName}
         </h1>
         <p className="text-sm text-[var(--fl-slate)]">
-          {t.public.craft[profile.craft]}
+          {/* What the freelancer called their work, not the storage column's
+              nearest equivalent: a hairdresser's page should not say
+              "creative freelancer". */}
+          {profile.professions.length > 0
+            ? profile.professions.map((p) => professionLabel(p, profile.locale)).join(" · ")
+            : t.public.craft[profile.craft]}
           {profile.city ? ` · ${profile.city}` : ""}
         </p>
       </header>
@@ -97,6 +112,8 @@ export default async function HandlePage({
         locale={profile.locale}
         srcChannel={srcChannel}
       />
+
+      <p className="text-center text-xs text-[var(--fl-slate)]">{t.public.intake.poweredBy}</p>
     </main>
   );
 }

@@ -11,6 +11,8 @@ const SAME_BY_DESIGN = new Set([
   "inbox.shell.inbox",
   // "Accent" is the Dutch word too.
   "setup.appearance.accentLabel",
+  // "Warmer" is the Dutch comparative too.
+  "inbox.detail.adjustments.warmer",
   // "Product" is the same word in Dutch.
   "inbox.shell.navLabel",
   // "Type" is the same word in Dutch.

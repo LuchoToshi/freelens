@@ -161,11 +161,28 @@ export function IntakeThread({
   if (step === "essentials") {
     return (
       <form onSubmit={beginConversation} className="flex flex-col gap-4">
+        {/* A visitor may never have heard of Freelens or seen this page
+            before: say who they are writing to, what to write, and what
+            happens next, before asking for anything. */}
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
+            {t.stepOf.replace("{n}", "1")}
+          </p>
+          <h2 className="font-serif text-xl font-medium text-[var(--fd-ink)]">
+            {t.heading.replace("{name}", firstName)}
+          </h2>
+          <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
+            {t.intro.replace(/\{name\}/g, firstName)}
+          </p>
+        </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="it-name" className="text-sm font-medium text-[var(--fd-ink)]">
             {form.nameLabel}
           </label>
-          <input id="it-name" required maxLength={120} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+          <input id="it-name" required maxLength={120} value={name} onChange={(e) => setName(e.target.value)} aria-describedby="it-name-why" className={inputClass} />
+          <span id="it-name-why" className="text-xs leading-relaxed text-[var(--fd-slate)]">
+            {t.nameWhy.replace("{name}", firstName)}
+          </span>
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="it-email" className="text-sm font-medium text-[var(--fd-ink)]">
@@ -178,9 +195,12 @@ export function IntakeThread({
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="it-message" className="text-sm font-medium text-[var(--fd-ink)]">
-            {t.planningLabel}
+            {t.planningLabel.replace("{name}", firstName)}
           </label>
-          <textarea id="it-message" required rows={5} maxLength={5000} value={message} onChange={(e) => setMessage(e.target.value)} className={`${inputClass} min-h-28 py-2 leading-relaxed`} />
+          <textarea id="it-message" required rows={5} maxLength={5000} value={message} onChange={(e) => setMessage(e.target.value)} aria-describedby="it-message-help" className={`${inputClass} min-h-28 py-2 leading-relaxed`} />
+          <span id="it-message-help" className="text-xs leading-relaxed text-[var(--fd-slate)]">
+            {t.planningHelp.replace("{name}", firstName)}
+          </span>
         </div>
         {/* Honeypot, unchanged from the classic form. */}
         <div aria-hidden="true" className="absolute -left-[9999px]">
@@ -190,6 +210,9 @@ export function IntakeThread({
         <button type="submit" className={primaryClass}>
           {t.continueButton}
         </button>
+        <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+          {t.privacy.replace("{name}", firstName)}
+        </p>
         <button type="button" onClick={onManualFallback} className={ghostClass}>
           {t.manualFallback}
         </button>
@@ -371,6 +394,9 @@ export function IntakeThread({
 
   return (
     <div className="flex flex-col gap-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--fd-slate)]">
+        {t.stepOf.replace("{n}", "2")}
+      </p>
       <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
         {t.confirmIntro.replace("{name}", firstName)}
       </p>
@@ -383,7 +409,7 @@ export function IntakeThread({
           </div>
         ))}
         <div className="flex flex-col gap-1 border-t border-[var(--fd-line)] pt-2 text-sm">
-          <span className="text-[var(--fd-slate)]">{t.planningLabel}</span>
+          <span className="text-[var(--fd-slate)]">{t.planningLabel.replace("{name}", firstName)}</span>
           <p className="whitespace-pre-line break-words leading-relaxed text-[var(--fd-ink)]">{message}</p>
         </div>
       </dl>
@@ -402,6 +428,9 @@ export function IntakeThread({
           {t.editAnswers}
         </button>
       </div>
+      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">
+        {t.privacy.replace("{name}", firstName)}
+      </p>
     </div>
   );
 }

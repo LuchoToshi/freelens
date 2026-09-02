@@ -48,12 +48,12 @@ const DEMO_VOICE_PROFILES: Record<FrontdeskLocale, VoiceProfile> = {
 
 const DEMO_PACKAGES_BY_LOCALE: Record<FrontdeskLocale, PromptPackage[]> = {
   en: [
-    { label: "Full day wedding", priceFromEur: 1800, unit: null, notes: "8 hours coverage, edited gallery" },
-    { label: "Half day wedding", priceFromEur: 1100, unit: null, notes: "4 hours coverage, edited gallery" },
+    { label: "Full day wedding", priceFromEur: 1800, chargeBy: "day", priceIsFrom: false, unit: null, notes: "8 hours coverage, edited gallery" },
+    { label: "Half day wedding", priceFromEur: 1100, chargeBy: "session", priceIsFrom: false, unit: null, notes: "4 hours coverage, edited gallery" },
   ],
   nl: [
-    { label: "Hele dag bruiloft", priceFromEur: 1800, unit: null, notes: "8 uur aanwezig, bewerkte galerij" },
-    { label: "Halve dag bruiloft", priceFromEur: 1100, unit: null, notes: "4 uur aanwezig, bewerkte galerij" },
+    { label: "Hele dag bruiloft", priceFromEur: 1800, chargeBy: "day", priceIsFrom: false, unit: null, notes: "8 uur aanwezig, bewerkte galerij" },
+    { label: "Halve dag bruiloft", priceFromEur: 1100, chargeBy: "session", priceIsFrom: false, unit: null, notes: "4 uur aanwezig, bewerkte galerij" },
   ],
 };
 
@@ -88,6 +88,8 @@ export function demoSetupExample(locale: FrontdeskLocale) {
     packages: demoPackages(locale).map((p) => ({
       label: p.label,
       price: String(p.priceFromEur),
+      chargeBy: p.chargeBy ?? null,
+      priceIsFrom: p.priceIsFrom ?? false,
       unit: p.unit ?? "",
       notes: p.notes ?? "",
     })),
