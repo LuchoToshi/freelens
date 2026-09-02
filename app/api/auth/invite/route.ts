@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const db = serviceClient();
   const { data: invite } = await db
     .from("invites")
-    .select("id, redeemed_at, expires_at, issued_to_email")
+    .select("id, redeemed_at, expires_at, issued_to_email, is_test_account")
     .eq("code", code)
     .maybeSingle();
 
@@ -62,6 +62,9 @@ export async function POST(request: Request) {
   const { data: created, error } = await db.auth.admin.createUser({
     email,
     email_confirm: true,
+    // app_metadata, not user_metadata: the account must not be able to
+    // relabel itself out of, or into, the founder's test-account exclusion.
+    app_metadata: invite.is_test_account ? { is_test_account: true } : {},
   });
   if (error || !created.user) {
     // The address already has an account (or creation failed): release the

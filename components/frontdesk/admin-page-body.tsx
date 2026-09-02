@@ -204,8 +204,9 @@ function AdminView({ session }: { session: Session }) {
 /** Founder-only invite issuance (English-only internal tool, like the rest). */
 function InviteIssuer({ session }: { session: Session }) {
   const [email, setEmail] = useState("");
+  const [isTestAccount, setIsTestAccount] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "error">("idle");
-  const [issued, setIssued] = useState<string | null>(null);
+  const [issued, setIssued] = useState<{ code: string; email: string } | null>(null);
 
   async function issue(e: React.FormEvent) {
     e.preventDefault();
@@ -217,13 +218,14 @@ function InviteIssuer({ session }: { session: Session }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ email: email || undefined }),
+        body: JSON.stringify({ email, isTestAccount }),
       });
       const payload = (await res.json()) as { ok: boolean; code?: string };
       if (payload.ok && payload.code) {
-        setIssued(payload.code);
+        setIssued({ code: payload.code, email });
         setState("idle");
         setEmail("");
+        setIsTestAccount(false);
         return;
       }
       setState("error");
@@ -239,13 +241,23 @@ function InviteIssuer({ session }: { session: Session }) {
       </h2>
       <form onSubmit={issue} className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fd-slate)]">
-          Bind to email (optional)
+          Bind to email (required)
           <input
             type="email"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="min-h-11 rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm"
           />
+        </label>
+        <label className="flex min-h-11 items-center gap-2 text-xs font-medium text-[var(--fd-slate)]">
+          <input
+            type="checkbox"
+            checked={isTestAccount}
+            onChange={(e) => setIsTestAccount(e.target.checked)}
+            className="size-4 accent-[var(--fd-ink)]"
+          />
+          Ours, not a customer (excluded from every number here)
         </label>
         <button
           type="submit"
@@ -256,9 +268,16 @@ function InviteIssuer({ session }: { session: Session }) {
         </button>
       </form>
       {issued && (
-        <p className="text-sm text-[var(--fd-ink)]">
-          Invite: <code className="rounded bg-[var(--fd-paper)] px-2 py-1 font-mono">{issued}</code>{" "}
-          (expires in 30 days; share as /inbox?invite={issued})
+        <p className="text-sm leading-relaxed text-[var(--fd-ink)]">
+          Invite for {issued.email}:{" "}
+          <code className="rounded bg-[var(--fd-paper)] px-2 py-1 font-mono">{issued.code}</code>
+          <br />
+          Send them{" "}
+          <code className="font-mono">
+            https://frlns.com/inbox?invite={issued.code}
+          </code>
+          . Expires in 30 days, works once, and only for that address. They will
+          still need the six-digit code emailed to it to sign in.
         </p>
       )}
       {state === "error" && (

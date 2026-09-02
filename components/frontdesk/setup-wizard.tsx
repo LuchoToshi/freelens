@@ -197,6 +197,9 @@ export function SetupWizard({
           locale,
           sign_off: signOff.trim() || null,
           photo_url: photoUrl || null,
+          // Set from app_metadata, which only the invite route writes, so a
+          // test account cannot quietly rejoin the founder's real numbers.
+          is_test_account: session.user.app_metadata?.is_test_account === true,
         },
         { onConflict: "auth_user_id" }
       )
