@@ -68,7 +68,7 @@ export function CheckNotes({
   const notes = checkNotes(body, eventDate);
 
   return (
-    <div className="flex flex-col gap-1">
+    <div role="status" className="flex flex-col gap-1">
       <span className="text-sm font-medium text-[var(--fd-ink)]">{c.passed}</span>
       <ul className="flex flex-col gap-0.5 text-xs leading-relaxed text-[var(--fd-slate)]">
         {notes.map((note) => (

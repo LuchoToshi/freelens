@@ -110,7 +110,7 @@ export function RevealStep({
   if (state === "loading") {
     return (
       <section className="flex flex-col gap-3">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">{t.heading}</h1>
         <p className="text-sm text-[var(--fd-slate)]">{dict.setup.voice.extracting}</p>
       </section>
     );
@@ -136,7 +136,7 @@ export function RevealStep({
       animate="visible"
     >
       <motion.div variants={arrive(reduce)} className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">{t.heading}</h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.sub}</p>
       </motion.div>
 

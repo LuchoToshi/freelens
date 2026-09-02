@@ -24,7 +24,7 @@ export function ShareStep({ locale, handle }: { locale: FrontdeskLocale; handle:
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">{t.heading}</h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.hint}</p>
       </div>
 
