@@ -105,6 +105,7 @@ const en = {
     empty: "No inquiries yet. Share your link and new requests will appear here, each with a reply prepared for you.",
     loading: "One moment.",
     loadError: "Couldn't load your inbox. Check your connection and try again.",
+    saveError: "That didn't save. Nothing has changed yet. Try again.",
     retry: "Try again",
     sampleBadge: "Example",
     selectPrompt: "Select an inquiry to read the client's message and the reply Freelens prepared.",
@@ -728,6 +729,7 @@ const en = {
       "Only what works today is shown. New permissions appear here when they actually ship, off by default.",
     stopNote:
       "There is no single switch that stops everything at once. To stop one piece of work, stop it on its own card, so nothing else is interrupted halfway.",
+    saveError: "That didn't save. Nothing has changed yet. Try again.",
   },
   desk: {
     greetingMorning: "Morning",
@@ -949,6 +951,7 @@ const en = {
       previewCta: "Send an inquiry",
       scopeNote: "That's all of v1, on purpose. No fonts, no layout options, no per-section styling.",
       saved: "Saved.",
+      saveError: "That didn't save. Try again.",
       reset: "Back to the default look",
     },
     share: {
@@ -1081,6 +1084,7 @@ const nl: typeof en = {
     empty: "Nog geen aanvragen. Deel je link, dan verschijnen nieuwe aanvragen hier, elk met een antwoord dat al voor je klaarstaat.",
     loading: "Momentje.",
     loadError: "Je inbox kon niet worden geladen. Controleer je verbinding en probeer opnieuw.",
+    saveError: "Dat is niet opgeslagen. Er is nog niets gewijzigd. Probeer het opnieuw.",
     retry: "Probeer opnieuw",
     sampleBadge: "Voorbeeld",
     selectPrompt: "Kies een aanvraag om het bericht van de klant te lezen en het antwoord dat Freelens opstelde.",
@@ -1704,6 +1708,7 @@ const nl: typeof en = {
       "Alleen wat vandaag werkt staat hier. Nieuwe rechten verschijnen hier zodra ze er echt zijn, standaard uit.",
     stopNote:
       "Er is geen knop die alles in een keer stopt. Wil je een taak stoppen, doe dat op de kaart van die taak zelf, dan wordt er niets anders halverwege onderbroken.",
+    saveError: "Dat is niet opgeslagen. Er is nog niets gewijzigd. Probeer het opnieuw.",
   },
   desk: {
       greetingMorning: "Goedemorgen",
@@ -1925,6 +1930,7 @@ const nl: typeof en = {
       previewCta: "Stuur een aanvraag",
       scopeNote: "Dat is bewust alles in v1. Geen lettertypes, geen indelingsopties, geen styling per onderdeel.",
       saved: "Opgeslagen.",
+      saveError: "Dat is niet opgeslagen. Probeer het opnieuw.",
       reset: "Terug naar het standaarduiterlijk",
     },
     share: {

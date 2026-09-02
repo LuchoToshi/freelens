@@ -139,6 +139,7 @@ export function InboxApp({
   const [rules, setRules] = useState<RuleRow[]>([]);
   const [gmailConnection, setGmailConnection] = useState<GmailConnectionRow | null>(null);
   const [freelancerState, setFreelancerState] = useState(freelancer);
+  const [saveError, setSaveError] = useState(false);
   // Test mode (§14.4): fictional data, zero writes. Derived from the URL so a
   // reload keeps the mode and leaving is a plain link back to /inbox.
   const [testMode, setTestMode] = useState(false);
@@ -1054,6 +1055,12 @@ export function InboxApp({
           </div>
         )}
 
+        {saveError && (
+          <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)] bg-white p-4 text-sm text-[var(--fd-error-text)]">
+            {t.saveError}
+          </p>
+        )}
+
         {!testMode && GMAIL_CONNECT_ENABLED && gmailStatus === "connected" && (
           <p role="status" className="rounded-2xl border border-[#22c55e] bg-white p-4 text-sm text-[var(--fd-ink)]">
             {t.gmail.connected}
@@ -1081,12 +1088,15 @@ export function InboxApp({
           packages={packages}
           bioConfirmedAt={bioConfirmedAt}
           onBioConfirmed={async () => {
+            const previous = bioConfirmedAt;
             const now = new Date().toISOString();
             setBioConfirmedAt(now);
-            await sb
+            const { error } = await sb
               .from("freelancers")
               .update({ link_in_bio_confirmed_at: now })
               .eq("auth_user_id", session.user.id);
+            setSaveError(error !== null);
+            if (error) setBioConfirmedAt(previous);
           }}
           gmailAvailable={GMAIL_CONNECT_ENABLED}
           gmailConnected={gmailConnection !== null && gmailConnection.revoked_at === null}
@@ -1104,13 +1114,23 @@ export function InboxApp({
             if (change.profile) update.voice_profile = change.profile;
             if (change.decisions) update.voice_proposal_decisions = change.decisions;
             if (change.paused !== undefined) update.voice_learning_paused = change.paused;
+            const previous = {
+              voice_profile: freelancerState.voice_profile,
+              voice_proposal_decisions: freelancerState.voice_proposal_decisions,
+              voice_learning_paused: freelancerState.voice_learning_paused,
+            };
             setFreelancerState((f) => ({
               ...f,
               voice_profile: (change.profile ?? f.voice_profile) as Record<string, unknown> | null,
               voice_proposal_decisions: change.decisions ?? f.voice_proposal_decisions,
               voice_learning_paused: change.paused ?? f.voice_learning_paused,
             }));
-            await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
+            const { error } = await sb
+              .from("freelancers")
+              .update(update)
+              .eq("auth_user_id", session.user.id);
+            setSaveError(error !== null);
+            if (error) setFreelancerState((f) => ({ ...f, ...previous }));
           }}
         />
         )}
@@ -1144,28 +1164,34 @@ export function InboxApp({
             onCreate={async (proposal) => {
               // evidenceCount -1 is the "don't suggest again" path: the rule
               // is stored declined so the shape never proposes itself again.
-              await sb.from("agent_rules").insert({
+              const { error } = await sb.from("agent_rules").insert({
                 freelancer_id: freelancerState.id,
                 trigger: proposal.trigger,
                 action: proposal.action,
                 status: proposal.evidenceCount === -1 ? "declined" : "trial",
               });
-              await load();
+              setSaveError(error !== null);
+              if (!error) await load();
             }}
             onUpdate={async (id, patch) => {
-              await sb.from("agent_rules").update(patch).eq("id", id);
-              await load();
+              const { error } = await sb.from("agent_rules").update(patch).eq("id", id);
+              setSaveError(error !== null);
+              if (!error) await load();
             }}
             onDelete={async (id) => {
-              await sb.from("agent_rules").delete().eq("id", id);
-              await load();
+              const { error } = await sb.from("agent_rules").delete().eq("id", id);
+              setSaveError(error !== null);
+              if (!error) await load();
             }}
             onPauseAll={async (paused) => {
+              const previous = freelancerState.rules_paused;
               setFreelancerState((f) => ({ ...f, rules_paused: paused }));
-              await sb
+              const { error } = await sb
                 .from("freelancers")
                 .update({ rules_paused: paused })
                 .eq("auth_user_id", session.user.id);
+              setSaveError(error !== null);
+              if (error) setFreelancerState((f) => ({ ...f, rules_paused: previous }));
             }}
           />
         )}

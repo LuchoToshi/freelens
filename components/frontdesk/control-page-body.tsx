@@ -55,14 +55,23 @@ function ControlOrRedirect({
 function ControlRoom({ session, freelancer }: { session: Session; freelancer: FreelancerRow }) {
   const sb = supabaseBrowser();
   const [state, setState] = useState(freelancer);
+  const [saveError, setSaveError] = useState(false);
   const dict = fdDict(state.locale);
   const c = dict.control;
   const dsk = dict.desk;
   const quietDays = resolveQuietDays(state.followup_quiet_days);
 
+  // Returns whether the write succeeded, so callers can roll back the
+  // optimistic state they already applied instead of showing "saved" for a
+  // permission change that never reached the database.
   const save = useCallback(
     async (update: Record<string, unknown>) => {
-      await sb.from("freelancers").update(update).eq("auth_user_id", session.user.id);
+      const { error } = await sb
+        .from("freelancers")
+        .update(update)
+        .eq("auth_user_id", session.user.id);
+      setSaveError(error !== null);
+      return error === null;
     },
     [sb, session.user.id],
   );
@@ -74,12 +83,20 @@ function ControlRoom({ session, freelancer }: { session: Session; freelancer: Fr
         <p className="text-base leading-relaxed text-[var(--fd-slate)]">{c.lead}</p>
       </header>
 
+      {saveError && (
+        <p role="alert" className="text-sm font-medium text-[var(--fd-error-text)]">
+          {c.saveError}
+        </p>
+      )}
+
       <PermissionMatrixCard
         locale={state.locale}
         stored={state.permission_levels}
         onChange={async (levels) => {
+          const previous = state.permission_levels;
           setState((f) => ({ ...f, permission_levels: levels }));
-          await save({ permission_levels: levels });
+          const ok = await save({ permission_levels: levels });
+          if (!ok) setState((f) => ({ ...f, permission_levels: previous }));
         }}
       />
 
@@ -90,12 +107,17 @@ function ControlRoom({ session, freelancer }: { session: Session; freelancer: Fr
           const update: Record<string, unknown> = {};
           if (change.quietDays !== undefined) update.followup_quiet_days = change.quietDays;
           if (change.paused !== undefined) update.followups_paused = change.paused;
+          const previous = {
+            followup_quiet_days: state.followup_quiet_days,
+            followups_paused: state.followups_paused,
+          };
           setState((f) => ({
             ...f,
             followup_quiet_days: change.quietDays ?? f.followup_quiet_days,
             followups_paused: change.paused ?? f.followups_paused,
           }));
-          await save(update);
+          const ok = await save(update);
+          if (!ok) setState((f) => ({ ...f, ...previous }));
         }}
       />
 
@@ -112,13 +134,19 @@ function ControlRoom({ session, freelancer }: { session: Session; freelancer: Fr
           if (change.profile) update.voice_profile = change.profile;
           if (change.decisions) update.voice_proposal_decisions = change.decisions;
           if (change.paused !== undefined) update.voice_learning_paused = change.paused;
+          const previous = {
+            voice_profile: state.voice_profile,
+            voice_proposal_decisions: state.voice_proposal_decisions,
+            voice_learning_paused: state.voice_learning_paused,
+          };
           setState((f) => ({
             ...f,
             voice_profile: (change.profile ?? f.voice_profile) as Record<string, unknown> | null,
             voice_proposal_decisions: change.decisions ?? f.voice_proposal_decisions,
             voice_learning_paused: change.paused ?? f.voice_learning_paused,
           }));
-          await save(update);
+          const ok = await save(update);
+          if (!ok) setState((f) => ({ ...f, ...previous }));
         }}
       />
 
