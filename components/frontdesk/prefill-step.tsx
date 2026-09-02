@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { track } from "@/lib/analytics";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
@@ -48,6 +48,14 @@ export function PrefillStep({
   // than from anything the freelancer shared. Kept separate from `prefill` so
   // no example value can ever be labeled as something read from a page.
   const [fromExample, setFromExample] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+
+  // The source screen and the review screen are the same component with no
+  // navigation between them, so nothing else would move a screen reader's
+  // focus when the extraction result replaces the source form.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, [mode]);
 
   const inputClass =
     "min-h-11 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base sm:text-sm focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
@@ -143,7 +151,13 @@ export function PrefillStep({
     return (
       <section className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
-          <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25"
+          >
+            {t.heading}
+          </h1>
           <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.intro}</p>
         </div>
 
@@ -231,7 +245,13 @@ export function PrefillStep({
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.reviewHeading}</h1>
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25"
+        >
+          {t.reviewHeading}
+        </h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
           {fromExample ? t.exampleNote : t.reviewIntro}
         </p>

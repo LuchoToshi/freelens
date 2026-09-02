@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabaseBrowser } from "@/lib/agent/supabase";
 import { fdDict, type FrontdeskLocale } from "@/lib/frontdesk/i18n";
@@ -43,6 +43,13 @@ export function VoiceStep({
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+
+  // Screen readers otherwise stay put on the paste textarea while the
+  // heading text and controls underneath it silently swap out.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, [phase]);
 
   async function extract() {
     setPhase("extracting");
@@ -93,7 +100,11 @@ export function VoiceStep({
     return (
       <section className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
-          <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25"
+          >
             {t.mirrorHeading}
           </h1>
           <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.mirrorHint}</p>
@@ -176,7 +187,13 @@ export function VoiceStep({
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.heading}</h1>
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25"
+        >
+          {t.heading}
+        </h1>
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.hint}</p>
       </div>
       <textarea

@@ -68,7 +68,9 @@ export function GuardPanel({
   if (status === "ready_for_review") {
     if (body) return <CheckNotes locale={locale} body={body} eventDate={eventDate ?? null} />;
     return (
-      <p className="text-xs leading-relaxed text-[var(--fd-slate)]">{d.validation.checksPassed}</p>
+      <p role="status" className="text-xs leading-relaxed text-[var(--fd-slate)]">
+        {d.validation.checksPassed}
+      </p>
     );
   }
 

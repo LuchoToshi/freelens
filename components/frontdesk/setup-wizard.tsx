@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
@@ -119,6 +119,18 @@ export function SetupWizard({
   const t = fdDict(locale).setup;
   const sb = supabaseBrowser();
   const currentDecision: DecisionKey | undefined = STEP_DECISION[step];
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  // Each step swaps its whole section in place; nothing else moves a
+  // screen reader's focus from wherever the previous step's button was.
+  // Its own heading is the one honest thing to land on, wherever the step
+  // renders one (this file's own three, or VoiceStep/RevealStep/ShareStep's).
+  useEffect(() => {
+    const heading = mainRef.current?.querySelector<HTMLElement>("h1");
+    if (!heading) return;
+    if (!heading.hasAttribute("tabindex")) heading.tabIndex = -1;
+    heading.focus();
+  }, [step]);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -275,7 +287,7 @@ export function SetupWizard({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
+    <main ref={mainRef} className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-10">
       {currentDecision && (
         <DecisionRail
           locale={locale}
@@ -287,7 +299,7 @@ export function SetupWizard({
 
       {step === 0 && (
         <section className="flex flex-col gap-5">
-          <h1 className="font-serif text-3xl font-medium leading-tight text-[var(--fd-ink)]">
+          <h1 className="font-serif text-3xl font-medium leading-tight text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">
             {t.welcome.heading}
           </h1>
           <div className="flex flex-col gap-3">
@@ -322,7 +334,7 @@ export function SetupWizard({
       {step === 1 && (
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">
               {t.profile.heading}
             </h1>
             <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.profile.clientsSee}</p>
@@ -454,7 +466,7 @@ export function SetupWizard({
       {step === 2 && (
         <section className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
-            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">
+            <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25">
               {t.packages.heading}
             </h1>
             <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.packages.hint}</p>
