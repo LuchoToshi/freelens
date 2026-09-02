@@ -418,6 +418,7 @@ function Login({ locale }: { locale: FrontdeskLocale }) {
           <div className="flex flex-col gap-2">
             <h1 className="font-serif text-2xl font-medium text-[var(--fd-ink)]">{t.inviteHeading}</h1>
             <p className="text-sm leading-relaxed text-[var(--fd-slate)]">{t.inviteIntro}</p>
+            <p className="text-sm leading-relaxed text-[var(--fd-ink)]">{t.inviteWhatHappens}</p>
           </div>
           <form onSubmit={submitInvite} className="flex flex-col gap-3">
             <label htmlFor="fd-auth-invite" className="text-sm font-medium text-[var(--fd-ink)]">
