@@ -85,16 +85,53 @@ export function appearanceStyle(appearance: Appearance): Record<string, string> 
   const dark = appearance.theme === "dark";
   const ink = dark ? "#F7F5F1" : "#1A1A1A";
   const ground = dark ? "#171614" : appearance.tone;
+  // A surface that sits on the ground: the card and field background. On a
+  // dark page this must not be white, or every input becomes a glaring box
+  // with unreadable text in it.
+  const surface = dark ? "#211F1C" : "#FFFFFF";
+  const accent = usableAccent(appearance.accent, ground);
+
   return {
+    // The public page's own family.
     "--fl-paper": ground,
     "--fl-ink": ink,
     "--fl-slate": dark ? "rgba(247,245,241,0.72)" : "rgba(26,26,26,0.66)",
     "--fl-line": dark ? "rgba(247,245,241,0.20)" : "rgba(26,26,26,0.14)",
-    "--fl-accent": appearance.accent,
-    "--fl-accent-text": accentTextColor(appearance.accent),
+    "--fl-accent": accent,
+    "--fl-accent-text": accentTextColor(accent),
+
+    // The intake form is built from FrontDesk components, which read the
+    // --fd-* family. Without these the page background would go dark while
+    // every label, heading and border stayed near-black on top of it, which
+    // is exactly what happened the first time this shipped.
+    "--fd-paper": ground,
+    "--fd-paper-dim": dark ? "#201E1B" : "#F2EEE6",
+    "--fd-surface": surface,
+    "--fd-ink": ink,
+    "--fd-slate": dark ? "rgba(247,245,241,0.74)" : "#6E675C",
+    "--fd-line": dark ? "rgba(247,245,241,0.20)" : "#E5DFD3",
+    "--fd-line-control": dark ? "rgba(247,245,241,0.42)" : "#8A8377",
+    "--fd-focus-ring": dark ? "#F7F5F1" : "#1A1A1A",
+    "--fd-error-text": dark ? "#F2A08A" : "#A8391F",
+    "--fd-accent": accent,
+
     backgroundColor: ground,
     color: ink,
   };
+}
+
+/**
+ * The accent, or the nearest usable stand-in.
+ *
+ * Two of the four accents are near-black, which is a good choice on paper and
+ * an invisible button on the dark theme. Rather than refuse the combination or
+ * silently keep a button nobody can see, the accent falls back to the page's
+ * own ink when it cannot be told apart from the ground. The freelancer's
+ * choice is honoured wherever it works, and the call to action is always
+ * visible, which is the whole point of it.
+ */
+export function usableAccent(accent: string, ground: string): string {
+  return contrast(accent, ground) >= 2.5 ? accent : ground === "#171614" ? "#F7F5F1" : "#1A1A1A";
 }
 
 /**

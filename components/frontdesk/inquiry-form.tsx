@@ -28,7 +28,7 @@ function fill(template: string, params: Record<string, string>): string {
 }
 
 const inputClass =
-  "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base transition focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+  "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-[var(--fd-surface,#fff)] px-3 text-base transition focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
 const labelClass = "text-sm font-medium text-[var(--fd-ink)]";
 
 export function InquiryForm({
@@ -94,7 +94,7 @@ export function InquiryForm({
     return (
       <p
         role="status"
-        className="rounded-2xl border border-[var(--fd-line)] bg-white p-6 text-center text-base leading-relaxed text-[var(--fd-ink)]"
+        className="rounded-2xl border border-[var(--fd-line)] bg-[var(--fd-surface,#fff)] p-6 text-center text-base leading-relaxed text-[var(--fd-ink)]"
       >
         {fill(t.confirmation, { name: displayName })}
       </p>
@@ -211,8 +211,8 @@ export function InquiryForm({
               onClick={() => setBudget(value)}
               className={`min-h-12 rounded-lg border px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fd-focus-ring)] ${
                 budget === value
-                  ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-white"
-                  : "border-[var(--fd-line-control)] bg-white text-[var(--fd-ink)]"
+                  ? "border-[var(--fd-ink)] bg-[var(--fd-ink)] text-[var(--fd-paper)]"
+                  : "border-[var(--fd-line-control)] bg-[var(--fd-surface,#fff)] text-[var(--fd-ink)]"
               }`}
             >
               {t.budgets[key]}

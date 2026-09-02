@@ -4,6 +4,8 @@ import {
   accentTextColor,
   appearanceStyle,
   contrast,
+  TONES,
+  usableAccent,
   DEFAULT_APPEARANCE,
   parseAppearance,
   serializeAppearance,
@@ -60,5 +62,45 @@ describe("every accent stays readable (handoff §11 contrast)", () => {
       const style = appearanceStyle(parseAppearance({ theme }));
       expect(contrast(style["--fl-ink"], style["--fl-paper"]), theme).toBeGreaterThanOrEqual(7);
     }
+  });
+});
+
+describe("every token the page renders with survives both themes", () => {
+  // The bug this covers: the page painted its background from --fl-* while
+  // the intake form kept reading the light --fd-* values, so a dark page had
+  // near-black labels on a near-black ground.
+  const READABLE = [
+    ["--fd-ink", "--fd-paper", 7],
+    ["--fl-ink", "--fl-paper", 7],
+    ["--fd-ink", "--fd-surface", 7],
+  ] as const;
+
+  for (const theme of ["light", "dark"] as const) {
+    for (const tone of TONES) {
+      for (const accent of ACCENTS) {
+        const style = appearanceStyle(parseAppearance({ theme, tone, accent }));
+
+        it(`${theme}/${tone}/${accent}: text clears its ground`, () => {
+          for (const [fg, bg, min] of READABLE) {
+            expect(contrast(style[fg], style[bg]), `${fg} on ${bg}`).toBeGreaterThanOrEqual(min);
+          }
+        });
+
+        it(`${theme}/${tone}/${accent}: the call to action is visible and readable`, () => {
+          // Visible against the page it sits on...
+          expect(contrast(style["--fl-accent"], style["--fl-paper"])).toBeGreaterThanOrEqual(2.5);
+          // ...and readable in itself.
+          expect(
+            contrast(style["--fl-accent"], style["--fl-accent-text"]),
+          ).toBeGreaterThanOrEqual(4.5);
+        });
+      }
+    }
+  }
+
+  it("keeps a near-black accent on paper, and swaps it out on the dark theme", () => {
+    expect(usableAccent("#1A1A1A", "#FAF8F4")).toBe("#1A1A1A");
+    expect(usableAccent("#1A1A1A", "#171614")).toBe("#F7F5F1");
+    expect(usableAccent("#C07F16", "#171614")).toBe("#C07F16");
   });
 });

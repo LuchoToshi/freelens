@@ -130,17 +130,17 @@ export function IntakeThread({
   }
 
   const inputClass =
-    "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-base transition focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
+    "min-h-12 w-full rounded-lg border border-[var(--fd-line-control)] bg-[var(--fd-surface,#fff)] px-3 text-base transition focus-visible:border-[var(--fd-focus-ring)] focus-visible:ring-2 focus-visible:ring-[var(--fd-focus-ring)]/25 focus-visible:outline-none";
   const chipClass =
-    "inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-white px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
+    "inline-flex min-h-11 items-center rounded-lg border border-[var(--fd-line-control)] bg-[var(--fd-surface,#fff)] px-3 text-sm font-medium text-[var(--fd-ink)] transition hover:border-[var(--fd-ink)]";
   const primaryClass =
-    "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fd-ink)] px-6 text-base font-medium text-white disabled:opacity-50";
+    "inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--fl-accent,var(--fd-ink))] px-6 text-base font-medium text-[var(--fl-accent-text,#fff)] disabled:opacity-50";
   const ghostClass =
     "w-fit text-sm font-medium text-[var(--fd-slate)] underline decoration-[var(--fd-line)] underline-offset-4 hover:text-[var(--fd-ink)]";
 
   if (step === "done") {
     return (
-      <p role="status" className="rounded-2xl border border-[var(--fd-line)] bg-white p-6 text-base leading-relaxed text-[var(--fd-ink)]">
+      <p role="status" className="rounded-2xl border border-[var(--fd-line)] bg-[var(--fd-surface,#fff)] p-6 text-base leading-relaxed text-[var(--fd-ink)]">
         {t.done.replace("{name}", firstName)}
       </p>
     );
@@ -148,7 +148,7 @@ export function IntakeThread({
   if (step === "error") {
     return (
       <div className="flex flex-col gap-3">
-        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)]/40 bg-white p-6 text-base leading-relaxed text-[var(--fd-ink)]">
+        <p role="alert" className="rounded-2xl border border-[var(--fd-error-text)]/40 bg-[var(--fd-surface,#fff)] p-6 text-base leading-relaxed text-[var(--fd-ink)]">
           {t.error}
         </p>
         <button type="button" onClick={() => setStep("confirm")} className={ghostClass}>
@@ -227,7 +227,7 @@ export function IntakeThread({
         <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
           {t.conversationIntro.replace("{name}", firstName)}
         </p>
-        <div className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
+        <div className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-[var(--fd-surface,#fff)] p-5">
           <span className="text-xs font-semibold uppercase tracking-wide text-[var(--fd-slate)]">
             {t.deskName.replace("{name}", firstName)}
           </span>
@@ -400,7 +400,7 @@ export function IntakeThread({
       <p className="text-sm leading-relaxed text-[var(--fd-slate)]">
         {t.confirmIntro.replace("{name}", firstName)}
       </p>
-      <dl className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-white p-5">
+      <dl className="flex flex-col gap-2 rounded-2xl border border-[var(--fd-line)] bg-[var(--fd-surface,#fff)] p-5">
         {lines.map((line) => (
           <div key={line.label} className="flex flex-wrap items-baseline gap-x-2 text-sm">
             <dt className="min-w-28 text-[var(--fd-slate)]">{line.label}</dt>
